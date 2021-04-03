@@ -1,0 +1,125 @@
+<div class="center-section-scroll vh-100 d-flex body-white" fxFlex>
+	<div  class="flex-fixed-header menu-title">
+    <h2 style="font-weight: 400;" *ngIf="selectedContainer" title="{{selectedContainer.name?'Package':'Add Package'}}" [innerHtml]="selectedContainer.name?'Package':'Add Package'"></h2>
+</div>
+<perfect-scrollbar class="padding-16">
+  <form [formGroup]="detailsForm" (ngSubmit)="createContainer(detailsForm)">
+    <mat-spinner class="medium-spinner" *ngIf="fetchingData"></mat-spinner>
+    <div class="min-container" *ngIf="!noContainers && !fetchingData" [class.user-footer]="detailsForm.dirty">
+       
+        <!-- <div>
+          <mat-form-field fxFlex="80" class="custom-input mandatory" floatLabel="never">
+            <label class="custom-label">{{language.defaults.containerName}}</label>
+            <input matInput #myInput maxlength=100 placeholder="Container Name" formControlName="name" id="containerName" />
+            <mat-error *ngIf="submitContainers || !detailsForm.controls.name.pristine && detailsForm.controls.name.hasError('required')">{{language.validations.containerName}}</mat-error>
+          </mat-form-field>
+        </div> -->
+<div class="ex-row">
+  <mat-form-field   class="custom-input mandatory grid-six" floatLabel="never">
+    <label class="custom-label mandatory">{{language.defaults.containerName}}</label>
+    <mat-select placeholder="Packaging Type"  #myInput formControlName="container_id">
+      <mat-option [value]="stat.id" *ngFor="let stat of packageDrpdown" [innerHtml]="stat.name"></mat-option>
+    </mat-select>
+    <mat-error *ngIf="submitContainers || !detailsForm.controls.container_id.pristine && detailsForm.controls.container_id.hasError('required')">{{language.validations.containerName}}</mat-error>
+  </mat-form-field>
+ 
+  <mat-form-field  class="custom-input mandatory grid-six " floatLabel="never">
+    <label class="custom-label mandatory"> Capacity</label>
+    <mat-icon class="i-icon"  title="Capacity of Packaging Type">info</mat-icon>
+
+    <input matInput type="number" min="0" max="99999999999" oninput="validity.valid||(value='')" placeholder="Capacity" formControlName="type_name"
+      id="containerType" />
+    <mat-error *ngIf="submitContainers || !detailsForm.controls.type_name.pristine && detailsForm.controls.type_name.hasError('required')">{{language.validations.containerSize}}</mat-error>
+  </mat-form-field>
+</div> 
+<div class="ex-row">
+  <mat-form-field   class="custom-input mandatory grid-six" floatLabel="never">
+    <label class="custom-label mandatory" style="text-transform: unset">Unit of Measurement</label>
+    <mat-select placeholder="Unit of Measurement" formControlName="uom_id"  (selectionChange)="selectType($event)">
+      <mat-option [value]="stat.id" *ngFor="let stat of adminService.uomData" [innerHtml]="stat.name"></mat-option>
+    </mat-select>
+    <mat-icon class="i-icon-u"  title="Measurement of Packaging Type ">info</mat-icon>
+
+    <mat-error *ngIf="submitContainers || !detailsForm.controls.uom_id.pristine && detailsForm.controls.uom_id.hasError('required')">Please Select UOM</mat-error>
+  </mat-form-field>
+
+  <mat-form-field   class="custom-input mandatory grid-six" floatLabel="never">
+    <label class="custom-label mandatory text-transform-none">{{language.defaults.height}}&nbsp;({{selectUnits}})</label>
+    <input matInput type="number" min="0" max="99999999999" oninput="validity.valid||(value='')" placeholder="Height" formControlName="height"
+      id="containerHeight" />
+    <mat-error *ngIf="submitContainers || !detailsForm.controls.height.pristine && detailsForm.controls.height.hasError('required')">{{language.validations.containerHeight}}</mat-error>
+  </mat-form-field>
+  <mat-form-field   class="custom-input mandatory grid-six" floatLabel="never">
+    <label class="custom-label mandatory text-transform-none">{{language.defaults.width}}&nbsp;({{selectUnits}})</label>
+    <input matInput type="number" min="0" max="99999999999" oninput="validity.valid||(value='')" placeholder="Width" formControlName="weight" id="containerWeight"
+    />
+    <mat-error *ngIf="submitContainers || !detailsForm.controls.weight.pristine && detailsForm.controls.weight.hasError('required')">{{language.validations.containerWidth}}</mat-error>
+  </mat-form-field>
+  <mat-form-field   class="custom-input mandatory grid-six" floatLabel="never">
+    <label class="custom-label mandatory text-transform-none">{{language.defaults.depth}}&nbsp;({{selectUnits}})</label>
+    <input matInput type="number" min="0" max="99999999999" oninput="validity.valid||(value='')" placeholder="Depth" formControlName="dimensions"
+      id="containerDimensions" />
+    <mat-error *ngIf="submitContainers || !detailsForm.controls.dimensions.pristine && detailsForm.controls.dimensions.hasError('required')">{{language.validations.containerDepth}}</mat-error>
+  </mat-form-field>
+  <mat-form-field   class="custom-input mandatory grid-six" floatLabel="never">
+    <label class="custom-label mandatory">Tare weight (kgs)</label>
+    <input matInput  type="number" placeholder="Tare weight" formControlName="tare_weight" id="tare_weight" />
+    <mat-icon class="i-icon-t"  title="Weight of Empty Container">info</mat-icon>
+    <mat-error *ngIf="submitContainers || !detailsForm.controls.tare_weight.pristine && detailsForm.controls.tare_weight.hasError('required')">Please Enter Tare weight</mat-error>
+  </mat-form-field>
+  <mat-form-field  class="custom-input mandatory grid-six"  floatLabel="never">
+    <label class="custom-label mandatory">{{language.defaults.status}}</label>
+    <mat-select placeholder="Status" formControlName="status">
+      <mat-option [value]="stat.param" *ngFor="let stat of status" [innerHtml]="stat.value"></mat-option>
+    </mat-select>
+    <mat-error *ngIf="submitContainers || !detailsForm.controls.status.pristine && detailsForm.controls.status.hasError('required')">{{language.validations.status}}</mat-error>
+  </mat-form-field>
+  <mat-form-field class="custom-input mandatory grid-full" floatLabel="never">
+    <label class="custom-label">Inner Description</label>
+    <textarea matInput maxlength="255" placeholder="Inner Description" formControlName="inner_description" id="ContainerDesc" ></textarea>
+    <!-- <mat-error *ngIf="submitContainers || !detailsForm.controls.inner_description.pristine && detailsForm.controls.inner_description.hasError('required')">Please Enter Inner Description</mat-error> -->
+  </mat-form-field>
+</div>
+        
+         
+         
+     
+        
+
+
+      <!-- <div>
+          <mat-form-field fxFlex="80" class="custom-input" floatLabel="never">
+            <label class="custom-label">{{language.defaults.description}}</label>
+            <textarea matInput placeholder={{language.defaults.description}} formControlName="description" id="ContainerDesc"></textarea>
+           
+          </mat-form-field>
+        </div>  -->
+   
+      </div>
+      <div class="footer" fxLayout="row" fxLayoutAlign="start center" *ngIf="detailsForm.dirty">
+          <div class="min-container d-flex justify-content-end">
+            <button type="button" mat-button (click)="cancel(detailsForm)">{{language.defaults.cancel}}</button>
+            <button type="submit" mat-raised-button>{{addContainers}}</button>
+          </div> 
+          
+        </div>
+
+   
+ 
+  </form>
+<div *ngIf="noContainers" class="no-results full">
+			<div class="empty-img-holder">
+        <img [src]='images.no_containers'>
+
+			</div>
+				<p class="no-result-text">{{language.defaults.noContainers}}</p>
+			 
+		</div>
+</perfect-scrollbar>
+
+ 
+
+  <!-- <button mat-fab color="primary" class="small-fab" (click)="newRole(true)">
+    <mat-icon>add</mat-icon>
+  </button> -->
+</div>

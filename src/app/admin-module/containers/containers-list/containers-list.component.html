@@ -1,0 +1,40 @@
+<div class="center-section-scroll vh-100 d-flex media-list-data holy-grail body-white ">
+	<div class="flex-fixed-header menu-title">
+		<h2 style="font-weight: 400;">{{language.defaults.containersCount}} ({{totalCount}})</h2>
+		<span class="add-link" (click)="getContainer()">
+			<mat-icon>add</mat-icon>Add
+		</span>
+	</div>
+	<div class="app-search-container search-small">
+		<mat-form-field class="search" floatLabel="never">
+			<input matInput placeholder={{language.defaults.search}} #search
+				(keyup)="searchContainers(search.value, $event)"
+				(blur)="!search.value.length ? open = false : open = true">
+			<mat-icon matPrefix class="org-search">search</mat-icon>
+			<mat-icon matSuffix *ngIf="searching" class="spinner">
+				<mat-spinner class="small-spinner"></mat-spinner>
+			</mat-icon>
+			<mat-icon matSuffix *ngIf="!searching && search.value.length"
+				(click)="search.value = '';searchContainers(search.value)">close</mat-icon>
+		</mat-form-field>
+	</div>
+	<perfect-scrollbar class="p-l-8 p-r-8">
+		<div class="list-items">
+			<mat-spinner class="medium-spinner" *ngIf="fetchingData"></mat-spinner>
+			<mat-list *ngIf="!fetchingData" class="media-list">
+				<mat-list-item @AdminListAnimate *ngFor="let list of containerTypes" (click)="getContainer(list)"
+					[class.active]="list.id === selectedContainer.id">
+					<div class="media d-flex align-items-center">
+						<div class="media-body">
+							<h1 class="font-weight-bold d-block text-nowrap single "
+								title="{{list.name}} - {{list.type_name}}">{{list.name}} - {{list.type_name}}</h1>
+						</div>
+					</div>
+				</mat-list-item>
+				<mat-list-item *ngIf="paginationScroll">{{language.defaults.loading}}</mat-list-item>
+			</mat-list>
+			<div class="search-empty admin-search" *ngIf="noContainers && !fetchingData">No Package Type Found</div>
+		</div>
+	</perfect-scrollbar>
+	<app-pagination *ngIf="totalCount!=0" [pageLimit]="totalCount" (pageloadMore)="loadMore($event)"></app-pagination>
+</div>

@@ -1,0 +1,73 @@
+<div class="center-section-scroll vh-100 d-flex body-white ">
+  <div class="page-header-ui">
+    <div class="flex-fixed-header page-title container-ui ">
+      <div>
+        <h2  style="font-weight: normal;" *ngIf="selectedRoles" title="{{selectedRoles.name?selectedRoles.name: 'Add Role'}}" [innerHtml]="selectedRoles.name?selectedRoles.name: 'Add Role'"></h2>
+      </div>
+    </div>
+  </div>
+
+  <perfect-scrollbar class="padding-16">
+
+    <form class="roles-form" [formGroup]="detailsForm" (ngSubmit)="createRole(detailsForm)">
+      <mat-spinner class="medium-spinner" *ngIf="fetchingData"></mat-spinner>
+      <div class="box min-container d-flex" fxLayout="column"  *ngIf="!noRoles && !fetchingData" [class.user-footer]="detailsForm.dirty">
+        <div class=" ex-row">
+          <!-- <h4>{{language.defaults.roleProfile}}</h4> -->
+          
+            
+                <mat-form-field class="custom-input mandatory grid-six" floatLabel="never">
+                    <label class="custom-label mandatory">{{language.defaults.roleName}}</label>
+              <input matInput #myInput maxlength=100 placeholder="Role Name" [ngClass]="{'disableClass': adminService.isRoleEditable}"
+               formControlName="name" [readonly]="adminService.isRoleEditable" id="role" />
+              <mat-error *ngIf="detailsSubmit || !detailsForm.controls.name.pristine && detailsForm.controls.name.hasError('required') && detailsForm.controls.name.hasError('whitespace')">{{language.validations.roleName}}</mat-error>
+            </mat-form-field>
+         
+         
+            <mat-form-field class="custom-input mandatory grid-six" floatLabel="never">
+              <label class="custom-label mandatory">{{language.defaults.status}}</label>
+              <mat-select placeholder="Status" formControlName="status" [disabled]="adminService.isRoleEditable">
+              <mat-option [value]="stat.param" *ngFor="let stat of status" [innerHtml]="stat.value"></mat-option>
+              </mat-select>
+              <mat-error *ngIf="detailsSubmit || !detailsForm.controls.status.pristine && detailsForm.controls.status.hasError('required')">{{language.validations.status}}</mat-error>
+            </mat-form-field>
+            
+
+       
+              <mat-form-field class="custom-input grid-full" floatLabel="never">
+                  <label class="custom-label">{{language.defaults.description}}</label>
+              <textarea matInput placeholder={{language.defaults.description}} [ngClass]="{'disableClass': adminService.isRoleEditable}" 
+              formControlName="description" [readonly]="adminService.isRoleEditable" id="desc" rows="5"></textarea>
+              <!-- <mat-error *ngIf="detailsForm.controls.description.hasError('required')">Please Enter Description</mat-error> -->
+            </mat-form-field>
+          
+        </div>
+  
+        <div fxLayout="column" class="permission_list" >
+<div   class="page-sub-heading" style="margin-top: 16px;"><h3 >{{language.defaults.permissions}}</h3></div>
+
+          
+           <mat-card class="permissions" style="padding: 0; margin-bottom: 20px;">
+            <mat-card-content>
+              <app-roles-permissions *ngFor="let parent of globalPermissions; let i = index" [permission]="parent"></app-roles-permissions>
+            </mat-card-content>
+          </mat-card> 
+        </div>
+      </div>
+     
+      <div *ngIf="noRoles" class="no-record">
+        <img [src]='images.no_role'>
+        <p>{{language.defaults.noRoles}}</p>
+      </div>
+      <div class="document-footer" fxLayout="row" fxLayoutAlign="start center" *ngIf="detailsForm.dirty">
+          <div class="min-container d-flex justify-content-end">   
+          <button type="button" mat-button (click)="cancel(detailsForm)">{{language.defaults.cancel}}</button>
+          <button type="submit" mat-raised-button >{{newRoleAdd}}</button>
+        </div>
+        </div>
+    </form>
+  </perfect-scrollbar>
+
+  
+
+</div>

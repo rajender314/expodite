@@ -1,0 +1,61 @@
+<div fxLayout="row" class="body-white">
+	<div class="center-section-scroll vh-100 d-flex media-list-data holy-grail body-white" style="">
+		<div class="flex-fixed-header menu-title ">
+			<h2 style="font-weight: 400;">Users ({{totalUsers}})</h2>
+			<span class="add-link" (click)="selectUser(0)">
+				<mat-icon>add</mat-icon>Add
+			  </span>
+
+		</div>
+	
+		<div class="app-search-container search-small">
+			<mat-form-field class="search" floatLabel="never">
+				<input matInput placeholder="{{language.defaults.search}}" #search onkeypress='return (event.charCode > 96 && event.charCode < 123) || (event.charCode > 64 && event.charCode < 91) || (event.charCode >= 48 && event.charCode <= 57) || event.charCode <= 31'
+				 (keyup)="searchUser(search.value, $event)" (blur)="!search.value.length ? open = false : open = true">
+				<mat-icon matPrefix class="org-search">search</mat-icon>
+				<mat-icon matSuffix *ngIf="searching" class="spinner">
+					<mat-spinner class="small-spinner"></mat-spinner>
+				</mat-icon>
+				<mat-icon matSuffix *ngIf="!searching && search.value.length" (click)="search.value = '';searchUser(search.value)">close</mat-icon>
+			</mat-form-field>
+		</div>
+		<perfect-scrollbar class=" p-l-8 p-r-8  ">
+			<div class="list-items" infiniteScroll [infiniteScrollDistance]="1" [infiniteScrollThrottle]="50" (scrolled)="onScroll()"
+			[scrollWindow]="false">
+			   <mat-spinner class="medium-spinner" *ngIf="fetchingData"></mat-spinner>
+   
+			   <mat-list class="media-list" @usersAnimate *ngIf="!fetchingData" style="padding-top: 0px">
+				   <mat-list-item class="font-family" style="height: 56px;" *ngFor="let user of usersList" (click)="selectUser(user.id)" [class.active]="selectedId === user.id">
+					   <div class="media d-flex align-items-center">
+						<div class="media-aside align-self-center ">
+							<span class="b-avatar badge-light-primary rounded-circle badge-light-info " style="width: 32px; height: 32px;">
+								<span class="b-avatar-img img " *ngIf="user.image">
+									<img class="mat-avatar" [src]="user.image ? user.image : 'public/signatures/assets/images/avatar.png'" [alt]="user.name" />
+									</span>
+									<span  *ngIf="!user.image" class="b-avatar-text">{{user.name | contactImageName: 2}}</span>
+									
+						  </span></div>
+							<div class="media-body ">
+								<h1 class="font-weight-bold d-block text-nowrap "> {{user.name}}</h1>
+								<small>{{user.email}}</small>
+							 </div> 
+							 </div>
+
+					 
+				   </mat-list-item>
+				   <mat-list-item *ngIf="paginationScroll">{{language.defaults.loading}}</mat-list-item>
+			   </mat-list>
+			   <div *ngIf="noUsers && !fetchingData" class="search-empty">{{language.defaults.noUserFound}}</div>
+		   </div>
+		   
+		</perfect-scrollbar> 
+		<app-pagination *ngIf="totalPages!=0" [pageLimit]="totalPages" (pageloadMore)="loadMore($event)"></app-pagination>
+		
+	</div>
+
+
+
+	<app-user-details [userId]="selectedId" (UpdateUser)="updateData($event)" class="w-100"></app-user-details>
+	<router-outlet></router-outlet>
+
+</div>

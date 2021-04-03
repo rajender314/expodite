@@ -1,0 +1,4 @@
+<div fxLayout="row">
+  <app-shipment-list  class="tabs-list" [update]="updatedShipmentDetails" (trigger)="getSelectedShipment($event)"></app-shipment-list>
+  <app-shipment-details  class="inner-content" [shipments]="selectedShipment" style="width:100%;" (trigger)="updateDetails($event)" ></app-shipment-details>
+</div>

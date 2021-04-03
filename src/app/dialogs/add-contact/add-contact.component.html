@@ -1,0 +1,177 @@
+<!-- <div class="app-modal" >
+    <mat-dialog-content class="client-step-content" cdk-focus-initial>
+        <form [formGroup]="contactForm">
+         
+            <mat-form-field class="custom-input" floatLabel="never">
+                <label class="custom-label">Name</label>
+                <input matInput maxlength="150" placeholder="Naaaaaaaaaaaaaaame" formControlName="company_name">
+                
+            </mat-form-field>
+    
+        </form>
+    </mat-dialog-content>
+    <mat-dialog-actions>
+        <span fxFlex></span>
+        <button tyep="button" mat-button mat-dialog-close>Cancel</button>
+        <button type="button" mat-raised-button color="primary">Select Product</button>
+    </mat-dialog-actions>
+
+</div> -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<mat-toolbar>
+	<h2 mat-dialog-title>Add Contact</h2>
+	<span fxFlex></span>
+</mat-toolbar>
+
+<mat-dialog-content>
+	<form [formGroup]="contactForm">
+		<!-- <mat-form-field class="custom-input block-ele" floatLabel="never">
+			<label class="custom-label">Contact ID</label>
+			<input matInput placeholder="Contact ID" formControlName="contact_id" maxlength="150">
+		
+		</mat-form-field> -->
+		<mat-form-field class="custom-input block-ele mandatory" floatLabel="never">
+			<label class="custom-label">Type</label>
+			<mat-select placeholder="Select" formControlName="log_type" [(ngModel)]="selectedtype" (selectionChange)="selectType($event)">
+				<mat-option *ngFor="let type of Types" [value]="type.id">{{type.name}}</mat-option>
+			</mat-select>
+			<mat-error *ngIf="contactForm.controls.log_type.hasError('required')">
+				Please Select Type
+			</mat-error>
+		</mat-form-field>
+		<mat-form-field class="custom-input block-ele mandatory" floatLabel="never">
+			<label class="custom-label mandatory">First Name</label>
+			<input matInput placeholder="Enter First Name" formControlName="firstname" maxlength="150">
+			<mat-error *ngIf="contactForm.controls.firstname.hasError('required') || contactForm.controls.firstname.hasError('whitespace')">
+				Please Enter First Name
+			</mat-error>
+		</mat-form-field>
+		<mat-form-field class="custom-input block-ele mandatory" floatLabel="never">
+			<label class="custom-label mandatory">Last Name</label>
+			<input matInput placeholder="Enter Last Name" formControlName="lastname" maxlength="150">
+			<mat-error *ngIf="contactForm.controls.lastname.hasError('required') || contactForm.controls.lastname.hasError('whitespace')">
+				Please Enter Last Name
+			</mat-error>
+		</mat-form-field>
+		<mat-form-field class="custom-input block-ele " floatLabel="never" *ngIf="showComapnyField">
+			<label class="custom-label">Designation</label>
+			<input matInput placeholder="Enter Designation" formControlName="designation_name" maxlength="150">
+			<!-- <mat-error *ngIf="contactForm.controls.designation_name.hasError('required') || contactForm.controls.designation_name.hasError('whitespace')">
+				Please Enter Designation
+			</mat-error> -->
+		</mat-form-field>
+
+
+		<mat-form-field class="custom-input block-ele mandatory" floatLabel="never" *ngIf="showComapnyField">
+			<label class="label-attention  vendor_drpdown">Company<span style="color: #ff0000;padding-left: 2px;">*</span></label>
+			 <input placeholder="Select Company" id="cmpnyclass" matInput [matAutocomplete]="auto" [(ngModel)]="modelData.name" value="{{modelData.name}}" formControlName="org_id" (keyup)="selectedClients($event)" >
+			 <button type="button" mat-button matSuffix mat-icon-button aria-label="Clear" (click)="clear()">
+				 <mat-icon>close</mat-icon>
+			 </button>
+			 <div>
+				 <mat-autocomplete #auto="matAutocomplete" auto>
+					 <mat-option (onSelectionChange)="selectionChange(company)"  *ngFor="let company of companyList" [value]="company.name">
+						 <span>{{ company.name }}</span>
+					 </mat-option>
+				 </mat-autocomplete>
+				
+			 </div>    
+			 <mat-error *ngIf="contactForm.controls.org_id.hasError('whitespace') || contactForm.controls.org_id.hasError('required')">
+				Please Select Company
+			</mat-error>
+			<p class="no-org-found" *ngIf="showNoOrgFound">
+					No Companies Found
+			</p>
+		 </mat-form-field>
+
+		<!-- <mat-form-field class="custom-input block-ele " floatLabel="never" *ngIf="showComapnyField">
+			<label class="custom-label">Company</label>
+			<mat-select placeholder="Select" formControlName="org_id" >
+				<mat-option *ngFor="let company of companyList" [value]="company.id">{{company.name}}</mat-option>
+			</mat-select>
+		
+		</mat-form-field> -->
+
+	
+		<mat-form-field class="custom-input block-ele mandatory" floatLabel="never">
+			<label class="custom-label mandatory">Email</label>
+			<input matInput placeholder="Enter Email" formControlName="email" maxlength="150">
+			<mat-error *ngIf="contactForm.controls.email.hasError('pattern')">
+				{{language.validations.emailValidation}}
+			</mat-error>
+			<mat-error *ngIf="contactForm.controls.email.hasError('required')">
+				Please Enter Email
+			</mat-error>
+		</mat-form-field>
+		<div class="ext-section">
+			<mat-form-field class="custom-input block-ele  phone_input" floatLabel="never">
+				<label class="custom-label mandatory">Phone Number</label>
+				<input type="text" [maxlength]="15"  matInput placeholder="Enter Phone Number"  minlength="10" formControlName="primary_phone"  (blur)="onPhoneChanges($event)">
+				<!-- <mat-error *ngIf="contactForm.controls.primary_phone.hasError('whitespace') || contactForm.controls.primary_phone.hasError('required')">
+							Please Enter Phone Number
+						</mat-error> -->
+						<p  class="groups-error" *ngIf="phoneErrorMsg">Please Enter Valid Phone Number</p>
+						<!-- <mat-error *ngIf="phoneErrorMsg">
+							Please Enter Phone Number
+						</mat-error>  -->
+			</mat-form-field>
+			<mat-form-field class="custom-input ext-label" floatLabel="never">
+				<label class="custom-label">Ext</label>
+				<input type="text" [maxlength]="5"  matInput placeholder="Enter Ext"  formControlName="extension_number"  (blur)="onExtChanges($event)">
+				<p  class="groups-error" *ngIf="extErrorMsg">Please Enter Valid Ext</p>
+			</mat-form-field>
+			</div>
+			<mat-form-field class="custom-input block-ele mandatory" floatLabel="never" *ngIf="!showComapnyField">
+				<label class="custom-label mandatory">Role</label>
+				<mat-select placeholder="Select" formControlName="roles_id">
+					<mat-option *ngFor="let role of Roles" [value]="role.id">{{role.name}}</mat-option>
+				
+				</mat-select>
+				<mat-error *ngIf="contactForm.controls.roles_id.hasError('whitespace') || contactForm.controls.roles_id.hasError('required')">
+					Please Select Role
+				</mat-error>
+			</mat-form-field>
+            
+           
+		
+	</form>
+	
+	<!-- <div class="contacts-group mandatory"  *ngIf="showComapnyField">
+ 		<label>Groups</label>
+		<div class="contacts-checked" *ngFor="let groupname of data.groupArray">
+			<mat-checkbox (change)="updateChecked(groupname , $event)" [(ngModel)]="checkedStatus[groupname.id]">{{groupname.name}}</mat-checkbox>
+			<p class="groups-info" *ngIf="groupname.id == 1">(Couriers related documents will be sent to this Group Personnel.)</p>
+			<p class="groups-info" *ngIf="groupname.id == 2">(Invoice and bank details to be sent to this Group Personnel.)</p>
+			
+		</div>
+		<p class="groups-error" *ngIf="showError">Please Select Group</p>
+	</div> -->
+
+	<!-- <div class="contacts-group">
+		<div class="contacts-checked">
+			<mat-checkbox (change)="giveUserAccess($event)">Give User Access</mat-checkbox>
+			
+		</div>
+		<p class="groups-error" *ngIf="showError">Please Select Group</p>
+	</div>  -->
+	<p *ngIf="errorMsg" class="errormsg-class" style="color: #f44336; font-size: 12px; padding-bottom: 14px;">{{errorMsg}}</p>
+</mat-dialog-content>
+<mat-dialog-actions>
+	
+	<span fxFlex></span>
+	<button mat-button mat-dialog-close>Close</button>
+	<button mat-raised-button (click)="createAddContact(contactForm)" [disabled] = "disabledSave">Add Contact</button>
+</mat-dialog-actions>

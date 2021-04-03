@@ -1,0 +1,37 @@
+<div class="preview-container" style="min-height: 50vh;">
+    <div *ngIf="inProcess">
+        <mat-spinner class="medium-spinner"></mat-spinner>
+    </div>
+    <mat-toolbar *ngIf="!inProcess" class="pdf_viewer_hdr">
+        <span class="material-icons" title="Download" (click)="downloadFile()">
+            cloud_download
+            </span>
+        <span class="material-icons" title="Rotate Right" (click)="rotateRight()" *ngIf="data.link_url.lastIndexOf('.pdf') > -1">
+            redo
+        </span>
+        <span class="material-icons" title="Rotate Left" (click)="rotateLeft()" *ngIf="data.link_url.lastIndexOf('.pdf') > -1">
+            undo
+        </span>
+        <span class="material-icons" title="Zoom In" (click)="zoom_in()" *ngIf="data.link_url.lastIndexOf('.pdf') > -1">
+            zoom_in
+            </span>
+        <span class="material-icons" title="Zoom Out" (click)="zoom_out()" *ngIf="data.link_url.lastIndexOf('.pdf') > -1">
+            zoom_out
+        </span>
+        <span class="material-icons" title="Close" (click)="closePreview()">
+            <mat-icon>close</mat-icon>
+        </span>
+    </mat-toolbar>
+     <mat-dialog-content style="max-height: 82vh !important" [ngClass]="isScroll ? 'addScroll' : ''" >
+        <div style="display: block; height: 100%; min-height:370px">
+           
+            <pdf-viewer [src]="data.link_url" *ngIf="data.link_url.lastIndexOf('.pdf') > -1" [show-borders]="false" (page-rendered)="pageRendered($event)"
+                [render-text]="true" style="height: 100%" [original-size]="true" [rotation]="rotation"
+                [zoom]="zoom_to"
+                ></pdf-viewer>
+
+                <ngx-doc-viewer *ngIf="data.link_url.lastIndexOf('.xlsx') > -1 || data.link_url.lastIndexOf('.doc') > -1 || data.link_url.lastIndexOf('.docx') > -1" [url]="data.link_url" style="height: 80vh !important"
+                    viewer="google" ></ngx-doc-viewer>
+        </div>
+      </mat-dialog-content>
+</div>

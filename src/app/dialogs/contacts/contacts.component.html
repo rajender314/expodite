@@ -1,0 +1,139 @@
+<mat-toolbar>
+	<h2 mat-dialog-title>{{(data.contact.contact_id!='0'?'Update Contact':'Add Contact')}}</h2>
+	<p *ngIf="errorMsg" class="errormsg-class" style="color: #f44336; font-size: 12px;margin-left: 22px;">{{errorMsg}}</p>
+	<span fxFlex></span>
+</mat-toolbar>
+<mat-dialog-content>
+	<form [formGroup]="contactsForm">
+		<mat-form-field class="custom-input block-ele mandatory" floatLabel="never">
+			<label class="custom-label mandatory">First Name</label>
+			<input matInput placeholder="Enter First Name" formControlName="first_name" maxlength="150" (keyup)="valChanged()">
+			<mat-error *ngIf="contactsForm.controls.first_name.hasError('required') || contactsForm.controls.first_name.hasError('whitespace')">
+				{{language.validations.firstName}}
+			</mat-error>
+		</mat-form-field>
+		<mat-form-field class="custom-input block-ele mandatory" floatLabel="never">
+			<label class="custom-label mandatory">Last Name</label>
+			<input matInput placeholder="Enter Last Name" formControlName="last_name" maxlength="150" (keyup)="valChanged()">
+			<mat-error *ngIf="contactsForm.controls.last_name.hasError('required') || contactsForm.controls.last_name.hasError('whitespace')">
+				{{language.validations.lastName}}
+			</mat-error>
+		</mat-form-field>
+		<!-- <mat-form-field class="custom-input block-ele" floatLabel="never">
+			<label class="custom-label">Designation</label>
+			<input matInput placeholder="Enter Designation" formControlName="designation_name" maxlength="150">
+			
+		</mat-form-field> -->
+		<mat-form-field class="custom-input block-ele mandatory" floatLabel="never">
+			<label class="custom-label mandatory">Email</label>
+			<input matInput placeholder="Enter Email" formControlName="primary_email" maxlength="150" (keyup)="valChanged()">
+			<mat-error *ngIf="contactsForm.controls.primary_email.hasError('pattern')">
+				{{language.validations.emailValidation}}
+			</mat-error>
+			<mat-error *ngIf="contactsForm.controls.primary_email.hasError('required')">
+				Please Enter Email
+			</mat-error>
+		</mat-form-field>
+		<div class="ext-section">
+			<mat-form-field class="custom-input block-ele phone_input mandatory" floatLabel="never">
+				<label class="custom-label mandatory">Phone Number</label>
+				<input matInput type="text" [maxlength]="15" (blur)="phonenumber($event)" placeholder="Enter Phone Number" (keyup)="valChanged()"  (blur)="onPhoneChanges($event)" formControlName="primary_phone">
+				<mat-error *ngIf="contactsForm.controls.primary_phone.hasError('required')">
+							Please Enter Phone Number
+						</mat-error>
+						<mat-error *ngIf="contactsForm.controls.primary_phone.hasError('pattern')">Please Enter Valid Phone Number</mat-error>
+
+			</mat-form-field>
+			<mat-form-field class="custom-input ext-label" floatLabel="never">
+				<label class="custom-label">Ext</label>
+				<input maxlength="3" matInput placeholder="Enter Ext" (keyup)="valChanged()" formControlName="ext" (blur)="onExtChanges($event)">
+				<!-- <p  class="groups-error" *ngIf="extErrorMsg">Please Enter Valid Ext</p> -->
+				<mat-error *ngIf="contactsForm.controls.ext.hasError('pattern')">Please Enter Valid Ext</mat-error>
+			</mat-form-field>
+		</div>
+	</form>
+	<!-- <form class="p_t_6" [formGroup]="contactsForm">
+		<div class="form-group">
+			<div formArrayName="emailArr">
+				<div *ngFor="let list of mailListArray.controls;let i = index" [formGroupName]="i" class="inline-space-bw">
+					<button mat-icon-button class="array-button">
+						<mat-icon (click)="addMail()">add</mat-icon>
+					</button>
+					<button mat-icon-button class="array-button">
+						<mat-icon (click)="removeMail(i)">remove</mat-icon>
+					</button>
+					<mat-form-field class="custom-input" floatLabel="never">
+						<label class="custom-label">Email</label>
+						<mat-select formControlName="email_address_type_id">
+							<mat-option *ngFor="let mail of data.emailAddressTypes" [value]="mail.id">{{mail.name}}</mat-option>
+						</mat-select>
+					</mat-form-field>
+
+					<mat-form-field class="custom-input ml_4" floatLabel="never" [ngClass]="{'mat-form-field-invalid':list.value.invalid}">
+						<label class="custom-label">Enter Email</label>
+						<input matInput placeholder="Enter Email" (input)="emailValidation(list)" formControlName="email_address">
+						<div class="error" *ngIf="list.value.invalid">
+							{{language.validations.emailValidation}}
+						</div>
+					</mat-form-field>
+				</div>
+			</div>
+		</div>
+
+		<div class="form-group">
+			<div formArrayName="phoneArr">
+				<div *ngFor="let list of numberListArray.controls;let i = index" [formGroupName]="i" class="inline-space-bw">
+					<button mat-icon-button class="array-button">
+						<mat-icon (click)="addNumber()">add</mat-icon>
+					</button>
+					<button mat-icon-button class="array-button">
+						<mat-icon (click)="removeNumber(i)">remove</mat-icon>
+					</button>
+					<mat-form-field class="custom-input" floatLabel="never">
+						<label class="custom-label">Phone</label>
+						<mat-select formControlName="phone_number_type_id">
+							<mat-option *ngFor="let number of data.phoneNumberTypes" [value]="number.id">{{number.name}}</mat-option>
+						</mat-select>
+					</mat-form-field>
+					<mat-form-field class="custom-input ml_4" floatLabel="never" [ngClass]="{'mat-form-field-invalid':list.value.invalid}">
+						<label class="custom-label">Enter Number</label>
+						<input matInput placeholder="Enter Number" type="number" min="0" max="99999999999999999" (input)="phoneNumberValidation($event, list)"
+						 formControlName="phone_number">
+						<div class="error" *ngIf="list.value.invalid">
+							{{language.validations.phoneNumber}}
+						</div>
+					</mat-form-field>
+				</div>
+			</div>
+		</div>
+	</form> -->
+	<!-- <div class="contacts-group mandatory">
+		<label>Groups</label>
+		<div class="contacts-checked" *ngFor="let groupname of data.groupArray">
+			<mat-checkbox (change)="updateChecked(groupname , $event)" [(ngModel)]="checkedStatus[groupname.id]">{{groupname.name}}</mat-checkbox>
+			<p class="groups-info" *ngIf="groupname.id == 1">(Couriers related documents will be sent to this Group Personnel.)</p>
+			<p class="groups-info" *ngIf="groupname.id == 2">(Invoice and bank details to be sent to this Group Personnel.)</p>
+			
+		</div>
+		<p class="groups-error" *ngIf="showError">Please Select Group</p>
+	</div> -->
+
+	<div class="contacts-group" *ngIf="data.contact.contact_id == '0'">
+		<!-- <label>Give User Access</label> -->
+		<div class="contacts-checked">
+			<mat-checkbox (change)="giveUserAccess($event)">Give User Access</mat-checkbox>
+			
+		</div>
+		<!-- <p class="groups-error" *ngIf="showError">Please Select Group</p> -->
+	</div> 
+	
+	
+</mat-dialog-content>
+<mat-spinner class="medium-spinner" *ngIf="showSpinner"></mat-spinner>
+
+<mat-dialog-actions>
+	
+	<span fxFlex></span>
+	<button mat-button mat-dialog-close>{{language.defaults.cancel}}</button>
+	<button mat-raised-button (click)="addContact(contactsForm)" [disabled] = "disabledSave || !contactsForm.dirty" >{{(data.contact.contact_id!='0'?'Update Contact':'Add Contact')}}</button>
+</mat-dialog-actions>

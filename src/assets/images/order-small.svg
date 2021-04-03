@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="25px" viewBox="0 0 20 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 50.2 (55047) - http://www.bohemiancoding.com/sketch -->
+    <title>order details icon </title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="order-details-icon-" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Order-icon">
+            <g id="Group-3">
+                <path d="M2.77777778,0.694444444 C1.62718455,0.694444444 0.694444444,1.62718455 0.694444444,2.77777778 L0.694444444,22.2222222 C0.694444444,23.3728155 1.62718455,24.3055556 2.77777778,24.3055556 L17.2222222,24.3055556 C18.3728155,24.3055556 19.3055556,23.3728155 19.3055556,22.2222222 L19.3055556,2.77777778 C19.3055556,1.62718455 18.3728155,0.694444444 17.2222222,0.694444444 L2.77777778,0.694444444 Z" id="Rectangle" stroke="#F07E0A" stroke-width="1.38888889"></path>
+                <g id="Group-2" transform="translate(3.333333, 13.888889)"></g>
+                <path d="M3.33333333,11.1111111 L16.6666667,11.1111111 L16.6666667,12.8787879 L3.33333333,12.8787879 L3.33333333,11.1111111 Z M3.33333333,14.2045455 L9.37878788,14.2045455 L9.37878788,15.9722222 L3.33333333,15.9722222 L3.33333333,14.2045455 Z M10.6666667,9.02777778 L3.33333333,9.02777778 L3.33333333,4.16666667 L10.6666667,4.16666667 L10.6666667,9.02777778 Z" id="Combined-Shape" fill="#F07E0A"></path>
+            </g>
+        </g>
+    </g>
+</svg>

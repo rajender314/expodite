@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 57.1 (83088) - https://sketch.com -->
+    <title>Group</title>
+    <desc>Created with Sketch.</desc>
+    <g id="List-Builder" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Group">
+            <g id="Group-4-Copy-4" fill="#DF3B2D">
+                <g id="Group-21">
+                    <rect id="Rectangle-4" x="0" y="0" width="20" height="20"></rect>
+                </g>
+            </g>
+            <path d="M16,4 C16.5522847,4 17,4.44771525 17,5 L17,15.1869159 C17,15.7392006 16.5522847,16.1869159 16,16.1869159 L4,16.1869159 C3.44771525,16.1869159 3,15.7392006 3,15.1869159 L3,5 C3,4.44771525 3.44771525,4 4,4 L16,4 Z M5.26236028,5.40654206 L4.40654206,5.40654206 L4.40654206,14.7894298 L5.83625922,14.7894298 L5.83625922,7.65275051 L9.9941059,10.2602943 L14.1689975,7.65275051 L14.1689975,14.7894298 L15.5878159,14.7894298 L15.5878159,5.40654206 L14.7404576,5.40654206 L9.9941059,8.34912696 L5.26236028,5.40654206 Z" id="Combined-Shape" fill="#FFFFFF"></path>
+        </g>
+    </g>
+</svg>

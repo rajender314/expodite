@@ -1,0 +1,118 @@
+
+<div class="d-flex  vh-100"  style="flex-direction: column;">
+  <mat-toolbar class="page-header-ui" style="height: 68px;">
+    <div class="flex-fixed-header page-title">
+      <div class="flex">
+        
+          <mat-icon class="mat-icon material-icons" role="img" aria-hidden="true" (click)="cancelMerge()"  style="cursor: pointer !important;position: relative;top: 2px;font-size: 18px;">arrow_back</mat-icon>
+              
+      
+        <span class="title" [innerHtml]="'Back To Inventory'"  style="cursor: pointer !important"></span>
+      </div>
+      
+    </div>
+   
+  </mat-toolbar>
+ 
+    <div fxLayout="row" class="d-flex" style="height: calc(100vh - 68px);">
+      <div class="center-section-scroll  d-flex secundory-menu">
+        <perfect-scrollbar class="flex-scroll-items p-l-8 p-r-8">
+          <div class="fxFlex side-nav-section merge-filters">
+            <div class="label">Category</div>
+            <mat-selection-list class="filters-list">
+              <mat-list-option class="orders-list" [selected]="category.id == selectedCategory.id" [disabled]="category.id == selectedCategory.id" (click)="selectCategory(category,'', $event)" *ngFor="let category of categoryList" [class.active]="selectedCategory.id === category.id">{{category.name}}</mat-list-option>
+            </mat-selection-list>
+            <mat-divider class="segment"></mat-divider>
+          </div>
+        </perfect-scrollbar>
+      </div>
+      <div  class="center-section-scroll  d-flex body-color">
+<perfect-scrollbar >
+  <div class="list-view-table p-b-16 customized-table-list">
+    <div fxlayout="column" class="container-ui">
+      <div class="table-view-for-list" infiniteScroll [infiniteScrollDistance]="1" [infiniteScrollThrottle]="50" (scrolled)="onScroll()" [scrollWindow]="false">
+           <div class="app-container">
+              <div class="table-container pad_0">
+                <mat-table #table [dataSource]="batchList" *ngIf="pagination.totalCount" class="no-hover-ui">
+                  <ng-container matColumnDef="checkbox">
+                    <mat-header-cell *matHeaderCellDef fxFlex="5">
+                      <mat-checkbox [(ngModel)]="selectAll" (change)="isSelectAll(selectAll)"></mat-checkbox>
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let Inventory; let i = index;" fxFlex="5">
+                      <mat-checkbox [(ngModel)]="Inventory.isChecked" (change)="isChecked($event, Inventory, i)"></mat-checkbox>
+                    </mat-cell>
+                  </ng-container>
+                  <ng-container matColumnDef="name">
+                    <mat-header-cell *matHeaderCellDef fxFlex="30"> Batch Number</mat-header-cell>
+                    <mat-cell *matCellDef="let Inventory" fxFlex="30" style="display: flex">
+                      <div class="d-flex align-items-center avatar-cell o-hidden w-100">
+                        <div class="icon-sec d-flex align-items-center">
+                          <img [src]='images.batchIcon_o' title="Inventory">
+                        </div>
+                        <div class="content-sec o-hidden ellipsis-text">
+                          <div class="d-flex" style="display: flex; -webkit-box-align: center; align-items: center; color: rgb(145, 158, 171); overflow: hidden;">
+
+                          </div>
+                          <h1 class="ellipsis-text ">{{Inventory.batch_nbr}}</h1>
+                          <small class="ellipsis-text">{{Inventory.category_name}}</small>
+                        </div>
+                      </div>
+                      
+                    </mat-cell>
+                  </ng-container>
+        
+                  <ng-container matColumnDef="mfd_date">
+                    <mat-header-cell *matHeaderCellDef fxFlex="20"> mfg date</mat-header-cell>
+                    <mat-cell *matCellDef="let Inventory" fxFlex="20">{{Inventory.mfd_date | date: 'MMM dd, yyyy'}}</mat-cell>
+                  </ng-container>
+        
+                  <ng-container matColumnDef="exp_date">
+                    <mat-header-cell *matHeaderCellDef fxFlex="20"> exp date </mat-header-cell>
+                    <mat-cell *matCellDef="let Inventory" fxFlex="20">{{Inventory.exp_date | date: 'MMM dd, yyyy'}}</mat-cell>
+                  </ng-container>
+        
+                  <ng-container matColumnDef="tot_qty">
+                    <mat-header-cell *matHeaderCellDef fxFlex="20">Remaining quantity</mat-header-cell>
+                    <mat-cell *matCellDef="let Inventory" fxFlex="20"> {{Inventory.remain_quan}} {{Inventory.uom_name}}
+                      <span fxFlex></span>
+                      <!-- <mat-icon class="go-to-details">keyboard_arrow_right</mat-icon> -->
+                    </mat-cell>
+                  </ng-container>
+        
+                  <mat-header-row class="table-row" *matHeaderRowDef="displayedColumns"></mat-header-row>
+                  <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+                </mat-table>
+              </div>
+           </div>
+       
+        <mat-spinner class="medium-spinner" *ngIf="fetchingData"></mat-spinner>
+        <div class="container-ui new-center-empty-ui" *ngIf="(pagination.totalCount == 0 && !fetchingData)">
+          <mat-card class="no-results">
+            <div class="empty-img-holder">
+              <img [src]='images.batchIcon_o'>
+            </div>
+            <p class="no-result-text">No Batches Found</p>
+
+          </mat-card>
+        
+        </div>
+      </div>
+    </div>
+  </div>
+</perfect-scrollbar>
+      
+        <div fxLayout="row" fxLayoutAlign="end center" class="document-footer " *ngIf="pagination.totalCount && checkedLength.length > 1">
+          <div class="w-100 container-ui justify-content-end d-flex">
+            <div [innerHtml]="'Total Quantity: ' + totalQuatity"></div>
+            <span fxFlex></span>
+            <button mat-button (click)="cancelMerge()">{{language.defaults.cancel}}</button>
+            <button mat-raised-button (click)="createMerge()">Merge Batch</button> 
+          </div>
+       
+        </div>
+      </div> 
+    </div>
+  
+</div>
+
+  

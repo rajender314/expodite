@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="75px" height="90px" viewBox="0 0 75 90" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 50.2 (55047) - http://www.bohemiancoding.com/sketch -->
+    <title>Order icon</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Client-Dashbaord" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Empty-order" transform="translate(-603.000000, -219.000000)">
+            <g id="Order-icon" transform="translate(603.000000, 219.000000)">
+                <path d="M10,2.5 C5.85786438,2.5 2.5,5.85786438 2.5,10 L2.5,80 C2.5,84.1421356 5.85786438,87.5 10,87.5 L65,87.5 C69.1421356,87.5 72.5,84.1421356 72.5,80 L72.5,10 C72.5,5.85786438 69.1421356,2.5 65,2.5 L10,2.5 Z" id="Rectangle" stroke="#DCDEDE" stroke-width="5"></path>
+                <g id="Group-2" transform="translate(12.500000, 50.000000)"></g>
+                <path d="M12.5,40 L62.5,40 L62.5,46.3636364 L12.5,46.3636364 L12.5,40 Z M12.5,51.1363636 L35.1704545,51.1363636 L35.1704545,57.5 L12.5,57.5 L12.5,51.1363636 Z M40,32.5 L12.5,32.5 L12.5,15 L40,15 L40,32.5 Z" id="Combined-Shape" fill-opacity="0.539770154" fill="#F7981C"></path>
+            </g>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,231 @@
+
+<section class="hiden-stepper">
+        <mat-horizontal-stepper #stepper>
+            <mat-step-header></mat-step-header>
+            <mat-step>
+                <div fxLayout="row">
+                     <div class="center-section-scroll vh-100 d-flex secundory-menu">
+						<div class="flex-fixed-header menu-title">
+                            <h1>Contacts ({{totalContacts}})</h1>                            
+                        </div>
+						<perfect-scrollbar class="flex-scroll-items p-l-8 p-r-8"> 
+							<div *ngIf="!filtersLoader">                             
+								<div @ordersAnimate>
+									<div class="fxFlex side-nav-section">
+										<div class="label">Filter By Type</div>
+										<mat-selection-list class="status-selection filters-list">
+											<mat-list-option (click)="checkboxChange(status)" (change)="selectState()"
+											selected="{{status.selected}}" class="orders-list"
+												*ngFor="let status of Types">
+												{{status.name}}
+											</mat-list-option>
+										</mat-selection-list>
+										<mat-divider class="segment"></mat-divider>
+									</div>
+								</div>
+								<!-- <div class="fxFlex side-button-section animated slideInUp" fxLayout="row"
+									fxLayoutAlign="end center" *ngIf="showFilter">
+									<button mat-button class="clear-link"
+										(click)="clearFilterData()">{{language.defaults.clear}}</button>
+									<span fxFlex></span>
+									<button mat-raised-button class="app-white-btn" (click)="applyFilterData()">Apply
+										Filter</button>
+								</div> -->
+							</div>
+						</perfect-scrollbar>
+						<div class="flex-fixed-footer" *ngIf="showFilter">
+                            <a class="secondarytextlink" (click)="clearFilterData()">{{language.defaults.clear}}</a>
+                            <span fxFlex></span>
+                            <button mat-raised-button class="app-white-btn" (click)="applyFilterData()">Apply
+                                Filter</button>
+                        </div>
+						
+                        
+                        <!-- <mat-spinner class="medium-spinner" *ngIf="filtersLoader"></mat-spinner> -->
+                    </div> 
+                    <div fxFlex class="center-section-scroll vh-100 d-flex body-color">
+						<div class="page-header-ui">
+							<div class="flex-fixed-header page-title container-ui ">
+								<div class="d-flex">
+									<div class="search-ui" >
+										<input matInput placeholder=""
+											#search (keyup)="searchOrders(search.value, $event)"
+											placeholder="Search"
+											(blur)="!search.value.length ? open = false : open = true">
+										<mat-icon matPrefix (click)="open = !open" class="org-search">search</mat-icon>
+										<mat-icon matSuffix *ngIf="searching" class="spinner">
+											<mat-spinner class="small-spinner"></mat-spinner>
+										</mat-icon>
+										<mat-icon class="search-info" *ngIf="!search.value.length" matTooltip="Search with Order Number/Po Number/Invoice Name">info</mat-icon>
+										<mat-icon class="search-close" matSuffix *ngIf="!searching && search.value.length"
+											(click)="search.value = '';searchOrders(search.value)">close</mat-icon>
+									</div>
+								</div>  
+								<!-- <div class="app-search-container">
+									<div class="app-container add-contact-flex">
+										<mat-form-field class="search" floatLabel="never">
+											<input matInput placeholder="Search with Company/Email"
+												#search (keyup)="searchOrders(search.value, $event)"
+												(blur)="!search.value.length ? open = false : open = true">
+											<mat-icon matPrefix  class="org-search">search</mat-icon>
+											<mat-icon matSuffix *ngIf="searching" class="spinner">
+												<mat-spinner class="small-spinner"></mat-spinner>
+											</mat-icon>
+											<mat-icon matSuffix *ngIf="!searching && search.value.length"
+											(click)="search.value = '';searchOrders(search.value)"
+											   >close</mat-icon>
+										</mat-form-field>
+										<div class="active-module">
+										
+											<span fxFlex></span>
+											<button mat-raised-button color="warn"  (click)="createOrder()" class="create-order-btn">+ Add Contact</button>
+										</div>
+									</div>
+								</div> -->
+							</div> 
+						</div>
+                      
+                        <!-- <div class="header-container">
+                            <div class="app-container" *ngIf="clientPermission">
+                                <mat-list-item class="order-list-row mat-list-item header-cleint">
+                                    <div class="item-container" fxFlex="25">P.O number</div>
+                                    <div class="item-container text-center" fxFlex="25">Quantity</div>
+                                    <div class="item-container right-amount" fxFlex="25">Amount</div>
+                                    <div class="item-container status-align" fxFlex="25">Status</div>
+                                </mat-list-item>
+                            </div>
+                            <div class="app-container" *ngIf="!clientPermission">
+                                <mat-list-item class="order-list-row mat-list-item header-cleint">
+                                    <div class="item-container" fxFlex="30">Order number</div>
+                                    <div class="item-container" fxFlex="25">Attention</div>
+                                    <div class="item-container text-center" fxFlex="10">P.O No</div>
+                                    <div class="item-container text-center" fxFlex="15">Amount</div>
+                                    <div class="item-container status-align" fxFlex="15">Status</div>
+                                </mat-list-item>
+                            </div>
+						</div> -->
+
+						<perfect-scrollbar>
+							<div class="list-view-table p-b-16 customized-table-list">
+								<div fxLayout="column" class="container-ui">
+									 
+								<div class="table-view-for-list " infiniteScroll [infiniteScrollDistance]="1"
+								[infiniteScrollThrottle]="50" (scrolled)="onScroll()" [infiniteScrollDisabled]="onscrolled" [scrollWindow]="false">
+								<div class="app-container" *ngIf="!fetchingData">
+									<!-- <div class="title-container">
+												<h2 class="title-heading">New Orders {{!clientPermission ? 'Received' : 'Placed'}} ({{newOrdersCount}})</h2>
+												<div *ngIf="!emptyOrdersData">
+													<a class="see-all-link" [ngClass]="{'hide-seall': !createOrderPermission}" [routerLink]="['/orders']">
+														<span>See all orders</span>
+														<mat-icon class="order-icon">keyboard_arrow_right</mat-icon>
+													</a>
+												</div>
+											</div> -->
+											<div class="table-container pad_0">
+												<mat-table *ngIf=" !emptyOrdersData"   [dataSource]="dataSource">
+													 <ng-container matColumnDef="contact_image">
+														<mat-header-cell *matHeaderCellDef fxFlex="20"> Contact Image </mat-header-cell>
+														<mat-cell *matCellDef="let element" fxFlex="20">
+															<div class="icon-sec"  *ngIf="element.profile_image_url == null">
+																<img [src]='images.ordersIcon_o' title="Contact Image">
+															</div>
+						
+															<div class="icon-sec" *ngIf="element.profile_image_url && element.profile_image_url != null">
+																<img [src]='images.ordersIcon_o' title="Contact Image">
+															</div>
+															<!-- <div class="content-sec">
+																<h1 class="order-number" title="{{element.orders.order_no}}">{{element.orders.order_no}}</h1>
+																<p class="order-info" title="{{element.orders.product_name}}">{{element.orders.product_name}}</p>
+															</div> -->
+														</mat-cell>
+													</ng-container>
+												<!--	<ng-container matColumnDef="client_name">
+														<mat-header-cell *matHeaderCellDef fxFlex="25"> Contact Name </mat-header-cell>
+														<mat-cell *matCellDef="let element" fxFlex="25">
+															<mat-icon mat-list-icon class="avatar-list" *ngIf="element.orders.client_image">
+																<div class="mat-order-avatar" [ngStyle]="{'background-image': 'url(' + element.orders.client_image + ')'}"></div>
+															</mat-icon>
+															<div mat-list-icon class="no-order-image" *ngIf="!element.orders.client_image">
+																<span class="mat-avatar">{{element.orders.client_name | contactImageName: 2}}</span>
+															</div>
+															<div class="content-sec">
+																<p class="client-name" title="{{element.orders.client_name}}">{{element.orders.client_name}}</p>
+																<p class="client-info" title="{{element.orders.name}}">{{element.orders.name}}</p>
+															</div>
+														</mat-cell>
+													</ng-container> -->
+													<ng-container matColumnDef="firstname">
+														<mat-header-cell *matHeaderCellDef> Contact Name </mat-header-cell>
+														<mat-cell *matCellDef="let element" title="{{element.name}}">{{element.name}}</mat-cell>
+													</ng-container>
+													<ng-container matColumnDef="org_name">
+														<mat-header-cell *matHeaderCellDef> Company </mat-header-cell>
+														<mat-cell *matCellDef="let element" title="{{element.org_name}}"> {{element.org_name}} </mat-cell>
+													</ng-container>
+													<ng-container matColumnDef="email">
+														<mat-header-cell *matHeaderCellDef> Email </mat-header-cell>
+														<mat-cell *matCellDef="let element" title="{{element.email}}">{{element.email }}</mat-cell>
+													</ng-container>
+													<ng-container matColumnDef="user_type">
+														<mat-header-cell *matHeaderCellDef> Type </mat-header-cell>
+														<mat-cell *matCellDef="let element" title="{{element.user_type}}">{{element.user_type}}</mat-cell>
+													</ng-container>
+													<ng-container matColumnDef="status">
+														<mat-header-cell *matHeaderCellDef> Status </mat-header-cell>
+														<mat-cell *matCellDef="let element"  title="{{element.status}}">
+															<div class="client-status" 
+															[ngClass]="{'accepted':element.status == 'Active' ,
+															
+															
+															  'cancelled':element.status == 'InActive'
+															}"
+															>{{element.status}}</div>
+															<span fxFlex></span>
+															<mat-icon  title="" class="go-to-details">keyboard_arrow_right</mat-icon>
+														</mat-cell>
+													</ng-container>
+													<!-- <ng-container matColumnDef="type">
+														<mat-header-cell *matHeaderCellDef> Type </mat-header-cell>
+														<mat-cell *matCellDef="let element" title="gfg">type</mat-cell>
+													</ng-container> -->
+													<mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
+													<mat-row class="orders-row" (click)="contactDetails(row)" [ngClass]="{'cursorDefault': !createOrderPermission}" *matRowDef="let row; columns: displayedColumns;"></mat-row>
+												</mat-table>
+						
+												<!-- client overview card -->
+						
+											<div class="container-ui new-center-empty-ui " *ngIf="!fetchingData && emptyOrdersData">
+												<mat-card class="no-results" >
+													<div class="empty-img-holder">
+														<img [src]="images.ordersIcon_o">
+													</div>
+													
+													<p class="no-result-text">No Contacts Found</p>
+												</mat-card>
+											</div>
+										
+											<div class=" container-ui new-center-empty-ui" *ngIf="fetchingData">
+												<mat-spinner class="medium-spinner" *ngIf="fetchingData"></mat-spinner>
+											</div>
+
+											</div>
+										</div>
+									</div>
+								 
+							</div>
+
+							</div>
+						
+						</perfect-scrollbar>
+                       
+						
+                    </div>
+                </div>
+			</mat-step>
+			
+		</mat-horizontal-stepper>
+        <!-- <div *ngIf="totalSpinner">
+            <mat-spinner class="medium-spinner"></mat-spinner>
+        </div> -->
+
+	</section>

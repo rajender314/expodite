@@ -1,0 +1,113 @@
+<mat-toolbar class="mat-small-toolbar list-toolbar">
+    <mat-icon  (click)="backQuote()"class="back-to-orders" >arrow_back</mat-icon>
+    <mat-icon mat-list-icon>
+        <img [src]='images.pdf_download' title="">
+    </mat-icon>
+    <span  class="text-pd">{{previewData?.file_name}}</span>
+    <span fxFlex></span>
+     <!-- <a [src]='ur'> -->
+        <a href="{{ur}}getQuotesPreview?id={{previewData.id}}&printable=0" >
+<!-- <a href="App.api_url + 'getQuotesPreview?id={{previewData.id}}&is_printable=0'"> -->
+        <button mat-icon-button>
+        <img [src]='images.download_arrow' title="Download">
+        </button>
+        
+     </a> 
+     <a href="{{ur}}getQuotesPreview?id={{previewData.id}}&printable=2"  target="_blank" >
+        <!-- <a href="App.api_url + 'getQuotesPreview?id={{previewData.id}}&is_printable=0'"> -->
+                <button mat-icon-button>
+                <img [src]='images.lead_printer' title="Print">
+                </button>
+                
+             </a> 
+     
+    <button (click)="emailQuote()" mat-icon-button>
+        <img [src]='images.quote_mail' title="Email">
+        </button>
+  </mat-toolbar>
+  <mat-dialog-content class="preview-content">
+      <div class="prev-row">
+        <div class="prev-clmn">
+            <div class="row-div addres-val">
+                <label class="row-label">Address</label>
+                <span class="row-value"title=" {{previewData.delivery_address.addres_1}}">
+                    {{previewData.delivery_address.address_1}}
+                </span>
+                <span *ngIf="previewData.delivery_address.address_2" class="row-value" title=" {{previewData.delivery_address.addres_2}}">
+                    {{previewData.delivery_address.address_2?previewData.delivery_address.address_2 :'--'}}
+                 </span>
+                 <span class="row-value"title=" {{previewData.delivery_address.country}}">
+                    {{previewData.delivery_address.country}}
+                </span>
+                <span class="row-value"title=" {{previewData.delivery_address.state}}">
+                    {{previewData.delivery_address.state}}
+                </span>
+                
+                <span class="row-value"title=" {{previewData.delivery_address.city}}">
+                    {{previewData.delivery_address.city}}
+                </span>
+                 <span class="row-value"title=" {{previewData.delivery_address.postal_code}}">
+                    {{previewData.delivery_address.postal_code}}
+                </span>
+            </div> 
+            <div class="row-div">
+                <label class="row-label">Phone Number</label>
+                <p class="row-value"title=" {{previewData.contact_number}}">
+                    {{previewData.contact_number}}
+                </p>
+            </div> 
+            <div class="row-div">
+                <label class="row-label"> Attention To</label>
+                <p class="row-value"title=" {{previewData.attention_to}}">
+                    {{previewData.attention_to}}
+                </p>
+            </div>
+          </div>
+          <div class="prev-clm">
+            <div class="row-div">
+                <label class="row-label">Quote ID</label>
+                <p class="row-value"title=" {{previewData.quotes_id}}">
+                    {{previewData.quotes_id}}
+                </p>
+            </div>
+            <div class="row-div">
+                <label class="row-label">Date Sent</label>
+                <p class="row-value"title=" {{previewData.date_sent}}">
+                    {{previewData.date_sent}}
+                </p>
+            </div>
+            <div class="row-div">
+                <label class="row-label">Quotation Deadline</label>
+                <p class="row-value"title=" {{previewData.quote_validity}}">
+                    {{previewData.quote_validity}}
+                </p>
+            </div>
+          </div>
+      </div>
+      <div class="prod-list">
+        <div class="prod-list-sub">
+            <div class="flx-1">Item</div>
+           <div class="flx-4">Description</div>
+           <div class="flx-3">Quantity</div>
+           <div class="flx-3">Price/Unit</div>
+           <div class="flx-3">Amount(USD) </div>
+
+        </div>
+        
+
+       </div>
+       <div class="prod-data-sub"  *ngFor="let each of previewProducts; let i = index;">
+        <div class="flx-1 row-value">{{i+1}}</div>
+        <div class="flx-4 row-value">{{each.products_name}}</div>
+        <div class="flx-3 row-value">{{each.quantity}} Kg/s</div>
+        <div class="flx-3 row-value">
+          USD {{each.unit_price}}/KG
+        </div>
+        <div class="flx-3 row-value">USD {{each.amount}}</div>
+     </div>
+      
+</mat-dialog-content>
+<mat-toolbar class="mat-small-toolbar list-toolbar brdr-ft">
+    <span fxFlex></span>
+    <span >Total: USD {{previewData.total_amount}}</span>
+  </mat-toolbar>

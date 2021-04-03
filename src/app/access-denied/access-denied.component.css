@@ -1,0 +1,50 @@
+.maintenance{
+    position: relative;
+    height: 100%;
+    background-color: #c5e7ee;
+}
+.info {
+    position: relative;
+    z-index: 999;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+    height: 100%;
+}
+.info .material-icons {
+    font-size: 56px;
+    color: #253957;
+}
+.info h2 {
+    font-size: 40px;
+    font-weight: 600;
+    color: #253957;
+    margin-bottom: 20px;
+}
+.info p {
+    font-size: 24px;
+    /* font-weight: 600;
+    color: #253957;
+    margin-bottom: 20px; */
+}
+.btn {
+    font-size: 14px;
+    color: #ffffff;
+    border: 0px solid;
+    border-bottom: 2px solid;
+    border-color: #253957;
+    padding: 10px 41px;
+    border-radius: 5px;
+    background: none;
+    display: inline-block;
+    margin: 10px 0;
+    background-color: #253957;
+    text-transform: none;
+    font-weight: 500;
+    transition: all 0.5s ease-in-out;
+    text-decoration: none;
+    cursor: pointer;
+    margin-top: 20px;
+}

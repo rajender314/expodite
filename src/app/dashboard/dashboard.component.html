@@ -1,0 +1,262 @@
+<div class="dashboard_section">
+  <div class="blue_section">
+    <mat-toolbar class="dashboard_filters">
+      <!-- <mat-icon>dashboard</mat-icon> -->
+          <form [formGroup]="dashboardForm">
+          <div fxLayout="row" fxLayoutAlign="start start">
+            <div fxFlex="70" fxLayoutAlign="start start">
+              <mat-form-field floatLabel="never">
+                <label for="projects" class="fld_lbl">Project</label>
+                <mat-select placeholder="Select Project" formControlName="projects">
+                  <mat-option [value]="project.id" *ngFor="let project of projectList" [innerHtml]="project.value"></mat-option>
+                </mat-select>
+                <mat-icon>keyboard_arrow_down</mat-icon>
+                <mat-error *ngIf="dashboardForm.controls.objectives.hasError('required')">Please Select Objective</mat-error>
+              </mat-form-field>
+              <hr>
+              <mat-form-field floatLabel="never" class="lrg_fld">
+                <label for="objectives" class="fld_lbl">Objective</label>
+                <mat-select placeholder="Select Objective" formControlName="objectives">
+                  <mat-option [value]="objective.id" *ngFor="let objective of objectiveList" [innerHtml]="objective.value"></mat-option>
+                </mat-select>
+                <mat-icon>keyboard_arrow_down</mat-icon>
+                <mat-error *ngIf="dashboardForm.controls.objectives.hasError('required')">Please Select Objective</mat-error>
+              </mat-form-field>
+              <hr>
+              <mat-form-field floatLabel="never" class="lrg_fld">
+                <label for="campaigns" class="fld_lbl">Campaign</label>
+                <mat-select placeholder="Select Campaign" formControlName="campaigns">
+                  <mat-option [value]="campaign.id" *ngFor="let campaign of campaignList" [innerHtml]="campaign.value"></mat-option>
+                </mat-select>
+                <mat-icon>keyboard_arrow_down</mat-icon>
+                <mat-error *ngIf="dashboardForm.controls.campaigns.hasError('required')">Please Select Campaign</mat-error>
+              </mat-form-field>
+            </div>
+            <div fxFlex="30" fxLayoutAlign="end end">
+              <mat-form-field floatLabel="never" class="hide_input">
+                <label for="date_range" class="fld_lbl">Date Range</label>
+                <input matInput placeholder="Date Range" formControlName="date_range">
+                <mat-error *ngIf="dashboardForm.controls.date_range.hasError('required')">Please Enter Date Range</mat-error>
+                <span class="date_val">Oct 14 to Nov 13, 2017
+                  <mat-icon>keyboard_arrow_down</mat-icon>
+                </span>
+              </mat-form-field>
+            </div>
+          </div>        
+        </form> 
+    </mat-toolbar>
+    <div class="imp_counts">
+      <div class="channels_list" fxLayout="row" fxLayoutAlign="start start" fxLayoutGap="20px">
+        <div class="channel_item" fxFlex="25" (click)="fbStats();">
+          <div class="sc_icon fb" fxFlex="30" [ngStyle]="{'background-image': 'url(' + sc_fb + ')'}"></div>
+          <div class="sc_info" fxFlex="70">
+            <span class="lbl">Impressions</span>
+            <span class="cnt">5.2M</span>
+          </div>
+        </div>
+        <div class="channel_item" fxFlex="25" (click)="twitterStats();">
+          <div class="sc_icon twit" fxFlex="30" [ngStyle]="{'background-image': 'url(' + sc_twit + ')'}"></div>
+          <div class="sc_info" fxFlex="70">
+            <span class="lbl">Impressions</span>
+            <span class="cnt">100K</span>
+          </div> 
+        </div>
+        <div class="channel_item" fxFlex="25">
+          <div class="sc_icon pint" fxFlex="30" [ngStyle]="{'background-image': 'url(' + sc_pint + ')'}"></div>
+          <div class="sc_info" fxFlex="70">
+            <span class="lbl">Impressions</span>
+            <span class="cnt">50K</span>
+          </div>  
+        </div>
+        <div class="channel_item" fxFlex="25">
+          <div class="sc_icon adwords" fxFlex="30" [ngStyle]="{'background-image': 'url(' + sc_adwords + ')'}"></div>
+          <div class="sc_info" fxFlex="70">
+            <span class="lbl">Impressions</span>
+            <span class="cnt">2.1M</span>
+          </div>   
+        </div>
+      </div>
+    </div>
+    <div class="ads_chart_section" fxLayout="row" fxLayoutAlign="start start">
+      <div class="sc_charts" fxFlex="74">
+        <p>Ads Campaign Impressions and Conversion</p>
+        <mat-tab-group class="mat-tab-group" (selectedTabChange)="onLinkClick($event)">
+          <mat-tab label="Facebook">
+            <div class="chart_block">
+                <canvas id="line_chart_0" width="250" height="150"></canvas>
+            </div>
+          </mat-tab>
+          <mat-tab label="Twitter">
+            <div class="chart_block">
+              <canvas id="line_chart_1" width="250" height="150"></canvas>
+            </div>
+          </mat-tab>
+          <mat-tab label="Pinterest">
+            <div class="chart_block">
+                <canvas id="line_chart_2" width="250" height="150"></canvas>
+            </div>  
+          </mat-tab>
+        </mat-tab-group>
+      </div>
+      <div class="circle_block" fxFlex="26">
+        <div class="circle_info">
+            <div class="pie_chart">
+                <canvas id="pie_chart_0" width="150" height="150"></canvas>
+              </div>
+            <div class="circle_txt">
+                <span class="circle_fb" [ngStyle]="{'background-image': 'url(' + sc_fb + ')'}"></span>
+                <span class="circle_fb_txt">Facebook Ads</span> 
+            </div>
+        </div>
+        <div class="imp_data frst">
+          <span class="hd_sec"><span class="color_blk pink"></span>Impressions</span>
+          <span class="hd_cnt">1,550,508</span>
+        </div>
+        <div class="imp_data">
+          <span class="hd_sec"><span class="color_blk violet"></span>Conversion</span>
+          <span class="hd_cnt">16,258</span>
+        </div>
+      </div>  
+    </div>
+  </div>
+  <div class="gray_section">
+    <div class="channels_ads">
+      <p>Channels Ad Comparison</p>
+      <table class="channels_tbl" cellspacing="0" cellpadding="0" border="0">
+          <thead>
+            <tr>
+              <th style="text-align:left;padding-left:30px;">Impressions</th>
+              <th>Clicks</th>
+              <th>Conversion</th>
+              <th>CPM</th>
+              <th>CTR</th>
+              <th>CPC</th>
+              <th>CPA</th>
+              <th>Conversion Rate</th>
+              <th>Frequency</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="text-align:left;padding-left:30px;"><div class="bg_cell fb" [ngStyle]="{'background-image': 'url(' + tbl_fb + ')'}">500,025</div></td>
+              <td>15,067</td>
+              <td>5,067</td>
+              <td>$2.5</td>
+              <td>9.31%</td>
+              <td>$3.25</td>
+              <td>$0.2</td>
+              <td>20.5%</td>
+              <td>8.5%</td>
+            </tr>
+            <tr class="alt">
+              <td style="text-align:left;padding-left:30px;"><div class="bg_cell twit" [ngStyle]="{'background-image': 'url(' + tbl_twit + ')'}">100,025</div></td>
+              <td>5,067</td>
+              <td>1,067</td>
+              <td>$4.5</td>
+              <td>3.31%</td>
+              <td>$2</td>
+              <td>$2.2</td>
+              <td>10.5%</td>
+              <td>20.5%</td>
+            </tr>
+            <tr>
+                <td style="text-align:left;padding-left:30px;"><div class="bg_cell pint" [ngStyle]="{'background-image': 'url(' + tbl_pint + ')'}">80,025</div></td>
+                <td>3,067</td>
+                <td>7,067</td>
+                <td>$8.5</td>
+                <td>8.31%</td>
+                <td>$4.2</td>
+                <td>$3</td>
+                <td>2.5%</td>
+                <td>1.5%</td>
+              </tr>
+          </tbody>
+        </table>
+    </div>
+    <div class="organic_section" fxLayout="row" fxLayoutAlign="start start">
+        <div fxFlex="50" class="org_cnts">
+            <div class="org_sc_tabs">
+              <mat-tab-group class="mat-tab-group">
+                <mat-tab label="Impressions" class="mat-tab active">
+                  <div class="org_sc_data" fxLayout="row">
+                    <div class="sc_data" fxFlex="40">
+                      <div class="sc_circle" [ngStyle]="{'background-image': 'url(' + sc_fb_circle + ')'}"></div>
+                      <span class="sc_data_cnt">125,067</span>
+                      <span>Total Impressions</span>
+                    </div>
+                    <div class="sc_versus" fxFlex="20">VS</div>
+                    <div class="sc_data" fxFlex="40">
+                      <div class="sc_circle" [ngStyle]="{'background-image': 'url(' + sc_twit_circle + ')'}"></div>
+                      <span class="sc_data_cnt">85,067</span>
+                      <span>Total Impressions</span>
+                    </div>
+                  </div>
+                </mat-tab>
+                <mat-tab label="Conversions" class="mat-tab">
+                  <div class="org_sc_data" fxLayout="row">
+                    <div class="sc_data" fxFlex="40">
+                      <div class="sc_circle" [ngStyle]="{'background-image': 'url(' + sc_fb_circle + ')'}"></div>
+                      <span class="sc_data_cnt">325,067</span>
+                      <span>Total Impressions</span>
+                    </div>
+                    <div class="sc_versus" fxFlex="20">VS</div>
+                    <div class="sc_data" fxFlex="40">
+                      <div class="sc_circle" [ngStyle]="{'background-image': 'url(' + sc_twit_circle + ')'}"></div>
+                      <span class="sc_data_cnt">225,067</span>
+                      <span>Total Impressions</span>
+                    </div>
+                  </div>
+                </mat-tab>
+                <mat-tab label="Clicks" class="mat-tab">
+                  <div class="org_sc_data" fxLayout="row">
+                    <div class="sc_data" fxFlex="40">
+                      <div class="sc_circle" [ngStyle]="{'background-image': 'url(' + sc_fb_circle + ')'}"></div>
+                      <span class="sc_data_cnt">425,067</span>
+                      <span>Total Impressions</span>
+                    </div>
+                    <div class="sc_versus" fxFlex="20">VS</div>
+                    <div class="sc_data" fxFlex="40">
+                      <div class="sc_circle" [ngStyle]="{'background-image': 'url(' + sc_twit_circle + ')'}"></div>
+                      <span class="sc_data_cnt">625,067</span>
+                      <span>Total Impressions</span>
+                    </div>
+                  </div>
+                </mat-tab>
+              </mat-tab-group>
+            </div>
+            <div class="org_analytics">
+                <p>Google Analytics Impressions</p>
+                <div class="org_sc_data" fxLayout="row" fxLayoutAlign="start start">
+                  <div class="sc_data" fxFlex="33">
+                    <span class="heading">Sessions</span>
+                    <span class="sc_data_cnt">122,060</span>
+                    <span class="dot"></span>
+                    <span>Last 30 days: 112,060</span>
+                  </div>
+                  <div class="sc_data" fxFlex="33">
+                    <span class="heading">Users</span>
+                    <span class="sc_data_cnt">112,060</span>
+                    <span class="dot"></span>
+                    <span>Last 30 days: 102,060</span>
+                  </div>
+                  <div class="sc_data" fxFlex="33">
+                    <span class="heading">Page/Session</span>
+                    <span class="sc_data_cnt">10,450</span>
+                    <span class="dot red"></span>
+                    <span>Last 30 days: 11,460</span>
+                  </div>
+                </div>
+            </div>
+        </div>
+        <div fxFlex="50" class="org_chart">
+          <div class="org_chart_hd"><span class="graph_icon" [ngStyle]="{'background-image': 'url(' + graph_icon + ')'}"></span>Google Analytics</div>
+          <hr>
+          <div class="pg_views"><span class="cnt">3,200,000</span><span>Page Views</span></div>
+          <div class="org_chart_img">
+              <canvas id="line_chart_3" width="200" height="150"></canvas>
+          </div>
+        </div>
+    </div>
+  </div>
+</div>
+

@@ -1,0 +1,37 @@
+<div class="list clients-list" [class.my-profile]="myProfile">
+    <div class="app-title">{{language.defaults.vendorCount}}  ({{totalCount}})
+        <span fxFlex></span>
+        <span class="add-link" (click)="addOrganization()">
+            <mat-icon>add</mat-icon>Add
+        </span>
+    </div>
+    <div class="app-search-container search-small">
+      <mat-form-field class="search" floatLabel="never">
+        <input matInput placeholder="{{language.defaults.search}}" #search (keyup)="searchOrganization(search.value, $event)" (blur)="!search.value.length ? open = false : open = true">
+        <mat-icon matPrefix class="org-search">search</mat-icon>
+        <mat-icon matSuffix *ngIf="searching" class="spinner">
+          <mat-spinner class="small-spinner"></mat-spinner>
+        </mat-icon>
+        <mat-icon matSuffix *ngIf="!searching && search.value.length" (click)="search.value = '';searchOrganization(search.value)">close</mat-icon>
+      </mat-form-field>
+    </div>
+    
+    <div class="list-items" infiniteScroll [infiniteScrollDistance]="1" [infiniteScrollThrottle]="50" (scrolled)="onScroll()"
+      [scrollWindow]="false">
+      <mat-spinner class="medium-spinner" *ngIf="fetchingData"></mat-spinner>
+      <mat-list class="organisation-list"  *ngIf="!fetchingData">
+        <mat-list-item *ngFor="let list of organizationsList" [ngClass]="{'active':list.id==selectedOrganizations.id}" (click)="getOrganization(list)">
+          <mat-icon mat-list-icon *ngIf="list.company_logo">
+            <img class="mat-avatar" [src]="list.company_logo ? list.company_logo : 'public/signatures/assets/images/avatar.png'" [alt]="list.company_name" />
+          </mat-icon>
+          <div mat-list-icon class="no-image" *ngIf="!list.company_logo">
+              <span class="mat-avatar">{{list.name | firstWord }}</span>
+            </div>
+          <h4 mat-line [innerHtml]="list.name"></h4>
+        </mat-list-item>
+        <mat-list-item *ngIf="paginationScroll">{{language.defaults.loading}}</mat-list-item>
+      </mat-list>
+      <div class="search-empty" *ngIf="!organizationsList.length && !fetchingData">{{language.defaults.noOrganisationsFound}}</div>
+    </div>
+  </div>
+  

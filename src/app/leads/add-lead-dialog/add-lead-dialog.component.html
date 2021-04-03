@@ -1,0 +1,714 @@
+<mat-toolbar>
+    <h2 mat-dialog-title></h2>
+    <span fxFlex> Add Lead</span>
+</mat-toolbar>
+<mat-dialog-content  class="add-lead-ht" cdkScrollable>
+    <form [formGroup]="storesAttributeForm"   *ngIf="fetchingData">
+
+        <div formArrayName="storesAttributes">
+            <!-- <h2 mat-dialog-title style="padding-left:0px;padding-top:0px;">Default Attributes</h2> -->
+            <div *ngFor="let attribute of storesAttributes?.controls; let i = index;"
+                [ngSwitch]="storesAttributesData[i]?.key">
+                <div class="form-elements" [formGroupName]="i">
+                    <div class="stores-attr-data">
+                        <div *ngSwitchCase="'single_line_text'">
+                            <mat-form-field class="custom-input block-ele mandatory w-100" floatLabel="never">
+                                <label class="custom-label"
+                                    [class.mandatory]="storesAttributesData[i]?.required">{{storesAttributesData[i].label_name}}</label>
+                                <input matInput placeholder="Enter {{storesAttributesData[i].label_name}}" [errorStateMatcher]="matcher"
+                                    [formControlName]="storesAttributesData[i].store_unique_label_key"
+                                    [maxlength]="storesAttributesData[i].label_element_data_length">
+
+                                <mat-error
+                                    *ngIf="(submittedStoresAttributeForm) 
+                                                    && (storesAttributeForm.controls.storesAttributes.controls[i].controls[storesAttributesData[i].store_unique_label_key].hasError('required')
+                                                    || storesAttributeForm.controls.storesAttributes.controls[i].controls[storesAttributesData[i].store_unique_label_key].invalid)">
+                                    Please enter
+                                    <span class="capitalize">{{storesAttributesData[i].label_name}}</span>
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+
+                        <div *ngSwitchCase="'number'">
+                            <mat-form-field class="custom-input block-ele mandatory w-100" floatLabel="never">
+                                <label class="custom-label"
+                                    [class.mandatory]="storesAttributesData[i]?.required">{{storesAttributesData[i].label_name}}</label>
+                                <input matInput placeholder="Enter {{storesAttributesData[i].label_name}}" [errorStateMatcher]="matcher"
+                                    [formControlName]="storesAttributesData[i].store_unique_label_key"
+                                    [maxlength]="storesAttributesData[i].label_element_data_length">
+
+
+                                <mat-error
+                                    *ngIf="(submittedStoresAttributeForm) 
+                                              && (storesAttributeForm.controls.storesAttributes.controls[i].controls[storesAttributesData[i].store_unique_label_key].hasError('required')
+                                              || storesAttributeForm.controls.storesAttributes.controls[i].controls[storesAttributesData[i].store_unique_label_key].invalid)">
+                                    Please enter
+                                    <span class="capitalize">{{storesAttributesData[i].label_name}}</span>
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+
+                        <div *ngSwitchCase="'paragraph_text'">
+                            <mat-form-field class="custom-input block-ele mandatory w-100" floatLabel="never">
+                                <label class="custom-label"
+                                    [class.mandatory]="storesAttributesData[i]?.required">{{storesAttributesData[i].label_name}}</label>
+                                <textarea matInput placeholder="Enter {{storesAttributesData[i].label_name}}" [errorStateMatcher]="matcher"
+                                    [formControlName]="storesAttributesData[i].store_unique_label_key"
+                                    [maxlength]="storesAttributesData[i].label_element_data_length">
+                                </textarea>
+
+                                <mat-error
+                                    *ngIf="(submittedStoresAttributeForm) 
+                                  && (storesAttributeForm.controls.storesAttributes.controls[i].controls[storesAttributesData[i].store_unique_label_key].hasError('required')
+                                  || storesAttributeForm.controls.storesAttributes.controls[i].controls[storesAttributesData[i].store_unique_label_key].invalid)">
+                                    Please enter
+                                    <span class="capitalize">{{storesAttributesData[i].label_name }}
+                                    </span>
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div *ngSwitchCase="'dropdown'" class="structure-select">
+                            <mat-form-field class="custom-input block-ele mandatory w-100" floatLabel="never">
+                                <label class="custom-label"
+                                    [class.mandatory]="storesAttributesData[i]?.required">{{storesAttributesData[i].label_name}}</label>
+                                <mat-select placeholder="Select {{storesAttributesData[i].value}}" [errorStateMatcher]="matcher"
+                                    [formControlName]="storesAttributesData[i].store_unique_label_key">
+                                    <mat-option [value]="attr.value"
+                                        *ngFor="let attr of storesAttributesData[i]?.options" [innerHtml]="attr.label">
+                                    </mat-option>
+                                </mat-select>
+
+                                <mat-error
+                                    *ngIf="(submittedStoresAttributeForm) 
+                                  && storesAttributeForm.controls.storesAttributes.controls[i].controls[storesAttributesData[i].store_unique_label_key].hasError('required')">
+                                    Please select
+                                    <span class="capitalize">{{storesAttributesData[i].label_name}}</span>
+                                </mat-error>
+                            </mat-form-field>
+
+                        </div>
+
+                        <div *ngSwitchCase="'auto_suggest'" class="structure-select">
+                            <mat-form-field class="custom-input block-ele mandatory w-100" floatLabel="never">
+                                <label class="custom-label"
+                                    [class.mandatory]="storesAttributesData[i]?.required">{{storesAttributesData[i].label_name}}
+                                </label>
+                                <input type="text" placeholder="Enter {{storesAttributesData[i].label_name}}" matInput
+                                    [formControlName]="storesAttributesData[i].store_unique_label_key" [errorStateMatcher]="matcher"
+                                    [matAutocomplete]="auto">
+                                <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayView">
+                                    <mat-option [value]="attr"
+                                        *ngFor="let attr of filterOpts(storesAttributesData[i]?.options, storesAttributeForm.controls?.storesAttributes?.controls[i]?.controls[storesAttributesData[i]?.store_unique_label_key], i)"
+                                        [innerHtml]="attr.label"></mat-option>
+                                </mat-autocomplete>
+
+                                <mat-error
+                                    *ngIf="(submittedStoresAttributeForm) 
+                                                  && (storesAttributeForm.controls.storesAttributes.controls[i].controls[storesAttributesData[i].store_unique_label_key].hasError('required')
+                                                  || storesAttributeForm.controls.storesAttributes.controls[i].controls[storesAttributesData[i].store_unique_label_key].invalid)">
+                                    Please enter
+                                    <span class="capitalize">{{storesAttributesData[i].label_name}}</span>
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+
+                        <div *ngSwitchCase="'multiple_choice'" class="structure-select">
+                            <mat-form-field class="custom-input block-ele mandatory w-100" floatLabel="never">
+                                <label class="custom-label"
+                                    [class.mandatory]="storesAttributesData[i]?.required">{{storesAttributesData[i].label_name}}
+                                </label>
+                                <mat-select multiple placeholder="Select {{storesAttributesData[i].value}}"
+                                    [formControlName]="storesAttributesData[i].store_unique_label_key" [errorStateMatcher]="matcher"
+                                    class="multi-select" panelClass="my-panel-class" [backdropClass]="'full-width'"
+                                    multiple>
+                                    <mat-option [value]="attr.value"
+                                        *ngFor="let attr of storesAttributesData[i]?.options">
+                                        {{attr.label}}</mat-option>
+                                </mat-select>
+
+                                <mat-error
+                                    *ngIf="(submittedStoresAttributeForm) 
+                                      && storesAttributeForm.controls.storesAttributes.controls[i].controls[storesAttributesData[i].store_unique_label_key].hasError('required')">
+                                    Please select
+                                    <span class="capitalize">{{storesAttributesData[i].label_name}}</span>
+                                </mat-error>
+                            </mat-form-field>
+
+                        </div>
+
+                        <div *ngSwitchCase="'checkboxes'" style="display:none">
+                            <mat-checkbox color="primary"
+                                [formControlName]="storesAttributesData[i].store_unique_label_key">
+                                {{storesAttributesData[i].label_name}}</mat-checkbox>
+                            <mat-error
+                                *ngIf="(submittedStoresAttributeForm) 
+                                      && storesAttributeForm.controls.storesAttributes.controls[i].controls[storesAttributesData[i].store_unique_label_key].hasError('required')">
+                                Please select
+                                <span class="capitalize">{{storesAttributesData[i].label_name}}</span>
+                            </mat-error>
+                        </div>
+
+                        <div *ngSwitchCase="'date_field'" class="structure-select">
+                            <mat-form-field class="custom-input block-ele mandatory w-100" floatLabel="never">
+                                <label class="custom-label"
+                                    [class.mandatory]="storesAttributesData[i]?.required">{{storesAttributesData[i].label_name}}
+                                </label>
+
+                                <div class="date-picker-field"
+                                    *ngIf="(storesAttributesData[i].store_unique_label_key != 'store_open_date') && (storesAttributesData[i].store_unique_label_key != 'store_close_date')">
+                                    <input matInput class="datepicker" [errorStateMatcher]="matcher"
+                                        placeholder="Select {{storesAttributesData[i].value}}"
+                                        [formControlName]="storesAttributesData[i].store_unique_label_key"
+                                        (click)="openCalendar(picker)" (focus)="openCalendar(picker)"
+                                        [matDatepicker]="picker" placeholder="Rent Start Date">
+                                    <mat-datepicker-toggle matSuffix [for]="picker">
+                                    </mat-datepicker-toggle>
+                                    <mat-datepicker #picker></mat-datepicker>
+                                </div>
+
+                                <!-- [max]="storesAttributeForm.controls.storesAttributes.controls[i].controls[storesAttributesData[i].store_unique_label_key].value" -->
+                                <!-- store open date -->
+                                <div class="date-picker-field"
+                                    *ngIf="storesAttributesData[i].store_unique_label_key == 'store_open_date'">
+                                    <input matInput class="datepicker" [errorStateMatcher]="matcher"
+                                        placeholder="Select {{storesAttributesData[i].value}}"
+                                        [formControlName]="storesAttributesData[i].store_unique_label_key"
+                                        (click)="openCalendar(picker)" (focus)="openCalendar(picker)"
+                                        [matDatepicker]="picker" placeholder="Rent Start Date">
+                                    <mat-datepicker-toggle matSuffix [for]="picker">
+                                    </mat-datepicker-toggle>
+                                    <mat-datepicker #picker></mat-datepicker>
+                                </div>
+
+                                <!-- store close data -->
+                                <!-- [min]="storesAttributeForm.controls.storesAttributes.controls[i].controls[storesAttributesData[i].store_unique_label_key].value" -->
+                                <div class="date-picker-field"
+                                    *ngIf="storesAttributesData[i].store_unique_label_key == 'store_close_date'">
+                                    <input matInput class="datepicker" [errorStateMatcher]="matcher"
+                                        placeholder="Select {{storesAttributesData[i].value}}"
+                                        [formControlName]="storesAttributesData[i].store_unique_label_key"
+                                        (click)="openCalendar(picker)" (focus)="openCalendar(picker)"
+                                        [matDatepicker]="picker" placeholder="Rent Start Date">
+                                    <mat-datepicker-toggle matSuffix [for]="picker">
+                                    </mat-datepicker-toggle>
+                                    <mat-datepicker #picker></mat-datepicker>
+                                </div>
+
+                                <mat-error
+                                    *ngIf="(submittedStoresAttributeForm) 
+                                  && storesAttributeForm.controls.storesAttributes.controls[i].controls[storesAttributesData[i].store_unique_label_key].hasError('required')">
+                                    Please select
+                                    <span class="capitalize">{{storesAttributesData[i].label_name}}</span>
+                                </mat-error>
+                            </mat-form-field>
+
+                        </div>
+
+
+                        <div *ngSwitchDefault>
+                            <mat-form-field class="custom-input block-ele mandatory w-100" floatLabel="never">
+                                <label class="custom-label"
+                                    [class.mandatory]="storesCustomAttributesData[i]?.required">{{storesAttributesData[i].label_name}}</label>
+                                <input matInput placeholder="Enter {{storesAttributesData[i].label_name}}" [errorStateMatcher]="matcher"
+                                    [formControlName]="storesAttributesData[i].store_unique_label_key"
+                                    [maxlength]="storesAttributesData[i].label_element_data_length">
+                                <mat-error
+                                    *ngIf="(submittedStoresAttributeForm) 
+                                              && (storesAttributeForm.controls.storesAttributes.controls[i].controls[storesAttributesData[i].store_unique_label_key].hasError('required')
+                                              || storesAttributeForm.controls.storesAttributes.controls[i].controls[storesAttributesData[i].store_unique_label_key].invalid)">
+                                    Please enter
+                                    <span class="capitalize">{{storesAttributesData[i].label_name}}</span>
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div formArrayName="storeCustomAttributes">
+            <!-- <span>Custom Attributes</span> -->
+            <!-- <h2 mat-dialog-title style="padding-left:0px;padding-top:0px;">Custom Attributes</h2> -->
+            <div *ngFor="let attribute of storesCustomAttributesData; let i = index;"
+                [ngSwitch]="storesCustomAttributesData[i]?.key">
+
+                <div class="form-elements" [formGroupName]="i">
+                    <div class="stores-attr-data">
+                        <div *ngSwitchCase="'single_line_text'">
+
+                            <mat-form-field class="custom-input block-ele mandatory w-100" floatLabel="never">
+                                <label class="custom-label"
+                                    [class.mandatory]="storesCustomAttributesData[i]?.required">{{storesCustomAttributesData[i].label_name}}</label>
+
+                                <input matInput placeholder="Enter {{storesCustomAttributesData[i].label_name}}" [errorStateMatcher]="matcher"
+                                    [formControlName]="storesCustomAttributesData[i].store_unique_label_key"
+                                    [maxlength]="storesCustomAttributesData[i].label_element_data_length">
+
+                                <mat-error
+                                    *ngIf="(submittedStoresAttributeForm) 
+                         && (storesAttributeForm.controls.storeCustomAttributes.controls[i].controls[storesCustomAttributesData[i].store_unique_label_key].hasError('required')
+                        || storesAttributeForm.controls.storeCustomAttributes.controls[i].controls[storesCustomAttributesData[i].store_unique_label_key].invalid)">
+                                    Please enter
+                                    <span class="capitalize">{{storesCustomAttributesData[i].label_name}}</span>
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+
+                        <div *ngSwitchCase="'number'">
+                            <mat-form-field class="custom-input block-ele mandatory w-100" floatLabel="never">
+                                <label class="custom-label"
+                                    [class.mandatory]="storesCustomAttributesData[i]?.required">{{storesCustomAttributesData[i].label_name}}
+                                </label>
+                                <input matInput placeholder="Enter {{storesCustomAttributesData[i].label_name}}" [errorStateMatcher]="matcher"
+                                    (keydown)="allowOnlyNum($event,i,storesCustomAttributesData[i].store_unique_label_key)"
+                                    [formControlName]="storesCustomAttributesData[i].store_unique_label_key"
+                                    [maxlength]="storesCustomAttributesData[i].label_element_data_length">
+
+
+                                <mat-error
+                                    *ngIf="(submittedStoresAttributeForm) 
+                                                      && (storesAttributeForm.controls.storeCustomAttributes.controls[i].controls[storesCustomAttributesData[i].store_unique_label_key].hasError('required')
+                                                      || storesAttributeForm.controls.storeCustomAttributes.controls[i].controls[storesCustomAttributesData[i].store_unique_label_key].invalid)">
+                                    Please enter
+                                    <span class="capitalize">{{storesCustomAttributesData[i].label_name}}</span>
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+
+                        <div *ngSwitchCase="'paragraph_text'">
+                            <mat-form-field class="custom-input block-ele mandatory w-100" floatLabel="never">
+                                <label class="custom-label"
+                                    [class.mandatory]="storesCustomAttributesData[i]?.required">{{storesCustomAttributesData[i].label_name}}
+                                </label>
+                                <textarea matInput placeholder="Enter {{storesCustomAttributesData[i].label_name}}" [errorStateMatcher]="matcher"
+                                    [formControlName]="storesCustomAttributesData[i].store_unique_label_key"
+                                    [maxlength]="storesCustomAttributesData[i].label_element_data_length">
+                              </textarea>
+                                <mat-error
+                                    *ngIf="(submittedStoresAttributeForm) 
+                                          && (storesAttributeForm.controls.storeCustomAttributes.controls[i].controls[storesCustomAttributesData[i].store_unique_label_key].hasError('required')
+                                          || storesAttributeForm.controls.storeCustomAttributes.controls[i].controls[storesCustomAttributesData[i].store_unique_label_key].invalid)">
+                                    Please enter
+                                    <span class="capitalize">{{storesCustomAttributesData[i].label_name }}
+                                    </span>
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+
+                        <div *ngSwitchCase="'dropdown'" class="structure-select">
+                            <mat-form-field class="custom-input block-ele mandatory w-100" floatLabel="never">
+                                <label class="custom-label"
+                                    [class.mandatory]="storesCustomAttributesData[i]?.required">{{storesCustomAttributesData[i].label_name}}
+                                </label>
+                                <mat-select placeholder="Enter {{storesCustomAttributesData[i].label_name}}" [errorStateMatcher]="matcher"
+                                    [formControlName]="storesCustomAttributesData[i].store_unique_label_key">
+                                    <mat-option [value]="attr.value"
+                                        *ngFor="let attr of storesCustomAttributesData[i]?.options"
+                                        [innerHtml]="attr.label">
+                                    </mat-option>
+                                </mat-select>
+                                <mat-error
+                                    *ngIf="(submittedStoresAttributeForm) 
+                                              && storesAttributeForm.controls.storeCustomAttributes.controls[i].controls[storesCustomAttributesData[i].store_unique_label_key].hasError('required')">
+                                    Please select
+                                    <span class="capitalize">{{storesCustomAttributesData[i].label_name}}</span>
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+
+                        <div *ngSwitchCase="'auto_suggest'" class="structure-select">
+                            <mat-form-field class="custom-input block-ele mandatory w-100" floatLabel="never">
+                                <label class="custom-label"
+                                    [class.mandatory]="storesCustomAttributesData[i]?.required">{{storesCustomAttributesData[i].label_name}}
+                                </label>
+                                <input type="text" placeholder="Enter {{storesCustomAttributesData[i]?.label_name}}" [errorStateMatcher]="matcher"
+                                    matInput [formControlName]="storesCustomAttributesData[i]?.store_unique_label_key"
+                                    [matAutocomplete]="auto">
+                                <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayView">
+                                    <mat-option [value]="attr"
+                                        *ngFor="let attr of filterOpts(storesCustomAttributesData[i]?.options, storesAttributeForm.controls?.storeCustomAttributes?.controls[i]?.controls[storesCustomAttributesData[i]?.store_unique_label_key], i)">
+                                        {{attr.label}}
+                                    </mat-option>
+                                </mat-autocomplete>
+
+                                <mat-error
+                                    *ngIf="(submittedStoresAttributeForm) 
+                                                      && (storesAttributeForm.controls.storeCustomAttributes.controls[i].controls[storesCustomAttributesData[i].store_unique_label_key].hasError('required')
+                                                      || storesAttributeForm.controls.storeCustomAttributes.controls[i].controls[storesCustomAttributesData[i].store_unique_label_key].invalid)">
+                                    Please enter
+                                    <span class="capitalize">{{storesCustomAttributesData[i].label_name}}</span>
+                                </mat-error>
+                            </mat-form-field>
+
+                        </div>
+
+                        <div *ngSwitchCase="'multiple_choice'" class="structure-select">
+                            <mat-form-field class="custom-input block-ele mandatory w-100" floatLabel="never">
+                                <label class="custom-label"
+                                    [class.mandatory]="storesCustomAttributesData[i]?.required">{{storesCustomAttributesData[i].label_name}}
+                                </label>
+                                <mat-select placeholder="Enter {{storesCustomAttributesData[i].label_name}}" [errorStateMatcher]="matcher"
+                                    [formControlName]="storesCustomAttributesData[i].store_unique_label_key"
+                                    class="multi-select" panelClass="my-panel-class" multiple>
+                                    <mat-option [value]="attr.value"
+                                        *ngFor="let attr of storesCustomAttributesData[i]?.options">
+                                        {{attr.label}}</mat-option>
+                                </mat-select>
+                                <mat-error
+                                    *ngIf="(submittedStoresAttributeForm) 
+                                              && storesAttributeForm.controls.storeCustomAttributes.controls[i].controls[storesCustomAttributesData[i].store_unique_label_key].hasError('required')">
+                                    Please select
+                                    <span class="capitalize">{{storesCustomAttributesData[i].label_name}}</span>
+                                </mat-error>
+                            </mat-form-field>
+
+                        </div>
+
+                        <div *ngSwitchCase="'checkboxes'" style="display:none">
+                            <mat-checkbox color="primary"
+                                [formControlName]="storesCustomAttributesData[i].store_unique_label_key">
+                                {{storesCustomAttributesData[i].label_name}}</mat-checkbox>
+                            <mat-error
+                                *ngIf="(submittedStoresAttributeForm) 
+                                              && storesAttributeForm.controls.storeCustomAttributes.controls[i].controls[storesCustomAttributesData[i].store_unique_label_key].hasError('required')">
+                                Please select
+                                <span class="capitalize">{{storesCustomAttributesData[i].label_name}}</span>
+                            </mat-error>
+                        </div>
+
+                        <div *ngSwitchCase="'date_field'" class="structure-select">
+                            <mat-form-field class="custom-input block-ele mandatory w-100" floatLabel="never">
+                                <label class="custom-label"
+                                    [class.mandatory]="storesCustomAttributesData[i]?.required">{{storesCustomAttributesData[i].label_name}}
+                                </label>
+
+
+                                <div class="date-picker-field"
+                                    *ngIf="(storesCustomAttributesData[i].store_unique_label_key != 'store_open_date') && (storesCustomAttributesData[i].store_unique_label_key != 'store_close_date')">
+                                    <input matInput class="datepicker" [errorStateMatcher]="matcher"
+                                        placeholder="Enter {{storesCustomAttributesData[i].label_name}}"
+                                        [formControlName]="storesCustomAttributesData[i].store_unique_label_key"
+                                        (click)="openCalendar(picker)" (focus)="openCalendar(picker)"
+                                        [matDatepicker]="picker">
+                                    <mat-datepicker-toggle matSuffix [for]="picker">
+                                    </mat-datepicker-toggle>
+                                    <mat-datepicker #picker></mat-datepicker>
+                                </div>
+
+
+                                <div class="date-picker-field"
+                                    *ngIf="storesCustomAttributesData[i].store_unique_label_key == 'store_open_date'">
+                                    <input matInput class="datepicker" [errorStateMatcher]="matcher"
+                                        placeholder="Enter {{storesCustomAttributesData[i].label_name}}"
+                                        [formControlName]="storesCustomAttributesData[i].store_unique_label_key"
+                                        (click)="openCalendar(picker)" (focus)="openCalendar(picker)"
+                                        [matDatepicker]="picker">
+                                    <mat-datepicker-toggle matSuffix [for]="picker">
+                                    </mat-datepicker-toggle>
+                                    <mat-datepicker #picker></mat-datepicker>
+                                </div>
+
+
+                                <div class="date-picker-field"
+                                    *ngIf="storesCustomAttributesData[i].store_unique_label_key == 'store_close_date'">
+                                    <input matInput class="datepicker" [errorStateMatcher]="matcher"
+                                        placeholder="Enter {{storesCustomAttributesData[i].label_name}}"
+                                        [formControlName]="storesCustomAttributesData[i].store_unique_label_key"
+                                        (click)="openCalendar(picker)" (focus)="openCalendar(picker)"
+                                        [matDatepicker]="picker">
+                                    <mat-datepicker-toggle matSuffix [for]="picker">
+                                    </mat-datepicker-toggle>
+                                    <mat-datepicker #picker></mat-datepicker>
+                                </div>
+
+                                <mat-error
+                                    *ngIf="(submittedStoresAttributeForm) 
+                                              && storesAttributeForm.controls.storeCustomAttributes.controls[i].controls[storesCustomAttributesData[i].store_unique_label_key].hasError('required')">
+                                    Please select
+                                    <span class="capitalize">{{storesCustomAttributesData[i].label_name}}</span>
+                                </mat-error>
+                            </mat-form-field>
+
+                        </div>
+
+
+                        <div *ngSwitchDefault>
+                            <mat-form-field class="custom-input block-ele mandatory w-100" floatLabel="never">
+                                <label class="custom-label"
+                                    [class.mandatory]="storesCustomAttributesData[i]?.required">{{storesCustomAttributesData[i].label_name}}
+                                </label>
+                                <input matInput placeholder="Enter {{storesCustomAttributesData[i].label_name}}" [errorStateMatcher]="matcher"
+                                    [formControlName]="storesCustomAttributesData[i].store_unique_label_key"
+                                    [maxlength]="storesCustomAttributesData[i].label_element_data_length">
+                                <mat-error
+                                    *ngIf="(submittedStoresAttributeForm) 
+                                                          && (storesAttributeForm.controls.storeCustomAttributes.controls[i].controls[storesCustomAttributesData[i].store_unique_label_key].hasError('required')
+                                                          || storesAttributeForm.controls.storeCustomAttributes.controls[i].controls[storesCustomAttributesData[i].store_unique_label_key].invalid)">
+                                    Please enter
+                                    <span class="capitalize">{{storesCustomAttributesData[i].label_name}}</span>
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div formArrayName="contacts">
+            <div class="contact-header">
+                <h2 mat-dialog-title style="padding-left:0px;padding-top:0px;">Contacts</h2>
+                <p class="edit-view " (click)="addContact()">
+                    Add Contact
+                </p>
+            </div>
+            <div class="contact-section" *ngFor="let contactContols of storesAttributeForm.get('contacts')['controls']; let i = index;">
+
+                <div class="form-elements" [formGroupName]="i">
+                    <div class="stores-attr-data contact-box">
+                        <mat-form-field class="custom-input block-ele mandatory w-100" floatLabel="never">
+                            <label class="custom-label mandatory">Contact Name</label>
+
+                            <input matInput placeholder="Enter Contact Name" formControlName="contact_name"  [matAutocomplete]="auto"
+                            [errorStateMatcher]="matcher" (input)="getContactList($event,i)">
+                           <mat-autocomplete #auto="matAutocomplete" (optionSelected)="contactSelected($event,i)" class="serch-with-dropdown-ui distribution-plan-filter-list">
+                               <mat-option *ngFor="let user of contactList | async" [value]="user">
+                                   <span>{{ user.name }}</span>
+                               </mat-option>
+                           </mat-autocomplete>
+
+                            <mat-error *ngIf="(submittedStoresAttributeForm) 
+                 && (storesAttributeForm.get('contacts')['controls'][i]?.get('contact_name')?.hasError('required')
+                || storesAttributeForm.get('contacts')['controls'][i]?.get('contact_name')?.invalid)">
+                                Please enter
+                                <span class="capitalize">Contact Name</span>
+                            </mat-error>
+                        </mat-form-field>
+                        <mat-form-field class="custom-input block-ele mandatory w-100" floatLabel="never">
+                            <label class="custom-label mandatory">Phone Number</label>
+
+                            <input matInput placeholder="Enter Phone Number" formControlName="contact_details"
+                                type="tel" [errorStateMatcher]="matcher" appInputNumber maxlength="10" minlength="10"
+                            >
+
+                            <mat-error *ngIf="(submittedStoresAttributeForm) 
+                 && (storesAttributeForm.get('contacts')['controls'][i]?.get('contact_details')?.hasError('required'))">
+                                Please enter
+                                <span class="capitalize">Phone Number</span>
+                            </mat-error>
+                            <mat-error *ngIf="(submittedStoresAttributeForm) 
+                 && (!storesAttributeForm.get('contacts')['controls'][i]?.get('contact_details')?.hasError('required')
+                 && storesAttributeForm.get('contacts')['controls'][i]?.get('contact_details')?.invalid)">
+                                Please enter
+                                <span class="capitalize"> valid Phone Number</span>
+                            </mat-error>
+                        </mat-form-field>
+                        <mat-form-field class="custom-input block-ele mandatory w-100" floatLabel="never">
+                            <label class="custom-label mandatory">Email</label>
+
+                            <input matInput placeholder="Enter Email" formControlName="email" [errorStateMatcher]="matcher">
+
+                            <!-- <mat-error *ngIf="(submittedStoresAttributeForm) 
+                 && (storesAttributeForm.get('contacts')['controls'][i]?.get('email')?.hasError('required')
+                 || storesAttributeForm.get('contacts')['controls'][i]?.get('email')?.invalid)">
+                                Please enter
+                                <span class="capitalize">Email</span>
+                            </mat-error> -->
+                            <mat-error *ngIf="(submittedStoresAttributeForm) 
+                            && ( storesAttributeForm.get('contacts')['controls'][i]?.get('email')?.invalid && !storesAttributeForm.get('contacts')['controls'][i]?.get('email')?.hasError('required'))">
+                                           Please enter
+                                           <span class="capitalize"> valid Email</span>
+                                       </mat-error>
+                            <mat-error *ngIf="(submittedStoresAttributeForm) 
+                            && (storesAttributeForm.get('contacts')['controls'][i]?.get('email')?.hasError('required')
+                            )">
+                                           Please enter
+                                           <span class="capitalize">  Email</span>
+                                       </mat-error>
+                        </mat-form-field>
+                        <!-- <p class="edit-view dlt-blu"
+                            (click)="deleteContact(i)" title="Delete">
+                            <mat-icon>delete</mat-icon>
+                        </p> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div formArrayName="billAddress">
+            <div class="contact-header">
+                <h2 mat-dialog-title style="padding-left:0px;padding-top:0px;">Billing Address</h2>
+               
+            </div>
+            <div class="contact-section" *ngFor="let contactContols of storesAttributeForm.get('billAddress')['controls']; let i = index;">
+
+                <div class="form-elements"  [formGroupName]="i">
+                    <div class="row-div">
+                        <mat-form-field  class="custom-input block-ele mandatory w-100" floatLabel="never">
+                           <label class="custom-label mandatory">Address Line 1</label>
+                           <input  matInput placeholder="Enter Address Line 1" [errorStateMatcher]="matcher" formControlName="address_1" >
+                           <mat-error *ngIf="(submittedStoresAttributeForm) && (storesAttributeForm.get('billAddress')['controls'][i]?.get('address_1')?.hasError('required')
+                 || storesAttributeForm.get('billAddress')['controls'][i]?.get('address_1')?.touched)">
+                                Please enter
+                                <span class="capitalize">Address Line 1</span>
+                            </mat-error>
+                        </mat-form-field>
+                     </div>
+                     <div class="row-div">
+                        <mat-form-field  class="custom-input block-ele  w-100" floatLabel="never">
+                           <label class="custom-label ">Address Line 2</label>
+                           <input  matInput placeholder="Enter Address Line 2" formControlName="address_2" >
+                           <!-- <mat-error *ngIf="submitForm && (formGroup.get('contact_number').hasError('required')
+                              || formGroup.get('contact_number').invalid)">
+                              Please Enter
+                              <span class="capitalize">Contact Number</span>
+                           </mat-error> -->
+                        </mat-form-field>
+                     </div>
+                    
+                     
+                     <div class="row-div">
+                     <mat-form-field class="custom-input block-ele mandatory w-100" floatLabel="never">
+                        <label class="custom-label mandatory">Country</label>
+                        <mat-select placeholder="Select Country" (selectionChange)="onCountryChangeBill($event)"  formControlName="country_id"  [errorStateMatcher]="matcher">
+                            <mat-option *ngFor="let country of countries" [value]="country.id">{{country.name}}</mat-option>
+                        </mat-select>
+                        <mat-error *ngIf="(submittedStoresAttributeForm) 
+                        && (storesAttributeForm.get('billAddress')['controls'][i]?.get('country_id')?.hasError('required')
+                        || storesAttributeForm.get('billAddress')['controls'][i]?.get('country_id')?.invalid)">
+                                       Please Select
+                                       <span class="capitalize">Country</span>
+                                   </mat-error>                    </mat-form-field>
+                </div>
+                     <div class="row-div">
+                        <mat-form-field class="custom-input block-ele mandatory w-100" floatLabel="never">
+                            <label class="custom-label mandatory">State</label>
+                            <mat-select placeholder="Select State" [errorStateMatcher]="matcher"  formControlName="state_province_id">
+                                <mat-option [value]="">No State</mat-option>
+                                <mat-option *ngFor="let state of statesBill" [value]="state.id">{{state.name}}</mat-option>
+                            </mat-select>
+                            <mat-error *ngIf="(submittedStoresAttributeForm) 
+                        && (storesAttributeForm.get('billAddress')['controls'][i]?.get('state_province_id')?.hasError('required')
+                        || storesAttributeForm.get('billAddress')['controls'][i]?.get('state_province_id')?.invalid)">
+                                       Please Select
+                                       <span class="capitalize">State</span>
+                                   </mat-error>
+                        </mat-form-field>
+                     </div>
+                     <div class="row-div">
+                        <mat-form-field  class="custom-input block-ele mandatory w-100" floatLabel="never">
+                           <label class="custom-label mandatory">City</label>
+                           <input  matInput placeholder="Enter City" [errorStateMatcher]="matcher" formControlName="city" >
+                           <mat-error *ngIf="(submittedStoresAttributeForm) 
+                           && (storesAttributeForm.get('billAddress')['controls'][i]?.get('city')?.hasError('required')
+                           || storesAttributeForm.get('billAddress')['controls'][i]?.get('city')?.invalid)">
+                                          Please enter
+                                          <span class="capitalize">City</span>
+                                      </mat-error>
+                        </mat-form-field>
+                     </div>
+                     <div class="row-div">
+                     <mat-form-field class="custom-input block-ele mandatory w-100" floatLabel="never">
+                        <label class="custom-label mandatory">Postal Code</label>
+                        <input matInput  maxlength="6" placeholder=" Enter Postal Code" (keydown)="allowOnlyNum($event,i,postal_code)" [errorStateMatcher]="matcher"  formControlName="postal_code">
+                        <mat-error *ngIf="(submittedStoresAttributeForm) 
+                        && (storesAttributeForm.get('billAddress')['controls'][i]?.get('postal_code')?.hasError('required')
+                        || storesAttributeForm.get('billAddress')['controls'][i]?.get('postal_code')?.invalid)">
+                                       Please Enter
+                                       <span class="capitalize">Postal Code</span>
+                         </mat-error>
+                         
+                         
+                       </mat-form-field>
+                    </div>
+                    <!-- <div>
+                        <mat-checkbox (change)="updateCheckedShip($event,billAddress)" class="label-add" >Shipping Address Same as Billing Address</mat-checkbox>
+                    </div> -->
+                                         
+
+                </div>
+            </div>
+        </div>
+        <div formArrayName="shipAddress">
+            <div class="contact-header">
+                <h2 mat-dialog-title style="padding-left:0px;padding-top:0px;">Shipping Address</h2>
+               
+            </div>
+            <div class="contact-section" *ngFor="let contactContols of storesAttributeForm.get('shipAddress')['controls']; let i = index;">
+
+                <div class="form-elements"  [formGroupName]="i">
+                    <div class="row-div">
+                        <mat-form-field  class="custom-input block-ele  w-100" floatLabel="never">
+                           <label class="custom-label ">Address Line 1</label>
+                           <input  matInput placeholder="Enter Address Line 1" formControlName="address_1" >
+                           <!-- <mat-error *ngIf="submitForm && (formGroup.get('contact_number').hasError('required')
+                              || formGroup.get('contact_number').invalid)">
+                              Please Enter
+                              <span class="capitalize">Contact Number</span>
+                           </mat-error> -->
+                        </mat-form-field>
+                     </div>
+                     <div class="row-div">
+                        <mat-form-field  class="custom-input block-ele  w-100" floatLabel="never">
+                           <label class="custom-label ">Address Line 2</label>
+                           <input  matInput placeholder="Enter Address Line 2" formControlName="address_2" >
+                           <!-- <mat-error *ngIf="submitForm && (formGroup.get('contact_number').hasError('required')
+                              || formGroup.get('contact_number').invalid)">
+                              Please Enter
+                              <span class="capitalize">Contact Number</span>
+                           </mat-error> -->
+                        </mat-form-field>
+                     </div>
+                    
+                    
+                     <div class="row-div">
+                     <mat-form-field class="custom-input block-ele  w-100" floatLabel="never">
+                        <label class="custom-label">Country</label>
+                        <mat-select placeholder="Select Country" (selectionChange)="onCountryChange($event)"  formControlName="country_id">
+                            <mat-option *ngFor="let country of countries" [value]="country.id">{{country.name}}</mat-option>
+                        </mat-select>
+                        <!-- <mat-error *ngIf="addressForm.controls.country_id.hasError('required')">Please select country</mat-error> -->
+                    </mat-form-field>
+                </div>
+                     <div class="row-div">
+                        <mat-form-field class="custom-input block-ele  w-100" floatLabel="never">
+                            <label class="custom-label">State</label>
+                            <mat-select placeholder= "Select State"  formControlName="state_province_id">
+                                <mat-option [value]="">No State</mat-option>
+                                <mat-option *ngFor="let state of states" [value]="state.id">{{state.name}}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                     </div>
+                     <div class="row-div">
+                        <mat-form-field  class="custom-input block-ele  w-100" floatLabel="never">
+                           <label class="custom-label ">City</label>
+                           <input  matInput placeholder="Enter City" formControlName="city" >
+                           <!-- <mat-error *ngIf="submitForm && (formGroup.get('contact_number').hasError('required')
+                              || formGroup.get('contact_number').invalid)">
+                              Please Enter
+                              <span class="capitalize">Contact Number</span>
+                           </mat-error> -->
+                        </mat-form-field>
+                     </div>
+                     <div class="row-div">
+                     <mat-form-field class="custom-input block-ele  w-100" floatLabel="never">
+                        <label class="custom-label">Postal Code</label>
+                        <input matInput maxlength="6"(keydown)="allowOnlyNum($event,i,postal_code)" placeholder="Enter Postal Code" formControlName="postal_code">
+                        <!-- <mat-error *ngIf="addressForm.controls.postal_code.hasError('required') || addressForm.controls.postal_code.hasError('whitespace') ">Please enter postal code</mat-error> -->
+                    </mat-form-field>
+                    </div>
+                     
+                </div>
+            </div>
+        </div>
+
+    </form>
+ <div class="inv2-spinner">
+            <mat-spinner class="medium-spinner" *ngIf="!fetchingData"></mat-spinner>
+        </div>
+</mat-dialog-content>
+<mat-dialog-actions>
+    <span fxFlex class="flx-50"></span>
+    <button mat-button mat-dialog-close (click)="cancel()">Cancel</button>
+    <button mat-raised-button clas="margn-15" (click)="saveAttributes(storesAttributeForm)">Add Lead</button>
+</mat-dialog-actions>

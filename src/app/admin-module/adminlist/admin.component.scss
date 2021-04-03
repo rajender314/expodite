@@ -1,0 +1,94 @@
+@mixin viewHeight($height){
+	height: calc(100vh - #{$height});
+}
+*:focus {
+    outline: none;
+}
+
+
+.admin-list-container{
+.mat-list{
+    &.admin-list{
+        margin: 0;
+        padding: 0;
+            .mat-list-item{
+                cursor: pointer;
+                border-radius: 4px;
+                .list-name{
+                    display: flex;
+                    flex-direction: column;
+                    flex-grow: 1;
+                    margin: 0;
+                    overflow: hidden;
+                }
+                &:hover{
+                    background-color: rgba(220, 224, 228, 0.41);
+                }
+                &.active{
+                    background-color: #DADDE2;
+                }
+            }
+        }
+    }
+}
+
+
+.admin{ 
+    
+    section{
+        &.tabs{
+            width: 180px;
+            background: #EDEFF2;
+            border-right:1px solid #CFD1D5;
+            @include viewHeight(68px);overflow: auto;
+            .mat-list{padding: 10px;
+                .mat-list-item{
+                    &.active{
+                        background-color: #DADDE2;
+                        border-radius: 4px;
+                    }
+                }
+            }
+        }
+        &.tabs-content{
+            .tabs-list{
+                .list-items{
+                    overflow: auto;
+                    &:hover {
+                        &::-webkit-scrollbar {
+                            background-color: transparent;
+                            width: 6px;
+                            }
+                            &::-webkit-scrollbar-thumb {
+                            background-color: #c1c1c1;
+                            border-radius: 3px;
+                        
+                        }
+                    }
+                }
+                
+            }
+        }
+    }
+}
+
+.list{
+    .list-items{
+        .mat-list {
+            margin: 0px 16px;
+            .mat-list-item{
+                &.active{
+                    background-color: #DADDE2;
+                    border-radius: 4px;
+                }
+                
+            }
+        }
+    } 
+} 
+
+
+.admin-icons{
+    vertical-align: middle;
+    display: flex;
+    }

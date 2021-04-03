@@ -1,0 +1,7 @@
+.addLineForm{
+    display: flex;
+    justify-content: space-between;
+    .mat-form-field.custom-input {
+        width: 49%;
+    }
+}

@@ -1,0 +1,40 @@
+<div class="custom-modal" *ngIf="orderDownload">
+	<mat-toolbar>
+		<h2 mat-dialog-title></h2>
+		<span fxFlex>Download Document</span>
+	</mat-toolbar>
+	<mat-horizontal-stepper class="step" @stepTransition #stepper>
+		<mat-step>
+			<mat-dialog-content class="export-order-content">
+				<span>Are you sure you want to download all the documents for this order?</span>
+				<!-- <ng-container>
+					<div *ngFor="let pdf of data.checkOrders.linkStatus">
+						<div *ngIf="!data.checkOrders.length">
+							<div class="or-divider">
+								<span class="divider-or">or</span>
+								<a href="{{pdf.filename}}" class="download-order">
+									<span>Download</span>
+								</a>
+								<div>Last Downloaded on {{pdf.date_added}}</div>
+							</div>
+						</div>
+				</ng-container> -->
+			</mat-dialog-content>
+			<mat-dialog-actions>
+				<span fxFlex></span>
+				<button mat-button mat-dialog-close>Cancel</button>
+				<button mat-raised-button matStepperNext (click)="exportPdf()">Download</button>
+			</mat-dialog-actions>
+		</mat-step>
+		<!-- <mat-step>
+			<mat-dialog-content>
+				<div class="download-content">Download will begin shortly...</div>
+			</mat-dialog-content>
+			<mat-dialog-actions>
+				<span fxFlex></span>
+				<button mat-button mat-dialog-close>Close</button>
+				<button  mat-raised-button (click)="deleteInventory()">Save</button>
+			</mat-dialog-actions>
+		</mat-step> -->
+	</mat-horizontal-stepper>
+</div>

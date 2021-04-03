@@ -1,0 +1,5 @@
+
+<div fxLayout="row">
+    <app-organizations-list [update]="updatedDetails" (trigger)="getSelectedOrganization($event)"></app-organizations-list>
+    <app-organizations-contacts [Contacts]="selectedOrganization" fxFlex="100%" (trigger)="updateDetails($event)"></app-organizations-contacts>
+</div>

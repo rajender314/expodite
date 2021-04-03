@@ -1,0 +1,192 @@
+<section class="hiden-stepper">
+
+
+<mat-horizontal-stepper #stepper>
+<mat-step-header></mat-step-header>
+    <mat-step>
+        <div fxLayout="row">
+            <div class="center-section-scroll vh-100 d-flex secundory-menu">
+                <div class="flex-fixed-header menu-title">
+                    <h1>Invoices</h1>
+                </div> 
+                <perfect-scrollbar class="flex-scroll-items p-l-8 p-r-8  " >
+                    
+                        <div @slideLeftAnimate *ngIf="!statusSpinner" class="fxFlex side-nav-section">
+                        <div class="label">{{language.defaults.filterStatus}}</div>
+                        <mat-selection-list class="status-selection filters-list">
+                            <mat-list-option (click)="checkboxChange(status)" (change)="selectState()" selected="{{status.selected}}" class="orders-list"
+                                *ngFor="let status of invoices.statusFilter">
+                                {{status.name}}
+                            </mat-list-option>
+                        </mat-selection-list>
+                        <mat-divider class="segment"></mat-divider>
+                    </div>
+                </perfect-scrollbar>
+                <div class="flex-fixed-footer" style="flex-direction: row; box-sizing: border-box; display: flex;" *ngIf="showFilter">
+                    <a class="secondarytextlink" (click)="clearFilterData()">{{language.defaults.clear}}</a>
+                <span fxFlex></span>
+                <button mat-raised-button class="app-white-btn" (click)="applyFilterData()" [disabled]="disableFilterBtn">Apply Filter</button>
+                </div>                      
+                <!-- <mat-spinner class="medium-spinner" *ngIf="statusSpinner"></mat-spinner> -->
+            </div>
+                <!-- invoices List view -->
+                <div class="center-section-scroll vh-100 d-flex  body-color">
+                    <div class="page-header-ui">
+                        <div class="flex-fixed-header page-title container-ui">
+                            <div class="d-flex">
+                                <div class="search-ui" >
+                                    <input matInput placeholder=""
+                                        #search (keyup)="searchOrders(search.value, $event)"
+                                        placeholder="Search"
+                                        (blur)="!search.value.length ? open = false : open = true">
+                                    <mat-icon matPrefix (click)="open = !open" class="org-search">search</mat-icon>
+                                    <mat-icon matSuffix *ngIf="searching" class="spinner">
+                                        <mat-spinner class="small-spinner"></mat-spinner>
+                                    </mat-icon>
+                                    <mat-icon class="search-info" *ngIf="!search.value.length" matTooltip="Search with Order Number/Po Number/Invoice Name">info</mat-icon>
+                                    <mat-icon class="search-close" matSuffix *ngIf="!searching && search.value.length"
+                                        (click)="search.value = '';searchOrders(search.value)">close</mat-icon>
+                                </div>
+                            </div>  
+                            <div class="d-flex">
+                                
+                            </div>
+                        </div>
+                    </div>
+                    <perfect-scrollbar>                       
+                        <div class="list-view-table p-b-16">
+                            <div class="table-header-ui top-sticky z-index-8" style="top: 16px" *ngIf="  invoices.data.length  " >
+                                <div class="container-ui" >
+                                    <mat-list-item class="order-list-row mat-list-item header-cleint">
+                                        <div class="item-container   p-l-12"  fxFlex="30"> Invoice Number</div>
+                                        <div class="item-container text-center "  fxFlex="25">Company Name</div>
+                                        <div class="item-container right-amount text-right" fxFlex="25">Amount</div>
+                                        <div class="item-container status-align p-r-16" fxFlex="20">Status</div>
+                                    </mat-list-item>
+                                </div>                              
+                            </div>
+                            <div fxLayout="column" class="container-ui" *ngIf="invoices.data.length" @slideLeftAnimate>                                 
+                                <div class="table-view-for-list" infiniteScroll [infiniteScrollDistance]="1" [infiniteScrollThrottle]="50" (scrolled)="onScroll()"
+                                [scrollWindow]="false">                                 
+                                    <mat-list >    
+                                        <div class="list-inner-content">
+                                            <mat-list-item class="order-list-row" (click)="orderDetails(stepper,invoicesList)" *ngFor="let invoicesList of invoices.data;let key = index">
+                                                <div class="item-container p-l-12" fxFlex="30">
+                                                    <div class="d-flex align-items-center avatar-cell o-hidden ">
+                                                        <div class="icon-sec">
+                                                            <img [src]='images.invoice_green' title="Invoice">
+                                                        </div>
+                                                        <div class="content-sec o-hidden ellipsis-text">
+                                                            <h1 title="{{invoicesList.Inovice.inv_nbr}}" class="ellipsis-text">{{invoicesList.Inovice.inv_nbr}}</h1>
+                                                            <small title="{{invoicesList.Inovice.product_name}}" class="ellipsis-text">
+                                                                Product Name(s) - {{invoicesList.Inovice.product_name}}</small>
+                                                        </div>
+                                                    </div> 
+
+                                                   
+                                                </div>
+                                                <div class="item-container" fxFlex="25">
+                                                   
+                                                    <div class="media d-flex align-items-center">
+                                                        <div class="media-aside align-self-center">
+                                                            <span  class="b-avatar badge-light-primary rounded-circle" *ngIf="invoicesList.Inovice.client_image" style="width: 32px; height: 32px;">
+                                                                <span class="b-avatar-img img" [ngStyle]="{'background-image': 'url(' + invoicesList.Inovice.client_image + ')'}"></span>
+                                                            </span>
+                                                            <span  class="b-avatar badge-light-primary rounded-circle badge-light-info" *ngIf="!invoicesList.Inovice.client_image" style="width: 32px; height: 32px;">
+                                                                <span class="b-avatar-text">{{invoicesList.Inovice.client_name | contactImageName: 2}}</span>
+                                                            </span>
+                                                        </div>
+                                                        <div class="media-body">
+                                                            <h1 class="font-weight-bold d-block text-nowrap single">{{invoicesList.Inovice.client_name}}</h1>
+                                                        </div>
+                                                    </div>
+
+                                                    
+                                                 
+                                                    <!-- <div class="content-sec align-center">
+                                                        <p class="client-name" title="{{invoicesList.Inovice.client_name}}" title="{{invoicesList.Inovice.client_name}}"> {{invoicesList.Inovice.client_name}}</p>
+                                                    </div> -->
+                                                </div>
+    
+    
+                                                <div class="item-container align-center text-right" fxFlex="25">
+                                                    <p class="w-100" title="{{invoicesList.totalSum}}">{{invoicesList?.Inovice?.currency }} {{invoicesList.totalSum }} </p>
+                                                </div>
+    
+                                                <div class="item-container status-cell status-tag-container " fxFlex="20">
+                                                    <!--<p mat-line class="client-status" [ngClass]="{'accepted':order.orders.status == 'Accepted' , 'in-transit':order.orders.status == 'In-transit', 'delivered':order.orders.status == 'Delivered', 'cancelled':order.orders.status == 'Cancelled','received':order.orders.status == 'Received','processing':order.orders.status == 'Processing'}"> {{order.orders.status}} </p>-->
+                                                    <p mat-line class="client-status" [ngClass]="{'due':invoicesList.Inovice.status == 'Due','overdue':invoicesList.Inovice.status == 'Overdue','open':invoicesList.Inovice.status == 'Open','paid':invoicesList.Inovice.status == 'Paid'}">
+                                                    {{invoicesList.Inovice.status}} </p>
+                                                    <span fxFlex></span>
+                                                    <mat-icon class="go-to-details">keyboard_arrow_right</mat-icon>
+                                                   
+                                                </div>
+                                               
+                                            </mat-list-item>
+                                        </div>    
+                                    </mat-list>
+    
+                                </div>
+    
+                            </div>
+                        
+                           
+                        </div>
+                        <div  class="container-ui new-center-empty-ui" *ngIf="!statusSpinner && !invoices.data.length && !filtering">
+
+                           
+                            <mat-card class="no-results"  >
+                                <div class="empty-img-holder"><img [src]="images.invoice_green"></div>
+                                <p class="no-result-text">No Invoices Found</p>
+                            </mat-card>
+                        </div>
+                        <mat-spinner class="medium-spinner" *ngIf="statusSpinner || fetchingData"></mat-spinner>
+                       
+                    </perfect-scrollbar>
+                    <div class=" pagination-footer" *ngIf="totalCount!=0">
+                        <div class="container-ui d-flex space-between  align-items-center ">
+                                <div><p>Showing {{listCount}} out of {{totalCount}}</p></div>
+                                <div>
+                                    <app-pagination [pageLimit]="totalCount" (pageloadMore)="loadMore($event)"></app-pagination>
+                                </div>
+                        </div>
+
+                       
+                    </div>
+
+                </div>
+            
+            <!-- <div fxFlex class="right-container body-color"> -->
+                <!-- <div class="app-search-container search-big">
+                    <div class="app-container">
+                        <mat-form-field class="search" floatLabel="never">
+                            <input matInput placeholder="Search with Invoice Number..." #search   (input)="inputValidator($event)"  (keyup)="searchOrders(search.value, $event)" (blur)="!search.value.length ? open = false : open = true">
+                            <mat-icon matPrefix (click)="open = !open" class="org-search">search</mat-icon>
+                            <mat-icon matSuffix *ngIf="searching" class="spinner">
+                                <mat-spinner class="small-spinner"></mat-spinner>
+                            </mat-icon>
+                            <mat-icon matSuffix *ngIf="!searching && search.value.length" (click)="search.value = '';searchOrders(search.value)">close</mat-icon>
+                        </mat-form-field>
+                    </div>
+                </div> -->
+
+                <!-- <div class="order-content"  infiniteScroll [infiniteScrollDistance]="1" [infiniteScrollThrottle]="50" (scrolled)="onScroll()"
+                [scrollWindow]="false">
+                   
+                    <div class="app-container">
+                     
+                    </div>
+                   
+                </div> -->
+            <!-- </div> -->
+        </div>
+    </mat-step>
+   
+</mat-horizontal-stepper>
+
+<!-- <div class="no-data" *ngIf="!statusSpinner && !invoices.data.length && !filtering" >
+    <img [src]='images.invoice_green'>
+    <p>No Invoices Found</p>
+</div> -->
+<!-- <mat-spinner class="medium-spinner" *ngIf="fetchingData"></mat-spinner> -->
+</section>

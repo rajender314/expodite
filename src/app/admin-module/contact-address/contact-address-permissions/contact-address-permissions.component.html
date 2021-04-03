@@ -1,0 +1,37 @@
+<div fxFlex class="permission_wrapper">
+  <div fxLayout="row" [class.user-header]="permission.level==1">
+    <div fxFlex="60">
+      <h2 *ngIf="permission.level == 1">{{permission.name}}</h2>
+      <div class="permission-name" *ngIf="permission.level != 1">{{permission.name}}</div>
+    </div>
+    <div flex="40" fxLayoutAlign="top right">
+      <h2 *ngIf="permission.type == 'label'" class="">{{language.defaults.permissions}}</h2>
+      <div *ngIf="permission.type != 'label'">
+        <mat-form-field class="permission" *ngIf="permission.type === 'select'" floatPlaceholder={{language.defaults.never}}>
+          <mat-select placeholder={{language.defaults.selectPermission}} [(ngModel)]="permission.selectedValue" (change)="check(permission, permission.selectedValue)">
+            <mat-option *ngFor="let option of permission.options" [value]="option.id">
+              {{ option.name }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-radio-group class="example-radio-group" *ngIf="permission.type === 'radio'" [(ngModel)]="permission.selectedValue">
+          <mat-radio-button (click)="check(permission, permission.selectedValue)" class="permission" *ngFor="let option of permission.options"
+            [value]="option.id">
+            {{option.name}}
+          </mat-radio-button>
+        </mat-radio-group>
+        <div *ngIf="permission.type === 'check'" > <!-- [style.paddingTop.px]="permission.level * 5" -->
+          <div *ngFor="let option of permission.options">
+            <mat-checkbox [checked]="permission.checked" (change)="check(permission, option.id)" class="example-margin">{{option.name}}</mat-checkbox>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="permission.children" class="permission-block">
+    <div [hidden]="(permission.type == 'check' && !permission.checked) || ((permission.type == 'select' || permission.type == 'radio') && permission.selectedValue != 1)">
+      <app-contact-address-permissions *ngFor="let child of permission.children; let i = index" [permission]="child" [class.child-permission-border]="permission.level > 2"
+        class="child-permission"></app-contact-address-permissions>
+    </div>
+  </div>
+</div>

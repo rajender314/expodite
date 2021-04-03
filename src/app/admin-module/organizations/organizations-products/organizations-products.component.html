@@ -1,0 +1,96 @@
+<div style="height: calc(100vh - 112px);">
+	<div style="height: 100%; display: flex; flex-direction: column;">
+		<div class="document-header">
+			<h2 class="document-name">{{language.defaults.productName}}</h2>
+		</div>
+		<perfect-scrollbar>
+			<div class="min-container">
+		<mat-card class="" style="padding: 0" *ngIf="!noProducts && !factoryProfile">
+			<mat-list class="product " style="padding: 0" >
+				 
+				<mat-accordion class="product-accordion">
+					<mat-expansion-panel *ngFor="let product of productTypes">
+						<mat-expansion-panel-header [collapsedHeight]="'40px'" [expandedHeight]="'40px'">
+							<mat-panel-title>
+								<mat-checkbox (change)="productTypeChange(product)" [disabled]='!client_interface' class="example-margin" [checked]="product.checked_status"
+								 fxFlex>
+									<span class="prod-name">{{product.name}} ({{product.category_name}})</span>
+								</mat-checkbox>
+							</mat-panel-title>
+						</mat-expansion-panel-header>
+						<ng-template matExpansionPanelContent>
+							<div class="price-table-for-range">
+								<mat-card class="client-documents-card product-card" style="padding: 0px;  max-width: 380px; border: solid #ccc 1px;">
+									<mat-list class="product" style="padding-top: 0px;">
+										<mat-list-item class="products-list product-divider" style="padding-top: 0px;">
+											<h4 mat-header class="product-header">Price Range</h4>
+											<h4 mat-header class="price-header">Default Price ({{currency}})</h4>
+										</mat-list-item>
+										<mat-list-item class="products-list" *ngFor="let range of product.priceRange">
+											<span mat-header class="prod-name">{{range.range_name}} {{range.uom_name}}</span>
+											<mat-form-field class="custom-input prod-price" floatLabel="never" style="margin-top: 18px;">
+												 <!-- <input matInput type="text" [name]="range.range_name" [ngModel]="range.range_price | number:'.2-2'" [ngModelOptions]="{updateOn:'blur'}" (keyup)="inputEnter($event)"
+													(ngModelChange)="range.range_price=$event"/> -->
+													<input matInput type="number" [data]="'USD'" [name]="range.range_name" appEpiCurrency type="text" (keyup)="inputEnter($event)" [ngModel]="range.range_price | epiCurrency: currency" [ngModelOptions]="{updateOn:'blur'}" 
+													(ngModelChange)="range.range_price=$event"/>
+											</mat-form-field>
+										</mat-list-item>
+									</mat-list>
+								</mat-card>
+							</div>
+						</ng-template>
+					</mat-expansion-panel>
+				</mat-accordion>
+			</mat-list>
+		</mat-card>
+		<!-- <div *ngIf=""> -->
+			
+		<mat-card class="client-documents-card product-card" *ngIf="!noProducts && factoryProfile">
+			<mat-list class="product">
+				<mat-list-item class="products-list product-divider">
+					<h4 mat-header class="product-header">{{language.defaults.productName}}</h4>
+				</mat-list-item>
+				<mat-accordion class="product-accordion">
+					<mat-expansion-panel *ngFor="let product of productTypes">
+						<mat-expansion-panel-header [expandedHeight]="'48px'">
+							<mat-panel-title>
+									<span class="prod-name">{{product.name}}</span>
+							</mat-panel-title>
+						</mat-expansion-panel-header>
+						<ng-template matExpansionPanelContent>
+							<div>
+								<mat-card class="client-documents-card product-card">
+									<mat-list class="product">
+										<mat-list-item class="products-list product-divider">
+											<h4 mat-header class="product-header">Price Range</h4>
+											<h4 mat-header class="price-header">Default Price ({{currency}})</h4>
+										</mat-list-item>
+										<mat-list-item class="products-list" *ngFor="let range of product.priceRange">
+											<span mat-header class="prod-name">{{range.range_name}}</span>
+											<span>{{range.range_price}}</span>
+										</mat-list-item>
+									</mat-list>
+								</mat-card>
+							</div>
+						</ng-template>
+					</mat-expansion-panel>
+				</mat-accordion>
+			</mat-list>
+		</mat-card>
+	</div>
+	</perfect-scrollbar>
+	<!-- </div> -->
+
+
+	<div class="document-footer" *ngIf="activeState" >
+		<div class="min-container d-flex justify-content-end">
+		<button type="button" mat-button (click)="cancelProductTypes()">{{language.defaults.cancel}}</button>
+		<button type="submit" mat-raised-button (click)="saveProductData()">{{language.defaults.save}}</button>
+	</div>
+	</div>
+	<div class="no-record no-clients" *ngIf="noProducts">
+		<p>No Products Found</p>
+	</div>
+	</div>
+	
+</div>

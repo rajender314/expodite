@@ -1,0 +1,266 @@
+.search{
+    color: rgba(23, 43, 77, 0.8);
+}
+.add-lead-ht{
+    height: calc(100vh - 202px) !important;
+}
+.store-first-cell{
+.ag-cell-label-container{
+    display: none;
+}
+}
+.sidenav-container,
+.store-sec {
+    .search-sec{
+        padding: 10px;
+    }
+}
+.excel-icon{
+    padding-right: 4px;
+    position: relative;
+    top: -2px;
+}
+.date-picker-field{
+    position: relative;
+    .mat-datepicker-toggle{
+        position: absolute;
+        right: 0;
+    }
+}
+.capitalize {
+    text-transform: capitalize;
+    .pixel-icons{
+        height: auto;
+        text-align: center;
+    }
+ }
+ .no-padding{
+     padding: 0px;
+     &.mat-select:after{
+         right:20px;
+     }
+     .mat-select-trigger{
+         padding: 10px;
+     }
+ }
+ .no-icons{
+    &.mat-select:after{
+        content: "";
+    }
+ }
+ .form-container{
+    pi-select{
+        label{
+        }
+        .pi-field{
+            .pi-select-input{
+              input{
+                  &:hover{
+                      background: transparent !important;
+                  }
+                  &:focus{
+                      border: 0px !important;
+                      box-shadow: none !important;
+                  }
+              }
+            }
+        }
+    }
+    pi-icon:hover{
+            background: transparent !important;
+        }
+ }
+ .my-panel-class{
+     min-width: calc(100% + 34px) !important;
+     position: absolute;
+     left: 22px;
+ }
+//  .multi-select{
+//      .ng-trigger-transformPanel{
+//          background: red;
+//      }
+//  }
+// .ag-row{
+//     &:hover{
+//         &:after{
+//             content: "\f044";
+//             font-family: 'Font Awesome\ 5 Free';
+//             float: right;
+//             position: fixed;
+//             right: 0;
+//             z-index: 999;
+//         }
+//     }
+// }
+.no-data {
+    display: flex;
+    justify-content: center;
+    padding: 15px 0px;
+  }
+.uploaded-files{
+    padding: 30px 0px 0px 0px;
+    .assets-sec{
+        border-bottom: 0px !important;
+    }
+    .upload-file-link{
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        .upload-file-link-content{
+            display: flex;
+            align-items: center;
+            color: #0747A6;
+            font-family: 'sf-medium';
+            cursor: pointer;
+            .mat-icon{
+                height: unset;
+                width: unset;
+                font-size: 16px;
+            }
+            .upload-link-text-sec{
+                margin-top: 3px;
+            }
+        }
+    }
+    .upload-content{
+        border: 1px solid #ccc;
+        margin-bottom: 25px;
+        &:hover {
+            .upload-image-section {
+                background-color: rgba(0, 0, 0, 0.43);
+            }
+            .background-image {
+                opacity: 0.7;
+            }
+        }
+        .upload-image-section{
+            position: relative;
+            cursor: pointer;
+            .background-image{
+                background-color: #ccc;
+                height:210px;
+                background-position: center;
+                overflow: hidden;
+                img{
+                    width: 100%;
+                    height: 100%;
+                }
+                video {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: fill;
+                }
+            }
+            .delete-icon{
+                display: none;
+                position: absolute;
+                bottom: 15px;
+                left:10px;
+                font-size: 16px;
+                i{
+                    color: #FFFFFF;
+                }
+            }
+            .download-icon{
+                display: none;
+                position: absolute;
+                bottom: 12px;
+                right:10px;
+                font-size: 20px;
+                i{
+                    color: #FFFFFF;
+                    font-size: 16px;
+                    // .icon-arrow-down{
+                    //     font-size: 20px;
+                    // }
+                }
+            }
+        }
+        .upload-details{
+            padding: 10px;
+            .detail-title{
+                font-size: 14px;
+                margin-bottom: 10px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+              .detail-format{
+                //   float: right;
+                text-overflow: ellipsis;
+                overflow: hidden;
+                white-space: nowrap;
+              }
+            }
+            .detail-content{
+                color: #999;
+                font-size: 12px;
+                margin-bottom: 10px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+               .detail-size{
+                text-overflow: ellipsis;
+                overflow: hidden;
+                white-space: nowrap;
+               }
+            }
+            .detail-keywords{
+                color: #999;
+                font-size: 14px;
+                margin-bottom: 0px;
+                text-overflow: ellipsis;
+                overflow: hidden;
+                white-space: nowrap;
+            }
+        }
+        &:hover{
+            .background-image{
+                background: #666;
+                opacity: 0.7;
+            }
+            .delete-icon, .download-icon{
+                display: block;
+            }
+        }
+    }
+}
+h2 {
+    &.asset-label {
+        padding-left: 0;
+        padding: 0px;
+    }
+}
+.w-100{
+    width: 100%;
+}
+.contact-header{
+    display: flex;
+    justify-content: space-between;
+    
+}
+.edit-view{
+    color: #075DA8;
+    font-weight: 400;
+    font-size: 16px;
+    cursor: pointer;
+    &.disabled {
+        pointer-events: none;
+        color: #7d7979db;
+    }
+}
+
+.contact-section{
+    border-bottom: 1px solid #ccc;
+    margin-bottom: 15px;
+}
+.contact-box{
+    position: relative;
+    .edit-view{
+        position: absolute;
+        top: -10px;
+        right: 0;
+    }
+}
+.dlt-blu{
+    color: #f45c5c !important;
+}

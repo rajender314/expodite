@@ -1,0 +1,63 @@
+// @import '../../../global.css';
+@import "../../orders-module/orders/orders.component";
+@import "../../orders-module/order-details/order-details.component";
+
+
+
+
+.invoice-contact{
+    margin: 0px;
+}
+.package-toolbar.hide-invoice{
+        display: none !important
+    }
+@media print {
+    .inner-detail-toolbar{
+        display: none !important;
+    }
+    .invoice-costTable th.costTable-head{
+        padding: 0px 0px;
+    }
+    .invoice-table td.invoice-tdata{
+        padding: 11px 0px;
+    }
+    .package-toolbar.hide-invoice, img{
+        display: block !important;
+        float:left;
+        padding: 10px;
+    }
+    .invoice-toolbar{
+        display: block !important;
+        float:left;
+        padding: 8px 0px;
+    }
+}
+.order-details{
+    font-size: 18px;
+    color: #323232;
+    letter-spacing: -0.2px;
+    font-family: 'Lato', sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-around;
+    margin-top: 25px;
+}
+.mat-button.mat-accent[disabled],
+.mat-button.mat-primary[disabled],
+.mat-button.mat-warn[disabled],
+.mat-button[disabled][disabled],
+.mat-icon-button.mat-accent[disabled],
+.mat-icon-button.mat-primary[disabled],
+.mat-icon-button.mat-warn[disabled],
+.mat-icon-button[disabled][disabled],
+.mat-stroked-button.mat-accent[disabled],
+.mat-stroked-button.mat-primary[disabled],
+.mat-stroked-button.mat-warn[disabled],
+.mat-stroked-button[disabled][disabled]{
+    &.add-Line{
+        color: #FF5722;
+        opacity: 0.8;
+        cursor: not-allowed;
+    }
+}

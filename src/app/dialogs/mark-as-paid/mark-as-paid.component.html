@@ -1,0 +1,12 @@
+<mat-toolbar>
+	<h2 mat-dialog-title></h2>
+	<span fxFlex>Payment Confirmation</span>
+</mat-toolbar>
+<mat-dialog-content class="delete-body">
+  	<span>Are you sure you want to Mark as Paid ?</span>
+</mat-dialog-content>
+<mat-dialog-actions>
+  	<span fxFlex></span>
+  		<button  mat-button mat-dialog-close>Cancel</button>
+  		<button  mat-raised-button (click)="markAsPaid()">Yes</button>
+</mat-dialog-actions>

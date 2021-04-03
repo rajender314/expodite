@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 50.2 (55047) - http://www.bohemiancoding.com/sketch -->
+    <title>orders</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Client-Dashbaord" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Artboard" transform="translate(-96.000000, -223.000000)">
+            <g id="orders" transform="translate(96.000000, 223.000000)">
+                <rect id="Rectangle-11" fill="#9270DC" x="0" y="0" width="20" height="20" rx="1"></rect>
+                <g id="noun_1247945_cc" transform="translate(2.500000, 4.500000)" fill="#FFFFFF" fill-rule="nonzero">
+                    <polygon id="Shape" points="7.30116279 0.68957377 7.30116279 10.9013607 1.20837209 9.09537705 1.20837209 3.89219672 5.97156977 4.17422951"></polygon>
+                    <polygon id="Shape" points="13.4989535 0.456409836 7.78168605 0.0955737705 9.19866279 3.84693443 14.9159302 3.48609836"></polygon>
+                    <polygon id="Shape" points="7.69831395 0.68957377 9.02790698 4.17422951 13.7907558 3.89219672 13.7907558 9.09537705 7.69831395 10.9013607"></polygon>
+                    <polygon id="Shape" points="1.50034884 0.456409836 0.0835465116 3.48609836 5.80081395 3.84693443 7.21761628 0.0955737705"></polygon>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

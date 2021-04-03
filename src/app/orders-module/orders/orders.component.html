@@ -1,0 +1,373 @@
+<mat-spinner class="medium-spinner" *ngIf="invoiceGenerateLoader"></mat-spinner>
+
+<div class="orders">
+
+    <div>
+        <mat-horizontal-stepper #stepper>
+            <mat-step-header></mat-step-header>
+            <mat-step>
+                <div fxLayout="row">
+                     <!-- Orders List view filters sidebar -->
+                    <div class="center-section-scroll vh-100 d-flex secundory-menu">
+                        <div class="flex-fixed-header menu-title">
+                            <h1>Orders ({{totalCount}})</h1>                            
+                        </div>
+                        <perfect-scrollbar class="flex-scroll-items p-l-8 p-r-8">                            
+                                <div @ordersAnimate>
+                                    <div class="fxFlex side-nav-section">
+                                        <div class="label">{{language.defaults.filterStatus}}</div>
+                                        <mat-selection-list class="status-selection filters-list">
+                                            <mat-list-option (click)="checkboxChange(status)" (change)="selectState()"
+                                                selected="{{status.selected}}" class="orders-list"
+                                                *ngFor="let status of orders.status">
+                                                {{status.name}}
+                                            </mat-list-option>
+                                        </mat-selection-list>
+                                        <mat-divider class="segment divider"></mat-divider>
+                                    </div>
+                                    <div class="fxFlex side-nav-section" *ngIf="!clientPermission">
+                                        <div class="label">{{language.defaults.filterByShipper}}</div>
+                                        <mat-selection-list class="status-selection  filters-list">
+                                            <mat-list-option (click)="checkboxChange(status)" (change)="selectState()"
+                                                selected="{{status.selected}}" class="orders-list"
+                                                *ngFor="let status of orders.shippingAddress">
+                                                {{status.address1}}
+                                            </mat-list-option>
+                                        </mat-selection-list>
+                                        <mat-divider class="segment divider"></mat-divider>
+                                    </div>
+                                    <div class="fxFlex side-nav-section " *ngIf="factoryPermission && !clientPermission">
+                                        <mat-selection-list class="status-selection filters-list">
+                                            <mat-list-option (click)="checkboxChange(date)" selected="{{date.selected}}"
+                                                class="orders-list" *ngFor="let date of orders.expectedDeliveryDate">
+                                                {{date.name}}
+                                            </mat-list-option>
+                                        </mat-selection-list>
+                                        <mat-divider class="segment divider"></mat-divider>
+                                    </div>
+                                    <div class="fxFlex custom-date-container filter-dates order-date-picker">
+                                        <div class="label">SELECT ORDER DATE</div>
+                                        <input class="datepicker" [(ngModel)]="orders.mfg_date" [matDatepicker]="picker"
+                                            (click)="openCalendar(picker)" (dateChange)="datePickerChange()"
+                                            (focus)="openCalendar(picker)" placeholder="Select Date">
+                                        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                                        <mat-datepicker #picker></mat-datepicker>
+                                        <mat-divider class="segment divider"></mat-divider>
+                                    </div>
+                                    <div class="fxFlex side-nav-section product-nav-section">
+                                        <div class="label">Products</div>
+                                        <mat-selection-list class="status-selection filters-list ">
+                                            <mat-list-option (click)="checkboxChange(product)" selected="{{product.selected}}"
+                                                class="orders-list" *ngFor="let product of orders.productsList;">
+                                                {{product.name}}
+                                            </mat-list-option>
+                                        </mat-selection-list>
+                                        <mat-divider class="segment divider"></mat-divider>
+                                    </div>
+                                    <!-- <div class="fxFlex side-nav-section" *ngIf="blockContent">
+                                        <mat-form-field class="custom-input custom-client filter-client" floatLabel="never" style="width: 100%">
+                                            <label class=" label">{{language.defaults.clientSelect}}</label>
+                                            <mat-select placeholder="" (selectionChange)="clientChange()"
+                                                [formControl]="orders.selectedClients" (openedChange)="openedChange($event)"
+                                                multiple>
+                                                <mat-option>
+                                                <ngx-mat-select-search [formControl]="clientsFilterCtrl"
+                                                    [placeholderLabel]="'Search Clients...'"
+                                                    [noEntriesFoundLabel]="'no matching client found'">
+                                                </ngx-mat-select-search>
+                                            </mat-option>
+                                                <mat-select-trigger>
+                                                    <span class="example-additional-selection">
+                                                        {{(orders.selectedClients.value?.length > 1)?orders.selectedClients.value.length+" Clients Selected": '1 Client Selected'}}
+                                                    </span>
+                                                </mat-select-trigger>
+                                                <mat-option *ngFor="let client of orders.organizations" [value]="client.id">
+                                                    {{client.name}}</mat-option>
+                                            </mat-select>
+                                        </mat-form-field>
+                                    </div> -->
+                                    <div class="fxFlex side-nav-section" *ngIf="blockContent">
+                                            <mat-form-field class="custom-input custom-client" floatLabel="never" style="width: 100%">
+                                                <label class="custom-label">Clients</label>
+                                                <mat-select placeholder="Select Client" (selectionChange)="clientChange()"
+                                                    [formControl]="orders.selectedClients" (openedChange)="openedChange($event)"
+                                                    multiple>
+                                                    <!-- <ngx-mat-select-search [formControl]="clientsFilterCtrl"
+                                                        [placeholderLabel]="'Search Clients...'"
+                                                        [noEntriesFoundLabel]="'no matching client found'">
+                                                    </ngx-mat-select-search> -->
+                                                    <mat-select-trigger>
+                                                        <span class="example-additional-selection">
+                                                            {{(orders.selectedClients.value?.length > 1)?orders.selectedClients.value.length+" Clients Selected": '1 Client Selected'}}
+                                                        </span>
+                                                    </mat-select-trigger>
+                                                    <mat-option *ngFor="let client of orders.organizations" [value]="client.id">
+                                                        {{client.name}}</mat-option>
+                                                </mat-select>
+                                            </mat-form-field>
+                                        </div>
+    
+                                </div>
+                                <!-- <div class="fxFlex side-button-section animated slideInUp" fxLayout="row" fxLayoutAlign="end center" *ngIf="showFilter">
+                                    <button mat-button class="clear-link"
+                                        (click)="clearFilterData()">{{language.defaults.clear}}</button>
+                                    <span fxFlex></span>
+                                    <button mat-raised-button class="app-white-btn" (click)="applyFilterData()">Apply
+                                        Filter</button>
+                                </div> -->                            
+                        <mat-spinner class="medium-spinner" *ngIf="filtersLoader"></mat-spinner>
+                    </perfect-scrollbar>                  
+                        
+                        <div class="flex-fixed-footer" *ngIf="showFilter">
+                            <a class="secondarytextlink" (click)="clearFilterData()">{{language.defaults.clear}}</a>
+                            <span fxFlex></span>
+                            <button mat-raised-button class="app-white-btn" (click)="applyFilterData()">Apply
+                                Filter</button>
+                        </div>
+                    </div>
+                     <!-- end Orders List view filters sidebar -->
+                    
+                    <!-- Orders List view -->
+                    <div class="center-section-scroll vh-100 d-flex  body-color">
+                        <div class="page-header-ui">
+                            <div class="flex-fixed-header page-title container-ui">
+                                <div class="d-flex">
+                                    <div class="search-ui" >
+                                        <input matInput placeholder=""
+                                            #search (keyup)="searchOrders(search.value, $event)"
+                                            placeholder="Search"
+                                            (blur)="!search.value.length ? open = false : open = true">
+                                        <mat-icon matPrefix (click)="open = !open" class="org-search">search</mat-icon>
+                                        <mat-icon matSuffix *ngIf="searching" class="spinner">
+                                            <mat-spinner class="small-spinner"></mat-spinner>
+                                        </mat-icon>
+                                        <mat-icon class="search-info" *ngIf="!search.value.length" matTooltip="Search with Order Number/Po Number/Invoice Name">info</mat-icon>
+                                        <mat-icon class="search-close" matSuffix *ngIf="!searching && search.value.length"
+                                            (click)="search.value = '';searchOrders(search.value)">close</mat-icon>
+                                    </div>
+                                </div>  
+                                <div class="d-flex">
+                                    <button mat-raised-button color="warn"  (click)="createOrder()"  *ngIf="createOrderPermission" class="create-order-btn">Create Order</button>    
+                                </div>
+                            </div>
+                        </div>                        
+                    <perfect-scrollbar>
+                        <div class="list-view-table">
+                            <div class="table-header-ui top-sticky z-index-8" style="top: 16px" *ngIf="orders.data.length">
+                                <div class="container-ui" *ngIf="clientPermission">
+                                    <mat-list-item class="order-list-row mat-list-item header-cleint">
+                                        <div class="item-container p-l-16"  fxFlex="25 text-right">P.O number</div>
+                                        <div class="item-container text-right "  fxFlex="25">Quantity</div>
+                                        <div class="item-container right-amount text-right" fxFlex="25">Amount</div>
+                                        <div class="item-container status-align p-r-16" fxFlex="25">Status</div>
+                                    </mat-list-item>
+                                </div>
+                                <div class="container-ui" *ngIf="!clientPermission">
+                                    <mat-list-item class="order-list-row mat-list-item header-cleint">
+                                        <div class="item-container p-l-16" fxFlex="20">Order number</div>
+                                        <div class="item-container" style="padding-left: 16px;" fxFlex="20">Attention</div>
+                                        <div class="item-container text-right" fxFlex="20">P.O No</div>
+                                        <div class="item-container text-right"   fxFlex="20">Amount</div>
+                                        <div class="item-container status-align p-r-16" fxFlex="20">Status</div>
+                                    </mat-list-item>
+                                </div>
+                            </div>
+
+                        <!-- <div class="header-container">
+                            <div class="app-container" *ngIf="clientPermission">
+                                <mat-list-item class="order-list-row mat-list-item header-cleint">
+                                    <div class="item-container" fxFlex="25">P.O number</div>
+                                    <div class="item-container text-center" fxFlex="25">Quantity</div>
+                                    <div class="item-container right-amount" fxFlex="25">Amount</div>
+                                    <div class="item-container status-align" fxFlex="25">Status</div>
+                                </mat-list-item>
+                            </div>
+                            <div class="app-container" *ngIf="!clientPermission">
+                                <mat-list-item class="order-list-row mat-list-item header-cleint">
+                                    <div class="item-container" fxFlex="30">Order number</div>
+                                    <div class="item-container" fxFlex="25">Attention</div>
+                                    <div class="item-container text-center" fxFlex="10">P.O No</div>
+                                    <div class="item-container text-center" fxFlex="15">Amount</div>
+                                    <div class="item-container status-align" fxFlex="15">Status</div>
+                                </mat-list-item>
+                            </div>
+                        </div>   -->
+                        <div class="global_list_view container-ui p-b-16" infiniteScroll [infiniteScrollDistance]="1"
+                        [infiniteScrollThrottle]="50" (scrolled)="onScroll()" [scrollWindow]="false">
+                       
+                            <div fxLayout="column" fxFlex="100" >
+                                <div *ngIf="!clientPermission">
+                                    <div *ngIf="!fetchingData" class="multi-list-ui">
+
+                                        <mat-list @ordersAnimate
+                                            *ngFor="let orderItem of orders.data;let key = index">
+                                            <h3 mat-subheader class="list-date">{{orderItem.date}}</h3>
+                                            <div class="list-item-card">
+                                                <mat-list-item class="order-list-row" 
+                                                    (click)="orderDetails(stepper,order)"
+                                                    *ngFor="let order of orderItem.list">
+                                                    <div class="item-container" fxFlex="20">
+                                                        <div class="d-flex align-items-center avatar-cell o-hidden ">
+                                                            <div class="icon-sec">
+                                                                <img [src]='images.ordersIcon_o' title="Orders">
+                                                            </div>
+                                                            <div class="content-sec o-hidden ellipsis-text">
+                                                                <h1 title="{{order.orders.order_no}}" class="ellipsis-text">
+                                                                    {{order.orders.order_no}}
+                                                                    <mat-icon *ngIf="order.orders.special_instructions"
+                                                                        class="flag-orders"
+                                                                        title="{{order.orders.special_instructions}}">
+                                                                        flag</mat-icon>
+                                                                </h1>
+                                                                <small title="{{order.orders.product_name}}" class="ellipsis-text">
+                                                                    {{order.orders.product_name}}</small>
+                                                            </div>
+                                                        </div>                                                        
+                                                    </div>
+
+                                                    <div class="item-container" fxFlex="20">
+                                                        <div class="d-flex align-items-center avatar-cell o-hidden ">
+                                                        <mat-icon mat-list-icon class="avatar-list"
+                                                            *ngIf="order.orders.client_image">
+                                                            <div class="mat-order-avatar"
+                                                                [ngStyle]="{'background-image': 'url(' + order.orders.client_image + ')'}">
+                                                            </div>
+                                                        </mat-icon>
+                                                        <div mat-list-icon class="no-order-image"
+                                                            *ngIf="!order.orders.client_image">
+                                                            <span
+                                                                class="mat-avatar">{{order.orders.client_name | contactImageName: 2}}</span>
+                                                        </div>
+                                                        <div class="content-sec o-hidden ellipsis-text">
+                                                            <h1 class="normal ellipsis-text" title="{{order.orders.client_name}}">
+                                                                {{order.orders.client_name}}</h1>
+                                                            <small class="client-name ellipsis-text" title="{{order.orders.name}}">
+                                                                {{order.orders.name}}</small>
+                                                        </div>
+                                                    </div>
+                                                    </div>
+                                                    <div class="item-container po_no text-right" fxFlex="20">
+                                                        <p mat-line title="{{order.orders.po_nbr}}">
+                                                            {{order.orders.po_nbr}} </p>
+                                                    </div>
+                                                    <div class="item-container amount_container text-right" fxFlex="20">
+                                                        <p mat-line title="{{order.orders.total_amount}}">
+                                                                {{order.orders.currency }} {{order.orders.total_amount }}
+                                                        </p>
+                                                    </div>
+                                                    <div class="item-container status-cell status-tag-container" fxFlex="20">
+                                                        <div class="client-status"  [ngClass]="{'accepted':order.orders.status == 'Accepted' , 'in-transit':order.orders.status == 'In-transit', 'delivered':order.orders.status == 'Delivered', 'cancelled':order.orders.status == 'Cancelled','received':order.orders.status == 'Received','processing':order.orders.status == 'Processing'}">{{order.orders.status}}</div>
+									<span fxFlex></span>
+                                    <mat-icon class="go-to-details">keyboard_arrow_right</mat-icon>
+                                    
+                                                        <!-- <p class="client-status"
+                                                            title="{{order.orders.status}}"
+                                                            [ngClass]="{'accepted':order.orders.status == 'Accepted' , 'in-transit':order.orders.status == 'In-transit', 'delivered':order.orders.status == 'Delivered', 'cancelled':order.orders.status == 'Cancelled','received':order.orders.status == 'Received','processing':order.orders.status == 'Processing'}">
+                                                            {{order.orders.status}} </p> -->
+                                                      
+                                                    </div>
+                                                </mat-list-item>
+                                            </div>
+                                        </mat-list>
+                                    </div>
+                                </div>
+                                <div *ngIf="clientPermission">
+                                    <div *ngIf="!fetchingData" class="multi-list-ui">
+                                        <mat-list @ordersAnimate
+                                            *ngFor="let orderItem of orders.data;let key = index">
+                                            <h3 mat-subheader class="list-date">{{orderItem.date}}</h3>
+                                            <div class="list-item-card">
+                                                <mat-list-item class="order-list-row"
+                                                    (click)="orderDetails(stepper,order)"
+                                                    *ngFor="let order of orderItem.list">
+                                                    <div class="item-container" fxFlex="25">
+                                                        <div class="d-flex align-items-center avatar-cell o-hidden ">
+                                                        <div class="icon-sec">
+                                                            <img [src]='images.ordersIcon_o' title="Orders">
+                                                        </div>
+                                                        <div class="content-sec">
+                                                            <h1 mat-line class="order-number">
+                                                                {{order.orders.po_nbr}}</h1>
+                                                            <p mat-line class="order-info"
+                                                                title="{{order.orders.product_name}}">
+                                                                {{order.orders.product_name}}</p>
+                                                        </div>
+                                                    </div>
+                                                    </div>
+                                                    <div class="item-container po_no text-right" fxFlex="25">
+                                                        <p mat-line title="{{order.orders.total_quantity}} Kg">
+                                                            {{order.orders.total_quantity}} Kg </p>
+                                                    </div>
+                                                    <div class="item-container amount_container text-right" fxFlex="25">
+                                                        <p mat-line title="{{order.orders.total_amount}}">
+                                                            {{order.orders.total_amount }}</p>
+                                                            <!-- {{order.orders.total_amount}}  -->
+                                                    </div>
+                                                    <div class="item-container status-cell status-tag-container" fxFlex="25">
+                                                            <div class="client-status"  [ngClass]="{'accepted':order.orders.status == 'Accepted' , 'in-transit':order.orders.status == 'In-transit', 'delivered':order.orders.status == 'Delivered', 'cancelled':order.orders.status == 'Cancelled','received':order.orders.status == 'Received','processing':order.orders.status == 'Processing', 'placed':order.orders.status == 'Placed'}">{{order.orders.status}}</div>
+                                                            <span fxFlex></span>
+                                                            <mat-icon class="go-to-details">keyboard_arrow_right</mat-icon>
+                                                        
+                                                            <!-- <p mat-line class="client-status"
+                                                            title="{{order.orders.status}}"
+                                                            [ngClass]="{'accepted':order.orders.status == 'Accepted' , 'in-transit':order.orders.status == 'In-transit', 'delivered':order.orders.status == 'Delivered', 'cancelled':order.orders.status == 'Cancelled','received':order.orders.status == 'Received','placed':order.orders.status == 'Placed','processing':order.orders.status == 'Processing'}">
+                                                            {{order.orders.status}} </p>
+                                                        <mat-icon class="go-to-details">keyboard_arrow_right
+                                                        </mat-icon> -->
+                                                    </div>
+                                                </mat-list-item>
+                                            </div>
+                                        </mat-list>
+                                    </div>
+                                </div>
+
+                                <div class=" container-ui new-center-empty-ui" *ngIf="fetchingData">
+                                    <mat-spinner class="medium-spinner" *ngIf="fetchingData"></mat-spinner>
+                                </div>
+                               
+                            </div>
+                       
+                    </div>
+                        </div>
+                        <div class=" container-ui new-center-empty-ui"  *ngIf="!orders.data.length && !fetchingData">
+                            <mat-card class="no-results">                            
+                                <div class="empty-img-holder">
+                                    <!-- <img [src]='images.ordersIcon_o'> -->
+                                    <img [src]='images.ordersIcon_o' title="Orders">
+                                </div>
+                                <p class="no-result-text">No Orders Found</p>
+                            </mat-card>
+                        </div>
+                        <div class=" container-ui new-center-empty-ui" *ngIf="totalSpinner">
+                            <mat-spinner class="medium-spinner"></mat-spinner>
+                        </div>
+                        
+                    </perfect-scrollbar>
+                    <div class=" pagination-footer" *ngIf="totalCount!=0">
+							<div class="container-ui d-flex space-between  align-items-center ">
+									<div><p>Showing {{listCount}} out of {{totalCount}}</p></div>
+									<div>
+										<app-pagination [pageLimit]="totalCount" (pageloadMore)="loadMore($event)"></app-pagination>
+									</div>
+							</div>
+	
+						   
+						</div>
+                </div>
+                <!-- End Orders List View -->
+                  
+
+
+                </div>
+            </mat-step>
+
+            
+
+        </mat-horizontal-stepper>
+        <!-- <div *ngIf="totalSpinner">
+            <mat-spinner class="medium-spinner"></mat-spinner>
+        </div> -->
+
+
+    </div>
+</div>

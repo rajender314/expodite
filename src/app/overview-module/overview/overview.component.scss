@@ -1,0 +1,183 @@
+.content-section{
+    margin: 0px;
+    padding: 16px;
+    padding-top: 0;
+    padding-bottom: 0;
+    height: calc(100vh - 70px);
+    overflow: auto;
+    &:hover {
+        &::-webkit-scrollbar {
+            background-color: transparent;
+            width: 6px;
+            height:6px;
+            }
+            &::-webkit-scrollbar-thumb {
+            background-color: #c1c1c1;
+            border-radius: 3px;
+        
+        }
+    }
+    
+}
+.overview-card {        
+    .overview-data {
+        font-size: 16px;
+        // color: #343a40;
+        color: var(--cardtextdarkcolor);
+        font-weight: 500;
+        letter-spacing: 0;
+        font-family: 'Rubik', sans-serif;
+        // font-family: 'Lato', sans-serif;
+        //width: 50%;
+        word-break: break-word;
+        .sub{
+            font-size: 12px;
+        }
+    }
+    .overview-label{
+        font-size: 12px;
+        color: var(--cardtextcolor);
+    text-transform: uppercase;
+    font-weight: 500;
+    letter-spacing: -0.002em;
+    // margin-bottom: 16px;
+    }
+    
+}
+
+.mat-card.app-card {
+    width: 100%;
+    background-color:  var(--bluelight);
+    border: 1px solid var(--gray);
+    margin:0 8px;
+    border-radius: 4px !important;
+    box-shadow: none;
+    min-height: 80px;
+    padding: 16px;
+    padding-bottom: 12px;
+    background-repeat: no-repeat;
+    background-position: right 18px bottom;
+    &.max-width-card {
+      max-width: 320px;
+      min-width: 240px;
+    }
+    &.past-due{
+        // background-image: linear-gradient(-135deg, #F47463 0%, #E8604E 100%);
+        background-color: #E8604E;
+        border: 1px solid #C65242;
+        .mat-card-title, .mat-card-subtitle, .overview-data, .mat-card-header{
+            color: #fff !important;
+        }
+    }
+    .mat-card-header-text {
+        margin: 0px;
+    }
+    .mat-card-header{
+        font-size: 12px;
+        color: var(--cardtextcolor);
+        font-weight: 500;
+        text-transform: uppercase;
+        font-weight: 500;
+        letter-spacing: -0.002em;
+        margin-bottom: 12px;
+        .remaining-data {
+            display: inline-block;
+            //width: 50%;
+        }
+    }
+    .mat-card-subtitle{
+        font-size: 16px;
+        color: #343a40;        
+        letter-spacing: 0;
+        // font-family: 'Lato', sans-serif;
+        font-family: 'Rubik', sans-serif;
+
+        &.top-pad-4{
+            padding-top: 26px;
+        }
+    }
+  
+    .overview-divide {
+        border-left:1px solid #CAD1D9;
+        margin: 0px 10px;
+        &.white {
+            border-left:0 none;
+        }
+    }
+    &:first-child{
+        // margin-left: 16px;
+        // flex: 0 0 168px;
+    }
+    &:last-child{
+        // margin-right: 16px;
+    }
+    &.client-min-width {
+    //   min-width: 240px;
+    //   max-width: 320px;
+    }
+    .column-data{
+        display: flex;
+        align-items:  baseline;
+        &.space-between{
+            justify-content: space-between;
+            line-height: 1.4;
+        }
+        .mat-card-header{
+            margin-bottom: 0;
+        }
+        &.due-costs{
+            .mat-card-header{
+                margin-right: 8px;
+                width: 42px;
+                font-size: 18px;
+                color: #566E86;
+                letter-spacing: 0;
+                font-family: 'Lato',
+                sans-serif;
+                word-break: break-word;
+            }
+            .overview-data {
+              font-size: 18px;
+              
+              color: var(--cardtextcolor);
+              letter-spacing: 0;
+              font-family: 'Lato', sans-serif;
+              word-break: break-word;
+                width: calc(100% - 42px);
+            }
+        }
+    }
+  }
+  .see-all-link {
+      &:hover{
+          opacity: 0.8;
+      }
+      .order-icon{
+          position: relative;
+          top:4px;
+      }
+  }
+    //   .go-to-details.mat-icon {
+    //     display: flex;
+    //     height: 20px !important;
+    //     align-items: flex-end;
+    //     margin-right: -10px;
+    //     font-size: 18px;
+    // }
+.no-record-invoice{
+    height: 150px;
+    justify-content: center;
+    display: flex;
+    vertical-align: middle;
+    align-items: center;
+}
+// .orders-row.cursorDefault:hover {
+//     background-color: #fff;
+//     opacity: 0.4;
+// }
+/*create order button focus issue fix*/ 
+.create-order-btn{
+    &.mat-raised-button.cdk-program-focused .mat-button-focus-overlay{
+        opacity: 0;
+    }
+}

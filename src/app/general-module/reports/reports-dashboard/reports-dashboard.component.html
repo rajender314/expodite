@@ -1,0 +1,43 @@
+<section fxFlex class="center-section-scroll vh-100 d-flex body-color ">
+  <div class="page-header-ui">
+    <div class="flex-fixed-header page-title container-ui">    
+      <div class="d-flex">
+        <div class="search-ui" >
+          <input matInput matInput placeholder="Search Reports" [(ngModel)]="search"
+           (keypress)="onKeyUp()" (keydown)="onKeyUp()" >
+          <mat-icon  matPrefix  class="org-search">search</mat-icon>  
+         <mat-icon class="search-close" matSuffix *ngIf="search.length"
+          (click)="clearSearch()">close</mat-icon> 
+      </div>
+      </div>
+    </div>
+   
+  </div>
+ <div class="">
+   <perfect-scrollbar>
+    <div class="container-ui" >
+      <div class="ex-row"  style="margin-top: 20px;">
+        <div class="grid-four" style="margin-top: 10px; margin-bottom: 10px " *ngFor="let list of sideListReports | myfilter:search">
+          <mat-card class="w-100"  
+          style="cursor: pointer;"
+          [routerLink]="[list.route]"
+          routerLinkActive="active">
+          <h4 mat-line>{{list.name}}</h4>
+         
+        </mat-card>
+        </div>
+      </div>
+
+
+     <div class=" container-ui new-center-empty-ui"  *ngIf="!sideListReports.length || noDataMsg">
+        <mat-card class="no-results">                            
+            <div class="empty-img-holder">
+                <!-- <img [src]='images.ordersIcon_o'> -->
+            </div>
+            <p class="no-result-text">No Data Found</p>
+        </mat-card>
+    </div>
+    </div>
+   </perfect-scrollbar>
+ </div>
+</section>

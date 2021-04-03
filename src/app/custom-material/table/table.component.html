@@ -1,0 +1,43 @@
+<div class="table-container">
+	<mat-table #table [dataSource]="dataSource">
+		<!--<mat-spinner *ngIf="!batchList"></mat-spinner>-->
+		<ng-container matColumnDef="batch_nbr">
+			<mat-header-cell *matHeaderCellDef fxFlex="20"> batch no.</mat-header-cell>
+			<mat-cell *matCellDef="let Inventory" fxFlex="20">
+				<div class="icon-sec">
+          			<img [src]='images.batchIcon_o' title="Inventory">
+        		</div>
+				<div class="content-sec">
+					<h1 class="order-info">{{Inventory.batch_nbr}}</h1>
+					<p class="order-info">{{Inventory.batch_nbr}}</p>
+				</div>
+			</mat-cell>
+		</ng-container>
+
+		<ng-container matColumnDef="mfd_date">
+			<mat-header-cell *matHeaderCellDef fxFlex="20"> mfg. date</mat-header-cell>
+			<mat-cell *matCellDef="let Inventory" fxFlex="20">{{Inventory.mfd_date}}</mat-cell>
+		</ng-container>
+
+		<ng-container matColumnDef="exp_date">
+			<mat-header-cell *matHeaderCellDef> exp. date </mat-header-cell>
+			<mat-cell *matCellDef="let Inventory">{{Inventory.exp_date}}</mat-cell>
+		</ng-container>
+		
+		<ng-container matColumnDef="tot_qty">
+			<mat-header-cell *matHeaderCellDef> total quantity</mat-header-cell>
+			<mat-cell *matCellDef="let Inventory"> {{Inventory.tot_qty}}</mat-cell>
+		</ng-container>
+
+		<ng-container matColumnDef="remain_quan">
+			<mat-header-cell *matHeaderCellDef> remaining quantity</mat-header-cell>
+			<mat-cell *matCellDef="let Inventory"> {{Inventory.remain_quan}}</mat-cell>
+		</ng-container>
+
+		<mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+		<mat-row (click)="getInventoryDetails(row)" routerLink="/inventory/detail/{{row.id}}" *matRowDef="let row; columns: displayedColumns;">
+		<!--<app-inventory-details [Details]="InventoryMap" (trigger)="InventoryMap($event)"></app-inventory-details>-->
+		</mat-row>
+	</mat-table>
+	
+</div>

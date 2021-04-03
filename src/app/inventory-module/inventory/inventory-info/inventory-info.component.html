@@ -1,0 +1,231 @@
+<section class="hiden-stepper">
+	<mat-horizontal-stepper class="inv-stepper" #stepper>
+<mat-step>
+        <div class="center-section-scroll expansion-panel-ui vh-100 d-flex body-color">
+
+            <mat-toolbar class="page-header-ui" >
+                <div class="flex-fixed-header page-title min-container" style="margin: 0 auto; ">
+                    <div (click)="goBack(stepper)" class="detail-back-action">
+                        <mat-icon class="back-to-orders mat-icon material-icons" role="img" aria-hidden="true">arrow_back</mat-icon>
+                    </div>
+                    <span class="title" title="{{BatchName}}" [innerHtml]="BatchName"></span>
+    
+                    <span fxFlex></span>
+                    <div class="icons">
+                        <button mat-icon-button (click)="batchDelete(stepper)" #removeFocus>
+                            <mat-icon class="delete-icon" title="Delete" mat-icon-button>delete</mat-icon>
+                        </button>
+                    </div>
+                </div>
+                <!--<mat-icon class="arrow-left"(click)="goBack(stepper)">keyboard_arrow_left</mat-icon>-->
+                <!--<mat-icon class="back-to-orders mat-icon material-icons" role="img" aria-hidden="true">arrow_back</mat-icon>-->
+              
+            </mat-toolbar>
+
+            <div class=" w-100 expansion-panel-scroll" style="height: calc(100vh - 70px);" [class.show-footer]="reportsFooter">
+                <div class="min-container  body-white" style="margin: 0 auto;  margin-top: 16px; border: 1px solid rgb(216, 218, 221);  " >
+                 
+                        <!-- <mat-toolbar class="batch-name" *ngIf="selectedBatch">
+                <mat-toolbar-row>
+                <div class="icon-sec">
+                                        <img [src]='images.batchIcon_o' title="Inventory" class="detail-icon">
+                                        <div class="inv-text" [innerHtml]="selectedBatch.name"></div>
+                                    </div> 
+                </mat-toolbar-row>
+            </mat-toolbar>-->
+                        <mat-tab-group #batchTabGroup class="inv-detail">
+                            <mat-tab label="Batch Details" >
+
+                                <div class="min-container"  id="custome-gaps" style="height: calc(100vh - 140px);  overflow-y: auto; margin: 0 auto; ; padding: 16px;   border-top: none;" *ngFor="let detail of selectedBatchList">
+                                   
+                                        <div class="ex-row"  *ngIf="!editable">
+                                            <div class="grid-six">
+                                                <h3 class="inv-readonly">{{language.defaults.batchNumber}}</h3>
+                                                <span class="inv-para">{{detail.batch_nbr}}</span>
+                                            </div>
+                                            <div class="grid-six">
+                                                <h3 class="inv-readonly">Category</h3>
+                                                <span class="inv-para">{{detail.category_name}}</span>
+                                            </div>
+                                            <div class="grid-six">
+                                                <h3 class="inv-readonly">Products</h3>
+                                                <span class="inv-para">{{detail.product_name}}</span>
+                                            </div>
+                                            
+                                            <div class="grid-six">
+                                                <h3 class="inv-readonly">{{language.defaults.totalQuantity}}</h3>
+                                                <span class="inv-para">{{detail.tot_qty}}</span>
+                                            </div>
+                                            <div class="grid-six">
+                                                <h3 class="inv-readonly">Remaining Quantity</h3>
+                                                <span class="inv-para">{{detail.remain_quan}}</span>
+                                            </div>
+                                            <div class="grid-six">
+                                                <h3 class="inv-readonly">{{language.defaults.manufacturingDate}}</h3>
+                                                <span class="inv-para">{{detail.mfd_date | date: 'MMM yyyy'}}</span>
+                                            </div>
+                                            <div class="grid-six">
+                                                <h3 class="inv-readonly">{{language.defaults.expiryDate}}</h3>
+                                                <span class="inv-para">{{detail.exp_date | date: 'MMM yyyy'}}</span>
+                                            </div>
+                                            <div class="grid-six">
+                                                <h3 class="inv-readonly">Status</h3>
+                                                <span class="inv-para">{{detail.status_name}}</span>
+                                            </div>
+                                            <div class="grid-full" *ngIf="detail.spcl_inst_flag">
+                                                <h3 class="inv-readonly">Special Instructions</h3>
+                                                <span class="inv-para" style="white-space: pre-wrap;   overflow-wrap: break-word;">{{detail.special_instructions}}</span>
+                                            </div>
+                                        </div>
+                                        
+                                        
+                                        <div class="batch-edit" *ngIf="!editable">
+                                            <!--<button mat-icon-button>
+                        <mat-icon class="edit-icon" title="Edit" mat-icon-button (click)="editInventory()">mode_edit</mat-icon>
+                        </button>-->
+                                            <a title="Edit" class="primary-text-link " style="cursor: pointer;" (click)="editInventory()">Edit</a>
+                                        </div>
+                                        <div class="edit-tab" *ngIf="editable">
+                                            <form [formGroup]="editForm" class="ex-row form-ui">
+                                                <mat-form-field class="grid-six  custom-input custom-edit mandatory" floatLabel="never">
+                                                    <label class="custom-label mandatory">{{language.defaults.batchNumber}}</label>
+                                                    <input matInput placeholder="Enter {{language.defaults.batchNumber}}" formControlName="batch_nbr" (keyup)="valChanged()">
+                                                    <mat-error *ngIf="editForm.controls.batch_nbr.hasError('required')">Please Enter Batch Number</mat-error>
+                                                </mat-form-field>
+                                                <mat-form-field class=" grid-six custom-input custom-edit mandatory" floatLabel="never">
+                                                    <label class="custom-label custom-edit mandatory">Category</label>
+                                                    <mat-select placeholder="Select {{language.defaults.productType}}" formControlName="category_id" (selectionChange)="selectCategory($event)">
+                                                        <mat-option *ngFor="let category of categoryList" [value]="category.id">
+                                                            {{ category.name }}
+                                                        </mat-option>
+                                                    </mat-select>
+        
+                                                </mat-form-field>
+        
+                                                <mat-form-field class="grid-six custom-input custom-edit mandatory" floatLabel="never">
+                                                    <label class="custom-label custom-edit mandatory">Products</label>
+                                                    <mat-select placeholder="Select Products" formControlName="product_types_id" (selectionChange)="selectProduct($event)">
+                                                        <mat-option *ngFor="let category of filterProdList" [value]="category.id">
+                                                            {{ category.name }}
+                                                        </mat-option>
+                                                    </mat-select>
+                                                    <!-- <mat-error *ngIf="editForm.controls.product_types_id.hasError('required')">Please Select Products</mat-error> -->
+                                                    <p class="address-error inv" *ngIf="showProdErrorMsg">Please Select Products</p>
+                                                </mat-form-field>
+                                              
+                                                <mat-form-field class="grid-six  custom-input custom-edit mandatory" floatLabel="never">
+                                                    <label class="custom-label mandatory">{{language.defaults.totalQuantity}}</label>
+                                                    <input matInput type="number" min="0" oninput="validity.valid||(value='')" (keyup)="valChanged()" placeholder="Enter {{language.defaults.totalQuantity}}"
+                                                     formControlName="tot_qty">
+                                                    <mat-error *ngIf="editForm.controls.tot_qty.hasError('required')">Please Enter Total Quantity</mat-error>
+                                                    <mat-error *ngIf="editForm.controls.tot_qty.hasError('min')">Please Enter value greater than zero</mat-error>
+
+                                                </mat-form-field>
+                                                <mat-form-field class="grid-six  custom-input custom-edit mandatory" floatLabel="never">
+                                                    <label class="custom-label mandatory">Remaining Quantity</label>
+                                                    <input matInput type="number" oninput="validity.valid||(value='')" (keyup)="valChanged()" maxlength="5" placeholder="Enter {{language.defaults.RemainingQuantity}}"
+                                                     formControlName="remain_quan">
+                                                    <mat-error *ngIf="editForm.controls.remain_quan.hasError('required')">Please Enter Remaining Quantity</mat-error>
+                                                    <!-- <mat-error *ngIf="submitForm">Remaining Quantity Exceeds Total Quantity</mat-error> -->
+                                                    <mat-error *ngIf="editForm.controls.remain_quan.hasError('min')">Please Enter value greater than zero</mat-error>
+                                                </mat-form-field>
+                                                
+                                                <mat-form-field class="grid-six  custom-inputdate mandatory" floatLabel="never">
+                                                    <label class="custom-labeldate">{{language.defaults.manufacturingDate}}</label>
+                                                    <input type="text" readonly matInput [matDatepicker]="picker3" style="padding: 12px 12px;" [min]="minDate1.start_date" (dateChange)="selectManufacringDate($event)" (focus)="openCalendar(picker3)" (click)="openCalendar(picker3)"
+                                                     placeholder="Select {{language.defaults.manufacturingDate}}" formControlName="mfd_date">
+                                                    <mat-datepicker-toggle class="mat-picker dateFocus" style="position: relative;
+                                                    bottom: 7px;" matSuffix [for]="picker3" (click)="datePicker()"></mat-datepicker-toggle>
+                                                    <mat-datepicker #picker3 startView="year"></mat-datepicker>
+                                                </mat-form-field>
+        
+                                                <mat-form-field class="grid-six  custom-inputdate mandatory" floatLabel="never">
+                                                    <label class="custom-labeldate">{{language.defaults.expiryDate}}</label>
+                                                    <input type="text" readonly matInput [matDatepicker]="picker4" style="padding: 12px 12px;" 
+                                                    (focus)="openCalendar(picker4)" (dateChange)="selectExpiryDate($event)"
+                                                    (click)="openCalendar(picker4)" [(ngModel)] = "prefillExpData" [min]="minDate1.expiry_date"
+                                                     placeholder="Select {{language.defaults.manufacturingDate}}" formControlName="exp_date">
+                                                    <mat-datepicker-toggle class="mat-picker dateFocus" style="position: relative;
+                                                    bottom: 7px;" matSuffix [for]="picker4" (click)="datePicker()"></mat-datepicker-toggle>
+                                                    <mat-datepicker #picker4 startView="year"></mat-datepicker>
+                                                </mat-form-field>
+        
+                                                <mat-form-field class="grid-six  custom-input custom-edit mandatory" floatLabel="never">
+                                                        <label class="custom-label custom-edit mandatory">Status</label>
+                                                        <mat-select placeholder="Select Status" formControlName="batch_status_id" (selectionChange)="selectStatus($event)">
+                                                            <mat-option *ngFor="let category of statusList" [value]="category.id">
+                                                                {{ category.name }}
+                                                            </mat-option>
+                                                        </mat-select>
+        
+                                                    </mat-form-field>
+        
+                                                <mat-form-field class="custom-input custom-edit grid-full " floatLabel="never">
+                                                    <label class="custom-label">Special Instructions</label>
+                                                    <textarea matInput formControlName="special_instructions" (keyup)="valChanged()" placeholder="Enter Special Instructions"></textarea>
+                                                </mat-form-field>
+                                                <div style="clear:both"></div>
+                                                <!-- <input type="text" #manufactureDate [placeholder]="language.defaults.manufacturingDate" class="digital-bush date-range datepicker" readonly/> -->
+                                                <div fxLayout="row" class="w-100" style="padding: 0 16px" fxLayoutAlign="end center"   *ngIf="showSavePanel">
+                                                    <button mat-button (click)="resetInventory(editForm)">{{language.defaults.cancel}}</button>
+                                                    <button mat-raised-button (click)="update(editForm)">{{language.defaults.save}}</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                </div>
+                              
+                                <div  class="container-ui new-center-empty-ui" *ngIf="(selectedBatchList.length == 0)">
+
+                           
+                                    <mat-card class="no-results"  >
+                                        <div class="empty-img-holder"><img [src]='images.batchIcon_o'></div>
+                                        <p class="no-result-text">No Data Found</p>
+                                    </mat-card>
+                                </div>
+                            </mat-tab>
+                           
+                            
+                            <mat-tab label="Quantity Used Details" class="client-orders">
+                                <div class="client-reports inventory" >
+                                    <table class="client-detail-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Organization Name</th>
+                                                <th>Total Quantity</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr *ngFor="let detail of selectedClientDetail">
+                                                <td>{{detail.name}}</td>
+                                                <td>{{detail.total_quantity}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <p *ngIf="!selectedClientDetail.length"
+                                    style="text-align: center;
+                                    color: #737373;
+                                    font-size: 18px;
+                                    padding: 18px;"
+                                    >No Data Found</p>
+                                </div>
+                               
+                               
+                              
+                                <!-- <div class="no-record no-clients" *ngIf="!selectedClientDetail.length">
+                                    <p>No Data Found</p>
+                                </div> -->
+
+                            </mat-tab>
+                          
+                        </mat-tab-group>
+                
+                </div>
+                <div class="footer-bottom inventory-reports fxflex animated slideInUp" fxLayout="row" fxLayoutAlign="end center" *ngIf="reportsFooter">
+                    <button type="button" mat-button (click)="cancelReportsTable()">{{language.defaults.cancel}}</button>
+                    <button type="submit" mat-raised-button (click)="saveReportsTable()">{{language.defaults.save}}</button>
+                </div>
+            </div>
+        </div>
+    </mat-step>
+    </mat-horizontal-stepper>
+</section>

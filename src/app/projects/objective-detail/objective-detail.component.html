@@ -1,0 +1,14 @@
+<div class="detail-container">
+    <mat-toolbar>
+        <span>Objective Details</span>
+
+        <span class="spacer"></span>
+
+        <button mat-icon-button [matMenuTriggerFor]="objectiveMenu">
+            <mat-icon>more_vert</mat-icon>
+        </button>
+        <mat-menu #objectiveMenu="matMenu" [overlapTrigger]="false">
+            <button mat-menu-item>Delete Objective</button>
+        </mat-menu>
+    </mat-toolbar>
+</div>

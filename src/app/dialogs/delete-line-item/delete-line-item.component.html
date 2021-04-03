@@ -1,0 +1,12 @@
+<mat-toolbar>
+	<h2 mat-dialog-title></h2>
+		<span fxFlex>Delete Line Item</span>
+</mat-toolbar>
+<mat-dialog-content class="delete-body">
+  	<span>Are you sure you want to delete this Line Item ?</span>
+</mat-dialog-content>
+<mat-dialog-actions>
+  	<span fxFlex></span>
+  		<button  mat-button mat-dialog-close>Cancel</button>
+  		<button  mat-raised-button (click)="deleteLineItem()">Delete Line Item</button>
+</mat-dialog-actions>

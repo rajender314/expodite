@@ -1,0 +1,79 @@
+<mat-toolbar>
+    <h2 mat-dialog-title>Email Quote</h2>
+    <span fxFlex> </span>
+</mat-toolbar>
+<mat-dialog-content>
+    <form [formGroup]="formGroup">
+       
+        <mat-form-field  class="custom-input block-ele mandatory w-100" floatLabel="never">
+            <label class="custom-label mandatory">To</label>
+            <input  matInput placeholder="Subject" formControlName="to_email"  >
+            <!-- <mat-error *ngIf=" submitForm && (formGroup.get('to_email').hasError('required')
+         || formGroup.get('to_email').invalid)">
+         Please 
+         <span class="capitalize"> Enter To</span>
+      </mat-error>   -->
+      
+      <mat-error *ngIf="(submitForm) && ( formGroup.get('to_email')?.invalid && !formGroup.get('to_email')?.hasError('required'))">
+     Please Enter
+                    <span class="capitalize"> valid Email</span>
+  </mat-error>
+    <mat-error *ngIf="(submitForm) 
+    && (formGroup.get('to_email')?.hasError('required')
+    )">
+                    Please 
+                    <span class="capitalize">Enter To</span>
+ </mat-error>
+         </mat-form-field>
+               
+        <mat-form-field  class="custom-input block-ele  w-100" floatLabel="never">
+            <label class="custom-label mandatory">Cc</label>
+            <input  matInput placeholder="Enter Cc" formControlName="cc_email"  >
+            <mat-error *ngIf=" submitForm && (formGroup.get('cc_email').hasError('required')
+         || formGroup.get('cc_email').invalid)">
+         Please 
+         <span class="capitalize"> Enter Cc</span>
+      </mat-error>
+         </mat-form-field>
+        <mat-form-field  class="custom-input block-ele mandatory w-100 sub-mrg" floatLabel="never">
+            <label class="custom-label mandatory">Subject</label>
+            <input class="capitalize"  matInput placeholder="Subject" formControlName="subject"  >
+            <mat-error *ngIf=" submitForm && (formGroup.get('subject').hasError('required')
+         || formGroup.get('subject').invalid)">
+         Please 
+         <span class="capitalize"> Enter Subject</span>
+      </mat-error>
+         </mat-form-field>
+        <!-- <mat-form-field class="custom-input block-ele mandatory w-100" floatLabel="never">
+            <label class="custom-label mandatory">Messaging</label>
+            <textarea matInput placeholder="Enter message" formControlName="message"></textarea>
+
+        </mat-form-field> -->
+        <label class="custom-label mandatory lbl-fnt mes-lbl">Messaging</label>
+
+        <!-- <angular-editor  [(ngModel)]="htmlColContent" [config]="editorConfig"></angular-editor> -->
+        <angular-editor  id="myEditor" formControlName="message" [config]="editorConfig"></angular-editor>
+
+         <div class="doc-cls">
+            <div class="doc-lbl"> <label class="custom-label mandatory lbl-fnt">Documents</label></div>
+                <div class="pdf-lbl-email">
+                    <a href="{{ur}}getQuotesPreview?id={{data.id}}&printable=2"   target="_blank">
+
+                    <mat-icon class="mr-7" mat-list-icon>
+                        <img [src]='images.quote_pdf' >
+                    </mat-icon>
+                    <p class="pdf-fil" title="{{data?.pdffile}}">{{data?data.pdffile:'--'}}</p>
+                </a>
+                   
+                </div>
+            
+            
+        </div>  
+    </form>
+
+</mat-dialog-content>
+<mat-dialog-actions>
+    <span fxFlex class="flx-50"></span>
+    <button mat-button mat-dialog-close (click)="cancel()">Cancel</button>
+    <button mat-raised-button clas="margn-15" (click)="save(formGroup)">Send</button>
+</mat-dialog-actions>

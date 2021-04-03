@@ -1,0 +1,290 @@
+<div class="app-modal" [class]="(App.user_details.log_type!='2'?'app-modal admin':'app-modal client')">
+    <mat-toolbar>
+        <h2 mat-dialog-title></h2>
+        <span fxFlex class="modal-title" *ngIf="(App.user_details.log_type!='2')">
+            <mat-icon *ngIf="(stepper._selectedIndex!='0')" (click)="goToPrev(stepper)" class="back-to-orders material-icons">arrow_back</mat-icon> 
+            <span *ngIf="(stepper._selectedIndex =='0')">Create Purchase Order</span>
+            <span *ngIf="(stepper._selectedIndex =='1')">Order Details</span>
+               <span *ngIf="(stepper._selectedIndex =='2')">Add New Address</span>
+            <span *ngIf="(stepper._selectedIndex =='3')">Order Confirmation</span>
+          
+            <!-- <span *ngIf="(stepper._selectedIndex =='4')">Order Confirmation</span>  -->
+        </span>
+        <span fxFlex class="modal-title" *ngIf="(App.user_details.log_type=='2')">
+            <mat-icon *ngIf="(stepper._selectedIndex!='0')" (click)="goToPrev(stepper)" class="back-to-orders material-icons">arrow_back</mat-icon> 
+            <!-- <span *ngIf="(stepper._selectedIndex =='0')">Create Order</span> -->
+            <span *ngIf="(stepper._selectedIndex =='0')">Order Details</span>
+            <span *ngIf="(stepper._selectedIndex =='1')">Add New Address</span>
+            <span *ngIf="(stepper._selectedIndex =='2')">Order Confirmation</span>
+            <!-- <span *ngIf="(stepper._selectedIndex =='2')">Add New Address</span>
+            <span *ngIf="(stepper._selectedIndex =='3')">Order Confirmation</span> -->
+        </span>
+    </mat-toolbar>
+  
+    <mat-spinner class="medium-spinner" *ngIf="confirOrderLoad"></mat-spinner>
+    <mat-horizontal-stepper class="step" @stepTransition #stepper [class]="'step_'+stepper._selectedIndex">
+       
+        <mat-step *ngIf="(App.user_details.log_type!='2')">
+            <mat-dialog-content class="client-step-content" cdk-focus-initial>
+                <form [formGroup]="clientsForm">
+                    <mat-list class="pad_0">
+                        <mat-form-field class="custom-input mandatory" floatLabel="never">
+                           <label class="label-attention mandatory vendor_drpdown">Vendor</label>
+                            <input placeholder="Select Vendor" matInput [matAutocomplete]="auto" [value]="modelData.name" formControlName="client" (keyup)="selectedClients($event)">
+                            <button type="button" mat-button matSuffix mat-icon-button aria-label="Clear" (click)="clear()">
+                                <mat-icon>close</mat-icon>
+                            </button>
+                            <div>
+                                <mat-autocomplete #auto="matAutocomplete" auto>
+                                    <mat-option (onSelectionChange)="selectionChange(client)" *ngFor="let client of order.organizations" [value]="client.id">
+                                        <span>{{ client.name }}</span>
+                                    </mat-option>
+                                </mat-autocomplete>
+                            </div>    
+                            <!-- <label class="custom-label">Select Client</label>
+                            <mat-select placeholder="Select Client" formControlName="client">
+                                <mat-option *ngFor="let client of order.organizations" [value]="client.id">
+                                    {{ client.name }}
+                                </mat-option>
+                            </mat-select> -->
+                            <mat-error *ngIf="clientsForm.controls.client.hasError('required')" >
+                                Please Select Client
+                            </mat-error>
+                        </mat-form-field>
+                        <div class="multi-select">
+                            <div class="multi-select">
+                                <mat-label class="label-attention mandatory">Attention</mat-label>
+                            <ng-select 
+                                        [items]="contactsList"
+                                        bindLabel="name"
+                                        bindValue="name"
+                                        addTagText = "Add Attention"
+                                        [addTag]="true"
+                                        [clearable]= "false"
+                                        (change)="changeUser()"
+                                        [multiple]="false"
+                                        placeholder="Select User"
+                                        formControlName="kindAttn">
+                            </ng-select>
+                            <mat-error class="error-msg" *ngIf="productSubmit && clientsForm.controls.kindAttn.hasError('required')" >
+                                Please Select User
+                            </mat-error>
+                            </div>
+                        </div> 
+                        <div class="ext-section">
+                            <mat-form-field class="custom-input mandatory w_75" floatLabel="never">
+                                <label class="custom-label">Phone Number</label>
+                                <!-- minlength="10" maxlength="10" -->
+                                <input type="number" formControlName="phone" matInput placeholder="Phone Number">
+                                <mat-error class="error-msg" *ngIf="productSubmit || !clientsForm.controls.phone.pristine && clientsForm.controls.phone.hasError('required')" >
+                                    Please Enter Phone Number
+                                </mat-error>
+                            </mat-form-field>
+                            <mat-form-field class="custom-input ext-label" floatLabel="never">
+                                <label class="custom-label">Ext</label>
+                                <input matInput placeholder="Ext" formControlName="ext">
+                            </mat-form-field>
+                        </div>
+                        <mat-form-field class="custom-input mandatory" floatLabel="never">
+                            <label class="custom-label">Email Address</label>
+                            <input matInput formControlName="email" placeholder="Email Address">
+                            <mat-error class="error-msg" *ngIf="productSubmit || !clientsForm.controls.email.pristine && clientsForm.controls.email.hasError('required')" >
+                                Please Enter Email Address
+                            </mat-error>
+                            <mat-error class="error-msg" *ngIf = "!clientsForm.controls.email.hasError('required') && clientsForm.controls.email.hasError('email')" >
+                                {{language.validations.emailValidation}}
+                            </mat-error>
+                        </mat-form-field>
+                    
+                        <mat-form-field class="custom-deliveryDate mandatory" floatLabel="never">
+                            <label class="custom-labeldate">Expected Delivery</label>
+                            <input matInput class="datepicker" [min]="now" (focus)="openCalendar(picker1)" (click)="openCalendar(picker1)"  formControlName="delivery_date" [(ngModel)]="deliveryDate"
+                            [matDatepicker]="picker1" placeholder="Expected Delivery">
+                            <mat-error class="error-msg" *ngIf="productSubmit || !clientsForm.controls.delivery_date.pristine && clientsForm.controls.delivery_date.hasError('required')" >
+                                Please Select Expected Delivery Date 
+                            </mat-error>
+                        <mat-datepicker-toggle class="mat-picker" matSuffix [for]="picker1"></mat-datepicker-toggle>
+                        <mat-datepicker #picker1 startView="year"></mat-datepicker>
+                        </mat-form-field>
+                        <mat-form-field class="custom-input" floatLabel="never">
+                            <label class="custom-label">Special Instructions</label>
+                            <textarea matInput formControlName="special_instructions" placeholder="Special Instructions"></textarea>
+                        </mat-form-field>
+                        <mat-error *ngIf="showError">{{errormessage}}</mat-error>
+                    </mat-list>
+
+                </form>
+            </mat-dialog-content>
+            <mat-dialog-actions>
+                <span fxFlex></span>
+                <button tyep="button" mat-button mat-dialog-close>Cancel</button>
+                <button type="button" mat-raised-button color="primary" (click)="goToProducts(stepper)">Select Product</button>
+            </mat-dialog-actions>
+        </mat-step>
+
+        <mat-step class="product-list-step">
+            <mat-dialog-content>
+                <div class="modal-label">
+                    <div class="product-label">Select Product</div>
+                <span *ngIf="productSubmit && order.selectedProductsError" class="error-msg">Please Select Product</span>
+                </div>
+                <mat-toolbar class="mat-toolbar-strip">
+                    <h3 class="product-name">PRODUCT</h3>
+                    <span fxFlex></span>
+                    <h3>QUANTITY</h3>
+                    <span fxFlex></span>
+                    <h3>PRICE/KG</h3>
+                </mat-toolbar>
+                <!-- <div class="no-product" *ngIf="!order.products">No Products for this client.</div> -->
+                <mat-list class="products-list">
+                    <mat-list-item *ngFor="let product of order.products; let i = index"  [fxHide]="!product.checked_status">
+                        <mat-checkbox (click)="changeCheckbox(product)" class="product-name" title="{{product.name}}">
+                           <span *ngIf="!product.shownEditMode"> {{product.name}}</span>
+                            <!-- <input *ngIf="product.shownEditMode" type="text"/> -->
+                            
+                            <span>
+                                <input type="text" *ngIf="product.shownEditMode" #myInput matInput class="inputBox custProdName"
+                                   oninput="validity.valid||(value='')" (keyup)="selectedProductRange(product, $event)" (input)="changeProductPrice(product)" 
+                                   [class.bdr-error]="product.error" placeholder="Product Name" >
+                            </span>
+                        </mat-checkbox>
+                        <span fxFlex></span>
+                        <input type="number" #myInput matInput class="inputBox"  min="0" max="999999999" oninput="validity.valid||(value='')" 
+                        (keyup)="selectedProductRange(product, $event)" (input)="changeProductPrice(product)"
+                         [class.bdr-error]="product.error" maxValue="99999.00" 
+                         placeholder="0">
+                        <h6 class="weight-label">Kg</h6>
+                        <span fxFlex></span>
+
+                        <span class="price-label" *ngIf="!product.shownEditMode">{{order.currency+' '+ (product.price || 0)}}</span>
+                        <span fxFlex></span>
+                        <input type="number" *ngIf="product.shownEditMode" #myInput matInput class="inputBox" 
+                         min="0" max="999999999" oninput="validity.valid||(value='')" (keyup)="selectedProductRange(product, $event)" 
+                         (input)="changeProductPrice(product)" [class.bdr-error]="product.error" maxValue="99999.00"  placeholder="0">
+                          
+
+                    </mat-list-item>
+                    <div>
+                   
+                            <span class="add-link" (click)="addVendorProducts()">
+                                <mat-icon class="mat-icon material-icons">add</mat-icon>Add Products
+                            </span>
+        
+                        </div>
+                </mat-list>
+              
+
+                <mat-toolbar class="mat-toolbar-strip">
+                        <h3>Select Shipping Address<span *ngIf="addressSubmit &&  order.selectedShippingError"
+                             class="error-msg error-strip">Please Select Shipping Address</span></h3>
+                        <span fxFlex></span>
+                        <span class="add-link" (click)="goToCreateAddress(stepper, 'client')">
+                            <mat-icon class="mat-icon material-icons">add</mat-icon>Add New
+                        </span>
+                    </mat-toolbar>
+                    <mat-selection-list class="address-selection">
+                        <mat-list-option 
+                                        
+                                        class="orders-list" 
+                                        >
+                                        <p>Enterpi</p>
+                                        <p>Hyd</p>
+                                        
+                                        <p>Telangana</p>
+                                        <p>India</p>
+                        </mat-list-option>
+                    </mat-selection-list>
+
+              
+            </mat-dialog-content>
+            <mat-dialog-actions>
+                <span fxFlex></span>
+                <button mat-button mat-dialog-close>Cancel</button>
+                <button mat-raised-button color="primary" (click)="goToAddress(stepper)">Select Address</button>
+            </mat-dialog-actions>
+        </mat-step>
+        <mat-step>
+                <mat-dialog-content>
+                    <div class="modal-label">Create Address</div>
+                    <mat-list>
+                        <form [formGroup]="createAddressForm">
+                            <!-- <mat-form-field class="custom-input" floatLabel="never" *ngIf="(order.addressType=='client')"> -->
+                            <mat-form-field class="custom-input mandatory" floatLabel="never">
+                                <label class="custom-label">{{language.defaults.addressType}}</label>
+                                <mat-select  placeholder={{language.defaults.addressType}} formControlName="address_type_id">
+                                    <mat-option *ngFor="let addre of order.address_types" [value]="addre.id">{{addre.name}}</mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                            <mat-form-field class="custom-input mandatory" floatLabel="never">
+                                <label class="custom-label">Address1</label>
+                                <input matInput formControlName="address1" placeholder="Address1">
+                                <mat-error *ngIf="createAddressForm.controls.address1.hasError('required')" >
+                                    Please Enter Address1
+                                </mat-error>
+                            </mat-form-field>
+                            <mat-form-field class="custom-input" floatLabel="never">
+                                <label class="custom-label">Address2</label>
+                                <input matInput formControlName="address2" placeholder="Address2">
+                            </mat-form-field>
+                            <mat-form-field class="custom-input" floatLabel="never">
+                                <label class="custom-label">Postal Code</label>
+                                <input matInput formControlName="postal_code" placeholder="Postal Code">
+                            </mat-form-field>
+                            <mat-form-field class="custom-input" floatLabel="never">
+                                <label class="custom-label">City</label>
+                                <input matInput formControlName="city" placeholder="City">
+                            </mat-form-field>
+                            <mat-form-field class="custom-input" floatLabel="never">
+                                <label class="custom-label">Country</label>
+                                <mat-select placeholder={{language.defaults.selectCountry}} (selectionChange)="onCountryChange($event)" formControlName="country">
+                                    <mat-option *ngFor="let country of order.countries" [value]="country.id">{{country.name}}</mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                            <mat-form-field class="custom-input" floatLabel="never">
+                                <label class="custom-label">State</label>
+                                <mat-select placeholder={{language.defaults.selectState}} formControlName="state">
+                                    <mat-option *ngFor="let state of order.states" [value]="state.id">{{state.name}}</mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </form>
+                    </mat-list>
+                </mat-dialog-content>
+                <mat-dialog-actions>
+                    <span fxFlex></span>
+                    <button mat-button mat-dialog-close>Cancel</button>
+                    <button mat-raised-button color="primary" (click)="createAddress(createAddressForm,stepper)">Create Address and Select</button>
+                </mat-dialog-actions>
+            </mat-step>
+        <mat-step>
+            <mat-dialog-content>
+                <p class="modal-label">You have initiated an order for the Product:</p>
+                <div *ngFor="let product of selectedProduct">
+                    <p class="gray-title">
+                        <span class="modal-label">Product Name:</span>
+                        <span class="product-detail">{{product.name}}</span>
+                    </p>
+                    <p class="gray-title">
+                            <span class="modal-label">Quantity:</span>
+                            <span class="product-detail">{{product.quantity}} Kg</span>
+                        </p>
+                    <p class="gray-title">
+                        <span class="modal-label">Price per Kg:</span>
+                        <span class="product-detail">{{product.price}}</span>
+                    </p>
+                    <p class="gray-title">
+                        <span class="modal-label">Expected Date:</span>
+                        <span class="product-detail">{{orderData.delivery_date | date: 'MMM dd, yyyy'}}</span>
+                    </p>
+                    
+                </div>
+        </mat-dialog-content>
+        <mat-dialog-actions>
+                <span fxFlex></span>
+                <button mat-button mat-dialog-close>Cancel</button>
+                <button mat-raised-button id="createorder" color="primary"  [disabled]="createbtnDisabled" (click)="createOrderConfirm(stepper)">Confirm Order</button>
+            </mat-dialog-actions>
+        </mat-step>
+
+    </mat-horizontal-stepper>
+
+</div>

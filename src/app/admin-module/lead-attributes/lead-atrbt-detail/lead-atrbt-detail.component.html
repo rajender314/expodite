@@ -1,0 +1,357 @@
+<div class="details" fxFlex>
+	<mat-toolbar class="mat-small-toolbar padLR_24" >
+	  <span class="admin-toolbar"  *ngIf="selectedAttribute" >  {{selectedAttribute.label}}</span> 
+	</mat-toolbar>
+  
+	<form class="roles-form" [formGroup]="detailsForm" (ngSubmit)="createRole(detailsForm)">
+	  <mat-spinner class="medium-spinner" *ngIf="fetchingData"></mat-spinner>
+	  <div class="box"  *ngIf="!noRoles " [class.user-footer]="detailsForm.dirty">
+		<div class="form-fields">
+		  <!-- <h4>{{language.defaults.roleProfile}}</h4> -->
+		  <div>
+			
+				<mat-form-field class="custom-input mandatory" floatLabel="never">
+					<label class="custom-label">Label</label>
+			  <input class="field-captl" matInput #myInput maxlength=100 placeholder="label" formControlName="label" id="role" />
+			  <mat-error *ngIf="detailsSubmit || !detailsForm.controls.label.pristine && detailsForm.controls.label.hasError('required') && detailsForm.controls.label.hasError('whitespace')">{{language.validations.roleName}}</mat-error>
+			</mat-form-field>
+		  </div>
+		  <div class="structure-select strut-type">
+
+			<mat-form-field class="custom-input mandatory" floatLabel="never">
+				<label class="custom-label">Type</label>
+				<mat-select placeholder="Select" formControlName="ui_element_id" [disabled]="true">
+					<mat-option *ngFor="let uiElement of dropdowns.uiElements"  [value]="uiElement.id">{{uiElement.label}}</mat-option>
+				</mat-select>
+				
+			</mat-form-field>
+          </div>
+		 
+		  <!-- <div>
+			  <mat-form-field class="custom-input" floatLabel="never">
+				  <label class="custom-label">{{language.defaults.description}}</label>
+			  <textarea matInput placeholder={{language.defaults.description}} formControlName="description" id="desc" rows="5"></textarea>
+			  
+			</mat-form-field>
+		  </div> -->
+		  <div>
+					  <mat-form-field class="custom-input mandatory" floatLabel="never">
+						<label class="custom-label">Status</label>
+						<mat-select placeholder="Status" formControlName="status">
+						  <mat-option [value]="stat.param" *ngFor="let stat of status" [innerHtml]="stat.value"></mat-option>
+						</mat-select>
+						<mat-error *ngIf="detailsSubmit || !detailsForm.controls.status.pristine && detailsForm.controls.status.hasError('required')">{{language.validations.status}}</mat-error>
+					  </mat-form-field>
+					</div>
+					
+		</div>
+		
+		<div *ngIf="uiElement" [ngSwitch]="uiElement.template_id" style="margin-bottom:20px;" class="type-fields">
+
+            <div *ngSwitchCase="'1'" class="choice-table sp-form-elements">
+
+
+              <!-- <ag-grid-angular #agGrid style="width: 500px; height: 200px;" class="ag-theme-balham" [rowData]="rowData"
+                rowHeight="50" [rowClass]="rowClass" [animateRows]="true" [rowSelection]="single" [resizable]="true"
+                [sortable]="true" [filter]="true" [columnDefs]="columnDefs" [defaultColDef]="defaultColDef"
+                (gridReady)="onGridReady($event)">
+              </ag-grid-angular> -->
+
+
+              <mat-radio-group formControlName="predefined_value" class="choices-wrapper">
+                <span class="form-label">Choices</span>
+                <div class="choices"  *ngIf="options.controls.length"  >
+                  <div class="header">
+                    <span class="radio def-btn">Default</span>
+                    <span class="text def-btn value-btn">Value</span>
+                    <span class="toggle def-btn">Status</span>
+                  </div>
+
+                  <div class="body" formArrayName="option">
+                    <div *ngFor="let choice of options.controls;let i = index" class="choice-box"
+                      [formGroupName]="i">
+                      <div class="radio ak-field-group">
+                        <mat-radio-button disableRipple="true" [value]="options.controls[i].get('id').value">
+                        </mat-radio-button>
+                      </div>
+
+                      <div class="text value-btn">
+                        <div class="ak-field-group ">
+                          <input type="text" class="ak-field-text field-captl" id="value" name="value" formControlName="value"
+                            maxlength="100">
+                          <div class="pi-error"
+                            *ngIf="options.controls[i].get('value').hasError('whitespace') && detailsForm.dirty">
+                            Please
+                            enter the value to save. </div>
+                          <div class="pi-error"
+                            *ngIf="options.controls[i].get('value').hasError('duplicateOption') && detailsForm.dirty">
+                            A
+                            Value with this name already exists.</div>
+                        </div>
+                      </div>
+
+                      <div class="toggle">
+                        <mat-slide-toggle color="primary" class="toggle" formControlName="status"></mat-slide-toggle>
+                      </div>
+                      <!-- <div class="actions" [class.add_only]="i == availableOptions - 1 && availableOptions &&  !attributeEdit"> -->
+                      <div class="actions" [class.add_only]="i == availableOptions - 1 && availableOptions">
+                        <span (click)="addControl()" *ngIf="i >= availableOptions - 1"
+                          [class.disable]="options.controls.length == maxAliases" class="btn-action add">
+                          <mat-icon>add</mat-icon>
+                        </span>
+                        <span (click)="removeControl(i)" *ngIf="availableOptions <= i"
+                          [class.disable]="options.controls.length == 1" class="btn-action remove">
+                          <mat-icon>remove</mat-icon>
+                        </span>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+              </mat-radio-group>
+
+            </div>
+
+            <div *ngSwitchCase="'2'">
+              <div class="structure-select ">
+				<mat-form-field class="custom-input mandatory" floatLabel="never">
+                <label for="size"class="custom-label">Size</label>
+                <mat-select type="text" class="" id="size" name="size" 
+                  formControlName="selected_value" (selectionChange)="changeLength($event.value)">
+                  <mat-option [value]="size.key" *ngFor="let size of dropdowns.sizes">
+                    {{size.label}}
+                  </mat-option>
+				</mat-select>
+				</mat-form-field>
+              </div>
+              <div class="structure-select">
+				<mat-form-field class="custom-input mandatory" floatLabel="never">
+                <label class="custom-label" for="size" >Data Type</label>
+                <mat-select type="text" class="" id="datatype" name="datatype"
+                  formControlName="label_element_data_type">
+                  <mat-option [value]="dataType.key" *ngFor="let dataType of dropdowns.dataTypes">
+                    {{dataType.label}}
+                  </mat-option>
+				</mat-select>
+			</mat-form-field> 
+              </div>
+              <div class="structure-select ">
+				
+				  <mat-form-field class="custom-input" floatLabel="never">
+					<label class="custom-label">Predefined Value</label>
+				<textarea matInput class="text-bottom field-captl " formControlName="predefined_value" [maxLength]="predefinedValueLength"></textarea>
+				<span class="field-note">Enter text of {{predefinedValueLength}} characters or
+					less.</span>
+			  </mat-form-field>
+              </div>
+            </div>
+
+            <div *ngSwitchCase="'3'" class="mg-btm">
+              <!-- <div class="strStore IDucture-select">
+								<span for="tooltip" class="level-name">Tooltip/Help</span>
+								<textarea class="ak-field-textarea" rows="3" id="tooltip" name="tooltip" formControlName="tooltip" maxlength="1024"></textarea>
+								<span class="field-note">Enter text of 1024 characters or less.</span>
+							</div>-->
+              <!-- <div class="note">Last modified on 09-10-2018 03:27 PM by Recon Dev User</div> -->
+              <span class="auto-suggest-form-label">Values</span>
+              <div class="auto-suggest">
+                <div class="actions">
+                  <!-- <span class="search-sec"> -->
+                   
+                    <div class="app-search-container search-small search-role">
+                      <mat-form-field class="search auto-serch-in" floatLabel="never">
+                        <input  matInput placeholder={{language.defaults.search}} #search (keyup)="DOMSearch( $event)" (blur)="!search.value.length ? open = false : open = true">
+                        <mat-icon matPrefix class="org-search">search</mat-icon>
+                        <mat-icon matSuffix *ngIf="searching" class="spinner">
+                          <mat-spinner class="small-spinner"></mat-spinner>
+                        </mat-icon>
+                        <mat-icon matSuffix *ngIf="!searching && search.value.length" (click)="search.value = '';DOMSearch(search.value)">close</mat-icon>
+                      </mat-form-field>
+                    </div>
+                    <!-- <app-search (onSearch)="DOMSearch($event)"></app-search> -->
+                  <!-- </span> -->
+                  <button class="btn btn-default button-sec" mat-raised-button
+                    (click)="addAutoSuggestValue()">Add</button>
+                </div>
+
+                <div class="list">
+                  <div class="header">
+                    <div class="item sorting">
+                      <!-- <div (click)="DOMSort('value')"><span class="sort-action {{value.sortBy | lowercase}}">Value</span></div>
+											<div (click)="DOMSort('status')"><span class="sort-action {{status.sortBy | lowercase}}">Status</span></div> -->
+                      <div class="value-wdth">
+                        <span class="sort-action">Value</span>
+                      </div>
+                      <div>
+                        <span class="sort-action">Status</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="content" *ngIf="selectedAttribute.option.length">
+                    <div class="item auto-item" *ngFor="let data of selectedAttribute.option">
+                      <div class="auto-value">
+                        <span (click)="focusElement('suggest_value', data);data.showValue = true"
+                          *ngIf="!data.showValue">{{data.value}}</span>
+                        <div *ngIf="data.showValue">
+                          <input #valueInput autocomplete="" name="suggest_value" type="text" class="ak-field-text"
+                            formControlName="suggest_value" (change)="onChangeOption('value', $event, data)"
+                            (blur)="onChangeOption('value', $event, data)" maxlength="100">
+                          <div class="pi-error" *ngIf="af.suggest_value.hasError('required')">
+                            Please Enter Value</div>
+                        </div>
+                      </div>
+                      <div>
+                        <span [innerHTML]="data.status ? 'Active' : 'Inactive'"
+                          (click)="focusElement('suggest_status', data);data.showStatus = true"
+                          *ngIf="!data.showStatus"></span>
+                        <select #mySelect name="suggest_status"  type="text"
+                          *ngIf="data.showStatus" formControlName="suggest_status"
+                          (change)="onChangeOption('status', $event, data)"
+                          (blur)="onChangeOption('status', $event, data)">
+                          <option *ngFor="let status of dropdowns.status" [value]="status.value">{{status.label}}
+                          </option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="content text-center no-value" *ngIf="!searchValue && !selectedAttribute.option.length">
+                    No Values Yet.
+                  </div>
+                  <div class="content text-center no-value" *ngIf="searchValue && !selectedAttribute.option.length">
+                    No Results Found.
+                  </div>
+                </div>
+
+                <div class="pagination">
+
+                </div>
+              </div>
+            </div>
+
+            <div *ngSwitchCase="'4'" class="size">
+              <div class="field-groups-2">
+                <div class="sp-form-elements">
+                 
+				  <mat-form-field class="custom-input mandatory" floatLabel="never">
+					<label class="custom-label">Decimal Digits</label>
+					<mat-select type="text" id="decimal_digits" name="decimal_digits"
+                    formControlName="selected_value">
+                    <mat-option [value]="digits.key" *ngFor="let digits of dropdowns.decimalDigits">
+                      {{digits.label}}
+                    </mat-option>
+				  </mat-select>
+					
+				  </mat-form-field>
+                </div>
+                <div class="sp-form-elements predefined-val">
+					<mat-form-field class="custom-input mandatory" floatLabel="never">
+                  <label for="name" class="form-label">Predefined Value</label>
+                  <input autocomplete="" [appAllowNumbers]="true" zero="false" matInput
+                    type="number" class="ak-field-text" id="predefined_value" name="predefined_value"
+                    formControlName="predefined_value" maxlength="26">
+                  <mat-error *ngIf="formSubmit && af.predefined_value.hasError('pattern')">Value
+					should be a number.</mat-error>
+				</mat-form-field>
+                </div>
+              </div>
+            </div>
+
+            <div *ngSwitchCase="'5'">
+              <div class="choices-wrapper">
+                <label>Attributes</label>
+                <div class="choices" *ngIf="options.controls.length">
+                  <div class="header">
+                    <span class="text">Spec</span>
+                    <span class="toggle">Delimiter</span>
+                  </div>
+                  <div class="body" formArrayName="option">
+                    <div *ngFor="let choice of options.controls;let i = index" class="choice-box"
+                      [formGroupName]="i">
+                      <div class="ak-field-group">
+                        <select type="text" formControlName="value">
+                          <option *ngFor="let type of attributes" [value]="type.id">
+                            {{type.label}}</option>
+                        </select>
+                        <div class="pi-error"
+                          *ngIf="options.controls[i].get('value').hasError('required') && formSubmit">
+                          Please
+                          Select Attribute</div>
+                      </div>
+                      <div class="ak-field-group field-captl">
+                        <input autocomplete=""  type="text" class="ak-field-text field-captl"
+                          formControlName="delimiter">
+                      </div>
+
+                      <div class="actions">
+                        <span (click)="removeControl(i)" [class.disable]="options.controls.length == 1" class="remove">
+                          <mat-icon>remove</mat-icon>
+                        </span>
+                        <span (click)="addControl()" class="add">
+                          <mat-icon>add</mat-icon>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div *ngSwitchCase="'6'">
+              <div class="choices-wrapper">
+
+                <div class="structure-select">
+                  
+				  <mat-form-field class="custom-input mandatory" floatLabel="never">
+					<label class="custom-label">Date Format</label>
+					<mat-select type="text" name="selected_value" 
+                    formControlName="selected_value">
+
+                    <mat-option style="text-transform: none" [value]="dateType.key"
+                      *ngFor="let dateType of dropdowns.dateTypes">
+                      {{dateType.label}}
+                    </mat-option>
+				  </mat-select>
+					
+				  </mat-form-field>
+                </div>
+              </div>
+            </div>
+            <div class="sp-form-elements mandity-fileds">
+              <div>
+                <mat-checkbox [value]="1" color="primary" [disabled]="disableCheck" formControlName="required">
+                  Mandatory Field</mat-checkbox>
+              </div>
+              <di></di>
+              <div>
+                <mat-checkbox [value]="1" color="primary" [disabled]="disableCheck" formControlName="display_in_grid">
+                  Display in
+                  Leads Grid</mat-checkbox>
+              </div>
+            </div>
+
+            <!-- <div class="ak-field-group" *ngIf="uiElement.template_id != 3 && uiElement.template_id != 5">
+							<label for="tooltip">Tooltip/Help</label>
+							<textarea class="ak-field-textarea" rows="3" id="tooltip" name="tooltip" formControlName="tooltip" maxlength="1024"></textarea>
+							<span class="field-note">Enter text of 1024 characters or less.</span>
+						</div> -->
+
+            <!-- <div *ngSwitchCase="selectedAttribute.key  == 'paragraph_text' || selectedSpecification.key == 'single_line_text' ? selectedSpecification.key : 'NotInCase'"
+						 class="note">
+							<p>Last modified on 09-10-2018 03:27 PM by Chris Pearce</p>
+							<p>Created on 09-08-2018 03:27 PM by Chris Pearce</p>
+						</div> -->
+
+          </div>
+		
+	  </div>
+	  <div class="footer" fxLayout="row" fxLayoutAlign="end center"  *ngIf="detailsForm.dirty">
+		<button type="button" mat-button (click)="cancel(detailsForm)">Cancel</button>
+		<button type="submit" mat-raised-button >Update Attribute</button>
+	  </div>
+	  <div *ngIf="noRoles" class="no-record">
+		<img [src]="images.no_category">
+		<p>No Attributes found</p>
+	  </div>
+	</form>
+  </div>
+  
+  

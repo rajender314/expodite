@@ -1,0 +1,34 @@
+mat-form-field{
+    display: flex;
+    flex-direction: column;
+}
+mat-dialog-content{
+    // max-height:80vh;
+    height:111px;
+}
+.address-form{
+    width:100%
+}
+// .delete-contact{
+//     margin-top:25px;
+// }
+mat-dialog-actions{
+    padding: 10px 24px 15px 21px;
+}
+// .alert-dialog{
+//     height: 215px!important;
+// }
+mat-toolbar{
+    span,h2{
+        display: flex;
+        align-items: center;
+    }
+}
+mat-toolbar{
+    background-color:#075DA8;
+    color:#fff;
+}
+// button.mat-raised-button{
+//     background-color:#3676ca;
+//     color:#fff;
+// }

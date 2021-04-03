@@ -1,0 +1,23 @@
+<mat-toolbar color="primary">
+    <h2 mat-dialog-title>Add Line Item</h2>
+      <span fxFlex></span>
+  </mat-toolbar>
+  <mat-dialog-content>
+      <form [formGroup]="lineItemForm" class="addLineForm">
+          <mat-form-field class="custom-input mandatory" floatLabel="never">
+            <label class="custom-label">Line Item</label>
+            <input matInput placeholder="Line Item" formControlName="lineItem">
+            <mat-error *ngIf = "lineItemForm.controls.lineItem.hasError('required')">Please Enter Line Item</mat-error>
+          </mat-form-field>
+          <mat-form-field class="custom-input mandatory" floatLabel="never">
+              <label class="custom-label">Value</label>
+              <input type="number" matInput placeholder="Value" formControlName="lineItemValue">
+              <mat-error *ngIf = "lineItemForm.controls.lineItemValue.hasError('required')">Please Enter Value</mat-error>
+          </mat-form-field>
+      </form>
+  </mat-dialog-content>
+  <mat-dialog-actions>
+      <span fxFlex></span>
+        <button  mat-button mat-dialog-close>Cancel</button>
+        <button  mat-raised-button (click)="addLineItem(lineItemForm)" [disabled] = "disabledSave || !lineItemForm.dirty">Add Line Item</button>
+  </mat-dialog-actions>

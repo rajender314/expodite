@@ -1,0 +1,27 @@
+
+.input-class {
+        border: 1px solid #d7dbe0;
+        height: 30px;
+        width: 80%;
+        padding: 5px;
+        border-radius: 3px;
+        margin-left: 2px;
+    }
+    .mat-option-text {
+        display: flex;
+        align-items: center;
+    }
+.inner-content{
+    display: flex;
+    align-items: center;
+    .mat-form-field{
+        max-width: 150px;
+        margin-right: 10px;
+    }
+    .addon-btns{
+        .mat-icon-button{
+            width: 30px;
+        }
+    }
+        
+}

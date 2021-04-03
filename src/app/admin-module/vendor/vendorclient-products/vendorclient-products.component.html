@@ -1,0 +1,140 @@
+<div class="products-billable" style="padding-bottom: 60px;">
+    <mat-card class="client-products-card">
+        <mat-card-content>
+            <fieldset class="admin-disable">
+                <div class="select-product">
+                    <mat-checkbox class="product-check normal-whitespace" [(ngModel)]="selectedChecbox1" [disabled]="selectedChecbox2">
+                        If you are a finished product manufacturer/marketer of finished product, please list below the names of the brand and products
+                        using {{companyDetails.companyName}}.
+                    </mat-checkbox>
+                </div>
+            </fieldset>
+            <fieldset class="admin-disable">
+                <div class="client-products">
+                    <div class="client-products-header">
+                        <div class="client-brand">Name of the Brand</div>
+                        <div class="client-product">Product Name</div>
+                        <div class="product-icons" (click)="fileSelectedvalue(products1)" *ngIf="adminUser || !adminUser">
+                            <input id="file" type="file" [disabled]="selectedChecbox2 || !selectedChecbox1" ng2FileSelect
+                                [uploader]="uploader" [hidden]="true" multiple />
+                            <label for="file">
+                                <span class="text-upload" [class.disable-delete]="selectedChecbox2 || !selectedChecbox1">Upload
+                                    TLA</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="adding-products">
+                        <form [formGroup]="myProductForm1">
+                            <div formArrayName="products1">
+                                <div class="products-section"
+                                    *ngFor="let comp of myProductForm1.get('products1')['controls'];let i=index"
+                                    [formGroupName]="i">
+                                    <div class="product-name">
+                                        <mat-form-field class="custom-input mt_0" floatLabel="never">
+                                            <input matInput placeholder="Brand Name" formControlName="product_name"
+                                                [readonly]="selectedChecbox2">
+                                        </mat-form-field>
+                                    </div>
+                                    <div class="product-name">
+                                        <mat-form-field class="custom-input mt_0" floatLabel="never">
+                                            <input matInput placeholder="Product Name" formControlName="product_brand"
+                                                [readonly]="selectedChecbox2">
+                                        </mat-form-field>
+                                    </div>
+                                    <div class="product-add-del">
+                                        <button mat-icon-button class="array-button"
+                                            [disabled]="selectedChecbox2 || !selectedChecbox1" (click)="addMail(i)">
+                                            <mat-icon>add</mat-icon>
+                                        </button>
+                                        <button mat-icon-button class="array-button" [class.disable-delete]=""
+                                            [disabled]="selectedChecbox2 || myProductForm1.controls.products1.value.length == 1"
+                                            (click)="removeMail(i)">
+                                            <mat-icon>remove</mat-icon>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </fieldset>
+            <fieldset class="admin-disable">
+                <div class="select-product" [attr.disabled]="adminUser">
+                    <mat-checkbox class="example-margin normal-whitespace" [disabled]="selectedChecbox1" [(ngModel)]="selectedChecbox2">
+                        If you are a contract manufacturer, please list below the name of the finished products manufacturers (your customers)/product
+                        marketer along with the respective brand and product names
+                    </mat-checkbox>
+                </div>
+            </fieldset>
+            <fieldset class="admin-disable">
+                <div class="client-products">
+                    <!-- [attr.disabled]="adminUser" -->
+                    <div class="client-products-header">
+                        <div class="client-brand">Name of the Brand</div>
+                        <div class="client-product">Product Name</div>
+                        <div class="product-icons" (click)="fileSelectedvalue(products2)" *ngIf="adminUser || !adminUser">
+                            <input id="file1" type="file" [disabled]="selectedChecbox1 || !selectedChecbox2" ng2FileSelect
+                                [uploader]="uploader" [hidden]="true" multiple />
+                            <label for="file1">
+                                <span class="text-upload" [class.disable-delete]="selectedChecbox1 || !selectedChecbox2">Upload
+                                    TLA</span>
+                            </label>
+            
+                        </div>
+                    </div>
+                    <div class="adding-products">
+                        <form [formGroup]="myProductForm2">
+                            <div formArrayName="products2">
+                                <div class="products-section"
+                                    *ngFor="let pro of myProductForm2.get('products2')['controls'];let s=index" [formGroupName]="s">
+                                    <div class="product-name">
+                                        <mat-form-field class="custom-input mt_0" floatLabel="never">
+                                            <input matInput placeholder="Brand Name" formControlName="product_name"
+                                                [readonly]="selectedChecbox1">
+                                        </mat-form-field>
+                                    </div>
+                                    <div class="product-name">
+                                        <mat-form-field class="custom-input mt_0" floatLabel="never">
+                                            <input matInput placeholder="Product Name" formControlName="product_brand"
+                                                [readonly]="selectedChecbox1">
+                                        </mat-form-field>
+                                    </div>
+                                    <div class="product-add-del">
+                                        <button mat-icon-button class="array-button"
+                                            [disabled]="selectedChecbox1 || !selectedChecbox2" (click)="addProducts(s)">
+                                            <mat-icon>add</mat-icon>
+                                        </button>
+                                        <button mat-icon-button class="array-button"
+                                            [disabled]="selectedChecbox1 || myProductForm2.controls.products2.value.length == 1"
+                                            (click)="deleteProducts(s)">
+                                            <mat-icon>remove</mat-icon>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </fieldset>
+        </mat-card-content>
+    </mat-card>
+    <div class="tla-uploads-section">
+        <div class="uploads-count" *ngIf="showUpload">Uploads</div>
+        <div class="tla-uploads">
+            <div class="upload-card" *ngFor="let upload of uploadData">
+                <span class="upload-name">{{upload.original_name}}</span>
+                <a class="upload-url" [href]="upload.link_url" target="_blank">
+                    <img class="upload-url-grey" [src]='images.dwnload_grey'>
+                </a>
+                <div class="upload-del">
+                    <mat-icon class="delete-icon upload-delete" (click)="uploadDel(index)">delete</mat-icon>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="footer-bottom fxflex animated slideInUp" [class.client-footer]="myProfile" fxLayout="row"
+        fxLayoutAlign="end center" *ngIf="(selectedChecbox1 || selectedChecbox2)">
+        <!-- *ngIf="(selectedChecbox1 || selectedChecbox2) && myProfile" -->
+        <button type="button" mat-button>Cancel</button>
+        <button type="button" mat-raised-button color="primary" (click)="submitValue()">{{language.defaults.save}}</button>
+    </div>

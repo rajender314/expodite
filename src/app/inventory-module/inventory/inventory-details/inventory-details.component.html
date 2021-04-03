@@ -1,0 +1,100 @@
+<div class="details-content">
+	<mat-toolbar class="batch-detail" *ngIf="selectedBatch">
+		<mat-toolbar-row>
+			<mat-icon class="arrow-left"(click)="goBack()">keyboard_arrow_left</mat-icon>
+			<span class="product-name" [innerHtml]="selectedBatch.name"></span>
+			
+			<span fxFlex></span>
+			<div class="icons">
+				<mat-icon class="icons" (click)="editInventory()">mode_edit</mat-icon>
+				<mat-icon class="icons" (click)="batchDelete()">delete</mat-icon>
+			</div>
+		</mat-toolbar-row>
+	</mat-toolbar>
+	<mat-card>
+		<mat-toolbar class="batch-name" *ngIf="selectedBatch">
+			<mat-toolbar-row>
+				<div class="icon-sec">
+          			<img [src]='images.batchIcon_o' title="Inventory" class="detail-icon">
+					  <span [innerHtml]="selectedBatch.name"></span>
+				</div>
+			</mat-toolbar-row>
+		</mat-toolbar>
+		<mat-tab-group>
+			<mat-tab label="Batch Details" *ngFor="let detail of batchList">
+				<div class="tab-name" *ngIf = "!editable">
+				<!-- <div class="products">
+					<h3>{{language.defaults.batchName}}</h3>
+					<p>{{detail.name}}</p>
+				</div> -->
+				<div class="products">
+					
+					<h3>{{language.defaults.productList}}</h3>
+					<p>{{detail.product_name}}</p>
+				</div>
+				<div class="products">
+					<h3>{{language.defaults.batchNumber}}</h3>
+					<p>{{detail.batch_nbr}}</p>
+				</div>
+				<div class="products">
+					<h3>{{language.defaults.totalQuantity}}</h3>
+					<p>{{detail.tot_qty}}</p>
+				</div>
+				<div class="products">
+					<h3>{{language.defaults.quantityRemaining}}</h3>
+    				<p>{{detail.remain_quan}}</p>
+				</div>
+				<div class="products">
+					<h3>{{language.defaults.manufacturingDate}}</h3>
+    				<p>{{detail.mfd_date}}</p>
+				</div>
+				<div class="products">
+					<h3>{{language.defaults.expiryDate}}</h3>
+    				<p>{{detail.exp_date}}</p>
+				</div>
+				</div>
+				<div class="edit-tab" *ngIf = "editable">
+					<form [formGroup] = "editForm">
+						<mat-form-field class="custom-input" floatLabel="never">
+							<label class="custom-label">{{language.defaults.productType}}</label>
+							<mat-select placeholder="{{language.defaults.productType}}" formControlName="product_types_id">
+								<mat-option *ngFor="let product of productList" [value]="product.id">
+								{{ product.name }}
+								</mat-option>
+							</mat-select>
+						</mat-form-field>
+						<mat-form-field class="custom-input" floatLabel="never">
+							<label class="custom-label">{{language.defaults.totalQuantity}}</label>
+							<input matInput placeholder="{{language.defaults.totalQuantity}}" formControlName="tot_qty">
+						</mat-form-field>
+						<mat-form-field class="custom-input" floatLabel="never">
+							<label class="custom-label">{{language.defaults.quantityRemaining}}</label>
+							<input matInput placeholder="{{language.defaults.quantityRemaining}}" formControlName="remain_quan">
+						</mat-form-field>
+						<mat-form-field class="custom-input" floatLabel="never">
+							<label class="custom-label">{{language.defaults.manufacturingDate}}</label>
+							<input matInput  [matDatepicker]="picker3" placeholder="{{language.defaults.manufacturingDate}}" formControlName="mfd_date">
+							<mat-datepicker-toggle matSuffix [for]="picker3"></mat-datepicker-toggle>
+                    		<mat-datepicker #picker3></mat-datepicker>
+						</mat-form-field> 
+						<mat-form-field class="custom-input" floatLabel="never">
+							<label class="custom-label">{{language.defaults.expiryDate}}</label>
+							<input matInput [matDatepicker]="picker4" placeholder="{{language.defaults.expiryDate}}" formControlName="exp_date">
+							<mat-datepicker-toggle matSuffix [for]="picker4"></mat-datepicker-toggle>
+                    		<mat-datepicker #picker4></mat-datepicker>
+						</mat-form-field>
+						<div fxLayout="row" fxLayoutAlign="end center">
+							<button  mat-button (click)="resetInventory(editForm)">{{language.defaults.cancel}}</button>
+							<button  mat-raised-button (click)="update(editForm)">{{language.defaults.save}}</button>
+						</div>
+					</form>
+				</div>
+
+			</mat-tab>
+			
+			<mat-tab label="Orders For this Batch">Orders For this Batch</mat-tab>
+		
+		</mat-tab-group>
+		
+	</mat-card>
+</div>

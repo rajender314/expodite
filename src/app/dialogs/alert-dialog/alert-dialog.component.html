@@ -1,0 +1,14 @@
+<mat-toolbar color="primary">
+  <h2 mat-dialog-title [innerHtml]="data.title"></h2>
+  <span fxFlex></span>
+</mat-toolbar>
+<mat-dialog-content class="reset-alert">
+  <div [innerHtml]="data.msg"></div>
+  <p [innerHtml]="data.reset_url" *ngIf="success" style="word-break:break-all"></p>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <span fxFlex></span>
+  <button *ngIf="!success" mat-button mat-dialog-close>{{language.defaults.cancel}}</button>
+  <button *ngIf="!success" mat-raised-button color="warn" (click)="confirm()">{{language.defaults.yes}} {{data.title}}</button> <!-- [mat-dialog-close]="success" -->
+  <button *ngIf="success" mat-raised-button color="warn" mat-dialog-close>{{language.defaults.okay}}</button>
+</mat-dialog-actions>

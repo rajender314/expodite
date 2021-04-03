@@ -1,0 +1,55 @@
+<div class="center-section-scroll vh-100 d-flex body-white ">
+	<div class="page-header-ui " *ngIf="!noCategory" >
+		<div class="flex-fixed-header page-title container-ui">
+			<h2  style="font-weight: 400;" title="{{selectedCategory.name?selectedCategory.name:'Add Category'}}" *ngIf="selectedCategory" [innerHtml]="selectedCategory.name?selectedCategory.name:'Add Category'"></h2>
+		</div>
+	</div>
+	<perfect-scrollbar class="padding-16">
+		<div class="min-container"> <form [formGroup]="detailsForm" (ngSubmit)="createShipment(detailsForm)">
+			<mat-spinner class="medium-spinner" *ngIf="fetchingData"></mat-spinner>
+			<div class="box"  *ngIf="!noCategory && !fetchingData" [class.user-footer]="detailsForm.dirty">
+				<div class="ex-row">
+				 
+						<mat-form-field  class="custom-input mandatory grid-six" floatLabel="never">
+							<label class="custom-label mandatory">{{language.defaults.categoryName}}</label>
+							<input matInput  #myInput  placeholder="{{language.defaults.categoryName}}" maxlength=150 formControlName="name" id="containerName" />
+							<mat-error *ngIf="submitcategory || !detailsForm.controls.name.pristine && detailsForm.controls.name.hasError('required')">Please Enter {{language.defaults.categoryName}}</mat-error>
+						</mat-form-field>
+						<mat-form-field   class="custom-input mandatory grid-six" floatLabel="never">
+							<label class="custom-label mandatory">{{language.defaults.status}}</label>
+							<mat-select placeholder="Status" formControlName="status"
+							>
+							<mat-option [value]="stat.param" *ngFor="let stat of status" [innerHtml]="stat.value"></mat-option>
+							</mat-select>
+							<mat-error *ngIf="submitcategory || !detailsForm.controls.status.pristine && detailsForm.controls.status.hasError('required')">{{language.validations.status}}</mat-error>
+						</mat-form-field>				 
+					
+						<mat-form-field   class=" grid-full custom-input" floatLabel="never">
+							<label class="custom-label">{{language.defaults.description}}</label>
+							<textarea matInput placeholder={{language.defaults.description}} maxlength=255 formControlName="description" id="shipmentDesc"></textarea>
+						</mat-form-field>
+					
+				</div>
+			</div>
+			
+			<div class="document-footer" fxLayout="row" fxLayoutAlign="start center" *ngIf="detailsForm.dirty">
+					<div class="min-container  d-flex justify-content-end">
+					<button type="button" mat-button (click)="cancel(detailsForm)">{{language.defaults.cancel}}</button>
+					<button type="submit" mat-raised-button >{{addCategory}}</button>
+					</div>
+				</div>
+		</form>
+	</div>	<div *ngIf="noCategory" class="no-results full"> 
+		<div class="empty-img-holder">
+			<img [src]="images.no_category">
+
+		</div>
+			<p class="no-result-text">No Categories Found</p>
+		
+	</div>
+	</perfect-scrollbar>
+
+	
+
+
+</div>

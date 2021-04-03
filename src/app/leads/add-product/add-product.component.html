@@ -1,0 +1,46 @@
+<div class="list admin-inner-list">
+  <mat-toolbar class="mat-small-toolbar list-toolbar">
+    <mat-icon  (click)="cancel()"class="back-to-orders pointer" >arrow_back</mat-icon>
+
+    <span (click)="backToList()">Add Product </span>
+  <span fxFlex></span>
+  
+  </mat-toolbar>
+ <div class="app-search-container search-small search-role">
+  <mat-form-field class="search" floatLabel="never">
+    <input matInput placeholder="Search Product"#search (keyup)="searchProducts(search.value, $event)" (blur)="!search.value.length ? open = false : open = true">
+    <mat-icon matPrefix class="org-search">search</mat-icon>
+    <mat-icon matSuffix *ngIf="searching" class="spinner">
+      <mat-spinner class="small-spinner"></mat-spinner>
+    </mat-icon>
+    <mat-icon matSuffix *ngIf="!searching && search.value.length" (click)="search.value = '';searchProducts(search.value)">close</mat-icon>
+  </mat-form-field>
+</div>
+<div class="list-items quote-list"  (scrolled)="onScroll()"
+  >
+  <mat-spinner class="medium-spinner" *ngIf="fetchingData"></mat-spinner>
+  <mat-list *ngIf="!fetchingData">
+      <mat-list-item @AdminListAnimate *ngFor="let list of productLIst" >
+        <!-- <mat-checkbox [value]="list.status" [checked]="list.selected" color="primary" class="chk-abs" [class.active]="list.id === selectedProduct.id"  (change)="getProduct($event,list)" formControlName="required"></mat-checkbox> -->
+        <!-- <div (click)="getProduct($event,list)" >
+          <mat-checkbox class="chk-abs" [value]="list.status" (change)="getProduct($event,list)" ></mat-checkbox>
+
+          <h4 mat-line  class="marh-lft" [value]="list.status" (click)="getProduct($event,list)" [checked]="list.selected" title="{{list.name}}" [innerHtml]="list.name"></h4>
+        </div> -->
+        <mat-checkbox [checked]="list.selected" (change)="getProduct($event,list)"
+        fxFlex>
+         <span  title="{{list.name}}"  class="prod-name">{{list.name}} </span>
+       </mat-checkbox>
+      </mat-list-item>
+      
+
+      <mat-list-item *ngIf="paginationScroll">{{language.defaults.loading}}</mat-list-item>
+  </mat-list>
+  <div class="search-empty admin-search empty-prod" *ngIf="noProducts &&!fetchingData">{{language.defaults.noProductTypeFound}}</div>
+</div>
+<mat-dialog-actions>
+  <span fxFlex class="flx-50"></span>
+  <button mat-button mat-dialog-close >Cancel</button>
+  <button mat-raised-button clas="margn-15"  [disabled]="!addProdt"  (click)="saveContact()">Continue </button>
+</mat-dialog-actions>
+</div>

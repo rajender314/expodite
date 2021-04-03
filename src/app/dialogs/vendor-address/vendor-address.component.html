@@ -1,0 +1,92 @@
+<mat-toolbar>
+	<h2 mat-dialog-title></h2>
+	<span fxFlex>{{(data.address.id)?"Edit Address":"Add Address"}}</span>
+</mat-toolbar>
+<mat-dialog-content>
+	<mat-selection-list class="selection-address">
+			<mat-list-option selected="{{address.selected ? true:false}}" 
+							checkboxPosition = 'before'
+							disableRipple = true
+							(click)="getAddress(address, clientAddress)" 
+							class="address-list" 
+							*ngFor="let address of clientAddress">
+				<p>Address {{address.address_count}}</p>
+			</mat-list-option>
+		</mat-selection-list>
+	<form [formGroup]="addressForm">
+		<!-- <mat-form-field class="custom-input mandatory" floatLabel="never">
+			<label class="custom-label">{{language.defaults.addressType}}</label>
+			<mat-select placeholder={{language.defaults.addressType}} formControlName="address_type_id" [disabled]="(data.address.id) ? true : false">
+				<mat-option *ngFor="let addre of address_type" [value]="addre.id">{{addre.name}}</mat-option>
+			</mat-select>
+			<mat-error *ngIf="addressForm.controls.address_type_id.hasError('required')">Please select Address Type</mat-error>
+		</mat-form-field> -->
+		<mat-form-field class="custom-input" floatLabel="never">
+			<label class="custom-label">{{language.defaults.companyName}}</label>
+			<input matInput maxlength="150" placeholder={{language.defaults.companyName}} formControlName="company_name">
+			
+		</mat-form-field>
+		<mat-form-field class="custom-input mandatory" floatLabel="never">
+			<label class="custom-label">{{language.defaults.address1}}</label>
+			<input matInput maxlength="150" placeholder={{language.defaults.address1}} formControlName="address1">
+			<mat-error *ngIf="addressForm.controls.address1.hasError('required') || addressForm.controls.address1.hasError('whitespace')">{{language.validations.address1}}</mat-error>
+		</mat-form-field>
+		<mat-form-field class="custom-input" floatLabel="never">
+			<label class="custom-label">{{language.defaults.address2}}</label>
+			<input matInput maxlength="150" placeholder={{language.defaults.address2}} formControlName="address2">
+			<!-- <mat-error *ngIf="addressForm.controls.address2.hasError('required') || addressForm.controls.address2.hasError('whitespace')">{{language.validations.address2}}</mat-error> -->
+		</mat-form-field>
+		<mat-form-field class="custom-input" floatLabel="never">
+			<label class="custom-label">{{language.defaults.city}}</label>
+			<input matInput maxlength="150" placeholder={{language.defaults.city}} formControlName="city">
+			<!-- <mat-error *ngIf="addressForm.controls.city.hasError('required') || addressForm.controls.city.hasError('whitespace')">{{language.validations.city}}</mat-error> -->
+		</mat-form-field>
+		<mat-form-field class="custom-input" floatLabel="never">
+			<label class="custom-label">Postal Code</label>
+			<input matInput maxlength="20" placeholder="postal code" formControlName="postal_code">
+			<!-- <mat-error *ngIf="addressForm.controls.postal_code.hasError('required') || addressForm.controls.postal_code.hasError('whitespace') ">Please enter postal code</mat-error> -->
+		</mat-form-field>
+
+		<mat-form-field class="custom-input mandatory" floatLabel="never">
+			<label class="custom-label">{{language.defaults.selectCountry}}</label>
+			<mat-select placeholder={{language.defaults.selectCountry}} (selectionChange)="onCountryChange($event)" formControlName="country_id">
+				<mat-option>Add Country</mat-option>
+				<mat-option *ngFor="let country of countries" [value]="country.id">{{country.name}}</mat-option>
+			</mat-select>
+			<mat-error *ngIf="addressForm.controls.country_id.hasError('required')">Please select country</mat-error>
+		</mat-form-field>
+
+		<div class="add-new-address" *ngIf="submitCountry">
+			<mat-form-field fxFlex="80" class="custom-input mandatory" floatLabel="never">
+				<label class="custom-label">Add Country</label>
+				<input matInput placeholder="Add Country" maxlength=10 placeholder="Add Country" formControlName="addCountry">
+				<!-- <mat-error *ngIf="addressForm.controls.addCountry.hasError('required')">Please enter country</mat-error> -->
+			</mat-form-field>
+			<span class="add-new" (click)="addCountry(addressForm)">Add Country</span>
+
+		</div>
+		<mat-form-field class="custom-input" floatLabel="never">
+			<label class="custom-label">{{language.defaults.selectState}}</label>
+			<mat-select placeholder={{language.defaults.selectState}} (selectionChange)="onStateChange()" formControlName="state_province_id">
+				<mat-option [value]="">No State</mat-option>
+				<mat-option *ngFor="let state of states" [value]="state.id">{{state.name}}</mat-option>
+			</mat-select>
+		</mat-form-field>
+
+		<div class="add-new-address" *ngIf="!addressForm.get('state_province_id').value && submitState">
+			<mat-form-field fxFlex="80" class="custom-input mandatory" floatLabel="never">
+				<label class="custom-label">Add State</label>
+				<input matInput maxlength=50 placeholder="Add State" formControlName="addState">
+			</mat-form-field>
+			<span class="add-new" (click)="addState(addressForm)">Add State</span>
+			<!-- <span class="add-new" (click)="addState(addressForm)">Please add State</span> -->
+		
+		</div>
+
+	</form>
+</mat-dialog-content>
+<mat-dialog-actions>
+	<span fxFlex></span>
+	<button mat-button mat-dialog-close>{{language.defaults.cancel}}</button>
+	<button mat-raised-button (click)="addAddress(addressForm)">{{newAddress}}</button>
+</mat-dialog-actions>

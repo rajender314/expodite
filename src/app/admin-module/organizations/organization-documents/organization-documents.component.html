@@ -1,0 +1,46 @@
+<div style="height: calc(100vh - 112px);">
+	 
+		<div   style="height: 100%;display: flex;flex-direction: column;" *ngIf="!emptyData" >
+			<div class="client-documents-card document-box">
+				<div class="document-header">
+					<h2 class="document-name">
+						{{language.defaults.documentName}}
+					</h2>
+				</div>
+				
+			</div>
+			<perfect-scrollbar>
+
+			
+			
+			<mat-selection-list style="margin-top: 0; padding-top: 0;" class="document-selection" *ngIf="documentTypes">
+				<mat-list-option  (change)="selectState()" class="document-option" checkboxPosition="before" (click)="documentTypeAllChange(selectAll)" selected="{{selectAll}}" >
+					<b>Select All</b>
+				</mat-list-option>
+				<mat-list-option  
+					(change)="selectState($event)" 
+					class="document-option" 
+					checkboxPosition="before" 
+					(click)="documentTypeChange(document)" 
+					
+					*ngFor="let document of documentTypes; let i = index"
+					[selected]="documentTypes[i].selected" >
+					{{document.name}}
+				</mat-list-option>
+			</mat-selection-list>
+		</perfect-scrollbar>
+			
+
+			<div class="document-footer" *ngIf="activeState">
+				<div class="min-container d-flex justify-content-end">
+				<button type="button" mat-button (click)="cancelDocumentTypes()">{{language.defaults.cancel}}</button>
+				<button type="submit" mat-raised-button (click)="saveDocumentTypes()">{{language.defaults.save}}</button>
+			</div>
+			</div> 
+		
+	</div>
+	<div class="no-record no-clients" *ngIf="!fetchingData && emptyData">
+		<p>No Documents Found</p>
+	</div>
+
+</div>

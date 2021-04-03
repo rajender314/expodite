@@ -1,0 +1,24 @@
+<mat-toolbar>
+    <h2 mat-dialog-title></h2>
+      <span fxFlex>{{(data.id)?"Update User":"Add User"}}</span>
+</mat-toolbar>
+<mat-dialog-content>
+	<form [formGroup]="userForm" class="useraccess-form">
+		<mat-form-field class="custom-input mandatory" floatLabel="never">
+			<label class="custom-label">Name</label>
+			<input matInput maxlength="150" placeholder="Name" formControlName="firstname" required>
+			<mat-error *ngIf="userForm.controls.firstname.hasError('required') || userForm.controls.firstname.hasError('whitespace') " >Please Enter Name</mat-error>
+		</mat-form-field>
+		<mat-form-field class="custom-input mandatory" floatLabel="never">
+			<label class="custom-label">Email</label>
+			<input matInput maxlength="150" placeholder="Email" formControlName="email" required>
+			<mat-error *ngIf="userForm.controls.email.hasError('pattern')">{{language.validations.emailValidation}}</mat-error>
+			<mat-error *ngIf="userForm.controls.email.hasError('required')">Please enter valid Email</mat-error>
+		</mat-form-field>
+	</form>
+</mat-dialog-content>
+<mat-dialog-actions>
+	<span fxFlex></span>
+	<button  mat-button mat-dialog-close>Cancel</button>
+	<button  mat-raised-button (click)="addUser(userForm)">{{(data.id)?"Update User":"Add User"}}</button>
+</mat-dialog-actions>

@@ -1,0 +1,12 @@
+<mat-toolbar>
+    <h2 mat-dialog-title></h2>
+      <span fxFlex>Delete View</span>
+  </mat-toolbar>
+  <mat-dialog-content class="delete-body">
+      <span>Are you sure you want to delete View ?</span>
+  </mat-dialog-content>
+  <mat-dialog-actions>
+      <span fxFlex></span>
+        <button  mat-button mat-dialog-close>No</button>
+        <button  mat-raised-button [mat-dialog-close]="true" >Yes, Delete View</button>
+  </mat-dialog-actions>

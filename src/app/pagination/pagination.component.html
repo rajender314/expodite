@@ -1,0 +1,22 @@
+<div class="custom-pagination-panel" >  
+        <span class="material-icons"  (click)="loadMore('prev')"
+        [ngClass]="{ disabled: active[1] }"> 
+          navigate_before
+          </span>
+        <div
+          class="pagination-items"
+          *ngFor="
+            let num of (numbers | slice: minLimit:maxLimit) ;
+            let i = index
+          "
+          (click)="loadMore(num)"
+          [ngClass]="{ active: active[num] }"
+        >
+          {{ num }}
+        </div>
+        <span class="material-icons"  (click)="loadMore('next')"
+        [ngClass]="{ disabled: active[numbers.length] }">
+          navigate_next
+          </span>
+
+      </div>

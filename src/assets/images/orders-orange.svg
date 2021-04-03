@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="30px" height="36px" viewBox="0 0 30 36" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 48.2 (47327) - http://www.bohemiancoding.com/sketch -->
+    <title>Group 3</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <path d="M4,0 L26,0 C28.209139,-4.05812251e-16 30,1.790861 30,4 L30,32 C30,34.209139 28.209139,36 26,36 L4,36 C1.790861,36 1.81925995e-12,34.209139 1.8189894e-12,32 L1.8189894e-12,4 C1.81871886e-12,1.790861 1.790861,4.05812251e-16 4,0 Z" id="path-1"></path>
+    </defs>
+    <g id="Order-icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Group-3">
+            <g id="Rectangle">
+                <use fill="#FFFFFF" fill-rule="evenodd" xlink:href="#path-1"></use>
+                <path stroke="#F07E0A" stroke-width="2" d="M4,1 C2.34314575,1 1,2.34314575 1,4 L1,32 C1,33.6568542 2.34314575,35 4,35 L26,35 C27.6568542,35 29,33.6568542 29,32 L29,4 C29,2.34314575 27.6568542,1 26,1 L4,1 Z"></path>
+            </g>
+            <g id="Group-2" transform="translate(5.000000, 20.000000)"></g>
+            <path d="M5,16 L25,16 L25,18.5454545 L5,18.5454545 L5,16 Z M5,20.4545455 L14.0681818,20.4545455 L14.0681818,23 L5,23 L5,20.4545455 Z M16,13 L5,13 L5,6 L16,6 L16,13 Z" id="Combined-Shape" fill="#F07E0A"></path>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,82 @@
+<div>
+   <mat-toolbar class="inner-detail-toolbar lead-header-view">
+      <div class="inv-back">
+         <mat-icon class="back-to-orders back" [routerLink]="'/leads'">arrow_back</mat-icon>
+         <span class="title" title="">{{overViewData?.lead_id}}</span>
+      </div>
+      <div>
+         <button mat-button (click)="createAppointment()" [disabled]="disbtnQc || !contactLength">
+            <div class="header-icon">
+               <mat-icon mat-list-icon>
+                  <img [src]='images.lead_appointments_blue' title="Create Appointment">
+               </mat-icon>
+               <span class="button-text">Create Appointment</span>
+            </div>
+         </button>
+         <button mat-button (click)="createQuote()" [disabled]="disbtnQc  || !contactLength" >
+            <div class="header-icon">
+               <mat-icon mat-list-icon>
+                  <img [src]='images.create_quote' title="Create Quote">
+               </mat-icon>
+               <span class="button-text">Create Quote</span>
+            </div>
+         </button>
+      </div>
+      
+
+   </mat-toolbar>
+</div>
+
+<div  *ngIf=" showqte  ">
+   <app-create-quote (messageEvent)="recivemes($event)"  [name]="someData"></app-create-quote>
+
+</div>
+<div class="inner-detail-container" id="innerDetailContent" fxLayout="row" *ngIf=" !showqte ">
+   <div class="side-nav" >
+      <mat-list class="inner-detail-list">
+         <mat-list-item class="inactive-tab" title="Details" [class.selected]="(activeTab=='details')"
+            (click)="scrollToView('details-tab','details')">
+            <mat-icon mat-list-icon>
+               <img [src]='images.lead_details' title="Details">
+            </mat-icon>
+            <h4 class="line-heder" mat-line> Details</h4>
+         </mat-list-item>
+         <mat-list-item class="inactive-tab" title="Appointments" [class.selected]="(activeTab=='appointments')"
+            (click)="scrollToView('appointments-tab','appointments')">
+            <mat-icon mat-list-icon>
+               <img [src]='images.lead_appointments' title="Appointments">
+            </mat-icon>
+            <h4 class="line-heder" mat-line>Appointments</h4>
+         </mat-list-item>
+         <mat-list-item class="inactive-tab" title="Documents">
+            <mat-icon mat-list-icon>
+               <img [src]='images.lead_documents' title="Documents">
+            </mat-icon>
+            <h4 class="line-heder" mat-line>Documents</h4>
+         </mat-list-item>
+         <mat-list-item class="inactive-tab" title="Quotes"[class.selected]="(activeTab=='quotes')"
+         (click)="scrollToView('quotes-tab','quotes')">
+            <mat-icon mat-list-icon>
+               <img [src]='images.lead_quotes' title="Quotes">
+            </mat-icon>
+            <h4 class="line-heder" mat-line>Quotes</h4>
+         </mat-list-item>
+         <mat-list-item class="inactive-tab" title="Messaging">
+            <mat-icon mat-list-icon>
+               <img [src]='images.lead_message' title="Messaging">
+            </mat-icon>
+            <h4 class="line-heder" mat-line>Messaging</h4>
+         </mat-list-item>
+         <mat-list-item class="inactive-tab" title="Activity Log">
+            <mat-icon mat-list-icon>
+               <img [src]='images.lead_activity' title="Activity Log">
+            </mat-icon>
+            <h4 class="line-heder" mat-line>Activity Log</h4>
+         </mat-list-item>
+      </mat-list>
+   </div>
+   <div class="lead-detail-view" (scroll)="onScroll($event)">
+      <app-lead-overview [name]="someData" (messageEvent)="recivemes($event)" ></app-lead-overview>
+
+   </div>
+</div>

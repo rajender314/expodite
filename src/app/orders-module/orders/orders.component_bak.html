@@ -1,0 +1,673 @@
+<div class="orders">
+    <div>
+        <mat-horizontal-stepper #stepper>
+            <mat-step-header></mat-step-header>
+            <mat-step>
+                <div fxLayout="row">
+                    <div class="side-nav">
+                        <div *ngIf="!filtersLoader">
+                            <div class="app-title">Orders</div>
+                            <div @ordersAnimate>
+                                <div class="fxFlex side-nav-section">
+                                    <div class="label">Filter By Status</div>
+                                    <mat-selection-list class="status-selection">
+                                        <mat-list-option (click)="checkboxChange(status)" (change)="selectState()" selected="{{status.selected}}" class="orders-list"
+                                            *ngFor="let status of orders.status">
+                                            {{status.name}}
+                                        </mat-list-option>
+                                    </mat-selection-list>
+                                    <mat-divider class="segment"></mat-divider>
+                                </div>
+                                <div class="fxFlex custom-date-container">
+                                    <div class="label">Select Date Range</div>
+                                    <!--<mat-form-field>-->
+                                    <input class="datepicker" [(ngModel)]="orders.mfg_date" [matDatepicker]="picker" (click)="openCalendar(picker)" (dateChange)="datePickerChange()"
+                                        (focus)="openCalendar(picker)" placeholder="Select Date">
+                                    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                                    <mat-datepicker #picker></mat-datepicker>
+                                    <!--</mat-form-field>-->
+                                    <mat-divider class="segment"></mat-divider>
+                                </div>
+                                <div class="fxFlex side-nav-section product-nav-section">
+                                    <div class="label">Product Types</div>
+                                    <mat-selection-list class="status-selection">
+                                        <mat-list-option (click)="checkboxChange(product)" [selected]="product.selected" class="orders-list" *ngFor="let product of orders.productsList;">
+                                            {{product.name}}
+                                        </mat-list-option>
+                                    </mat-selection-list>
+                                    <mat-divider class="segment"></mat-divider>
+                                </div>
+                                <div class="fxFlex side-nav-section">
+                                    <mat-form-field class="custom-input custom-client" floatLabel="never">
+                                        <label class="custom-label">Select Client</label>
+                                        <mat-select placeholder="Select Client" (change)="clientChange()" [formControl]="orders.selectedClients" multiple>
+                                            <mat-select-trigger>
+                                                <span class="example-additional-selection">
+                                                    {{(orders.selectedClients.value?.length > 1)?orders.selectedClients.value.length+" Clients Selected":'1 Client Selected'}}
+                                                </span>
+                                            </mat-select-trigger>
+                                            <mat-option *ngFor="let client of orders.organizations" [value]="client.id">{{client.name}}</mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                            <div class="fxFlex side-button-section" [class.active]="showFilter">
+                                <button mat-button class="clear-link" (click)="clearFilterData()">Clear</button>
+                                <span fxFlex></span>
+                                <button mat-raised-button class="app-white-btn" (click)="applyFilterData()">Apply Filter</button>
+                            </div>
+                        </div>
+                        <mat-spinner class="medium-spinner" *ngIf="filtersLoader"></mat-spinner>
+                    </div>
+
+                    <div fxFlex class="right-container">
+                        <div class="app-search-container search-big">
+                            <div class="app-container">
+                                <mat-form-field class="search" floatLabel="never">
+                                    <input matInput placeholder="{{language.defaults.search}}" #search (keyup)="searchOrders(search.value, $event)" (blur)="!search.value.length ? open = false : open = true">
+                                    <mat-icon matPrefix (click)="open = !open" class="org-search">search</mat-icon>
+                                    <mat-icon matSuffix *ngIf="searching" class="spinner">
+                                        <mat-spinner class="small-spinner"></mat-spinner>
+                                    </mat-icon>
+                                    <mat-icon matSuffix *ngIf="!searching && search.value.length" (click)="search.value = '';searchOrders(search.value)">close</mat-icon>
+                                </mat-form-field>
+                            </div>
+                        </div>
+
+
+                        <div class="order-content" infiniteScroll [infiniteScrollDistance]="1" [infiniteScrollThrottle]="50" (scrolled)="onScroll()"
+                            [scrollWindow]="false">
+                            <div class="app-container">
+                                <div fxLayout="column">
+                                    <div *ngIf="!fetchingData" class="list-container">
+                                        <mat-list @ordersAnimate *ngFor="let orderItem of orders.data;let key = index">
+                                            <h3 mat-subheader>{{orderItem.date}}</h3>
+                                            <div class="list-inner-content">
+                                                <mat-list-item class="order-list-row" (click)="orderDetails(stepper,order)" *ngFor="let order of orderItem.list">
+                                                    <div class="item-container" fxFlex="35">
+                                                        <div class="icon-sec">
+                                                            <img [src]='images.ordersIcon_o' title="Orders">
+                                                        </div>
+                                                        <div class="content-sec">
+                                                            <h1 mat-line class="order-number">{{order.orders.order_no}}</h1>
+                                                            <p mat-line class="order-info">{{order.orders.product_name}}</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="item-container" fxFlex="25">
+                                                        <div class="client-logo">
+                                                            <div class="logo-img" [ngStyle]="{'background-image': 'url(' + order.orders.client_image  + ')'}"></div>
+                                                        </div>
+                                                        <div class="content-sec">
+                                                            <p> {{order.orders.client_name}}</p>
+                                                            <p> {{order.orders.name}}</p>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="item-container po_no" fxFlex="10">
+                                                        <p mat-line>000111 {{order.orders.po_nbr}} </p>
+                                                    </div>
+
+                                                    <div class="item-container amount_container" fxFlex="15">
+                                                        <p mat-line> {{order.orders.total_amount}} </p>
+                                                    </div>
+
+                                                    <div class="item-container status-tag-container" fxFlex="15">
+                                                        <p mat-line class="client-status open"> {{order.orders.status}} </p>
+                                                        <mat-icon class="go-to-details">keyboard_arrow_right</mat-icon>
+                                                    </div>
+                                                </mat-list-item>
+                                            </div>
+
+                                        </mat-list>
+
+                                        <div class="no-data" *ngIf="!orders.data.length">{{language.defaults.noOrdersFound}}</div>
+
+
+                                    </div>
+                                    <mat-spinner class="medium-spinner" *ngIf="fetchingData"></mat-spinner>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </mat-step>
+
+            <mat-step>
+
+                <mat-toolbar class="inner-detail-toolbar">
+                    <mat-icon class="back-to-orders" (click)="backToOrders(stepper)">arrow_back</mat-icon>
+                    <span class="title">{{orders.selectedOrder.order_no}}</span>
+                    <div class="order-detail-status">{{orders.selectedOrder.status}}</div>
+                    <span fxFlex></span>
+                    <span class="order-date">Order Date:
+                        <b>{{orders.selectedOrder.date_added}}</b>
+                    </span>
+                    <span class="vertical-divider"></span>
+                    <button mat-icon-button>
+                        <img [src]='images.chat_icon' title="chat">
+                    </button>
+                    <button mat-icon-button>
+                        <img [src]='images.printer_icon' title="print">
+                    </button>
+                    <span class="vertical-divider"></span>
+                    <!-- <img [src]='images.download_order' title="order download">  -->
+                    <a href="generate_pdf?id={{orders.selectedOrder.id}}" class="order-download">
+                        <img [src]='images.download_order' title="order download">
+                        <span class="download-order-text">Download Order</span>
+                    </a>
+                </mat-toolbar>
+
+                <div class="inner-detail-container" fxLayout="row">
+                    <div class="side-nav">
+                        <mat-list class="inner-detail-list">
+                            <mat-list-item>
+                                <mat-icon mat-list-icon>
+                                    <img [src]='images.activity_small' title="Activity">
+                                </mat-icon>
+                                <h4 mat-line>Activity</h4>
+                            </mat-list-item>
+
+                            <mat-list-item>
+                                <mat-icon mat-list-icon>
+                                    <img [src]='images.orders_small' title="Order Details">
+                                </mat-icon>
+                                <h4 mat-line>Order Details</h4>
+                            </mat-list-item>
+
+                            <mat-list-item>
+                                <mat-icon mat-list-icon>
+                                    <img [src]='images.pkgDetails_small' title="Packaging Details">
+                                </mat-icon>
+                                <h4 mat-line>Packaging Details</h4>
+                            </mat-list-item>
+
+                            <mat-list-item>
+                                <mat-icon mat-list-icon>
+                                    <img [src]='images.invoice_small' title="Invoice">
+                                </mat-icon>
+                                <h4 mat-line>Invoice</h4>
+                            </mat-list-item>
+
+                            <mat-list-item>
+                                <mat-icon mat-list-icon>
+                                    <img [src]='images.coa_small' title="COA">
+                                </mat-icon>
+                                <h4 mat-line>COA</h4>
+                            </mat-list-item>
+
+                            <mat-list-item>
+                                <mat-icon mat-list-icon>
+                                    <img [src]='images.shippingDetails_small' title="Shipping Details">
+                                </mat-icon>
+                                <h4 mat-line>Shipping Details</h4>
+                            </mat-list-item>
+                        </mat-list>
+                        <mat-divider></mat-divider>
+                    </div>
+
+                    <div fxFlex class="inner-detail-content">
+                        <div class="app-container">
+                            <div class="inner-container">
+                                <div class="address-container" fxLayout="row">
+
+                                    <div class="shipper-secction" fxFlex="33">
+                                        <h4 class="gray-title">SHIPPER</h4>
+                                        <div class="address-inner-content" *ngFor="let company of orders.companyShpAddrDt">
+                                            <b>{{company.address1}}</b>
+                                            <p>{{company.address2}}</p>
+                                            <p>{{company.state}}</p>
+                                            <p>{{company.countrty}}</p>
+                                            <p>{{company.postal_code}}</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="vertical-divider"></div>
+                                    <div fxFlex="33">
+                                        <div class="shipper-secction">
+                                            <h4 class="gray-title">BI
+                                                <!-- <span class="client-status open"> {{orders.selectedOrder.status}} </span> -->LL TO PARTY</h4>
+                                            <div class="address-inner-content">
+                                                <b>{{orders.billingAddr.bill_address1}}</b>
+                                                <p>{{orders.billingAddr.bill_address2}}</p>
+                                                <p>{{orders.billingAddr.bill_state}}</p>
+                                                <p>{{orders.billingAddr.bill_countrty}}</p>
+                                                <p>{{orders.billingAddr.bill_postal_code}}</p>
+                                            </div>
+                                        </div>
+
+                                        <div class="shipper-secction mt_30">
+                                            <h4 class="gray-titheadle">SHIP TO</h4>
+                                            <div class="address-inner-content">
+                                                <b>{{orders.shippingAddr.ship_address1}}</b>
+                                                <p>{{orders.shippingAddr.ship_address2}}</p>
+                                                <p>{{orders.shippingAddr.ship_state}}</p>
+                                                <p>{{orders.shippingAddr.ship_countrty}}</p>
+                                                <p>{{orders.shippingAddr.ship_postal_code}}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div fxFlex class="order-po-container">
+                                        <div class="order-po">
+                                            <a *ngIf="orders.selectedOrder.image" href="{{orders.selectedOrder.po_url}}" target="_blank" class="po-img">
+                                                <img [src]="orders.selectedOrder.image" />
+                                            </a>
+                                            <a *ngIf="!orders.selectedOrder.image" class="no-img">
+                                            </a>
+                                            <div class="po-numbheader">
+                                                P NO - {{orders.selectedOrder.po_nbr}}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div fxLayout="row">
+                                    <div class="orders-table">
+                                        <mat-table #table [dataSource]="orders.productsData">
+                                            <!-- Position Column -->
+
+                                            <ng-container matColumnDef="order_product_id">
+                                                <mat-header-cell *matHeaderCellDef> Item </mat-header-cell>
+                                                <mat-cell *matCellDef="let element"> {{element.order_product_id}} </mat-cell>
+                                            </ng-container>
+
+                                            <!-- Name Column -->
+                                            <ng-container matColumnDef="product_name">
+                                                <mat-header-cell *matHeaderCellDef> Description / Packing </mat-header-cell>
+                                                <mat-cell *matCellDef="let element"> {{element.product_name}} </mat-cell>
+                                            </ng-container>
+
+                                            <!-- Weight Column -->
+                                            <ng-container matColumnDef="product_quantity">
+                                                <mat-header-cell *matHeaderCellDef> Quantity </mat-header-cell>
+                                                <mat-cell *matCellDef="let element"> {{element.product_quantity}} </mat-cell>
+                                            </ng-container>
+
+                                            <!-- Symbol Column -->
+                                            <ng-container matColumnDef="product_price">
+                                                <mat-header-cell *matHeaderCellDef> Price / Unit </mat-header-cell>
+                                                <mat-cell *matCellDef="let element"> {{element.product_price}} </mat-cell>
+                                            </ng-container>
+
+                                            <ng-container matColumnDef="product_price_total">
+                                                <mat-header-cell *matHeaderCellDef> Amount </mat-header-cell>
+                                                <mat-cell *matCellDef="let element"> {{element.product_price_total}} </mat-cell>
+                                            </ng-container>
+
+                                            <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+                                            <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+
+                                        </mat-table>
+                                        <div class="footer">
+                                            <span class="total-text">Total</span>
+                                            <span>{{orders.selectedOrder.total_amount}}</span>
+                                        </div>
+                                        <div fxLayout="row" *ngIf="orders.selectedOrder.orders_types_id=='1'" class="packages-footer" fxLayoutAlign="end center">
+                                            <button mat-button  (click)="cancelPackages()">Cancel</button>
+                                            <button mat-raised-button class="green-btn" (click)="acceptOrder()">Accept Order</button>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <!-- <span class="client-status open"> {{orders.selectedOrder.status}} </span> -->
+
+                            </div>
+
+
+                            <!--<div class="inner-container">
+                              <mat-toolbar class="package-toolbar">Package Details</mat-toolbar>
+                                <div fxLayout="row">
+                                    <div class="orders-table">
+                                        <mat-toolbar class="package-head">
+                                            <span>1.Batch No:</span>
+                                            <span>KSM/17/S211</span>
+                                        </mat-toolbar>
+                                        <div class="package-data">
+                                            <table class="package-table" cellpadding="0" cellspacing="0">
+                                                <thead>
+                                                    <tr>
+                                                        <th>SL.NO</th>
+                                                        <th>Item Name</th>
+                                                        <th class="table-right">Quanitiy</th>
+                                                        <th class="table-right">Tare Weight (in Kgs)</th>
+                                                        <th class="table-right">Net Weight (in Kgs)</th>
+                                                        <th class="table-right">Gross Weight (in Kgs)</th>
+                                                        <th class="table-right">Dimensions(HXWXD) in mm</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>1</td>
+                                                        <td>HDPE DRUM</td>
+                                                        <td class="table-right">8</td>
+                                                        <td class="table-right">
+                                                            <span class="package-weight">24.8</span>
+                                                            <span class="package-weight">(8X31.8 KG)</span>
+                                                        </td>
+                                                        <td class="table-right">200</td>
+                                                        <td class="table-right">224.8</td>
+                                                        <td class="table-right">615X315X386</td>
+                                                    </tr>
+                                                    <tr class="package-total">
+                                                        <td class="table-right" colspan="3">Total in Kgs</td>
+                                                        <td class="table-right">272.8</td>
+                                                        <td class="table-right">2200.0</td>
+                                                        <td class="table-right">2472.8</td>
+                                                        <td></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div class="summary-footer">
+                                            <div class="summary-description">
+                                               <h4>Description:</h4>
+                                               <p>Each Drum:
+                                                   <span>Inner-Double Polyethylene bags SL.NO</span>
+                                               </p>
+                                               <p>Each Drum</p>
+                                               <p>Outer - HDPE Drum</p>
+                                            </div>
+                                            <div class="summary">
+                                               <h4>Summary:</h4>
+                                               <p>Total Net Weight
+                                                   <span>2200.00 Kg</span>
+                                               </p>
+                                               <p>Total Tare Weight
+                                                   <span>2200.00 Kg</span>
+                                               </p>
+                                               <p>Total Gross Weight
+                                                   <span>2200.00 Kg</span>
+                                               </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>-->
+
+                            <!--<div class="inner-container">
+
+                            <!-- new content -->
+                            <div class="inner-container">
+
+                                <mat-toolbar class="package-toolbar">
+                                    <img [src]='images.package_icon' title="Orders">
+                                    <span>Package Details</span>
+                                    <span fxFlex></span>
+                                    <button mat-icon-button>
+                                        <img [src]='images.download_arrow' title="Download">
+                                    </button>
+                                    <button mat-icon-button>
+                                        <img [src]='images.printer_icon' title="Print">
+                                    </button>
+                                </mat-toolbar>
+                                <table class="package-details-table">
+                                    <tbody>
+                                        <!-- before batch -->
+                                        <tr>
+                                            <td>1</td>
+                                            <td>
+                                                <span>{{orderFormCompnayDetails.mainTitle}}</span>
+                                                <span class="remaining-txt">(Remaining Quentity 25kgs)</span>
+                                                <span class="add-batch" (click)="addBatchNumber()">
+                                                    <mat-icon>add</mat-icon> Add Batch Number</span>
+                                            </td>
+                                            <td class="v-top">75 KG</td>
+                                        </tr>
+                                        <!-- after batch -->
+                                        <tr class="after-batch">
+                                            <td colspan="5" class="after-batch-data">
+                                                <mat-toolbar class="package-head">
+                                                    <span>1.Batch No:</span>
+                                                    <span>KSM/17/S211</span>
+                                                </mat-toolbar>
+                                                <table class="package-table" cellpadding="0" cellspacing="0">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>SL.NO</th>
+                                                            <th>Item Name</th>
+                                                            <th class="table-right">Quanitiy</th>
+                                                            <th class="table-right">Tare Weight (in Kgs)</th>
+                                                            <th class="table-right">Net Weight (in Kgs)</th>
+                                                            <th class="table-right">Gross Weight (in Kgs)</th>
+                                                            <th class="table-right">Dimensions(HXWXD) in mm</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>1</td>
+                                                            <td>HDPE DRUM</td>
+                                                            <td class="table-right">8</td>
+                                                            <td class="table-right">
+                                                                <span class="package-weight">24.8</span>
+                                                                <span class="package-weight">(8X31.8 KG)</span>
+                                                            </td>
+                                                            <td class="table-right">200</td>
+                                                            <td class="table-right">224.8</td>
+                                                            <td class="table-right">615X315X386</td>
+                                                        </tr>
+                                                        <tr class="package-total">
+                                                                <td class="table-right" colspan="3">Total in Kgs</td>
+                                                                <td class="table-right">272.8</td>
+                                                                <td class="table-right">2200.0</td>
+                                                                <td class="table-right">2472.8</td>
+                                                                <td></td>
+                                                            </tr>
+
+                                                    </tbody>
+                                                </table>
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>2</td>
+                                            <td>
+                                                <span>KSM-66 Ashwagandha Organic-Certified</span>
+                                                <span class="remaining-txt">(Remaining Quentity 25kgs)</span>
+                                                <span class="add-batch" (click)="addBatchNumber()">
+                                                    <mat-icon>add</mat-icon>Add Batch Number</span>
+                                            </td>
+                                            <td class="v-top">75 KG</td>
+                                        </tr>
+                                       
+                                    </tbody>
+                                </table>
+                                <div class="summary-footer">
+                                        <div class="summary-description">
+                                            <h4>Description:</h4>
+                                            <p>Each Drum:
+                                                <span>Inner-Double Polyethylene bags SL.NO</span>
+                                            </p>
+                                            <p>Each Drum</p>
+                                            <p>Outer - HDPE Drum</p>
+                                        </div>
+                                        <div class="summary">
+                                            <h4>Summary:</h4>
+                                            <p>Total Net Weight
+                                                <span>2200.00 Kg</span>
+                                            </p>
+                                            <p>Total Tare Weight
+                                                <span>2200.00 Kg</span>
+                                            </p>
+                                            <p>Total Gross Weight
+                                                <span>2200.00 Kg</span>
+                                            </p>
+                                        </div>
+                                    </div>
+                            </div> 
+                            <div class="inner-container">
+                                <mat-toolbar class="package-toolbar">
+                                    <img [src]='images.invoice_green' title="Orders">
+                                    <div class="invoice-toolbar">
+                                        <div class="invoice-number">
+                                            <span class="details-span">IN #OS/17/S299</span>
+                                            <span class="order-detail-status">Open</span>
+                                        </div>
+                                        <div class="xyz">
+                                            <span class="details-date">Dec 18,2017</span>
+                                        </div>     
+                                    </div>
+                                   
+                                    <span fxFlex></span>
+                                    <div class="packages-icons">
+                                        <button mat-icon-button>
+                                            <img [src]='images.download_arrow' title="Download">
+                                        </button>
+                                        <button mat-icon-button>
+                                            <img [src]='images.printer_icon' mat-icon-button title="Print">
+                                        </button>
+                                        <button mat-icon-button>
+                                            <img [src]='images.grey_arrow' mat-icon-button>
+                                        </button>
+                                    </div>
+                                </mat-toolbar>
+                                  <div class="address-container" fxLayout="row">
+
+                                    <div class="shipper-secction" fxFlex="33">
+                                        <h4 class="gray-title">BILL TO PARTY</h4>
+                                        <div class="address-inner-content">
+                                            <b>QD Herbs SDN. BHD</b>
+                                            <p>No. 1&3, Persirian Perindustrian Pengkalan 35,</p>
+                                            <p>Taman Perindustrian Sri Pengkalan,</p>
+                                            <p>Jalan lahat 31500 Ipoh park,</p>
+                                            <p>Malaysia</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="vertical-divider"></div>
+                                    <div fxFlex="33">
+                                        <div class="shipper-secction">
+                                            <h4 class="gray-title">SHIP TO PARTY</h4>
+                                            <div class="address-inner-content">
+                                                <b>QD Herbs SDN. BHD</b>
+                                                <p>No. 1&3, Persirian Perindustrian Pengkalan 35,</p>
+                                                <p>Taman Perindustrian Sri Pengkalan,</p>
+                                                <p>Jalan lahat 31500 Ipoh park,</p>
+                                                <p>Malaysia</p>
+                                            </div>
+                                        </div>
+                                        <div class="shipper-secction mt_16">
+                                            
+                                            <div class="address-inner-content">
+                                                <p class="invoice-contact">Phone:9696969696</p>
+                                                <p class="invoice-contact">Attention:Choong Wan Shin</p>
+                                                <p class="invoice-contact">Email:admin@ksm66.com</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div fxLayout="row">
+                                    <div class="orders-table">
+                                        <table class="invoice-table">
+                                            <thead>
+                                                <tr>
+                                                    <th class="invoice-head">SI.NO</th>
+                                                    <th class="invoice-head">Description/Packaging</th>
+                                                    <th class="invoice-head">Batch.No</th>
+                                                    <th class="invoice-head">MFG-Date</th>
+                                                    <th class="invoice-head">Exp-Date</th>
+                                                    <th class="invoice-head">Quantity(Kgs)</th>
+                                                    <th class="invoice-head">Rate per Kg(USD)</th>
+                                                    <th class="invoice-head">Amount(USD)</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td class="invoice-row">1</td>
+                                                    <td class="invoice-row">KSM-66 Ashwagandha Vegan</td>
+                                                    <td class="invoice-row">KSM/17/S215</td>
+                                                    <td class="invoice-row">09/17</td>
+                                                    <td class="invoice-row">08/20</td>
+                                                    <td class="invoice-row">75 KG</td>
+                                                    <td class="invoice-row">65.00</td>
+                                                    <td class="invoice-row">USD 4.875.00</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="invoice-row">2</td>
+                                                    <td class="invoice-row">KSM Ashwagandha Organic-Certified</td>
+                                                    <td class="invoice-row">KSM/17/S215</td>
+                                                    <td class="invoice-row">09/17</td>
+                                                    <td class="invoice-row">08/20</td>
+                                                    <td class="invoice-row">75 KG</td>
+                                                    <td class="invoice-row">65.00</td>
+                                                    <td class="invoice-row">USD 4.875.00</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="invoice-row " colspan="5" style="padding: 0;">
+                                                        <table class="invoice-row-table">
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td>
+                                                                        <div class="gst-details">
+                                                                            <span class="gst-one">GSTN TYPE:GSN</span>
+                                                                            <span class="gst-two">END USE:GSX200</span>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td>
+                                                                        <div class="gst-details">
+                                                                            <span class="invoice-desc">We intend to claim rewards under Merchandise Export from India scheme undertake to abide by the Provisions of Foreign Exchange Management Act ,1999. As amended time to time including Realisation/Repatriation of Foreign Exchange.
+                                                                            </span>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                                
+                                                            </tbody>
+                                                        </table>
+                                                    </td>
+                                                    <td class="invoice-row table-invoice" colspan="3" rowspan="2">
+                                                        <table class="invoice-costTable">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th class="costTable-head">Sub Total</th>
+                                                                    <th class="costTable-head">USD 4,875</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td class="costTable-row">Packaging Charges</td>
+                                                                    <td class="costTable-row">USD 25.00</td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td class="costTable-row">SGST</td>
+                                                                    <td class="costTable-row">NIL</td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td class="costTable-row">CGST</td>
+                                                                    <td class="costTable-row">NIL</td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td class="costTable-row">IGST</td>
+                                                                    <td class="costTable-row">NIL</td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td class="costTable-row">Freight Charges</td>
+                                                                    <td class="costTable-row">NIL</td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <div class="footer invoice-footer">
+                                            <span class="addLine">+ Add Line Item</span>
+                                            <span fxFlex></span>
+                                            <span class="total-text">Total</span>
+                                            <span>USD 9,750.00</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+
+                </div>
+
+            </mat-step>
+
+        </mat-horizontal-stepper>
+
+    </div>
+</div>

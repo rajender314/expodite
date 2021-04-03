@@ -1,0 +1,62 @@
+<div class="details" fxFlex>
+  <mat-toolbar class="mat-small-toolbar">
+    <span *ngIf="Organization" [innerHtml]="Organization.company_name"></span>
+  </mat-toolbar>
+  <form [formGroup]="detailsForm" class="organisation-details" (ngSubmit)="createOrganization(detailsForm)">
+    <mat-spinner class="medium-spinner" *ngIf="fetchingData"></mat-spinner>
+    <div class="box" *ngIf="!noOrganizations && !fetchingData" [class.user-footer]="detailsForm.dirty">
+      <div class="form-fields">
+        <h4>{{language.defaults.organisationProfile}}</h4>
+        <div>
+          <mat-form-field fxFlex="80">
+            <input matInput placeholder={{language.defaults.organisationName}} formControlName="company_name" id="Organization">
+            <mat-error *ngIf="detailsForm.controls.company_name.hasError('required')">{{language.validations.organisationName}}</mat-error>
+
+          </mat-form-field>
+        </div>
+        <div>
+            <mat-form-field fxFlex="80">
+            <mat-select placeholder="currency" formControlName="currency">
+                
+                <mat-option *ngFor="let cur of currency" [value]="cur.id">{{cur.name}}</mat-option>
+              </mat-select>
+            </mat-form-field>
+        </div> 
+        <div>
+          <mat-form-field fxFlex="80">
+            <mat-select placeholder={{language.defaults.selectStatusplaceHolder}} id="status" formControlName="status">
+              <mat-option value="true">{{language.defaults.active}}</mat-option>
+              <mat-option value="false">{{language.defaults.inactive}}</mat-option>
+            </mat-select>
+            <mat-error *ngIf="detailsForm.controls.status.hasError('required')">{{language.validations.status}}</mat-error>
+          </mat-form-field>
+        </div>
+        <div fxLayout="row" class="image-uplo " [class.not-allowed]="pointerEvent">
+          <div ng2FileDrop [ngClass]="{'file-over': hasDropZoneOver}" (fileOver)="fileOverBase($event)" (onFileDrop)="fileDrop($event)"
+            [uploader]="uploader" class="file-drop-zone">
+            <input id="file" type="file" ng2FileSelect [uploader]="uploader" (change)="fileSelected($event)" [hidden]="true" multiple
+            />
+            <label for="file">
+              <a>{{language.defaults.browseFile}}</a>
+            </label>
+          </div>
+          <div class="images">
+            <ul *ngIf="uploads.length">
+              <li *ngFor="let file of uploads; let i = index">
+                <img [src]="file.source_path" alt="file.filename">
+                <div class="overlay"></div>
+                <mat-icon class="delete" (click)="deleteItem(i)">delete</mat-icon>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+   <!-- delete section have done   --> 
+    </div>
+    <div class="footer" fxLayout="row" fxLayoutAlign="end center" *ngIf="detailsForm.dirty">
+      <button type="button" mat-button (click)="cancel(detailsForm)">{{language.defaults.deleteX}}</button>
+      <button type="submit" mat-raised-button color="primary" [disabled]="detailsForm.invalid">{{language.defaults.save}}</button>
+    </div>
+    <div *ngIf="noOrganizations" class="no-records">{{language.defaults.noOrganisationsFound}}</div>
+  </form>
+</div>

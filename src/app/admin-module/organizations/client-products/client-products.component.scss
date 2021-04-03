@@ -1,0 +1,127 @@
+.products-billable {
+    padding: 24px;
+}
+.client-products-card {
+    width: 70%;
+    box-shadow: none !important;
+    padding: 0px;
+    .select-product {
+        margin-bottom: 15px;
+        .mat-checkbox-layout {
+            white-space: normal;
+        }
+    }
+}
+.product-check {
+    label,
+    .mat-checkbox-layout .mat-checkbox-label {
+        white-space: normal !important;
+    }
+    .mat-checkbox-layout {
+        white-space: normal;
+    }
+}
+.admin-disable {
+    margin: 0;
+    padding: 0;
+    border:none;
+}
+.client-products {
+    border:1px solid #d3d3d3;
+    margin-bottom: 15px;
+    .client-products-header {
+        display: flex;
+        padding: 9px 16px;
+        border-bottom: 1px solid #d3d3d3;
+        background: #E4E5E9;
+        .client-brand {
+            width: 40%;
+        }
+        .text-upload {
+            position: absolute;
+            right: 15px;
+            color:#075DA8;
+            opacity: 0.8;
+            cursor: pointer;
+            font-weight: 500;
+            &.disable-delete {
+                opacity: 0.5;
+                cursor: not-allowed;
+                &:hover {
+                    opacity: 0.5;
+                }
+            }
+            &:hover {
+                opacity: 1;
+            }
+        }
+       
+    }
+    .adding-products {
+        padding: 16px 16px 0px 16px;
+        .products-section {
+            display: flex;
+            .product-name {
+                // margin-right:21px;
+                width: 40%;
+            }
+            .product-add-del{
+                width:20%;
+                .array-button {
+                    &.disable-delete {
+                        cursor: not-allowed;
+                        color:#d3d3d3;
+                    }
+                }
+            }
+        }
+        
+    }
+}
+
+.add-product {
+    display: flex;
+    align-items: center;
+}
+.product-check.mat-checkbox {
+    .mat-checkbox-layout .mat-checkbox-label {
+        color: #565656;
+    }
+    
+}
+.tla-uploads-section {
+    margin-top:30px;
+    display: flex;
+    flex-basis: 250px;
+    flex-direction: column;
+    .uploads-count {
+        color: #565656;
+        font-weight: 500;
+        font-size: 18px;
+    }
+    .tla-uploads {
+        display: flex;
+        flex-wrap: wrap;
+        margin-top:30px;
+        .upload-card {
+            display: flex;
+            align-items: center;
+            width:250px;
+            height: auto;
+            border:1px solid #d3d3d3;
+            padding: 16px;
+            margin-right: 15px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            .upload-name {
+                width:80%;
+                display: inline-block;
+                word-break: break-word;
+            }
+            .upload-url{
+                width:20%;
+                text-align: right;
+            }
+        }
+    }
+}

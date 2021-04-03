@@ -1,0 +1,123 @@
+<div class="contacts-billable">
+	<mat-card class="client-documents-card product-card">
+		<div class="certified-product-heading">Product Name</div>
+		<mat-list class="certified-products-list">
+			<mat-accordion class="product-accordion">
+				<ng-container *ngFor="let product of productTypes">
+					<mat-expansion-panel  (opened)="getAddedFiles(product.id)">
+						<mat-expansion-panel-header *ngIf="product.checked_status" >
+							<mat-panel-title>
+								<mat-list-item >
+									<div class="certified-product-name">{{product.name}} ({{product.category_name}})</div>
+								</mat-list-item>
+							</mat-panel-title>
+						</mat-expansion-panel-header>
+						<ng-template matExpansionPanelContent>
+							<div>
+								<mat-card class="client-documents-card product-card">
+											<div class="address-container activity-status2">
+												<div class="image-upload" [ngClass]="{'justify': certificationAttachments.length}" [class.not-allowed]="pointerEvent">
+													<div ng2FileDrop [ngClass]="{'file-over': hasDropZoneOver}"
+														(fileOver)="fileOverBase($event)" (onFileDrop)="fileDrop($event)" [uploader]="uploader" class="file-zone"
+														multiple>
+														<input id="insuranceFiles" type="file" ng2FileSelect [uploader]="uploader" (change)="fileSelected($event)"
+															[hidden]="true" multiple />
+														<div class="pdf-upload attachment_upload layout-column">
+											
+															<label for="insuranceFiles">
+																<div class="upload_post">
+																	<div class="upload_section" (click)="setAddedFilesUrl(product)">
+																		<mat-icon class="contact-add mat-icon notranslate material-icons mat-icon-no-color"
+																			role="img" aria-hidden="true">add</mat-icon>
+																		<h3 class="contact-text">Upload</h3>
+																	</div>
+											
+																</div>
+											
+															</label>
+														</div>
+											
+													</div>
+													<div class="image_wrap" *ngFor="let file of certificationAttachments; let i = index">
+													<!-- <div class="image_wrap" *ngFor="let file of product.attach_arr; let i = index"> -->
+														<div class="upload_post">
+															<div class="upload_section">
+																<a [href]="file.link_url" target="_blank">
+																	<img *ngIf="file.link_url.lastIndexOf('.pdf') == -1 && file.link_url.lastIndexOf('.doc') == -1 && file.link_url.lastIndexOf('.doc') == -1 && file.link_url.lastIndexOf('.xlsx') == -1"
+																		class="list-upload-img" [src]='file.link_url'>
+																	<div style="width: 116px; height: 100px" *ngIf="file.link_url.lastIndexOf('.pdf') > -1">
+																		<pdf-viewer [src]="file.link_url" [original-size]="false" [fit-to-page]="false"
+																			[render-text]="true" [show-all]="false" [page]="1"
+																			style="display: block; height: 100px"></pdf-viewer>
+																	</div>
+											
+											
+																	<ngx-doc-viewer
+																		*ngIf="file.link_url.lastIndexOf('.doc') > -1 || file.link_url.lastIndexOf('.docx') > -1 || file.link_url.lastIndexOf('.xlsx') > -1"
+																		[url]="file.link_url" viewer="google" style="width:216px;height:200px;"></ngx-doc-viewer>
+																	<div class="file-info">
+																		{{file.original_name}}
+																	</div>
+																</a>
+											
+															</div>
+															<div class="icon-section">
+																<div class="icon-content">
+																	<span class="img-icon">
+																		<a class="click" title="Download" href="downloadProductCertificate?id={{file.db_name}}&original_file={{file.original_name}}">
+																			<span class="material-icons">
+																				cloud_download
+																			</span>
+																		</a>
+																	</span>
+																	<span class="img-icon">
+																		<a class="click" title="Preview" (click)="openPreview(file, i)">
+																			<span class="material-icons">
+																				remove_red_eye
+																			</span>
+																		</a>
+																	</span>
+																	<span class="img-icon">
+																		<a class="click" title="Delete" (click)="deleteUploads(file, i, product.id)">
+																			<span class="material-icons">
+																				delete_outline
+																			</span>
+																		</a>
+																	</span>
+																</div>
+															</div>
+														</div>
+											
+											
+													</div>
+												</div>
+											</div>
+											<!-- <div class="product-uploads">
+												<div class="product-icons" (click)="fileSelectedvalue(product)" *ngIf="adminUser">
+													<input id="file" type="file" ng2FileSelect [uploader]="uploader" [hidden]="true" multiple />
+													<label for="file">
+														<img ng2FileSelect [uploader]="uploader" [src]='images.product_upload' title="Upload">
+														<span class="text-upload">Upload</span>
+													</label>
+												</div>
+												<div class="product-icons" *ngIf="product.uploaded_file">
+													<a href="downloadProductCertificate?id={{product.uploaded_file}}">
+														<img [src]='images.product_download' title="Download">
+														<span class="text-upload">Download</span>
+													</a>
+												</div>
+											</div> -->
+								</mat-card>
+							</div>
+						</ng-template>
+					</mat-expansion-panel>
+				</ng-container>
+			</mat-accordion>
+			
+		</mat-list>
+	</mat-card>
+</div>
+
+<!-- <div class="no-record no-clients" *ngIf="noProducts">
+	<p>No Products Found</p>
+</div> -->

@@ -1,0 +1,296 @@
+<div>
+	<mat-toolbar class="app-header main layout-header-color">
+		<div class="app-container">
+			<div class="active-module">
+				<div class="label">Overview of {{adminService.instanceName}} </div>
+				
+				<span fxFlex></span>
+				<!-- <p *ngIf="appFnvironment == 'Local'">Local</p>
+				<p *ngIf="appFnvironment == 'Stage'">Stage</p> -->
+
+				<!-- <button mat-raised-button color="warn"  (click)="createPurchaseOrder()" class="create-order-btn">Create Purchase Order</button>
+				<button mat-raised-button color="warn" *ngIf="createOrderPermission" (click)="createOrder()" class="create-order-btn">Create Order</button> -->
+			</div>
+		</div>
+	</mat-toolbar>
+	<perfect-scrollbar  class="content-section layout-body-color">
+		<div class="app-container" *ngIf="!fetchingData">
+			<div  fxLayout="row" class="mr-8 ml-8 p-t-16"  fxLayout.lt-sm="column">
+				<mat-card @zoomAnimate class="app-card overview-card" [class.client-min-width]="clientPermission">
+					<mat-card-header class="secondary-font">Orders </mat-card-header>
+					<!-- <mat-card-subtitle class="secondary-font">{{orders.newOrders == 1 ? orders.newOrders + ' ' + 'Order' : orders.newOrders + ' ' + 'Orders'}} </mat-card-subtitle> -->
+					<div class="column-data space-between">
+						<div class="overview-label">New Orders Today</div>
+						<div class="overview-data">{{orders.newOrders}}</div>
+					</div>
+					<div class="column-data space-between">
+						<div class="overview-label">Total Orders</div>
+						<div class="overview-data">{{orders.total_orders_count}}</div>
+					</div>
+				</mat-card>
+				<mat-card @zoomAnimate class="app-card overview-card" *ngIf="!clientPermission">
+					<mat-card-header>
+					  <div class="remaining-data secondary-font" >Stock Available</div>
+					</mat-card-header>
+					<div class="column-data space-between" *ngFor='let stock of stock_available'>
+						<div class="overview-label">{{stock.name}} </div>
+						<div class="overview-data">{{stock.sum || 0}} {{stock.uom_name}} 
+						</div>
+						<!-- <div class="overview-label">{{orders.prod1}} {{orders.prod1Name}}</div>
+						<div class="overview-data">{{orders.veganRemaining || 0}} {{orders.prod1Name}} 
+						</div> -->
+						
+					</div>
+					<!-- <div class="column-data space-between"  *ngIf="orders.prod2">
+						<div class="overview-label">{{orders.prod2}} </div>					
+						  <div class="overview-data">{{orders.spectrumRemaining}} {{orders.prod2Name}}
+							</div>
+					</div> -->
+				</mat-card>
+				<!-- <mat-card @zoomAnimate class="app-card overview-card" *ngIf="clientPermission" [class.max-width-card]="clientPermission">
+					<mat-card-header class="secondary-font">Total Due</mat-card-header>
+					<div class="column-data space-between" style="margin-top: 36px;" *ngIf="orders.currency_type.currency_type != 'USA'">
+						<div class="overview-label">{{orders.totalPastDue}}</div>
+						<div class="overview-data">{{orders.totalDueINR || 0 | epiCurrency : 'INR'}}</div>
+					</div>
+					<div class="column-data space-between" style="margin-top: 36px;" *ngIf="orders.currency_type.currency_type == 'USA'">
+						<div class="overview-label">{{orders.totalPastDue}}</div>
+						<div class="overview-data">{{orders.totalDue || 0 | epiCurrency : 'USD'}}</div>
+					</div>
+				</mat-card> -->
+				<mat-card @zoomAnimate class="app-card overview-card" >
+					<mat-card-header>Total Due</mat-card-header>
+					<div *ngFor="let list of orders.due ">
+						<div class="column-data space-between">
+							<div class="overview-label">{{list.name}}</div>
+							<div class="overview-data">{{list.value || 0 | epiCurrency : 'INR'}}</div>
+						</div>
+					</div>
+					<!-- <div class="column-data space-between">
+						<div class="overview-label">{{orders.due1Name}}</div>
+						<div class="overview-data">{{orders.due1Value || 0 | epiCurrency : 'INR'}}</div>
+					</div>
+					<div class="column-data space-between">
+						<div class="overview-label">USD</div>
+						<div class="overview-data">{{orders.totalDue || 0 | epiCurrency : 'USD'}}</div>
+				
+					</div> -->
+				</mat-card>
+				<mat-card @zoomAnimate class="app-card overview-card" *ngIf="!clientPermission">
+					<mat-card-header>Total Past Due</mat-card-header>
+					<div *ngFor="let list of orders.overdue ">
+						<div class="column-data space-between">
+							<div class="overview-label">{{list.name}}</div>
+							<div class="overview-data">{{list.value || 0 | epiCurrency : 'INR'}}</div>
+						</div>
+					</div>
+					<!-- <div class="column-data space-between">
+						<div class="overview-label">{{orders.dueo1Name}}</div>
+						<div class="overview-data">{{orders.dueo1Value || 0 | epiCurrency : 'INR'}}</div>
+					</div>
+					
+					<div class="column-data space-between">
+						<div class="overview-label">USD</div>
+						<div class="overview-data">{{orders.totalPastDue || 0 | epiCurrency : 'USD'}}</div>
+					</div> -->
+				</mat-card>
+			</div>
+			<div fxLayout="column">
+				<div class="page-header p-b-8 p-t-16">
+					<aside>
+						<h2 class="title-heading m-0">New Orders {{!clientPermission ? 'Received' : 'Placed'}} ({{newOrdersCount}})</h2>
+					</aside>
+					<aside *ngIf="!emptyOrdersData">
+						<a class="primary-text-link with-mat-icon d-flex align-items-center" [ngClass]="{'hide-seall': !createOrderPermission}" [routerLink]="['/orders']">
+							<span>See all orders</span>
+							<mat-icon class="order-icon">keyboard_arrow_right</mat-icon>
+						</a>
+					</aside>
+				</div>
+				<div class="table-main-container">				
+					<div class="global_list_view top-align-cell-data pad_0 ">
+						<mat-table *ngIf="!emptyOrdersData && !clientPermission" @overviewAnimateLeft [dataSource]="dataSource">
+							<ng-container matColumnDef="order_no">
+								<mat-header-cell *matHeaderCellDef fxFlex="20"> Order Number </mat-header-cell>
+								<mat-cell *matCellDef="let element" fxFlex="20" style="display: flex;" class="p-r-8">
+									<div class="d-flex align-items-center avatar-cell o-hidden">
+									<div class="icon-sec">
+										<img [src]='images.ordersIcon_o' title="Orders">
+									</div>
+									<div class="content-sec o-hidden ellipsis-text">
+										<h1  title="{{element.orders.order_no}}" class="ellipsis-text">{{element.orders.order_no}}</h1>
+										<small title="{{element.orders.product_name}} " class="ellipsis-text">{{element.orders.product_name}}</small>
+									</div>
+								</div>
+								</mat-cell>
+							</ng-container>
+							<ng-container matColumnDef="client_name">
+								<mat-header-cell *matHeaderCellDef fxFlex="25"> Client </mat-header-cell>
+								
+								<mat-cell *matCellDef="let element" fxFlex="25" style="display: flex;">
+									<div class="d-flex align-items-center avatar-cell o-hidden">
+										<mat-icon mat-list-icon class="avatar-list" *ngIf="element.orders.client_image">
+											<div class="mat-order-avatar" [ngStyle]="{'background-image': 'url(' + element.orders.client_image + ')'}"></div>
+										</mat-icon>
+										<div mat-list-icon class="no-order-image" *ngIf="!element.orders.client_image">
+											<span class="mat-avatar">{{element.orders.client_name | contactImageName: 2}}</span>
+										</div>
+										<div class="content-sec o-hidden ellipsis-text">
+											<h1 class="normal ellipsis-text" title="{{element.orders.client_name}}">{{element.orders.client_name}}</h1>
+											<small class="client-info ellipsis-text" title="{{element.orders.name}}">{{element.orders.name}}</small>
+										</div>
+									</div>
+									
+								</mat-cell>
+							</ng-container>
+							<ng-container matColumnDef="po_nbr">
+								<mat-header-cell class="text-right" *matHeaderCellDef> PO NO </mat-header-cell>
+								<mat-cell *matCellDef="let element" class="text-right" title="{{element.orders.po_nbr}}">{{element.orders.po_nbr}}</mat-cell>
+							</ng-container>
+							<ng-container matColumnDef="date_added">
+								<mat-header-cell *matHeaderCellDef> Date Ordered </mat-header-cell>
+								<mat-cell *matCellDef="let element" title="{{element.orders.date_added}}"> {{element.orders.date_added}} </mat-cell>
+							</ng-container>
+							<ng-container matColumnDef="total_amount">
+								<mat-header-cell class="text-right" *matHeaderCellDef> Total Amount </mat-header-cell>
+								<mat-cell *matCellDef="let element" class="text-right" title="{{element.orders.total_amount}}">{{element.orders.total_amount | epiCurrency : element.orders.currency : true}}</mat-cell>
+							</ng-container>
+							<ng-container matColumnDef="order_status">
+								<mat-header-cell *matHeaderCellDef> Status </mat-header-cell>
+								<mat-cell *matCellDef="let element" class="status-cell">
+									<div class="client-status" [ngClass]="{'accepted':element.orders.status == 'Accepted' , 'in-transit':element.orders.status == 'In-transit', 'delivered':element.orders.status == 'Delivered', 'cancelled':element.orders.status == 'Cancelled','received':element.orders.status == 'Received','processing':element.orders.status == 'Processing'}">{{element.orders.status}}</div>
+									<span fxFlex></span>
+									<mat-icon class="go-to-details">keyboard_arrow_right</mat-icon>
+								</mat-cell>
+							</ng-container>
+							<mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+							<mat-row class="orders-row" (click)="orderDetail(row)" [ngClass]="{'cursorDefault': !createOrderPermission}" *matRowDef="let row; columns: displayedColumns;"></mat-row>
+						</mat-table>
+
+						<!-- client overview card -->
+						<!-- *ngIf="!emptyOrdersData && clientPermission" -->
+						<mat-table *ngIf="!emptyOrdersData && clientPermission" @overviewAnimateLeft [dataSource]="dataSource">
+							<ng-container matColumnDef="po_nbr">
+								<mat-header-cell *matHeaderCellDef fxFlex="20"> PO No </mat-header-cell>
+								<mat-cell *matCellDef="let element" fxFlex="20">
+									
+									<div class="d-flex align-items-center avatar-cell o-hidden">
+										<div class="icon-sec">
+											<img class="pro-img-avatar" [src]='images.ordersIcon_o' title="Orders"/>
+										</div>
+										<div class="content-sec o-hidden ellipsis-text">
+											<h1 class="ellipsis-text " title="{{element.orders.po_nbr}}">{{element.orders.po_nbr}}</h1>
+											<small class="ellipsis-text" title="{{element.orders.product_name}}">{{element.orders.product_name}}</small>
+										</div>								
+									
+								</div>
+								</mat-cell>
+							</ng-container>
+							<ng-container matColumnDef="total_quantity">
+								<mat-header-cell *matHeaderCellDef fxFlex="25"> Total Quantity </mat-header-cell>
+								<mat-cell *matCellDef="let element" fxFlex="25" title="{{element.orders.total_quantity}} Kgs">{{element.orders.total_quantity}} Kgs</mat-cell>
+							</ng-container>
+							<ng-container matColumnDef="total_amount">
+								<mat-header-cell class="text-right" *matHeaderCellDef fxFlex="30"> Total Amount </mat-header-cell>
+								<mat-cell *matCellDef="let element" class="text-right" fxFlex="30" title="{{element.orders.total_amount}}">{{element.orders.total_amount | epiCurrency : element.orders.currency : true}}</mat-cell>
+							</ng-container>
+							<ng-container matColumnDef="order_status">
+								<mat-header-cell *matHeaderCellDef fxFlex="25"> Status </mat-header-cell>
+								<mat-cell *matCellDef="let element" fxFlex="25">
+									<div class="client-status"
+										[ngClass]="{'accepted':element.orders.status == 'Accepted' , 'in-transit':element.orders.status == 'In-transit', 'delivered':element.orders.status == 'Delivered', 'cancelled':element.orders.status == 'Cancelled','received':element.orders.status == 'Received','placed':element.orders.status == 'Placed','processing':element.orders.status == 'Processing'}">
+										{{element.orders.status}}</div>
+									<span fxFlex></span>
+									<mat-icon class="go-to-details">keyboard_arrow_right</mat-icon>
+								</mat-cell>
+							</ng-container>
+							<mat-header-row *matHeaderRowDef="displayedClientColumns"></mat-header-row>
+							<mat-row class="orders-row" (click)="orderDetail(row)" [ngClass]="{'cursorDefault': !createOrderPermission}" *matRowDef="let row; columns: displayedClientColumns;"></mat-row>
+						</mat-table>
+						<mat-card class="no-results" *ngIf="!fetchingData && emptyOrdersData">
+							<div class="empty-img-holder"><img [src]="images.ordersIcon_o"></div>
+							<p class="no-result-text">No New Orders Found</p>
+						</mat-card>
+					</div>
+				</div>
+			</div>
+			<div fxLayout="column">
+				<div class="page-header p-b-8 p-t-16">
+					<aside>
+						<h2 class="title-heading m-0">Invoices Overdue</h2>
+					</aside>
+					<aside *ngIf="!emptyInvoiceData">
+						<a class="primary-text-link with-mat-icon d-flex align-items-center" [ngClass]="{'hide-seall': !invoicePermission}" [routerLink]="['/invoices']">
+							<span>See all Invoices</span>
+							<mat-icon class="order-icon">keyboard_arrow_right</mat-icon>
+						</a>
+					</aside>
+				</div>
+				<!--  -->
+				<div class="table-main-container" >				
+					<div class="global_list_view top-align-cell-data pad_0" *ngIf="!emptyInvoiceData">
+						<mat-table  @overviewAnimateLeft [dataSource]="invoiceDataSource">
+							<ng-container matColumnDef="inv_nbr">
+								<mat-header-cell *matHeaderCellDef fxFlex="20"> Invoice Number </mat-header-cell>
+								<mat-cell *matCellDef="let element" fxFlex="20">
+									<div class="d-flex align-items-center avatar-cell o-hidden">
+											<div class="icon-sec">
+												<img class="pro-img-avatar" [src]='images.invoicesIcon_o' title="Orders"/>
+											</div>
+											<div class="content-sec o-hidden ellipsis-text">
+												<h1 class="ellipsis-text" title="{{element.Inovice.inv_nbr}}">{{element.Inovice.inv_nbr}}</h1>
+												<small class="ellipsis-text" title="{{element.Inovice.po_nbr}}">{{element.Inovice.po_nbr}}</small>
+											</div>
+
+									
+								</div>
+								</mat-cell>
+							</ng-container>
+							<ng-container matColumnDef="client_name">
+								<mat-header-cell *matHeaderCellDef fxFlex="30"> Client </mat-header-cell>
+								<mat-cell *matCellDef="let element" fxFlex="30">
+									<div class="d-flex align-items-center avatar-cell o-hidden">
+										<div class="icon-sec" *ngIf="element.Inovice.client_image">
+											<div  class="pro-img-avatar"  [ngStyle]="{'background-image': 'url(' + element.Inovice.client_image + ')'}"></div>
+										</div>
+										<div class="grid-profile-text-avatar"  *ngIf="!element.Inovice.client_image">
+											{{element.Inovice.client_name | contactImageName: 2}}
+										</div> 
+										<div class="content-sec o-hidden ellipsis-text">
+										<h1 class="ellipsis-text" title="{{element.Inovice.client_name}}">{{element.Inovice.client_name}}</h1>
+										<small class="ellipsis-text" title="{{element.Inovice.kindName}}">{{element.Inovice.kindName}}</small>
+										</div>
+									</div>
+								</mat-cell>
+							</ng-container>
+							<ng-container matColumnDef="total_amount">
+								<mat-header-cell class="text-right" *matHeaderCellDef> Total Amount </mat-header-cell>
+								<mat-cell *matCellDef="let element" class="text-right" title="{{element.totalSum}}">{{element.totalSum | epiCurrency : element.Inovice.currency : true}} </mat-cell>
+							</ng-container>
+							<ng-container matColumnDef="order_status">
+								<mat-header-cell *matHeaderCellDef> Status </mat-header-cell>
+								<mat-cell *matCellDef="let element">
+									<div class="client-status" [ngClass]="{'due':element.Inovice.status == 'Due','overdue':element.Inovice.status == 'Overdue','open':element.Inovice.status == 'Open','paid':element.Inovice.status == 'Paid'}">{{element.Inovice.status}}</div>
+									<span fxFlex></span>
+									<mat-icon class="go-to-orders">keyboard_arrow_right</mat-icon>
+								</mat-cell>
+							</ng-container>
+							<mat-header-row *matHeaderRowDef="displayedOrderList"></mat-header-row>
+							<mat-row (click)="invoiceDetail(row)" [ngClass]="{'cursorDefault': !invoicePermission}" *matRowDef="let row; columns: displayedOrderList;"></mat-row>
+						</mat-table>
+						
+					</div>
+					<mat-card class="no-results" *ngIf="!fetchingData && emptyInvoiceData">
+						<div class="empty-img-holder"><img [src]="images.invoice_green"></div>
+						<p class="no-result-text">No Invoices Overdue</p>
+					</mat-card>
+				</div>
+			</div>
+		</div>
+
+		<div class="inv-spinner">
+			<mat-spinner class="medium-spinner" *ngIf="fetchingData"></mat-spinner>
+		</div>
+
+	</perfect-scrollbar >
+</div>

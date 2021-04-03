@@ -1,0 +1,27 @@
+<!--Success alert-->
+<div *ngIf="data?.status=='success'">
+  <mat-icon class="success-alert">check_circle</mat-icon>
+  <span>{{data.msg}}</span>
+  <div class="clearfix"></div>
+</div>
+<!--Error alert-->
+<div *ngIf="data?.status=='error'">
+
+  <mat-icon class="error-alert">error_outline</mat-icon>
+  <span>{{data.msg}}</span>
+  <div class="clearfix"></div>
+
+</div> 
+<!--Alert(already exist etc..,) -->
+<!-- <div *ngIf="data.status=='alert'">
+  <mat-icon class="error-alert">warning</mat-icon>
+  <span>{{data.msg}}</span>
+  <div class="clearfix"></div>
+
+</div> -->
+<!--Saving in progress -->
+<!-- <div *ngIf="data.status=='process'">
+  <mat-spinner class="toast-spinner"></mat-spinner>
+  <span>{{data.msg}}</span>
+  <div class="clearfix"></div>
+</div> -->

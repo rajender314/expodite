@@ -1,0 +1,22 @@
+.multi_select_list{
+    margin: 20px 0;
+}
+mat-option{
+    padding-right: 12px;
+}
+ng-select .ng-dropdown-panel {
+     height: 250px !important; 
+     overflow: auto;
+     /* max-width: 550px; */
+ }
+ .w-100{
+     width: 100%;
+ }
+ .mat-error{
+     margin-bottom: 8px;
+     font-size: 13px;
+ }
+ .mat-radio-group{
+     margin-top: 10px;
+     display: block;
+ }

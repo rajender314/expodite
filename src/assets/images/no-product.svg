@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="35px" height="35px" viewBox="0 0 35 35" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 50.2 (55047) - http://www.bohemiancoding.com/sketch -->
+    <title>orders</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Client-Dashbaord" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="orders">
+            <rect id="Rectangle-11" fill="#9270DC" x="0" y="0" width="35" height="35" rx="3"></rect>
+            <g id="noun_1247945_cc" transform="translate(4.375000, 7.875000)" fill="#FFFFFF" fill-rule="nonzero">
+                <polygon id="Shape" points="12.7770349 1.2067541 12.7770349 19.0773811 2.11465116 15.9169098 2.11465116 6.81134426 10.4502471 7.30490164"></polygon>
+                <polygon id="Shape" points="23.6231686 0.798717213 13.6179506 0.167254098 16.0976599 6.73213525 26.1028779 6.10067213"></polygon>
+                <polygon id="Shape" points="13.4720494 1.2067541 15.7988372 7.30490164 24.1338227 6.81134426 24.1338227 15.9169098 13.4720494 19.0773811"></polygon>
+                <polygon id="Shape" points="2.62561047 0.798717213 0.146206395 6.10067213 10.1514244 6.73213525 12.6308285 0.167254098"></polygon>
+            </g>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,94 @@
+<div class="order-modal">
+	<mat-toolbar>
+		<h2 mat-dialog-title></h2>
+		<mat-icon class="back-to-orders" *ngIf="(stepper._selectedIndex!='0')" (click)="goToPrev(stepper)">arrow_back</mat-icon>
+		<span fxFlex>Add Batch Quantity</span>
+	</mat-toolbar>
+	<mat-horizontal-stepper class="step" #stepper>
+		<mat-step>
+			<mat-dialog-content class="batch-contents">
+				<div *ngIf="!noAddBatches">
+					
+					<mat-form-field class="custom-input w_100" floatLabel="never">
+						<label class="custom-label">Search Batch Number</label>
+						<input matInput placeholder="Batch Number" #search (keyup)="searchBatches(search.value, $event)" (blur)="!search.value?.length ? open = false : open = true">
+						<mat-icon matSuffix *ngIf="searching" class="spinner addbatch-spinner">
+							<mat-spinner class="small-spinner addbatch-spinner"></mat-spinner>
+						  </mat-icon>
+						  
+					</mat-form-field>
+					<div *ngIf="noBatches">
+						<p >Search criteria does'nt match the requirements (quantity or category or batch) </p>
+					</div>
+					
+					<div>
+					<div class="packages-or"><span>OR</span></div>
+					<h3 class="batchnumber-header">Select from the Batch List ({{batchCategoryName}})</h3>
+					<div *ngIf="batchError">
+						<label class="custom-label error-msg error-strip">Add More Quantity </label>
+					</div>
+					<span *ngIf="order.selectesBatchList" class="error-msg error-strip">Please Select Batch List</span>
+					<div class="batchnumber-card">
+						<mat-selection-list class="batches-selection" #shoes>
+							<mat-list-option selected="{{batch.selected}}" (click)="selectBatch(batch)" *ngFor="let batch of order.batches" checkboxPosition="before"
+							 class="batcheslist-sel">
+								<span class="batchspan-one">{{batch.batch_nbr}}
+								<mat-icon *ngIf="batch.spcl_inst_flag" class="flag-batch" title="{{batch.special_instructions}}">flag</mat-icon></span>
+								<span class="batchspan-two">{{batch.remain_quan}} {{batch.uom_name}}</span>
+							</mat-list-option>
+						</mat-selection-list>
+					</div>
+					</div>
+				</div>
+				<div class="no-addBatches" *ngIf="!order.batches?.length">No Batches Found. 
+					<span class="inventory-link" [routerLink]="['/inventory']" (click)="goToInv()"> Go to Inventory</span>
+				</div>
+				<mat-spinner *ngIf="order.fetchingBatches" class="medium-spinner"></mat-spinner>
+			</mat-dialog-content>
+			<mat-spinner class="medium-spinner" *ngIf="showSpinner"></mat-spinner>
+			<mat-dialog-actions>
+				<span fxFlex></span>
+				<button mat-button mat-dialog-close>Cancel</button>
+				<button mat-raised-button class="addbatch" [disabled]="noAddBatches" (click)="addOrderBatch(stepper)">Add Batch</button>
+			</mat-dialog-actions>
+		</mat-step>
+		<mat-step>
+			<mat-dialog-content class="added-batch">
+				<h3 class="batchnumber-header">{{data.product.product_name+" - "+data.product.product_quantity}} {{data.product.uom_name}}</h3>
+				<span class="batch-quantity" [ngClass]="{'limit-exceed':order.totalQuantity == data.product.product_quantity}">Added {{order.totalQuantity}} {{data.product.uom_name}} out of {{data.product.product_quantity}} {{data.product.uom_name}}</span>
+				<div *ngFor="let batches of order.selectedBatch">
+				<h4 class="batchnumber-subheader">Batch No: {{batches.batch_nbr}} ({{batches.remain_quan}} {{batches.uom_name}} Remaining)</h4>
+				
+				<div class="batchnumber-card">
+					<mat-list class="packaging-details">
+						<mat-list-item *ngFor="let container of order.containers" class="packaging-list">
+							<div class="drum-icon">
+								<img [src]='images.package_drum'>
+								<span class="batch-weight">{{container.name}} - {{container.type_name}}</span>
+							</div>
+							<span fxFlex></span>
+							<div class="order-count">
+								<span class="order-decr">
+								<mat-icon (click)="valueDecriment(batches,container)">remove</mat-icon>
+							</span>
+								<!-- <span class="order-num">{{batches.quantity[container.id]}}</span> -->
+								<input matInput [(ngModel)] = "batches.quantity[container.id]" (keyup)="onChange($event,batches,container)">
+								<!-- <span class="order-num">{{container.quantity}}</span> -->
+								<span class="order-incr">
+								<mat-icon (click)="valueIncriment(batches, container)" [class.disabled]="batches.disableContainerAdd">add</mat-icon>
+							</span>
+							</div>
+						</mat-list-item>
+					</mat-list>
+				</div>
+			</div>
+			</mat-dialog-content>
+			<mat-spinner class="medium-spinner" *ngIf="showSpinner"></mat-spinner>
+			<mat-dialog-actions>
+				<span fxFlex></span>
+				<button mat-button mat-dialog-close>Cancel</button>
+				<button mat-raised-button [disabled]="order.totalQuantity != data.product.product_quantity || disableBtn" (click)="addBatchNumber()">Done</button>
+			</mat-dialog-actions>
+		</mat-step>
+	</mat-horizontal-stepper>
+</div>

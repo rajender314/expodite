@@ -1,0 +1,10 @@
+<div fxLayout="row">
+  <app-product-list [update]="updatedProductDetails" 
+                    (getCategory)="getCategoryList($event)"
+                    (trigger)="getSelectedProductType($event)">
+  </app-product-list>
+  <app-product-details [productType]="selectedProduct" 
+                       [categoryDt]="categoryData" style="width:100%;" 
+                       (trigger)="updateProductDetails($event)">
+  </app-product-details>
+</div>

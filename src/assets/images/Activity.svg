@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="24px" viewBox="0 0 20 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 48.2 (47327) - http://www.bohemiancoding.com/sketch -->
+    <title>Activity</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Order-left-nav" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" transform="translate(-22.000000, -72.000000)">
+        <g id="Activity" transform="translate(22.000000, 72.000000)">
+            <rect id="Rectangle-2" fill="#EF5350" x="0" y="0" width="20" height="24" rx="2.5"></rect>
+            <path d="M9.57142857,18.7142857 C10.2785714,18.7142857 10.8571429,17.9428571 10.8571429,17 L8.28571429,17 C8.28571429,17.9428571 8.86428571,18.7142857 9.57142857,18.7142857 L9.57142857,18.7142857 Z M14.5882353,14.8823529 L14.5882353,11 C14.5882353,8.81176471 13.1058824,7.04705882 11.0588235,6.55294118 L11.0588235,6.05882353 C11.0588235,5.49411765 10.5647059,5 10,5 C9.43529412,5 8.94117647,5.49411765 8.94117647,6.05882353 L8.94117647,6.55294118 C6.89411765,7.04705882 5.41176471,8.81176471 5.41176471,11 L5.41176471,14.8823529 L4,16.2941176 L4,17 L16,17 L16,16.2941176 L14.5882353,14.8823529 L14.5882353,14.8823529 Z" id="Shape" fill="#FFFFFF"></path>
+        </g>
+    </g>
+</svg>

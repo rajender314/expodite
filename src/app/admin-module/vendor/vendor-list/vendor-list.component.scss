@@ -1,0 +1,109 @@
+.mat-avatar{
+    width:30px;
+    height:30px;
+}
+mat-list.organisation-list.mat-list.ng-star-inserted{
+    padding-top: 0;
+}
+.organisation-list .mat-list-item-content{
+    padding: 0 10px !important;
+}
+.small-fab{
+    background-color: #3676ca;
+}
+
+.mat-list-item:hover{
+    background-color: rgba(220, 224, 228, 0.41);
+    // border-radius: 4px;
+}
+
+.mat-form-field.search{
+    width: 260px;
+}
+// .list-items{
+//     position: relative;
+//     overflow-y: auto;
+//     height: calc(100vh - 139px);
+//     padding-top: 0;
+//     margin: 0px;
+//     mat-spinner{
+//         position: absolute;
+//         top: 50%;
+//         left: 50%;
+//         transform: translate(-50%,-50%);
+//     }
+//     .mat-list{
+//         &.organisation-list{
+//             margin: 0px 16px;
+//         }
+//     }
+//     // mat-list mat-list-item{height: 48px !important;}
+    
+//     .mat-list{
+//         .mat-list-item{
+//             font-size: 15px;
+//             color: rgba(40, 41, 43, 0.9);
+//             height: 48px;
+//             &:hover{
+//                 background-color:rgba(220, 224, 228, 0.41);
+//             }
+//             &.active
+//              {
+//                 background-color: #DADDE2;
+//                 border-radius: 4px;
+//                 outline: none;
+//             }
+//             .mat-icon{
+//                 width: 30px;
+//                 height: 30px;
+//                 font-size: 30px;
+//             }
+//             .mat-list-text{
+//                 padding: 0 16px 0px 10px;
+//             }
+//         }
+//     }
+// }
+
+.add-org{
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+// .list{
+//     border-right: 1px solid #D7D7D7;
+//     &.clients-list{
+//         width: 300px;
+//         background: #EDEFF2;
+//         box-shadow: 1px 0 0 0 #D7D7D7;
+//         .mat-toolbar.mat-small-toolbar{
+//             min-height: 68px;border-bottom: 0px;
+//             background: transparent;
+//             // .mat-toolbar-row{height: 45px;}
+//         }
+//         .list-title{
+//             width: auto;
+//             padding: 0;
+//         }
+
+//     }
+// }
+
+
+
+mat-toolbar .list-title{
+    font-family: 'Lato', sans-serif;
+    font-weight: 500;
+    font-size: 24px;
+    color: #323232;
+    line-height: 40px;
+    justify-content: center;
+    display: flex;
+    align-items: center;
+}
+
+.mat-input-flex mat-form-field-flex .mat-form-field-infix{
+    width:70px;
+    display: block;
+}

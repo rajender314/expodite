@@ -1,0 +1,31 @@
+<div class="contacts-billable"  *ngIf="!noSettings && !fetchingData">
+    <mat-card class="contacts-card user-contact"  (click)="addNewUser('')">
+        <mat-card-content>
+            <mat-icon class="contact-add">add</mat-icon>
+            <h3 class="contact-text">Add User</h3>
+        </mat-card-content>
+    </mat-card>
+    <mat-card class="contacts-card useraccess-card"  *ngFor="let user of selectedOrganization; let i = index;">
+        <div class="contact-details">
+            <h3 class="contact-name">
+                {{user.firstname}}  
+            </h3>
+            <p class="contact-address">
+                {{user.email}}  
+            </p>
+        </div>
+        <div class="contact-editDelete">
+            <div class="contact-edit" (click)="addNewUser(user)" title="Edit">
+                  <span>edit</span>
+                  <span class="divider-one"></span>
+            </div>
+            <div class="contact-delete" (click)="openDialog('reset',i)" title="Reset Password">Reset Password</div>
+        </div>
+        <div class="cb"></div>
+    </mat-card>
+  </div>
+  
+  <div *ngIf="noSettings" class="no-records">
+      <p>No Users Found</p>
+  </div>
+  

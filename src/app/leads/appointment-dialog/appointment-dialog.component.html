@@ -1,0 +1,64 @@
+<mat-toolbar>
+    <h2 mat-dialog-title></h2>
+    <span fxFlex> {{isEditScreen ? 'Edit' : 'Create'}} Appointment</span>
+</mat-toolbar>
+<mat-dialog-content>
+    <form [formGroup]="formGroup">
+        <mat-form-field class="custom-input block-ele mandatory w-100" floatLabel="never">
+            <label class="custom-label mandatory">Title</label>
+            <input maxlength="50" matInput placeholder="Enter Title" formControlName="title">
+
+            <mat-error *ngIf="formGroup.get('title').touched
+                                && (formGroup.get('title').hasError('required')
+                                || formGroup.get('title').invalid)">
+                Please enter
+                <span class="capitalize">Title</span>
+            </mat-error>
+        </mat-form-field>
+        <mat-form-field class="custom-input block-ele mandatory w-100" floatLabel="never">
+            <label class="custom-label mandatory">Details</label>
+            <textarea maxlength="250" matInput placeholder="Enter Details" formControlName="details"></textarea>
+
+            <mat-error *ngIf="formGroup.get('details').touched
+                                && (formGroup.get('details').hasError('required')
+                                || formGroup.get('details').invalid)">
+                Please enter
+                <span class="capitalize">Details</span>
+            </mat-error>
+        </mat-form-field>
+        <mat-form-field class="custom-input block-ele mandatory w-100" floatLabel="never">
+            <label class="custom-label mandatory">Assignee</label>
+            <mat-select placeholder="Select Assignee" formControlName="assignee">
+                <mat-option *ngFor="let each of assigneeList" [value]="each.id">{{each.contact_name}}</mat-option>
+            </mat-select>
+
+            <mat-error *ngIf="formGroup.get('assignee').touched
+                                && (formGroup.get('assignee').hasError('required')
+                                || formGroup.get('assignee').invalid)">
+                Please select
+                <span class="capitalize">Assignee</span>
+            </mat-error>
+        </mat-form-field>
+        <mat-form-field class="custom-input block-ele mandatory w-100" floatLabel="never">
+            <label class="custom-label mandatory">Date & Time</label>
+            <input matInput [ngxMatDatetimePicker]="picker"  (click)="picker.open()"placeholder="Choose Date & Time" formControlName="time"
+                [min]="minDate" [readonly]="true">
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <ngx-mat-datetime-picker #picker [showSpinners]="true" [showSeconds]="false" [stepHour]="1" [stepMinute]="1"
+                [stepSecond]="1" [touchUi]="false" [color]="'primary'" [enableMeridian]="false">
+            </ngx-mat-datetime-picker>
+            <mat-error *ngIf="formGroup.get('time').touched
+            && (formGroup.get('time').hasError('required')
+            || formGroup.get('time').invalid)">
+                Please select
+                <span class="capitalize">Date & Time </span>
+            </mat-error>
+        </mat-form-field>
+    </form>
+
+</mat-dialog-content>
+<mat-dialog-actions>
+    <span fxFlex class="flx-50"></span>
+    <button mat-button mat-dialog-close (click)="cancel()">Cancel</button>
+    <button mat-raised-button clas="margn-15" [disabled]=submitted (click)="save()">{{isEditScreen ? 'Update' : 'Create'}}</button>
+</mat-dialog-actions>

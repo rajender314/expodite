@@ -1,0 +1,283 @@
+    
+    <section class="hiden-stepper">
+        <mat-horizontal-stepper #stepper>
+            <mat-step-header></mat-step-header>
+            <mat-step>
+                <div fxLayout="row">
+    <div class="center-section-scroll vh-100 d-flex  body-color">
+        <div class="page-header-ui">
+            <div class="flex-fixed-header page-title container-ui">                     
+                <div class="d-flex align-items-center">
+                    <div class=" detail-back-action"  (click)="backToOrders()">
+                        <mat-icon class="back-to-orders">arrow_back</mat-icon>
+                    </div>
+                    <h1>{{invoiceName}}</h1>
+                    <!-- <span class="order-date top-pad-5">Order No:
+                        <b (click)="orderDetail()" class="cursor-pointer">{{invoices.selectedInvoice.invoice['order_no']}}</b>
+                    </span>
+                    <span class="order-date top-pad-5">Order Date:
+                        <b>{{invoices.selectedInvoice.invoice['date_added']}}</b>
+                    </span> -->
+                </div>  
+                <span fxFlex></span>
+                <div class="packages-icons">
+                    <a target="_blank"
+                      href="generateInvpdf?orders_id={{orderId}}&is_printable=1">
+                      <button mat-icon-button>
+                        <img [src]='images.printer_icon' title="Print">
+                      </button>
+                    </a>
+                    <!-- <a href="generateInvpdf?orders_id={{orderId}}&is_printable=0">
+                      <button mat-icon-button>
+                        <img [src]='images.download_arrow' title="Download">
+                      </button>
+                    </a> -->
+                  
+                  </div>
+                <div class="d-flex align-items-center">                       
+                    <div class="media action d-flex align-items-center" (click)="orderDetail()">
+                        <div class="media-aside align-self-center   ">
+                            <span  class="icon-sec" style="width: 32px; height: 32px;">
+                                <img [src]='images.ordersIcon_o' title="Orders">
+                            </span>                              
+                        </div>
+                        <div class="media-body p-0">
+                            <h1 class="font-weight-bold d-block text-nowrap single">{{invoices.selectedInvoice.invoice['order_no']}}</h1>
+                            <small>{{invoices.selectedInvoice.invoice['date_added']}}</small>
+                        </div>
+                    </div>
+                   
+
+                    <a href="generateInvpdf?orders_id={{invoices.selectedInvoice.invoice['orders_id']}}&is_printable=0">
+                        <button mat-raised-button color="warn">Download</button> 
+                        <!-- <button mat-icon-button>
+                        <img [src]='images.download_arrow' title="Download">
+                        </button> -->
+                    </a>
+                </div>
+            </div>
+        </div>
+        <perfect-scrollbar>
+            <div class="container-ui" *ngIf="selectedInvoiceCount">  
+                <div class="page-layout m-t-16 ">                 
+                    <mat-toolbar class="package-toolbar hide-invoice">
+                        <img [src]='images.invoice_green'>
+                        <div class="invoice-toolbar">
+                            <div class="invoice-number">
+                                <span class="details-span">{{invoices.selectedInvoice.invoice['inv_nbr']}}</span>
+                            </div>
+                            <div>
+                                <span class="details-date">{{invoices.selectedInvoice.invoice['date_added']}}</span>
+                            </div>
+                        </div>
+                      
+                    </mat-toolbar>
+                    <div class="address-container" fxLayout="row">
+                        <div class="shipper-secction" fxFlex="50">
+                            <h4 class="gray-title">BILL TO PARTY</h4>
+                            <div class="address-inner-content">
+                                <b class="bill-address">{{invoices.selectedInvoice.billingAddr.company_name}}</b>
+                                <p class="bill-address">{{invoices.selectedInvoice.billingAddr.bill_address1}}</p>
+                                <p class="bill-address">{{invoices.selectedInvoice.billingAddr.bill_address2}}</p>
+                                <p class="bill-address">{{invoices.selectedInvoice.billingAddr.bill_state}}</p>
+                                <p class="bill-address">{{invoices.selectedInvoice.billingAddr.bill_countrty}}</p>
+                                <p class="bill-address">{{invoices.selectedInvoice.billingAddr['bill_city']}} - {{invoices.selectedInvoice.billingAddr.bill_postal_code}}</p>
+                            </div>
+                        </div>
+
+                        <div class="vertical-divider"></div>
+                        <div fxFlex="50">
+                            <div class="shipper-secction">
+                                <h4 class="gray-title">SHIP TO PARTY</h4>
+                                <div class="address-inner-content">
+                                    <b class="bill-address">{{invoices.selectedInvoice.shippingAddr.company_name}}</b>
+                                    <p class="bill-address">{{invoices.selectedInvoice.shippingAddr.ship_address1}}</p>
+                                    <p class="bill-address">{{invoices.selectedInvoice.shippingAddr.ship_address2}}</p>
+                                    <p class="bill-address">{{invoices.selectedInvoice.shippingAddr.ship_state}}</p>
+                                    <p class="bill-address">{{invoices.selectedInvoice.shippingAddr.ship_countrty}}</p>
+                                    <p class="bill-address">{{invoices.selectedInvoice.shippingAddr['ship_city']}} - {{invoices.selectedInvoice.shippingAddr.ship_postal_code}}</p>
+                                </div>
+                            </div>
+                            <div class="shipper-secction mt_16">
+
+                                <div class="address-inner-content">
+                                    <p class="invoice-contact">Phone: {{invoices.selectedInvoice.invoice['phone']}}</p>
+                                    <p class="invoice-contact">Attention: {{invoices.selectedInvoice.invoice['kindName']}}</p>
+                                    <p class="invoice-contact">Email: {{invoices.selectedInvoice.invoice['email']}}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div fxLayout="row">
+                        <div class="orders-table">
+                            <table class="invoice-table">
+                                <thead>
+                                    <tr>
+                                        <th class="invoice-head">SI.NO</th>
+                                        <th class="invoice-head">Description/Packaging</th>
+                                        <th class="invoice-head">Batch.No</th>
+                                        <th class="invoice-head">Mfg. Date</th>
+                                        <th class="invoice-head">Exp. Date</th>
+                                        <th class="invoice-head">Quantity</th>
+                                        <th class="invoice-head">UOM</th>
+                                        <th class="invoice-head">Rate per UOM({{invoices.selectedInvoice.invoice['currency']}})</th>
+                                        <th class="invoice-head" style="text-align: right;">Amount({{invoices.selectedInvoice.invoice['currency']}})</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="invoice-row" *ngFor="let product of invoices.selectedInvoice.productsData; index as productIndex;">
+                                        <td class="invoice-tdata">{{productIndex+1}}</td>
+                                        <td class="invoice-tdata">{{product.product_name}}</td>
+                                        <td class="invoice-tdata">{{product.batch_nbr}}</td>
+                                        <td class="invoice-tdata">{{product.mfd_date}}</td>
+                                        <td class="invoice-tdata">{{product.exp_date}}</td>
+                                        <td class="invoice-tdata">{{product.product_quantity}}</td>
+                                        <td class="invoice-tdata"> {{product.uom_name}}</td>
+                                        <td class="invoice-tdata">{{product.product_price | epiCurrency : product.currency : true}}</td>
+                                        <td class="invoice-tdata">{{product.product_price_total | epiCurrency : product.currency : true}}</td>
+                                    </tr>
+
+                                    <tr class="invoice-row">
+                                        <td class="invoice-tdata " colspan="5" style="padding: 0;border-right: 1px solid #d3d3d3;">
+                                            <table class="invoice-row-table">
+                                                <tbody>
+                                                    <tr>
+                                                        <td>
+
+                                                            
+                                                            <div class="gst-details">
+                                                                <span class="gst-one">GSTN TYPE: {{companyInvoiceDetails_com.GSTN_TYPE}}</span>
+                                                                <span class="gst-two">END USE: {{companyInvoiceDetails_com.END_USE}}</span>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <div class="gst-details">
+                                                                <span class="invoice-desc">We intend to claim rewards under Merchandise Export from India scheme undertake to abide by the Provisions of Foreign Exchange Management Act ,1999. As amended time to time including Realisation/Repatriation of Foreign Exchange.
+                                                            </span>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                        <td class="invoice-tdata table-invoice" colspan="4" rowspan="2">
+                                            <table class="invoice-costTable">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="costTable-head" colspan="2">Sub Total</th>
+                                                        <th class="costTable-head">{{invoices.selectedInvoice.invoice['total_amount'] }}</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody >
+                                                    <tr>
+                                                        <td class="costTable-row" colspan="2">Packaging Charges</td>
+                                                        <td  *ngIf="blockContent"  class="costTable-row" [attr.contenteditable]="clientPermission ? false : true" (keydown)="changeInvoicePackCharge(colIndex, $event)">{{invoices.selectedInvoice.invoice.pack_charge | epiCurrency  : invoices.selectedInvoice.invoice['currency']}}</td>
+                                                        <td  *ngIf="!blockContent"  class="costTable-row" contenteditable="false" (keydown)="changeInvoicePackCharge(colIndex, $event)">{{invoices.selectedInvoice.invoice.pack_charge | epiCurrency : invoices.selectedInvoice.invoice['currency']}}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="costTable-row" colspan="2">SGST</td>
+                                                        <td  *ngIf="blockContent"  class="costTable-row" [attr.contenteditable]="clientPermission ? false : true" (keydown)="changeInvoiceTaxGst(colIndex, $event)">{{invoices.selectedInvoice.invoice.tax_gst | epiCurrency : invoices.selectedInvoice.invoice['currency']}}</td>
+                                                        <td  *ngIf="!blockContent"  class="costTable-row" contenteditable="false" (keydown)="changeInvoiceTaxGst(colIndex, $event)">{{invoices.selectedInvoice.invoice.tax_gst | epiCurrency : invoices.selectedInvoice.invoice['currency']}}</td>
+                                                        
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="costTable-row" colspan="2">CGST</td>
+                                                        
+                                                        <td  *ngIf="blockContent"  class="costTable-row" [attr.contenteditable]="clientPermission ? false : true" (keydown)="changeInvoiceTaxCgst(colIndex, $event)">{{invoices.selectedInvoice.invoice.tax_csgt | epiCurrency : invoices.selectedInvoice.invoice['currency']}}</td>
+                                                        <td  *ngIf="!blockContent"  class="costTable-row" contenteditable="false" (keydown)="changeInvoiceTaxCgst(colIndex, $event)">{{invoices.selectedInvoice.invoice.tax_csgt | epiCurrency : invoices.selectedInvoice.invoice['currency']}}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="costTable-row" colspan="2">IGST</td>
+                                                        
+                                                        <td  *ngIf="blockContent"  class="costTable-row" [attr.contenteditable]="clientPermission ? false : true" (keydown)="changeInvoiceTaxIgst(colIndex, $event)">{{invoices.selectedInvoice.invoice.tax_igst | epiCurrency : invoices.selectedInvoice.invoice['currency']}}</td>
+                                                        <td  *ngIf="!blockContent"  class="costTable-row" contenteditable="false" (keydown)="changeInvoiceTaxIgst(colIndex, $event)">{{invoices.selectedInvoice.invoice.tax_igst | epiCurrency : invoices.selectedInvoice.invoice['currency']}}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="costTable-row" colspan="2">Freight Charges</td>
+                                                        
+                                                        <td  *ngIf="blockContent"  class="costTable-row" [attr.contenteditable]="clientPermission ? false : true" (keydown)="changeInvoiceTaxOthers(colIndex, $event)">{{invoices.selectedInvoice.invoice.tax_others | epiCurrency : invoices.selectedInvoice.invoice['currency']}}</td>
+                                                        <td  *ngIf="!blockContent"  class="costTable-row" contenteditable="false" (keydown)="changeInvoiceTaxOthers(colIndex, $event)">{{invoices.selectedInvoice.invoice.tax_others | epiCurrency : invoices.selectedInvoice.invoice['currency']}}</td>
+                                                    </tr>
+                                                    
+                                                    <tr *ngFor="let column of invoices.selectedInvoice.invoice['extra_col']; index as colIndex;" >
+                                                        <td class="costTable-row delete" 
+                                                        [class.disableClass]="InvoiceDetails.order_status == 'Delivered' || InvoiceDetails.order_status == 'Cancelled' || InvoiceDetails.order_status == 'In-transit'"
+                                                        [class.events-none]="InvoiceDetails.order_status == 'Delivered' || InvoiceDetails.order_status == 'Cancelled' || InvoiceDetails.order_status == 'In-transit'">
+                                                            <mat-icon class="delete-icon" title="Delete" (click)="deleteLineItem(colIndex)">delete</mat-icon>
+                                                        </td>
+                                                        <td class="costTable-row" (input)="changeInvoiceExtraKey(colIndex, $event)" contenteditable="true">{{column.key}}</td>
+                                                        <td class="costTable-row" (keydown)="changeInvoiceExtraValue(colIndex, $event)" contenteditable="true">{{column.value}}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div class="footer invoice-footer" *ngIf = "blockContent">
+                                <button class="add-Line" mat-button *ngIf="!clientPermission" [disabled]="InvoiceDetails.order_status == 'In-transit' ||
+                                InvoiceDetails.order_status == 'Delivered' || InvoiceDetails.order_status == 'Cancelled' " (click)="addLineItem()">
+                                <mat-icon>add</mat-icon>
+                                Add Line Item</button>
+                                <span fxFlex></span>
+                                <span class="total-text">Total</span>
+                                <span>{{invoices.selectedInvoice.totalSum | epiCurrency : invoices.selectedInvoice.invoice['currency'] : true}}</span>
+                            </div>
+                            <div class="payment-mode" *ngIf="!clientPermission">
+                                
+                                <p *ngIf = "blockContent">
+                                    <label>Terms of Payment:</label>
+                                    <mat-form-field class="custom-input" floatLabel="never">
+                                        <mat-select class="payment-select" [disabled]="disablePayment || InvoiceDetails.order_status == 'In-transit' ||
+                                        InvoiceDetails.order_status == 'Delivered' || InvoiceDetails.order_status == 'Cancelled' "   placeholder="Payment Type"  [(value)]="invoices.selectedInvoice.invoice['payment_type']" >
+                                            <mat-option  (click)="changePaymentType(pay.name)" *ngFor="let pay of paymentType" [value]="pay.name">
+                                            {{ pay.name }}
+                                            </mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                    
+                                </p>
+                                <div class="banking-detail">
+                                    <img [src]='images.download_order' title="Download">
+                                    <a href="{{bankDetailUrl}}">Bank details</a>
+                                    
+                                </div>
+                                <div *ngIf="activePayment">
+                                    <span fxFlex></span>
+                                    <section class="section-right">
+                                        <button type="button" (click)="cancelpay()" mat-button>Cancel</button>
+                                        <button type="submit" (click)="savePaymentType()" mat-raised-button>Save</button>
+                                    </section>
+                                <div class="cb"></div>
+                                </div>
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div  class="container-ui new-center-empty-ui" *ngIf="(selectedInvoiceCount == 0)">
+
+                           
+                <mat-card class="no-results"  >
+                    <div class="empty-img-holder"><img [src]='images.batchIcon_o'></div>
+                    <p class="no-result-text">No Data Found</p>
+                </mat-card>
+            </div>
+        </perfect-scrollbar>
+        
+    </div>
+    </div>
+    </mat-step>
+
+</mat-horizontal-stepper>
+
+    <mat-spinner class="medium-spinner" *ngIf="fetchingData"></mat-spinner>
+    </section>
+
+<!-- <span class="order-details" (click)="orderDetail()">Order no : {{invoices.selectedInvoice.invoice['order_no']}}</span> -->
+
+

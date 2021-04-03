@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 48.2 (47327) - http://www.bohemiancoding.com/sketch -->
+    <title>chat-comment-oval-speech-bubble-with-text-lines</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Order-Detail-Nav" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" transform="translate(-1019.000000, -11.000000)">
+        <g id="chat-comment-oval-speech-bubble-with-text-lines" transform="translate(1020.000000, 12.000000)" fill="#8A8A8A" fill-rule="nonzero" stroke="#8A8A8A" stroke-width="0.2">
+            <path d="M11,0 C4.92526797,0 0,4.30923203 0,9.625 C0,12.663085 1.61218301,15.367683 4.125,17.131817 L4.125,22 L8.94368301,19.076049 C9.61058497,19.186085 10.296683,19.25 11,19.25 C17.075451,19.25 22,14.940768 22,9.625 C22,4.30923203 17.075451,0 11,0 Z M11,17.875 C10.197,17.875 9.4215,17.7815 8.67623203,17.622683 L5.43946405,19.568281 L5.48278105,16.379683 C3.00163399,14.887134 1.375,12.420402 1.375,9.625 C1.375,5.06895098 5.68423203,1.375 11,1.375 C16.315768,1.375 20.625,5.06895098 20.625,9.625 C20.625,14.181049 16.315768,17.875 11,17.875 Z" id="Shape"></path>
+        </g>
+    </g>
+</svg>

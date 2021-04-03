@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="14px" height="9px" viewBox="0 0 14 9" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 48.2 (47327) - http://www.bohemiancoding.com/sketch -->
+    <title>ic/expand_more/grey600</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Icons-Download-2" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" transform="translate(-90.000000, -7.000000)" opacity="0.508605072">
+        <g id="Group-2">
+            <g id="ic/expand_more/grey600" transform="translate(97.000000, 12.000000) scale(1, -1) translate(-97.000000, -12.000000) translate(85.000000, 0.000000)">
+                <g id="ic_expand_more_24px">
+                    <polygon id="Shape" fill="#757575" fill-rule="nonzero" points="17.355 8 12 13.3433333 6.645 8 5 9.645 12 16.645 19 9.645"></polygon>
+                    <polygon id="Shape" points="0 0 24 0 24 24 0 24"></polygon>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,58 @@
+
+<div class="admin" fxLayout="row">
+  <div class="center-section-scroll vh-100 d-flex secundory-menu">
+    <div class="flex-fixed-header menu-title ">
+      <h1>Reports</h1>
+    </div>
+     <perfect-scrollbar class="p-l-8 p-r-8">
+      <div class="fxFlex side-nav-section">
+   <mat-list class="media-list ">
+        <ng-container *ngFor="let list of sideListReports">
+      <mat-list-item class="report-item"   [routerLink]="[list.route]" *ngIf="list.selected"
+      [ngClass]="{'active-report': list.id == ReportsService.reportId}"  (click)="mainReportView(list)">
+  <div class="media d-flex align-items-center">
+    <div class="media-body" style="padding-left: 2px;">
+      <h1 class="font-weight-bold d-block text-nowrap single">{{list.name}}</h1>
+    </div>
+  </div>
+     
+       
+      </mat-list-item>
+     
+    </ng-container>
+    </mat-list>
+      </div>
+
+       <mat-divider class="divider"></mat-divider>
+    <p style="padding-left: 8px; font-size: 16px;" *ngIf="viewsList?.length">Custom Reports</p>
+    <mat-list class="inner-detail-list custom-reports-list">
+      <ng-container *ngFor="let list of viewsList">
+    <mat-list-item   style="height: 66px;" class="report-item" [ngClass]="{'active-report': list.view_id == ReportsService.viewId}"  (click)="reportView(list)"
+     >
+      <!-- <mat-icon mat-list-icon>
+      <img class="admin-icons" [src]='list.icon'>
+    </mat-icon> -->
+    <div class="media d-flex align-items-center"  >
+      <div class="media-body" style="padding-left: 2px;">
+        <h1 class="font-weight-bold d-block text-nowrap " >{{list.view_name}}</h1>
+        <small style="color: #777;">in {{labelObj[list.module]}}</small>
+        <span mat-line class="user-act" style="color: #777;" (click)="reportView(list)">-by {{list.created_user_name}}</span>
+      </div>
+     
+    </div>
+      <!-- <h4 mat-line (click)="reportView(list)">{{list.view_name}}</h4>   
+      <span  mat-line class="module-act" (click)="reportView(list)" >in {{labelObj[list.module]}} </span>
+      <span   mat-line class="user-act" (click)="reportView(list)"> -by {{list.created_user_name}}</span> -->
+      <!-- <h4>{{list.view_name}} </h4> -->
+     
+    </mat-list-item>
+   
+    
+    
+  </ng-container>
+  </mat-list>
+     </perfect-scrollbar>
+
+  </div>
+  <router-outlet></router-outlet>
+</div>

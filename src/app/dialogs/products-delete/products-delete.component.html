@@ -1,0 +1,15 @@
+<mat-toolbar>
+  <h2 mat-dialog-title>Delete Products</h2>
+  <span fxFlex></span>
+  <!--<button mat-icon-button mat-dialog-close>
+    <mat-icon>close</mat-icon>
+  </button>-->
+</mat-toolbar>
+<mat-dialog-content class="delete-body">
+  <div class="delete-address">{{language.defaults.deleteConfirmation}} {{data.name}}?</div>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <span fxFlex></span>
+  <button mat-button mat-dialog-close>{{language.defaults.cancel}}</button>
+  <button mat-raised-button  (click)="deleteProducts()">Delete Products</button>
+</mat-dialog-actions>

@@ -1,0 +1,82 @@
+<mat-toolbar color="primary">
+  <h2 mat-dialog-title>Add Drums</h2>
+  <span fxFlex></span>
+</mat-toolbar>
+<mat-dialog-content>
+  <form [formGroup]="drumCounts" class="addLineForm">
+    <div
+      formArrayName="drumsArray"
+      *ngFor="let array of drumsArray; let i = index">
+      <div [formGroupName]="i" class="inner-content">
+        <mat-form-field class="custom-input mandatory" floatLabel="never">
+          <label class="custom-label">Drum Name</label>
+          <input matInput placeholder="Drum Name" formControlName="drumName" />
+        </mat-form-field>
+        <mat-form-field class="custom-input mandatory" floatLabel="never">
+          <label class="custom-label">Containers List</label>
+          <mat-select
+            placeholder="Containers"
+            formControlName="container_list"
+            multiple
+            (selectionChange)="selectedValue($event.value)"
+          >
+            <ng-container formArrayName="drumList">
+              <mat-option
+                [formGroupName]="j"
+                *ngFor="let drumLists of drumList; let j = index"
+                [value]="drumLists"
+                >{{ drumLists.value }}
+                <span> *</span>
+                <input
+                  matInput
+                  class="input-class"
+                  placeholder="Qunatity"
+                  formControlName="quantity"
+                />
+              </mat-option>
+            </ng-container>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field class="custom-input mandatory" floatLabel="never">
+          <label class="custom-label">Drum count</label>
+          <input
+            matInput
+            placeholder="Drum Count"
+            formControlName="drumCount"
+          />
+        </mat-form-field>
+        <mat-form-field class="custom-input mandatory" floatLabel="never">
+          <label class="custom-label">Select batch</label>
+        <mat-select placeholder="Select batch" formControlName="batch">
+          <mat-option *ngFor="let batch of bathcList" [value]="batch">
+              {{ batch }}
+          </mat-option>
+      </mat-select>
+    </mat-form-field>
+      
+        <!-- [disabled]="drumList.value!=''" -->
+        <div class="addon-btns">
+          <button mat-icon-button (click)="addDrums()">
+            <mat-icon>add</mat-icon>
+          </button>
+          <button
+            mat-icon-button
+            (click)="removeDrums(i)"
+            [disabled]="drumCounts.controls.drumsArray.controls.length == 1"
+          >
+            <mat-icon>remove</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+  </form>
+  <mat-error *ngIf = "drumData">Please Select Valid Quantity</mat-error>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <span fxFlex></span>
+  <button mat-button mat-dialog-close>Cancel</button>
+  <button mat-raised-button color="primary" (click)="saveDrums(drumCounts)">
+    Add Drum
+  </button>
+</mat-dialog-actions>

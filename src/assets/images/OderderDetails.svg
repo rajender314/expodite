@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="25px" viewBox="0 0 20 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 48.2 (47327) - http://www.bohemiancoding.com/sketch -->
+    <title>Oderder Details</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Order-left-nav" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" transform="translate(-22.000000, -119.000000)">
+        <g id="Order-icon-small" transform="translate(22.000000, 119.600000)">
+            <path d="M2.66666667,0 L17.3333333,0 C18.8060927,-2.705415e-16 20,1.19390733 20,2.66666667 L20,21.3333333 C20,22.8060927 18.8060927,24 17.3333333,24 L2.66666667,24 C1.19390733,24 1.81916976e-12,22.8060927 1.8189894e-12,21.3333333 L1.8189894e-12,2.66666667 C1.81880904e-12,1.19390733 1.19390733,2.705415e-16 2.66666667,0 Z" id="Rectangle" fill="#F07E0A" fill-rule="nonzero"></path>
+            <path d="M3.33333333,10.6666667 L16.6666667,10.6666667 L16.6666667,12.3636364 L3.33333333,12.3636364 L3.33333333,10.6666667 Z M3.33333333,13.6363636 L9.37878788,13.6363636 L9.37878788,15.3333333 L3.33333333,15.3333333 L3.33333333,13.6363636 Z M10.6666667,8.66666667 L3.33333333,8.66666667 L3.33333333,4 L10.6666667,4 L10.6666667,8.66666667 Z" id="Combined-Shape" fill="#FFFFFF" fill-rule="evenodd"></path>
+        </g>
+    </g>
+</svg>

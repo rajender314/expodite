@@ -1,0 +1,40 @@
+
+<div fxFlex class="permission_wrapper" >
+
+	
+	<div fxLayout="row" [class.user-header]="permission.level==1">
+		<div fxFlex="70">			
+			<h3 style="padding-left: 8px; font-weight: 400; font-size: 16px;"  *ngIf="permission.level == 1">{{permission.name}}</h3>
+			<div class="permission-name" *ngIf="permission.level != 1" [ngClass]="{'child-level':permission.level == 3 }">{{permission.name}}</div>
+		</div>
+		<div flex="20" fxLayoutAlign="top right">
+		<!--<h4 *ngIf="permission.type == 'label'" class="">Permissions</h4>-->
+			<div *ngIf="permission.type != 'label'" [ngClass]="{'child-check-level':permission.level == 3}">
+				<mat-form-field class="custom-input permission" *ngIf="permission.type === 'select'" floatLabel="never">
+					<mat-select placeholder="Select permission"  [(ngModel)]="permission.selectedValue" (change)="check(permission, permission.selectedValue)">
+						<mat-option *ngFor="let option of permission.options" [value]="option.id">
+						{{ option.name }}
+						</mat-option>
+					</mat-select>
+				</mat-form-field>
+				<mat-radio-group class="example-radio-group" *ngIf="permission.type === 'radio'" [(ngModel)]="permission.selectedValue">
+					<mat-radio-button (click)="check(permission, permission.selectedValue)" class="permission" *ngFor="let option of permission.options"
+					[value]="option.id">
+					{{option.name}}
+					</mat-radio-button>
+				</mat-radio-group>
+				<div *ngIf="permission.type === 'check'">
+					<div *ngFor="let option of permission.options">
+						<mat-checkbox [checked]="permission.checked"  [disabled]="adminService.isRoleEditable" (change)="check(permission, option.id)" class="example-margin">{{option.name}}</mat-checkbox>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div *ngIf="permission.children" class="permission-block">
+	<div [hidden]="(permission.type == 'check' && !permission.checked) || ((permission.type == 'select' || permission.type == 'radio') && permission.selectedValue != 1)">
+	<app-roles-permissions *ngFor="let child of permission.children; let i = index" [permission]="child" [class.child-permission-border]="permission.level > 2"
+	class="child-permission"></app-roles-permissions>
+	</div>
+	</div>
+</div>

@@ -1,0 +1,13 @@
+.no-form-field {
+    width: 300px;
+    display: flex;
+    align-items: flex-start;
+    position: relative;
+    #date_range {
+        display: flex;
+    }
+    .mat-select-arrow-wrapper {
+        display: flex;
+        align-items: center;
+    }
+}

@@ -1,0 +1,54 @@
+.full-width{
+    width: 100%;
+}
+.email-document-selection{
+    display: flex;
+    flex-wrap: wrap;
+}
+.email-document-option{
+    width: 33.33%;
+    font-size: 14px;
+}
+.mat-error {
+  text-transform: capitalize;
+  font-size: 13px;
+  color: #f44336;
+}
+.mat-list-base .mat-list-item .mat-list-item-content,
+.mat-list-base .mat-list-option .mat-list-item-content{
+  padding: 0 16px 0 0;
+}
+mat-label.label-attention{
+  margin-bottom: 8px;
+  display: block;
+  font-size: 14px;
+  color: #565656;
+}
+mat-label.label-attention.mandatory {
+  position: relative;
+  &:after {
+    content: '*';
+    position: absolute;
+    top: 1px;
+    margin-left: 3px;
+    color: #ff0000;
+  }
+}
+.multi-select{
+    padding-bottom: 16px;
+}
+.custom-label{
+  font-size: 14px;
+  color: #565656;
+  &.mandatory {
+    position: relative;
+
+    &:after {
+      content: '*';
+      position: absolute;
+      top: 1px;
+      margin-left: 3px;
+      color: #ff0000;
+    }
+  }
+}

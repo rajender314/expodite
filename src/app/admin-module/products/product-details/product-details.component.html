@@ -1,0 +1,122 @@
+<div  class="center-section-scroll vh-100 d-flex body-white" >
+	<div class="page-header-ui " *ngIf="!noProducts">
+		<div class="flex-fixed-header page-title container-ui ">
+				<h2 style="font-weight: 400;" *ngIf="selectedProducts" title="{{selectedProducts.name?selectedProducts.name:'Add Product'}}" 
+				[innerHtml]="selectedProducts.name?selectedProducts.name:'Add Product'"></h2>
+		</div>
+	</div>
+	<!-- <mat-toolbar class="mat-small-toolbar padLR_24">
+		<span class="admin-toolbar" *ngIf="selectedProducts" title="{{selectedProducts.name?selectedProducts.name:'Add Product'}}" [innerHtml]="selectedProducts.name?selectedProducts.name:'Add Product'"></span>
+	</mat-toolbar> -->
+
+	<perfect-scrollbar class="padding-16">
+		<div class="min-container"> 
+	<form class="roles-form" (ngSubmit)="createProductType(detailsForm)">
+		<mat-spinner class="medium-spinner" *ngIf="fetchingData"></mat-spinner>
+		<div class="box" *ngIf="!noProducts && !fetchingData" [class.user-footer]="detailsForm.dirty">
+			<div class="ex-row" [formGroup]="detailsForm">
+			
+					<mat-form-field  class="custom-input mandatory grid-six" floatLabel="never">
+						<label class="custom-label mandatory">Product Name</label>
+						<input matInput   #myInput placeholder="Product Name" formControlName="name" />
+						<mat-error *ngIf="submitProduct || !detailsForm.controls.name.pristine && detailsForm.controls.name.hasError('required')">Please Enter Product Name</mat-error>
+					</mat-form-field>
+				
+					<mat-form-field  class="custom-input mandatory grid-six" floatLabel="never">
+						<label class="custom-label mandatory">Category</label>
+						<mat-icon class="i-icon"  title="Product Category">info</mat-icon>
+						<mat-select placeholder="Category" formControlName="category_id">
+
+							<mat-option *ngFor="let cat of categoryDt" [value]="cat.id">{{cat.name}}</mat-option>
+						</mat-select>
+						<mat-error *ngIf="submitProduct || !detailsForm.controls.category_id.pristine && detailsForm.controls.category_id.hasError('required')">Please Select Category</mat-error>
+					</mat-form-field>
+			
+					<mat-form-field   class="custom-input mandatory grid-six" floatLabel="never">
+						<label class="custom-label mandatory">Default Price (USD)</label>
+						<mat-icon class="i-icon-d"   title="MRP">info</mat-icon>
+						<input matInput type="text" maxlength="5"  placeholder="Default Price (USD)" (keyup)="updateDefaultPrice($event)" [(ngModel)] = "defaultPrice" formControlName="price" id="price"/>
+						<mat-error *ngIf="detailsForm.controls.price.hasError('required')">{{language.validations.price}}</mat-error>
+						<mat-error *ngIf="!detailsForm.controls.price.hasError('required') && detailsForm.controls.price.hasError('min')">Please Enter value greater than zero</mat-error>
+						<mat-error *ngIf="!detailsForm.controls.price.hasError('min') &&  detailsForm.controls.price.hasError('pattern')">Please Enter Valid Default Price</mat-error>
+
+					</mat-form-field>
+					<mat-form-field   class="custom-input mandatory grid-six" floatLabel="never">
+						<label class="custom-label mandatory" style="text-transform: unset">Unit of Measurement</label>
+						<mat-select placeholder="Unit of Measurement" formControlName="uom_id"  (selectionChange)="selectType($event)">
+						  <mat-option [value]="stat.id" *ngFor="let stat of uomList" [innerHtml]="stat.name"></mat-option>
+						</mat-select>
+						<mat-icon class="i-icon-u"   title="Product Related Unit">info</mat-icon>
+						<mat-error *ngIf="submitProduct  && detailsForm.controls.uom_id.hasError('required')">Please Select Unit of Measurement</mat-error>
+					  </mat-form-field>
+				<!-- oninput="validity.valid||(value='')" -->
+
+				<mat-form-field  class="custom-input mandatory grid-six" floatLabel="never" *ngIf="showUnitWeight">
+					<label class="custom-label mandatory">Unit Weight (in Kgs)</label>
+					<input matInput type="text"  maxlength="5" placeholder="Unit Weight"  formControlName="unit_weight" />
+					<mat-error *ngIf=" detailsForm.controls.unit_weight.hasError('required')">Please Enter Unit Weight</mat-error>
+					<mat-error *ngIf="!detailsForm.controls.unit_weight.hasError('required') && 
+					detailsForm.controls.unit_weight.hasError('min')">Please Enter value greater than zero</mat-error>
+					<mat-error *ngIf="!detailsForm.controls.unit_weight.hasError('min') &&  detailsForm.controls.unit_weight.hasError('pattern')">Please Enter Valid Unit Weight</mat-error>
+
+					<!-- <mat-error *ngIf="submitProduct && detailsForm.controls.price.hasError('min')">Please Enter value greater than or equal to 1</mat-error> -->
+
+				</mat-form-field>
+			
+					<mat-form-field   class="custom-input mandatory grid-six" floatLabel="never">
+						<label class="custom-label mandatory">{{language.defaults.status}}</label>
+						<mat-select placeholder="Status" formControlName="status">
+							<mat-option [value]="stat.param" *ngFor="let stat of status" [innerHtml]="stat.value"></mat-option>
+						</mat-select>
+						<mat-error *ngIf="submitProduct || (!detailsForm.controls.status.pristine && detailsForm.controls.status.hasError('required'))">{{language.validations.status}}</mat-error>
+					</mat-form-field>
+				  
+				  <mat-form-field   class="custom-input grid-full" floatLabel="never">
+					<label class="custom-label">Description</label>
+					<textarea matInput placeholder="Description" maxlength="255" formControlName="description" id="description" > </textarea>
+				</mat-form-field>
+			</div>
+			<div class="admin-products form-fields">
+				<mat-card class="client-documents-card product-card" fxFlex="60">
+					<mat-list class="product">
+						<mat-list-item class="products-list product-divider">
+							<h4 mat-header class="product-header">Price Range</h4>
+							<h4 mat-header class="price-header">Default Price (USD)</h4>
+						</mat-list-item>
+						<mat-list-item class="products-list" *ngFor="let range of selectedProducts?.priceRange; let i = index">
+							<span mat-header class="prod-name">{{range.range_name}} {{selectUnits}}</span>
+							<mat-form-field class="custom-input prod-price" floatLabel="never">
+								<!-- <input matInput type="text" [name]="range.range_name" min="1" max="99999999999" (keyup)="inputEnter($event)" class="price-value" [(ngModel)]="range.range_price"> -->
+								<!-- <input matInput type="text" [name]="range.range_name" [ngModel]="range.range_price | number:'.2-2'" (keyup)="inputEnter($event)" [ngModelOptions]="{updateOn:'blur'}" 
+								(ngModelChange)="range.range_price=$event"/> -->
+								<input matInput type="number" [data]="'USD'" [name]="range.range_name" style="margin-bottom: 13px;" type="text" (keyup)="inputEnter($event)" [ngModel]="range.range_price" [ngModelOptions]="{updateOn:'blur'}" 
+													(ngModelChange)="range.range_price=$event"/>
+							</mat-form-field>
+						</mat-list-item>
+					</mat-list>
+				</mat-card>
+			</div>
+		</div>
+		<div class="footer" fxLayout="row" fxLayoutAlign="start center" *ngIf="detailsForm.dirty">
+				<div class="min-container d-flex justify-content-end">
+					<button type="button" mat-button (click)="cancel(detailsForm)">{{language.defaults.cancel}}</button>
+					<button type="submit" mat-raised-button>{{addProducts}}</button>
+				</div>
+				
+			</div>
+		
+	</form>
+	</div>
+	<div *ngIf="noProducts" class="no-results full">
+		
+		<div class="empty-img-holder">
+			<img [src]="images.no_products">
+
+		</div>
+			<p class="no-result-text">{{language.defaults.noProductTypeFound}}</p>
+		
+	</div>
+	</perfect-scrollbar>
+
+	
+</div>

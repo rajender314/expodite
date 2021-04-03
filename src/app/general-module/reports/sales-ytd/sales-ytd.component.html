@@ -1,0 +1,121 @@
+<section class="center-section-scroll vh-100 d-flex body-color">
+  <div class="page-header-ui">
+      <div class="flex-fixed-header page-title">
+          <div class="d-flex">
+            <div class="inv-back" [routerLink]="['/reports']">
+              <mat-icon class="back-to-orders">arrow_back</mat-icon>
+            </div>
+              <h1>Payments Received</h1>
+          </div>
+          <div class="d-flex align-items-center"> 
+              <p class="filters-indication filters-indication d-flex align-items-center filter-btn-ui" style="opacity: .8;"  *ngIf="filtersApplied && showSaveView"><span class="material-icons">
+                        filter_alt
+                    </span> Filters Applied</p>
+              <div class="view-section"  *ngIf="permissionForView && viewsList.length && showSaveView">
+                <mat-form-field appearance="fill">
+                    <label>Saved Views</label>
+                    <mat-select [(ngModel)]="savedViewValue" placeholder="Saved Views" (ngModelChange)="getSelectedView(savedViewValue)">
+                        <mat-option *ngFor="let view of viewsList; let i = index" [value]="view.view_id" class="with-delete-icon">{{view.view_name}}
+                            <span  class="delete-view"  title="Delete View" *ngIf="view.view_id != 1 && view.is_delete_icon" (click)=" deleteView(view.view_id, i)">
+                                <img [src]="deleteIcon" alt="delete icon" 
+          />
+                                </span>
+                        </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+            </div>
+            <button mat-raised-button class="mat-button mat-primary-btn"  *ngIf="showSaveView"  [disabled]="!isChanged" (click)="saveView()">Save View</button>
+              <button mat-raised-button class="mat-button mat-primary-btn" (click)="getSalesYearToDateExportReport()">Export</button>
+            </div>   
+         
+      </div>
+  </div>
+
+  
+
+
+<div class="report-filters">
+  <form [formGroup]="filtersForm">
+  <mat-form-field appearance="fill" class="date-field">
+    <label>Start Date</label>
+    <input matInput placeholder="Select Date" [matDatepicker]="picker1" formControlName="start_date" (focus)="openCalendar(picker1)" (click)="openCalendar(picker1)">
+    <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+    <mat-datepicker #picker1></mat-datepicker>
+
+  </mat-form-field>
+  <mat-form-field appearance="fill" class="date-field">
+    <label>End Date</label>
+    <input matInput placeholder="Select Date" [matDatepicker]="picker2" formControlName="end_date" (focus)="openCalendar(picker2)"
+      (click)="openCalendar(picker2)">
+    <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+    <mat-datepicker #picker2></mat-datepicker>
+  </mat-form-field>
+  <!-- <mat-form-field appearance="fill"  class="mult-selectfilter">
+    <label>Country</label>
+    <mat-select formControlName="country" multiple placeholder="All">
+      <mat-option *ngFor="let country of countries" [value]="country.id">{{country.name}}</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field appearance="fill"  class="mult-selectfilter">
+    <label>Currency</label>
+    <mat-select formControlName="currency" multiple placeholder="All">
+      <mat-option *ngFor="let currency of currencies" [value]="currency.id">{{currency.type}}</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field appearance="fill"  class="mult-selectfilter">
+    <label>Product</label>
+    <mat-select formControlName="productType" multiple placeholder="All">
+      <mat-option *ngFor="let productType of productTypes" [value]="productType.id">{{productType.name}}</mat-option>
+    </mat-select>
+  </mat-form-field> -->
+  <div class="filter-actions">
+    <button class="mat-primary" mat-button   (click)="clearFilters()">Clear</button>
+    <button mat-raised-button class="mat-button mat-primary-btn" [disabled]="filtersForm.invalid" (click)="filterOrdersReportData()">Filter</button>
+  </div>
+  </form>
+</div>
+  <div class="reports-grid sales-ytd">  
+    <mat-spinner class="medium-spinner" *ngIf="fetchingData"></mat-spinner>
+    
+    <div class=" container-ui new-center-empty-ui" style="height: 100%;" *ngIf="noData && !reportsSpinner">
+      <mat-card class="no-results">                            
+          <div class="empty-img-holder">
+              <!-- <img [src]='images.invoicesIcon_o'> -->
+              <span class="material-icons">
+                  payments
+                  </span>
+          </div>
+          <p class="no-result-text">No Payments Recieved Found</p>
+      </mat-card>
+  </div>
+    <ng-container *ngIf="!noData && !reportsSpinner">
+      <ag-grid-angular   
+        class="ag-theme-alpine ag-theme-balham reports_grid"
+        [autoGroupColumnDef]="autoGroupColumnDef"
+        [sideBar]="sideBar"
+        [defaultColDef]="defaultColDef"
+        [rowData]="rowData"
+        [columnDefs]="columnDefs"
+        [animateRows]="true"        
+        rowHeight="40"
+        headerHeight="30"
+        [enableRangeSelection]="true"
+        [enableFilter]="true"
+        [enableSorting]="true"
+        [enableColResize]="true"
+        [pagination]="true"
+        [paginationPageSize]="paginationPageSize"
+        (gridReady)="onGridReady($event)"
+        (columnMoved)="onGridChanged($event)"
+        (cellDoubleClicked)="onGridChanged($event)"
+        (sortChanged)="onGridChanged($event)"
+        (filterChanged)="onGridChanged($event)"
+        (columnRowGroupChanged)="onGridChanged($event)"
+        (columnResized)="onGridChanged($event)"
+        (columnPinned)="onGridChanged($event)"
+        (columnVisible)="onGridChanged($event)"
+        >
+      </ag-grid-angular>
+    </ng-container>
+  </div>
+</section>

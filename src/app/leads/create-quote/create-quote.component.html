@@ -1,0 +1,279 @@
+<div class="quote-container" *ngIf="show">
+    <mat-toolbar class="details-toolbar">
+       <div class="head-icon">
+          <!-- <mat-icon mat-list-icon>
+             <img [src]='images.lead_details' title="Details">
+             </mat-icon> -->
+             <mat-icon  (click)="backQuote()"class="back-to-orders pointer" >arrow_back</mat-icon>
+             <mat-icon class="icon-left"mat-list-icon>
+               <img [src]='images.lead_quotes' title="Quotes">
+           </mat-icon>
+          <span>Create Quote</span>
+       </div>
+       <span fxFlex></span>
+    </mat-toolbar>
+    <form [formGroup]="formGroup">
+<div class="px-10">
+       <div class="row-div">
+          <label class="row-label">Lead ID</label>
+          <p class="row-value"> {{overViewData['lead_id'] ? overViewData['lead_id'] : '--'}}</p>
+       </div>
+      
+          <div class="form-section">
+             <div class="row-div">
+                <mat-form-field class="custom-input block-ele mandatory w-100" floatLabel="never">
+                   <label class="custom-label mandatory">Attention To</label>
+                  
+                   <mat-select placeholder="Select Attention To"   formControlName="attention_name"  (selectionChange)="contactSelected($event)">
+                     <mat-option *ngFor="let user of assigneeList  " [value]="user"  >{{ user.contact_name}}</mat-option>
+                 </mat-select>
+                 
+
+                   <mat-error *ngIf=" (formGroup.get('attention_name').hasError('required')
+                      || formGroup.get('attention_name').invalid)">
+                      Please select
+                      <span class="capitalize">Attention to</span>
+                   </mat-error>
+                </mat-form-field>
+                <!-- <mat-form-field class="custom-input block-ele mandatory w-100" floatLabel="never">
+                  <label class="custom-label mandatory">Attention TO</label>
+
+                  <input matInput placeholder="Enter Attention TO" formControlName="attention_name"  [matAutocomplete]="auto"
+                  (input)="getAssigneeList($event)">
+                 <mat-autocomplete #auto="matAutocomplete" (optionSelected)="contactSelected($event)" class="serch-with-dropdown-ui distribution-plan-filter-list">
+                     <mat-option *ngFor="let user of assigneeList  "*ngFor="let user of assigneeList  " [value]="user">
+                         <span>{{ user.contact_name }}</span>
+                     </mat-option>
+                 </mat-autocomplete>
+
+                 <mat-error *ngIf="submitForm && (formGroup.get('attention_name').hasError('required')
+                 || formGroup.get('attention_name').invalid)">
+                 Please Enter
+                 <span class="capitalize">Attention TO</span>
+              </mat-error>
+              </mat-form-field> 
+              <mat-form-field class="custom-input block-ele mandatory w-100" floatLabel="never">
+                  <label class="custom-label mandatory">Attention TO</label>
+
+                  <input matInput placeholder="Enter Attention TO" formControlName="attention_name"  [matAutocomplete]="auto"
+                  (input)="getAssigneeList($event)">
+                 <mat-autocomplete #auto="matAutocomplete" (optionSelected)="contactSelected($event)" class="serch-with-dropdown-ui distribution-plan-filter-list">
+                     <mat-option *ngFor="let user of assigneeList  "*ngFor="let user of assigneeList  " [value]="user">
+                         <span>{{ user.contact_name }}</span>
+                     </mat-option>
+                 </mat-autocomplete>
+
+                 <mat-error *ngIf="submitForm && (formGroup.get('attention_name').hasError('required')
+                 || formGroup.get('attention_name').invalid)">
+                 Please Enter
+                 <span class="capitalize">Attention TO</span>
+              </mat-error>
+              </mat-form-field> -->
+                
+             </div>
+             <div class="row-div">
+                <mat-form-field  class="custom-input block-ele mandatory w-100" floatLabel="never">
+                   <label class="custom-label mandatory">Contact Number</label>
+                   <input type="tel" [disabled]="true" readonly matInput placeholder="Enter Contact Number" formControlName="contact_number" appInputNumber maxlength="10">
+                   <mat-error *ngIf="submitForm && (formGroup.get('contact_number').hasError('required')
+                      || formGroup.get('contact_number').invalid)">
+                      Please Enter
+                      <span class="capitalize">Contact Number</span>
+                   </mat-error>
+                </mat-form-field>
+             </div>
+             <div class="row-div">
+                <mat-form-field class="custom-input block-ele mandatory w-100" floatLabel="never">
+                   <label class="custom-label mandatory">Email</label>
+                   <input matInput placeholder="Enter Email" readonly [disabled]="true"formControlName="email"
+                      >
+                   <mat-error *ngIf=" submitForm && (formGroup.get('email').hasError('required')
+                      || formGroup.get('email').invalid)">
+                      Please Enter
+                      <span class="capitalize">Email</span>
+                   </mat-error>
+                </mat-form-field>
+             </div>
+             <div class="row-div">
+                <mat-form-field class="custom-input block-ele mandatory w-100" floatLabel="never">
+                   <label class="custom-label mandatory">Quote Validity</label>
+                   <div class="date-picker-field"
+                      >
+                      <input matInput class="datepicker"
+                         placeholder="Select Date"
+                         formControlName="quote_validity"
+                          [min]="minDate"
+                         (click)="openCalendar(picker)" (focus)="openCalendar(picker)"
+                         [matDatepicker]="picker" >
+                      <mat-datepicker-toggle matSuffix [for]="picker">
+                      </mat-datepicker-toggle>
+                      <mat-datepicker #picker></mat-datepicker>
+                   </div>
+                   <mat-error *ngIf="  (formGroup.get('quote_validity').hasError('required')
+                   || formGroup.get('quote_validity').invalid)">
+                   Please 
+                   <span class="capitalize">Select Date</span>
+                </mat-error>
+                </mat-form-field>
+             </div>
+             <div class="row-div">
+                <mat-form-field class="custom-input block-ele  w-100" floatLabel="never">
+                   <label class="custom-label ">Special  Instructions</label>
+                   <input matInput placeholder=" Enter Special  Instructions" formControlName="special_instructions" >
+                   <!-- <mat-error *ngIf="formGroup.get('title').touched
+                      && (formGroup.get('title').hasError('required')
+                      || formGroup.get('title').invalid)">
+                      Please enter
+                      <span class="capitalize">Title</span>
+                      </mat-error> -->
+                </mat-form-field>
+             </div>
+          </div>
+       
+    </div>
+    <div class="px-10">
+        <div class="prod-toolbar">
+            <div class="icon">
+                
+                <span class="mandatory Sel-prod">Select Products </span>
+            </div>
+            <span fxFlex></span>
+            <p class="edit-view">
+                <button mat-raised-button  class="bgd-blu"
+          (click)="addProduct(formGroup)">Add Products</button>
+            </p>
+        </div>
+        <div class="prod-list">
+         <div class="prod-list-sub">
+            <div class="flx-4">Product</div>
+            <div class="flx-3  Sel-prod">Quantity</div>
+            <div class="flx-3  Sel-prod">Pricing</div>
+            <div class="flx-3">Amount</div>
+            <div class="flx-3"> </div>
+
+         </div>
+         
+
+        </div>
+        <div *ngIf="!slectedProducts?.length" class="prod-data-sub no-prod">No Products Selected</div>
+        <div class="prod-data-sub"  *ngFor="let each of slectedProducts; let i = index;">
+         <div class="flx-4 row-value">{{each.name}}</div>
+         <div class="flx-3 inp-box">
+            <mat-form-field class="custom-input block-ele mandatory w-100 mrgin-field"   floatLabel="never">
+               <input type="number"   
+                [appAllowNumbers]="true" class="wdth-inp" 
+                 [(ngModel)]="each.quantity"    [ngModelOptions]="{standalone: true}"
+                matInput #fieldName+[each.quantity]="ngModel"  maxlength="10"          ngControl="[fieldName+each.quantity]"
+                (change)="quantyChange($event,i,slectedProducts,each)"required >
+         <span class="kg-cls">Kg/s</span>
+         <p  class="error-msg" *ngIf="submitForm && !each.quantity">Please Enter Quantity</p>
+         <!-- <div *ngIf="(fieldName+[each.quantity]).errors && ((fieldName+[each.quantity]).dirty || (fieldName+[each.quantity]).touched)"> -->
+            <!-- <span *ngIf="(fieldName+[each.quantity]).errors.required">Enter Name</span> -->
+        <!-- </div> -->
+         <!-- <mat-error *ngIf=" submitForm && (formGroup.get('input').hasError('required')
+         || formGroup.get('input').invalid)">
+          
+         <span class="capitalize">Please Enter Value</span>
+      </mat-error>   -->
+      <!-- <span *ngIf="formGroup.quantity.hasError('required')">Please Enter</span> -->
+     </mat-form-field> 
+                            
+         </div>
+          <!-- <div class="flx-3 row-value">USD {{each.price}} /KG </div> -->
+          <div class="flx-3 inp-box">
+            <mat-form-field class="custom-input block-ele mandatory w-100 mrgin-field"   floatLabel="never">
+               <span class="usd-cls">USD</span>
+               <input type="number" name="price"  maxlength="10" 
+               [(ngModel)]="each.price" [ngModelOptions]="{standalone: true}"
+               [appAllowNumbers]="true" class="wdth-inp"  matInput  (change)="priceChange($event,i,slectedProducts,each)">
+              <span class="kg-cls"> /KG </span>  
+              <p  class="error-msg" *ngIf="submitForm && !each.price">Please Enter Price</p>
+
+         
+     </mat-form-field> 
+          </div>
+          
+      
+         <div class="flx-3 row-value">$ {{each.amount| number}}</div>
+         <div class="flx-3 delete-blu" title="Delete" > <mat-icon (click)="deleteProduct(each,i)">delete</mat-icon> </div>
+         <div></div>
+      </div>
+      
+     </div>
+     <div class="prod-toolbar sel-del">
+      <div class="icon">
+          
+         <span class="mandatory Sel-prod">Select Delivery Address</span>
+      </div>
+      <span fxFlex></span>
+     
+  </div>
+     <div class="delivery ">
+      <div class="px-10 flx-50"  *ngIf="overViewData && overViewData?.billAddress">
+         <div class="row-div add-mar">Billing Address</div>
+         <div  *ngFor="let each of  overViewData?.billAddress; let i = index;">
+          <mat-checkbox (change)="updateChecked(each , $event)" class="label-add"formControlName="required" [disabled]="checkDisbleBill" >{{each.address_1}}</mat-checkbox>
+          <!-- <p class="label-add mrg-30"> {{each.address_1}}</p> -->
+          <p class="label-add mrg-30"> {{each.address_2}}</p>
+          <p  class="label-add mrg-30"> {{each.country_name}}</p>
+          <p  class="label-add mrg-30"> {{each.state_province_name}}</p>
+          <p  class="label-add mrg-30"> {{each.city}}</p>
+          <p class="label-add mrg-30"> {{each.postal_code}}</p>
+   
+   
+   
+         </div>
+        
+      </div>
+      <div class="px-10 flx-50"  *ngIf="overViewData && overViewData?.shipAddress.length">
+         <div class="row-div add-mar">Shipping Address</div>
+         <div  *ngFor="let each of  overViewData?.shipAddress; let i = index;">
+          <mat-checkbox (change)="updateCheckedShip(each , $event)" class="label-add" formControlName="requiredShip"  [disabled]="checkDisbleShip" >{{each.address_1}}</mat-checkbox>
+          <!-- <p  class="label-add mrg-30"> {{each.address_1}}</p> -->
+          <p  class="label-add mrg-30"> {{each.address_2}}</p>     
+          <p  class="label-add mrg-30"> {{each.country_name}}</p>
+          <p  class="label-add mrg-30"> {{each.state_province_name}}</p>
+          <p  class="label-add mrg-30"> {{each.city}}</p>
+          <p  class="label-add mrg-30"> {{each.postal_code}}</p>
+   
+   
+   
+         </div>
+        
+      </div>
+     </div>
+     
+     
+     <!-- <div class="px-10"  *ngIf="overViewData && overViewData?.shipAddress">
+      <div  *ngFor="let each of  overViewData?.shipAddress; let i = index;">
+       <mat-checkbox (change)="updateChecked(each , $event)" [(ngModel)]="checkedStatus[each.id]">{{each.address_1}}</mat-checkbox>
+       <p> {{each.address_1}}</p>
+       <p> {{each.address_2}}</p>
+       <p> {{each.city}}</p>
+       <p> {{each.country_name}}</p>
+       <p> {{each.state_province_name}}</p>
+       <p> {{each.postal_code}}</p>
+
+
+
+      </div>
+     
+   </div> -->
+    </form>
+    
+    
+    <div class="quote-ftr">
+       <span fxFlex class="flx-50"></span>
+       <!-- <div class="tot-wdth">
+         TOTAL USD $ {{totalAmount}}
+      </div> -->
+       <button mat-button mat-dialog-close (click)="cancel()">Cancel</button>
+       <button mat-raised-button class="margn-15" [disabled] ="formGroup?.pristine || enblebtn || !slectedProducts.length|| !delEnable "
+          (click)="saveQuote(formGroup)">Generate Quote</button>
+    </div>
+ </div>
+ <!-- <div *ngIf="!show" >
+   <app-lead-details></app-lead-details>
+ </div> -->
+ 
+ 

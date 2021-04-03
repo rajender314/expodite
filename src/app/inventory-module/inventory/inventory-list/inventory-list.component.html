@@ -1,0 +1,28 @@
+<div fxFlex class="right-content-section" infiniteScroll [infiniteScrollDistance]="1" [infiniteScrollThrottle]="50" (scrolled)="onScroll()"
+    [scrollWindow]="false">
+    <div class="app-search-container search-big">
+        <div class="search-orders">
+            <mat-form-field class="search" floatLabel="never">
+                <input matInput placeholder="search" #search (keyup)="searchBatches(search.value, $event)" (blur)="!search.value.length ? open = false : open = true">
+                <mat-icon matPrefix (click)="open = !open" class="org-search">search</mat-icon>
+                <mat-icon matSuffix *ngIf="searching" class="spinner">
+                    <mat-spinner class="small-spinner"></mat-spinner>
+                </mat-icon>
+                <mat-icon matSuffix *ngIf="!searching && search.value.length" (click)="search.value = '';searchBatches(search.value)">close</mat-icon>
+            </mat-form-field>
+        </div>
+    </div>
+    <div class="order-content">
+        <div fxLayout="column">
+            <div class="table-main-container">
+            <div class="table-container">
+                
+                <mat-spinner class="medium-spinner" *ngIf="searching"></mat-spinner>
+                <span *ngIf="!searching && noBatches">abc</span>
+                <app-table [tableData]="batchList" [columns]="displayedColumns"></app-table>
+                
+            </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,32 @@
+<div *ngIf="!emptyData">
+	<div class="contacts-billable">
+		<mat-card class="client-documents-card document-box">
+			<div class="document-header">
+				<h2 class="document-name">
+					{{language.defaults.documentName}}
+				</h2>
+			</div>
+			<mat-selection-list class="document-selection" *ngIf="documentTypes">
+				<mat-list-option  (change)="selectState()" class="document-option" checkboxPosition="before" (click)="documentTypeAllChange(selectAll)" selected="{{selectAll}}" >
+					<b>Select All</b>
+				</mat-list-option>
+				<mat-list-option  
+					(change)="selectState()" 
+					class="document-option" 
+					checkboxPosition="before" 
+					(click)="documentTypeChange(document)" 
+					selected="{{document.selected}}" 
+					*ngFor="let document of documentTypes">
+					{{document.name}}
+				</mat-list-option>
+			</mat-selection-list>
+		</mat-card>
+	</div>
+	<div class="footer-bottom products-footer fxflex animated slideInUp" *ngIf="activeState"  fxLayout="row" fxLayoutAlign="end center">
+		<button type="button" mat-button (click)="cancelDocumentTypes()">{{language.defaults.cancel}}</button>
+		<button type="submit" mat-raised-button (click)="saveDocumentTypes()">{{language.defaults.save}}</button>
+	</div>
+</div>
+<div class="no-record no-clients" *ngIf="!fetchingData && emptyData">
+	<p>No Documents Found</p>
+</div>

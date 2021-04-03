@@ -1,0 +1,24 @@
+
+.cb{
+    clear: both;
+}
+.document-list{
+    .abc{
+            padding: 0 16px;
+    border-bottom: 1px solid #cacaca;
+    background: #E4E5E9;
+    width: 100%;
+    }
+}
+// .document-option:nth-child(even){
+//     background-color: #efefef; 
+// }
+.document-selection {
+    .mat-list-option {
+        .mat-list-item-content {
+            .mat-list-text {
+                text-transform: none;
+            }
+        }
+    }
+}

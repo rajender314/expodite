@@ -1,0 +1,38 @@
+
+
+
+  .products-list .mat-input-container.custom-input .mat-input-flex{
+    padding: 1px 12px;
+}
+  .products-list .mat-input-container.custom-input.mat-focused .mat-input-flex{
+    padding: 0px 11px;
+}
+.products-list .mat-input-container.custom-input{
+    margin-top:17px;
+}
+
+
+.mat-card.panel-card{
+    width: 90%;
+    margin: 0px auto;
+    padding: 0px;
+    border:1px solid #d7dbe0;
+}
+
+.product-card{
+    .mat-expansion-panel-header  {
+        height: 48px;
+    }
+    
+    .mat-expansion-panel-content{
+        height: 0px !important;
+        visibility: hidden !important;
+    }
+    
+    .mat-expansion-panel-header.mat-expanded + .mat-expansion-panel-content{
+            height: auto !important;
+            visibility: visible !important;
+        }
+    
+
+ }

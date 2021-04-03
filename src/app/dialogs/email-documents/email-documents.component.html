@@ -1,0 +1,66 @@
+<mat-toolbar color="primary">
+    <h2 mat-dialog-title>Email Documents</h2>
+    <span fxFlex></span>
+</mat-toolbar>
+<mat-dialog-content style="padding-bottom: 16px;">
+    <form [formGroup]="emailDocuments" class="addLineForm">
+    <div class="multi-select">
+        <mat-label class="label-attention mandatory">To</mat-label>
+        <ng-select class="multi-ng-select" [items]="toUsers" bindLabel="name" bindValue="name" [addTag]="false"
+            [clearable]="true" [multiple]="true" placeholder="Select Users" formControlName="toUser">
+        </ng-select>
+        <mat-error *ngIf="emailSendSubmit && emailDocuments.controls.toUser.hasError('required')">
+            Please Select To
+        </mat-error>
+    </div>
+    <div class="multi-select">
+        <mat-label class="label-attention">CC</mat-label>
+        <ng-select class="multi-ng-select" [items]="toUsers" bindLabel="name" bindValue="name" addTagText="Add CC Email" [addTag]="true"
+            [clearable]="true" [multiple]="true" placeholder="Enter email id" formControlName="ccUser">
+        </ng-select>
+    </div>
+    <mat-form-field class="custom-input mandatory full-width" floatLabel="never">
+        <label class="custom-label mandatory">Subject</label>
+        <input matInput formControlName="emailSubject" placeholder="Subject">
+        <mat-error *ngIf="emailSendSubmit && emailDocuments.controls.emailSubject.hasError('required')">
+            Please Enter Subject
+        </mat-error>
+    </mat-form-field>
+    <mat-form-field class="custom-input mandatory full-width" floatLabel="never">
+        <label class="custom-label mandatory">Message</label>
+        <textarea matInput formControlName="emailBody" placeholder="Message"></textarea>
+        <mat-error *ngIf="emailSendSubmit && emailDocuments.controls.emailBody.hasError('required')">
+            Please Enter Message
+        </mat-error>
+    </mat-form-field>
+</form>
+<label class="custom-label mandatory">Documents</label>
+<mat-selection-list class="email-document-selection">
+    <mat-list-option (change)="selectState()" class="email-document-option" checkboxPosition="before"
+        (click)="documentTypeAllChange(selectAll)" selected="{{selectAll}}">
+        <b>Select All</b>
+    </mat-list-option>
+    <mat-list-option (change)="selectState()" class="email-document-option" checkboxPosition="before"
+        (click)="documentTypeChange(document)" selected="{{document.selected}}" *ngFor="let document of documentTypes">
+        {{document.name}}
+    </mat-list-option>
+</mat-selection-list>
+<mat-error *ngIf="showAttachmentsError">
+    Please select atleast one Document
+</mat-error>
+    
+</mat-dialog-content>
+<mat-dialog-actions>
+    <span fxFlex></span>
+    <button mat-button mat-dialog-close>Cancel</button>
+    <button mat-raised-button (click)="sendEmailDocs()">
+        Send Documents
+    </button>
+</mat-dialog-actions>
+<div class="loading-wait" *ngIf="confirEmailSending">
+    <mat-spinner class="medium-spinner" ></mat-spinner>
+    <p>Sending Email Documents...</p>
+</div>
+<div class="loading-wait" *ngIf="emailSentSuccessMsg">
+    <p>Email has been sent successfully.</p>
+</div>

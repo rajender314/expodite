@@ -1,0 +1,93 @@
+.w-100{
+    width: 100%;
+}
+ .pdf-lbl-email{
+    padding: 5px 10px;
+    border-radius: 4px;
+    width: 200px;
+    background-color: #f2f2f2;
+    display: flex;
+}
+.mr-7
+{
+    margin-top:7px
+}
+.doc-cls{
+    padding-bottom:10px;
+}
+
+.lbl-fnt{
+    font-size: 14px;
+    color: #565656;
+    text-transform: capitalize;
+}
+.pdf-fil{
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 16px 0px;
+}
+.capitalize{
+    text-transform: capitalize;
+}
+.mes-lbl{
+    position: relative;
+    bottom: 8px
+}
+.doc-lbl{
+    padding: 8px 0px;
+}
+.angular-editor-textarea{
+    border-color: #DFE3E9!important;
+    border: 1px solid #DFE3E9 !important;
+}
+:host /deep/ angular-editor#myEditor .angular-editor-textarea:focus{
+    border: 1px solid  !important;
+    border-color:#4C9AFF !important
+ }:host /deep/ angular-editor#myEditor .angular-editor-textarea{
+    border: 1px solid #DFE3E9 !important;
+ }
+:host /deep/ angular-editor#myEditor .angular-editor-button[title="Insert Image"]{
+    display: none
+ }
+ :host /deep/ angular-editor#myEditor .angular-editor-button[title="Insert Video"]{
+    display: none
+ }
+ :host /deep/ angular-editor#myEditor .angular-editor-button[title="HTML Code"]{
+    display: none
+ }
+ :host /deep/ angular-editor#myEditor .angular-editor-button[title="Horizontal Line"]{
+    display: none
+ }
+ :host /deep/ angular-editor#myEditor .angular-editor-button[title="Unlink"]{
+    display: none
+ }
+ :host /deep/ angular-editor#myEditor .angular-editor-button[title="Insert Link"]{
+    display: none
+ }
+ :host /deep/ angular-editor#myEditor .angular-editor-button[title="Subscript"]{
+    display: none
+ }
+ :host /deep/ angular-editor#myEditor .angular-editor-button[title="Strikethrough"]{
+    display: none
+ }
+ :host /deep/ angular-editor#myEditor .angular-editor-button[title="Superscript"]{
+    display: none
+ }
+ /* :host /deep/ angular-editor#myEditor ae-select.select-custom-style{
+    display: none
+ } */
+ .sub-mrg{
+   margin-bottom: 20px;
+}
+
+
+
+
+.pdf-fil{
+   color: black!important;
+}
+.pdf-lbl-email a{ 
+    display: flex;
+    overflow: hidden;
+}

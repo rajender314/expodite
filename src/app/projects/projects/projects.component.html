@@ -1,0 +1,15 @@
+<mat-sidenav-container class="list-detail-container default">
+
+    <mat-sidenav mode="side" opened="true">
+        <mat-nav-list>
+            <mat-list-item *ngFor="let project of projects" (click)="selectProject(project)" [ngClass]="{active: (selectedProject === project)}">
+                <h4 mat-line>{{project.name}}</h4>
+            </mat-list-item>            
+        </mat-nav-list>
+    </mat-sidenav>
+
+    <mat-sidenav-content>
+        <app-objectives [project]="selectedProject" *ngIf="selectedProject"></app-objectives>
+    </mat-sidenav-content>
+
+</mat-sidenav-container>

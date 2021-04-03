@@ -1,0 +1,6 @@
+<div fxLayout="row">
+  <app-roles-list class="tabs-list" [update]="updatedRoleDetails" (trigger)="getSelectedRole($event)"></app-roles-list>
+  <app-roles-details class="inner-content" [roles]="selectedRole" style="width:100%;" (trigger)="updateDetails($event)"></app-roles-details>
+</div>
+
+

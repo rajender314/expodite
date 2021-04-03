@@ -1,0 +1,260 @@
+<div class="stats_wrapper">
+    <div class="heading_block">
+        <div class="hdr_back" fxLayout="row">
+            <a class="back_lnk" (click)="go_back();"><mat-icon>arrow_back</mat-icon> Back</a>
+            <span fxFlex></span>
+            <div class="stats_title">Twitter Stats</div>
+            <span fxFlex></span>
+          </div>
+          
+    </div>
+    <div class="chart_wrapper">
+      <div class="stats_heading">Twitter Ads</div>
+      <div class="chart_section">
+        <section class="bar_chart">
+            <p>Ads Campaign Performance</p>
+            <div class="chart_blocks" fxLayout="row" fxLayoutAlign="start start">
+              <div class="ch_block padg" fxFlex="25">
+                  <span>Spend</span>                     
+                  <span class="cnt">$790</span>
+                  <div class="horiz_bar">
+                    <div class="horiz_bar_val" style="width:50%;background:#5D9AEC;"></div>
+                    <hr>
+                    <div style="clear:both;"></div>
+                  </div>
+                  <p>Budget: $1,240</p>
+              </div>
+              <div class="ch_block padg" fxFlex="25">
+                  <span>Conversions</span>                     
+                  <span class="cnt">400</span>
+                  <div class="horiz_bar">
+                    <div class="horiz_bar_val" style="width:35%;background:#7CBC87;"></div>
+                    <hr>
+                    <div style="clear:both;"></div>
+                  </div>
+                  <p>Budget: $1,000</p>
+              </div>
+              <div class="ch_block padg" fxFlex="25">
+                  <span>Cost per click</span>                     
+                  <span class="cnt">$1.97</span>
+                  <div class="horiz_bar">
+                    <div class="horiz_bar_val" style="width:65%;background:#E55762;"></div>
+                    <hr>
+                    <div style="clear:both;"></div>
+                  </div>
+                  <p>Budget: $1.5</p>
+              </div>   
+              <div class="ch_block lst" fxFlex="25">
+                  <div class="">
+                    <canvas id="conversion_trend_chart" width="200" height="200"></canvas>
+                  </div>
+              </div>       
+            </div>
+        </section>
+        <div fxLayout="row" fxLayoutAlign="start start" fxLayoutGap="20px" class="col_2">
+          <section class="bar_chart cnt_blocks" fxFlex="69">
+            <p>Ads Campaign Measurement</p>
+            <div class="ch_block padg">
+              <span>Impressions</span>                     
+              <span class="cnt">520,858</span>
+            </div>
+            <div class="ch_block padg">
+              <span>Clicks</span>                     
+              <span class="cnt">80,000</span>
+            </div>
+            <div class="ch_block padg">
+              <span>Conversions</span>                     
+              <span class="cnt">7,000</span>
+            </div>
+            <div class="ch_block padg">
+              <span>Conversion Rate</span>                     
+              <span class="cnt">9.4%</span>
+            </div>
+            <div class="ch_block padg">
+              <span>CTR</span>                     
+              <span class="cnt">52,858</span>
+            </div>
+            <div class="ch_block padg">
+              <span>CPM</span>                     
+              <span class="cnt">320,858</span>
+            </div>
+            <div class="ch_block padg">
+              <span>CPA</span>                     
+              <span class="cnt">152,0256</span>
+            </div>
+          </section>
+          <section class="bar_chart" fxFlex="29">
+            <p>Clicks vs Conversions</p>
+            <div class="ch_block pie_chart_blk">
+              <div class="pie_chart">
+                <canvas id="pie_chart_0" width="140" height="140"></canvas>
+              </div>
+              <div class="pie_chart_info">
+                <div class="imp_data frst">
+                  <span class="hd_sec"><span class="color_blk blue"></span>80K</span>
+                  <span class="hd_cnt">Conversions</span>
+                </div>
+                <div class="imp_data">
+                  <span class="hd_sec"><span class="color_blk violet"></span>7K</span>
+                  <span class="hd_cnt">Clicks</span>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+        <div fxLayout="row" fxLayoutAlign="start start" fxLayoutGap="20px" class="col_2">
+          <section class="bar_chart" fxFlex="49">
+            <p>Ads CPM & CPP</p>
+            <div class="ch_block">
+              <div class="cpm_cpp_chart">
+                <canvas id="cpm_cpp_chart" width="300" height="240"></canvas>
+              </div>
+            </div>
+          </section>
+          <section class="bar_chart" fxFlex="49">
+            <p>Ads Impressions and Reach</p>
+            <div class="ch_block">
+              <div class="imp_reach_chart">
+                <canvas id="imp_reach_chart" width="300" height="240"></canvas>
+              </div>
+            </div>
+          </section>
+        </div>
+        <div fxLayout="row" fxLayoutAlign="start start">
+          <section class="bar_chart" fxFlex="100">
+            <p>Ads Summary</p>
+            <div class="ch_block">
+              <table class="tbl_styles" cellspacing="0" cellpadding="0" border="0">
+                <thead>
+                  <tr>
+                    <th style="text-align:left;">Campaigns</th>
+                    <th>Spend</th>
+                    <th>Cost Per Unique click</th>
+                    <th>CPM</th>
+                    <th>CTR</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style="text-align:left;"><a class="bg_cell">Winter Sale</a></td>
+                    <td>$15,767.42</td>
+                    <td>$125.81</td>
+                    <td>$4,187.10</td>
+                    <td>13.31%</td>
+                  </tr>
+                  <tr class="alt">
+                    <td style="text-align:left;"><a class="bg_cell">Holiday gift Guide</a></td>
+                    <td>$15,767.42</td>
+                    <td>$125.81</td>
+                    <td>$4,187.10</td>
+                    <td>13.31%</td>
+                  </tr>
+                  <tr>
+                    <td style="text-align:left;"><a class="bg_cell">Featured Holiday Food</a></td>
+                    <td>$15,767.42</td>
+                    <td>$125.81</td>
+                    <td>$4,187.10</td>
+                    <td>13.31%</td>
+                    </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+  
+    <div class="chart_wrapper row_2">
+      <div class="stats_heading">Twitter Organic</div>
+      <div class="chart_section">
+        <section class="bar_chart">
+            <div class="chart_blocks" fxLayout="row" fxLayoutAlign="start start">
+              <div class="ch_block padg" fxFlex="25">
+                  <span>Impressions</span>                     
+                  <span class="cnt">52,858</span>
+                  <div class="reach_chart">
+                    <canvas id="reach_chart_0" width="200" height="50"></canvas>
+                  </div>
+              </div>
+              <div class="ch_block padg" fxFlex="25">
+                  <span>Replies</span>                     
+                  <span class="cnt">80,258</span>
+                  <div class="reach_chart">
+                    <canvas id="reach_chart_1" width="200" height="50"></canvas>
+                  </div>
+              </div>
+              <div class="ch_block padg" fxFlex="25">
+                  <span>Retweets</span>                     
+                  <span class="cnt">4,250</span>
+                  <div class="reach_chart">
+                    <canvas id="reach_chart_2" width="200" height="50"></canvas>
+                  </div>
+              </div>   
+              <div class="ch_block padg" fxFlex="25">
+                <span>Favorites</span>                     
+                <span class="cnt">1,260</span>
+                <div class="reach_chart">
+                  <canvas id="reach_chart_3" width="200" height="50"></canvas>
+                </div>
+            </div>       
+            </div>
+        </section>
+        <div fxLayout="row" fxLayoutAlign="start start" fxLayoutGap="20px">
+          <section class="bar_chart lft_chart" fxFlex="50">
+            <p>Link Clicks and Follows</p>
+            <p class="pg_proj">Account: HLMS</p>
+            <div class="chart_blocks" fxLayout="row" fxLayoutAlign="start start">
+              <div class="ch_block padg" fxFlex="50">
+                  <span>Link Clicks</span>                     
+                  <span class="cnt">8,282</span>
+                  <div class="reach_chart">
+                    <canvas id="reach_chart_4" width="200" height="50"></canvas>
+                  </div>
+              </div>
+              <div class="ch_block padg" fxFlex="50">
+                  <span>Follows</span>                     
+                  <span class="cnt">521</span>
+                  <div class="reach_chart">
+                    <canvas id="reach_chart_5" width="200" height="50"></canvas>
+                  </div>
+              </div>
+            </div> 
+          </section>
+          <section class="bar_chart rgt_chart" fxFlex="50">
+            <p>Recent Tweets</p>
+            <div class="chart_blocks txt_lft points_list">
+              <div class="point_item">
+                <span class="point_logo"></span>
+                <div class="point_txt">
+                  <p><b>HLMS</b> <span>@hlmsmag . Nov 4</span></p>
+                  <p>Read how <a href="#">@jeweljk</a>, author, actress & singer-songwriter made 
+                    <a href="#">#happiness</a> habit in our cover story. <a href="#">#SamsClubMag buff.ly/2yi2Zhs</a>
+                  </p>
+                </div>
+              </div>
+              <div class="point_item">
+                <span class="point_logo"></span>
+                <div class="point_txt">
+                  <p><b>HLMS</b> <span>@hlmsmag . Nov 4</span></p>
+                  <p>Read how <a href="#">@jeweljk</a>, author, actress & singer-songwriter made 
+                    <a href="#">#happiness</a> habit in our cover story. <a href="#">#SamsClubMag buff.ly/2yi2Zhs</a>
+                  </p>
+                </div>
+              </div>
+              <div class="point_item">
+                <span class="point_logo"></span>
+                <div class="point_txt">
+                  <p><b>HLMS</b> <span>@hlmsmag . Nov 4</span></p>
+                  <p>Read how <a href="#">@jeweljk</a>, author, actress & singer-songwriter made 
+                    <a href="#">#happiness</a> habit in our cover story. <a href="#">#SamsClubMag buff.ly/2yi2Zhs</a>
+                  </p>
+                </div>
+              </div>              
+            </div> 
+          </section>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+  

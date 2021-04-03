@@ -1,0 +1,43 @@
+ .mat-snack-bar-container{
+    font-family: Roboto,"Helvetica Neue",sans-serif;
+    font-size: 17px;
+    box-shadow: 0 0 5px rgba(0,0,0,0.4);
+    &.default {background: #fff;color: #333;
+        .mat-icon{vertical-align: bottom;}
+        .success-alert{color: #157014;}
+        .error-alert{color: #d9534f;}
+    }
+    /*background: #f7cb3a ;
+    color: #866700 ;
+    .success-alert{
+        color: #157014 ;
+    }
+    .error-alert{
+        color: #e72d2d ;
+    }
+    .alert{
+        color: #ee4b23 ;
+    }
+    mat-icon, mat-spinner{
+        float: left;
+    }
+    .toast-spinner{
+        width: 16px !important;
+        height: 16px !important;
+        margin-top: 4px;
+        circle {
+            stroke: #866700 ;
+        }
+        svg{
+            width: 16px !important;
+            height: 16px !important;
+        }
+    }
+    
+    span{
+        display: inline-block;
+        line-height: 26px;
+        float: left;
+        padding-left: 10px;
+    }*/
+ }

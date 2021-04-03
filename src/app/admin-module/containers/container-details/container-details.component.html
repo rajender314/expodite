@@ -1,0 +1,43 @@
+<div class="details" fxFlex>
+  <mat-toolbar class="mat-small-toolbar">
+    <span *ngIf="selectedRoles" [innerHtml]="selectedRoles.name"></span>
+  </mat-toolbar>
+  <form [formGroup]="detailsForm" (ngSubmit)="createRole(detailsForm)">
+    <mat-spinner class="medium-spinner" *ngIf="fetchingData"></mat-spinner>
+    <div class="box" @AdminDetailsAnimate *ngIf="!noRoles && !fetchingData" [class.user-footer]="detailsForm.dirty">
+      <div class="form-fields">
+        <h4>{{language.defaults.roleProfile}}</h4>
+        <div>
+          <mat-form-field fxFlex="80">
+            <input matInput placeholder="Role Name" formControlName="name" id="role" />
+            <mat-error *ngIf="detailsForm.controls.name.hasError('required')">{{language.validations.roleName}}</mat-error>
+          </mat-form-field>
+        </div>
+        <div>
+          <mat-form-field fxFlex="80">
+            <textarea matInput placeholder={{language.defaults.description}} formControlName="description" id="desc"></textarea>
+            <!-- <mat-error *ngIf="detailsForm.controls.description.hasError('required')">Please Enter Description</mat-error> -->
+          </mat-form-field>
+        </div>
+      </div>
+
+      <div fxLayout="column" class="permission_list">
+        <h2>{{language.defaults.permissions}}</h2>
+         <mat-card class="permissions">
+          <mat-card-content>
+            <app-roles-permissions *ngFor="let parent of globalPermissions; let i = index" [permission]="parent"></app-roles-permissions>
+          </mat-card-content>
+        </mat-card> 
+      </div>
+
+    </div>
+    <div class="footer" fxLayout="row" fxLayoutAlign="end center" *ngIf="detailsForm.dirty">
+      <button type="button" mat-button (click)="cancel(detailsForm)">{{language.defaults.cancel}}</button>
+      <button type="submit" mat-raised-button [disabled]="detailsForm.invalid">{{language.defaults.save}}</button>
+    </div>
+    <div *ngIf="noRoles" class="no-records">{{language.defaults.noRoles}}</div>
+  </form>
+  <!-- <button mat-fab color="primary" class="small-fab" (click)="newRole(true)">
+    <mat-icon>add</mat-icon>
+  </button> -->
+</div>

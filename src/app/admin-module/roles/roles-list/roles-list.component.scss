@@ -1,0 +1,63 @@
+// @mixin viewHeight($height){
+// 	height: calc(100vh - #{$height});
+// }
+// @mixin noRecords($left, $top){
+//     position: absolute;left: $left;top: $top;
+//     border: 1px solid #e5e5e5;background: #3676ca;
+//     color: #fff;border-radius: 4px;
+// }
+// .list{
+//     width: 300px;
+//     border-right: 0px;
+//     // height: calc(100vh - 58px);
+//     &.admin-inner-list{
+//         box-sizing: content-box;
+//         // height: 100vh;
+//         background-color: #fff;
+//         border-left: 1px solid #D7D7D7;
+//         border-right: 1px solid #D7D7D7;
+//         // transform: translateX(300px);
+//         transition: all 0.2s ease-in-out;
+//         // &.active{
+//         //     transform: translateX(0px);
+            
+//         // }
+//     }
+//     .mat-small-toolbar{
+//         padding-right: 16px;
+//     }
+
+//     .mat-fab{position: fixed;right: 35px;z-index: 1;bottom: 80px;
+//         &:hover{
+//             background-color: #3676ca;
+//             box-shadow: 0 5px 5px -3px rgba(0,0,0,.2), 0 8px 10px 1px rgba(0,0,0,.14), 0 3px 14px 2px rgba(0,0,0,.12);
+//         }
+//     }
+//     .mat-fab{
+//         background-color: #3676ca;
+//     }
+//     .list-items{@include viewHeight(100px);overflow-y: auto;position: relative;
+//         .mat-list{padding-top: 10px;
+//             .mat-list-item{
+//                 // border-bottom: 1px solid #eeeeee; 
+//                 padding: 0px 8px;
+//                  .mat-list-item-content{
+//                     padding-left: 6px;
+//                     padding-right: 6px;
+//                 }
+//                 .no-image, .mat-icon{width: 40px;height: 40px;font-size:13px;overflow: hidden; 
+//                     text-align: center;line-height: 40px;text-transform: uppercase;
+//                     .mat-avatar{max-width:100%;border-radius: 50%;color: #999;}
+//                 }
+//             }
+//         }
+//     }
+// }
+// mat-toolbar.list-toolbar span{
+//     line-height: 40px;
+//     justify-content: center;
+//     display: flex;
+//     align-items: center;
+// }
+
+// // 

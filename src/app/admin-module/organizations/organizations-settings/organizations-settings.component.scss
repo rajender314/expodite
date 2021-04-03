@@ -1,0 +1,38 @@
+    .footer-bottom {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        left: 0;
+        padding: 15px;
+        border-top: 1px solid #D7D7D7;
+        background: #eee;
+        &.client-footer {
+            width:calc(100vw - 65px);
+        }
+    }
+
+
+.reset-btn{
+    color:#FF5722;
+    font-weight: 500;
+    margin-left:24px;
+    cursor: pointer;
+    opacity: 1;
+    transition: all 0.3s linear;
+    &:hover{
+        opacity: 0.8;
+        text-decoration: underline;
+        transition: all 0.3s linear;
+    }
+}
+.settings-contact{
+    padding-bottom:0px; 
+}
+.mat-card.user-card{
+    width: 75%;
+    border:1px solid #dfdfdf;
+}
+.user-button{
+    width: 75%;
+    padding: 24px 0px;
+}

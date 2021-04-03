@@ -1,0 +1,33 @@
+{
+    "result": {
+        "success": true,
+        "data": {
+            "projects": [
+                {
+                    "id": "WXFJZWFLYzZ3NFFZaVJCS2FLN3Q3UT09Ojr6TwRrri58GJQ4VFKCcfEm",
+                    "name": "Ask the Doctors"
+                },
+                {
+                    "id": "VnYzSG43d25kYWFLTE5PSDJ4UHQ5UT09Ojoeljb.c54AGsML7IIhq1K4",
+                    "name": "Baby on Board"
+                },
+                {
+                    "id": "UjJIcjl0WEJpYlBKY1cxZG1iZ1dYZz09Ojr~43IE.3XDFjuUFPGLryv4",
+                    "name": "Sams Club Holiday Offers"
+                },
+                {
+                    "id": "eUJTSVc1MEdabkkxdTZReG1MaWhDQT09Ojr08GzOL4ui67.SDnId5KrF",
+                    "name": "Black Friday Sales"
+                },
+                {
+                    "id": "cnJMNnhwcms4WDhFZHFabFpFN0tCdz09OjrbLFsf7Gt6EGYXvERQ68.d",
+                    "name": "Sams Holiday Sales"
+                }
+            ],
+            "count": 5,
+            "lastpage": 1
+        },
+        "message": "Successfully retrieved projects",
+        "status_code": 200
+    }
+}

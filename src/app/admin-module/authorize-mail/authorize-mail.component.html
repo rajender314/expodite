@@ -1,0 +1,16 @@
+<mat-spinner class="medium-spinner" *ngIf="fetchingData"></mat-spinner>
+<div class="mail" *ngIf="!fetchingData">
+  <a href="{{url}}" *ngIf="!authorized && !reAuthorize">
+    <button mat-raised-button color="warn" class="create-order-btn">Click Here</button></a>
+
+
+  <button *ngIf="authorized && !reAuthorize" mat-raised-button color="warn" (click)="authorizeData()"
+    class="create-order-btn">Click Here</button>
+
+
+  <a href="{{url}}" *ngIf="authorized && reAuthorize">
+    <button mat-raised-button color="warn" class="create-order-btn">RE-AUTHORIZE</button></a>
+
+
+  <!-- <span *ngIf="authorize">You are already Authorized.</span> -->
+</div>

@@ -1,0 +1,55 @@
+<div class="preview-container">
+    <div *ngIf="inProcess">
+        <mat-spinner class="medium-spinner"></mat-spinner>
+    </div>
+    <mat-toolbar *ngIf="!inProcess" class="save_section">
+       <h4>Save View</h4>
+        <span class="material-icons" title="Close" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </span>
+    </mat-toolbar>
+     <mat-dialog-content style="min-height: 276px">
+        <div >
+            <form [formGroup]="saveViewForm">
+                <div>
+                    <mat-form-field class="custom-input mandatory w-100" floatLabel="never">
+                        <label class="custom-label">Name</label>
+                        <input matInput #myInput placeholder="Please Enter View Name" formControlName="name" id="containerName" maxlength="255"/>
+                        <mat-error *ngIf="submitForm || !saveViewForm.controls.name.pristine && saveViewForm.controls.name.hasError('required')">Name is Required</mat-error>
+                    </mat-form-field>
+                </div>
+                <div>
+                   
+                    <mat-radio-group class="share_section"  formControlName="share">
+                        <mat-radio-button class="radio-sec" color="primary" value="0"  (change)="radioChange($event)">Share with All Users</mat-radio-button>
+                        <mat-radio-button class="radio-sec" color="primary" value="1"  (change)="radioChange($event)">Share with Selected Users</mat-radio-button>
+                    </mat-radio-group>
+                </div>
+                <div *ngIf="saveViewForm.controls.share.value == '1'" class="multi_select_list">
+                        <label class="custom-label">User 
+                            <span style="color: red">*</span>
+                        </label>
+
+                    <ng-select class="multi-ng-select" [items]="usersList"
+                                bindLabel="username"
+                                bindValue="user_id"
+                                [multiple]="true"
+                                placeholder="Select User"
+                                formControlName="shared_users">
+                    </ng-select>
+                </div>
+                <p *ngIf="!submitForm && showMsg" class="address-error">No Users Found. Please add Users</p>
+
+                <div>
+                    <span *ngIf="errMessage != ''">{{errMessage}}</span>
+                </div>
+                <div class="filter-actions save-view-actions">
+                    <button class="mat-primary" mat-button   (click)="close()">Cancel</button>
+                    <button mat-raised-button class="mat-button mat-primary-btn" [disabled]="saveViewForm.invalid" (click)="saveForm()">Save View</button>
+                </div>
+            </form>
+            
+        </div>
+      </mat-dialog-content>
+</div>
+<!-- <div>Save view</div> -->

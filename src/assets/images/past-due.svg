@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="62px" height="48px" viewBox="0 0 62 48" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 48.2 (47327) - http://www.bohemiancoding.com/sketch -->
+    <title>noun_1455314_cc</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <filter x="-2.5%" y="-3.8%" width="105.0%" height="110.8%" filterUnits="objectBoundingBox" id="filter-1">
+            <feOffset dx="0" dy="2" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="1.5" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.0746150362 0" type="matrix" in="shadowBlurOuter1" result="shadowMatrixOuter1"></feColorMatrix>
+            <feMerge>
+                <feMergeNode in="shadowMatrixOuter1"></feMergeNode>
+                <feMergeNode in="SourceGraphic"></feMergeNode>
+            </feMerge>
+        </filter>
+    </defs>
+    <g id="Overview-Staff-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" transform="translate(-1151.000000, -179.000000)">
+        <g id="Group-Copy-3" filter="url(#filter-1)" transform="translate(962.000000, 102.000000)" stroke="#FFFFFF">
+            <g id="noun_1455314_cc" transform="translate(192.000000, 78.000000)">
+                <path d="M1.5,3.40074933 L1.5,53.5 L54.5,53.5 L54.5,3.30565234 L44.0358202,12.4618097 L36,5.93270576 L28,12.4327058 L19.9718566,5.90983921 L11.4148464,12.4534352 L1.5,3.40074933 Z" id="Rectangle-3" stroke-width="3" opacity="0.343976449"></path>
+                <g id="Group-3" transform="translate(14.000000, 18.000000)" fill="#FFFFFF" fill-rule="nonzero" opacity="0.375962409" stroke-width="0.8">
+                    <path d="M15,0 C6.729,0 0,6.729 0,15 C0,23.271 6.729,30 15,30 C23.271,30 30,23.271 30,15 C30,6.729 23.271,0 15,0 Z M16,27.949 L16,26 L14,26 L14,27.949 C7.63,27.461 2.539,22.37 2.051,16 L5,16 L5,14 L2.051,14 C2.539,7.63 7.63,2.539 14,2.051 L14,4 L16,4 L16,2.051 C22.37,2.539 27.461,7.63 27.949,14 L25,14 L25,16 L27.949,16 C27.461,22.37 22.37,27.461 16,27.949 Z" id="Shape"></path>
+                    <path d="M15.352455,7 L13.5483871,7 L13.5483871,14.6319474 C13.5483871,14.8945711 13.6431007,15.1453471 13.812683,15.3299735 L18.0793627,20 L19.3548387,18.6039479 L15.352455,14.2232024 L15.352455,7 Z" id="Shape"></path>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

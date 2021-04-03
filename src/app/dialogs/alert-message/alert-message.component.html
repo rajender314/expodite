@@ -1,0 +1,16 @@
+<mat-toolbar color="primary">
+  <h2 mat-dialog-title [innerHtml]="data.title"></h2>
+  <span fxFlex></span>
+  <!--<button mat-icon-button mat-dialog-close>
+    <mat-icon>close</mat-icon>
+  </button>-->
+</mat-toolbar>
+<mat-dialog-content>
+  <div [innerHtml]="data.msg"></div>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <span fxFlex></span>
+  <button *ngIf="!success" mat-button mat-dialog-close>{{language.defaults.cancel}}</button>
+  <button *ngIf="!success" mat-raised-button mat-dialog-close color="warn" (click)="confirm()">{{language.defaults.yes}} {{data.title}}</button> <!-- [mat-dialog-close]="success" -->
+
+</mat-dialog-actions>

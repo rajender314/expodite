@@ -1,0 +1,36 @@
+<div class="details clients-details-container" fxFlex>
+    <mat-toolbar class="app-header main">
+        <div class="app-container alt  app-alt">
+            <div class="active-module">
+                <span class="label">Leads</span>
+                <span fxFlex></span>
+                <button mat-raised-button color="warn" (click)="addLead()" class="create-order-btn"> Add
+                    Lead</button>
+            </div>
+        </div>
+    </mat-toolbar>
+
+
+
+    <div class="content-section extr-sec">
+        <div fxLayout="column">
+            <div class="app-container alt extr-alt" *ngIf="datalngth && !fetchingData">
+                <ag-grid-angular #agGrid style="width: 100%;height: calc(100vh - 150px); overflow:auto"
+                    class="ag-theme-alpine ag-theme-balham reports_grid lead-grid p" rowHeight="60" headerHeight="40"
+                    [rowData]="rowData" [columnDefs]="columnDefs" sideBar=true (gridReady)="onGridReady($event)"
+                    (rowClicked)="onRowClicked($event)" [overlayLoadingTemplate]="loadingTemplate"
+                    [overlayNoRowsTemplate]="noRowsTemplate">
+                </ag-grid-angular>
+            </div>
+            <div class="app-container alt extr-alt no-lead-data"  style="width: 100%;height: calc(100vh - 150px); overflow:auto" *ngIf="!fetchingData && !datalngth">
+                <div class="no-lead-data-sub">No Leads To Display</div>
+            </div>
+            <div class="inv3-spinner">
+                <mat-spinner class="medium-spinner" *ngIf="fetchingData"></mat-spinner>
+            </div>
+        </div>
+
+    </div>
+
+
+</div>

@@ -1,0 +1,6 @@
+<div fxLayout="row">
+    <app-primary-package-list class="tabs-list" [update]="updatedContainersDetails" (trigger)="getSelectedContainer($event)"></app-primary-package-list>
+    <app-primary-package-details class="inner-content" [containers]="selectedContainer" style="width:100%;" (trigger)="updateDetails($event)"></app-primary-package-details>
+  </div>
+  
+  
