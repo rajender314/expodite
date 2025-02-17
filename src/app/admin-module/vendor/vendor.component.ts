@@ -1,28 +1,20 @@
-import { ContactsViewService } from './../../services/contacts-view.service';
-import { Component, OnInit } from '@angular/core';
-import { Title } from '@angular/platform-browser';
+import { Component, OnInit } from "@angular/core";
+import { Title } from "@angular/platform-browser";
 declare var App: any;
 @Component({
-  selector: 'app-vendor',
-  templateUrl: './vendor.component.html',
-  styleUrls: ['./vendor.component.scss']
+  selector: "app-vendor",
+  templateUrl: "./vendor.component.html",
+  styleUrls: ["./vendor.component.scss"],
 })
-
 export class VendorComponent implements OnInit {
-
   selectedOrganization: object;
   updatedDetails: object;
 
-  constructor( private titleService: Title,
-      public contactsViewService: ContactsViewService ) { }
+  constructor(private titleService: Title) {}
 
   ngOnInit() {
-    // this.titleService.setTitle(App['company_data'] );
-    this.titleService.setTitle("Expodite - Vendors");
-// console.log(App)
-}
-  
-  
+    this.titleService.setTitle(App["company_data"].VendorTitle);
+  }
 
   getSelectedOrganization(data: any): void {
     if (data) {
@@ -33,9 +25,9 @@ export class VendorComponent implements OnInit {
   }
 
   updateDetails(result): void {
-    this.updatedDetails = { 
+    this.updatedDetails = {
       id: result.flag,
-      result: result.data
+      result: result.data,
     };
   }
 }

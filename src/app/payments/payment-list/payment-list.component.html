@@ -1,0 +1,661 @@
+<!-- <mat-spinner
+  class="medium-spinner"
+  *ngIf=" creatingComposite"
+></mat-spinner> -->
+
+<div class="orders">
+  <div>
+    <mat-horizontal-stepper #stepper>
+      <mat-step-header></mat-step-header>
+      <mat-step>
+        <div fxLayout="row">
+          <div class="center-section-scroll vh-100 d-flex secundory-menu">
+            <div class="flex-fixed-header menu-title">
+              <h1>Payments ({{ totalCount }})</h1>
+            </div>
+            <perfect-scrollbar
+              class="flex-scroll-items p-l-8 p-r-8 estimate-flter-panel"
+            >
+              <div @insuranceAnimate class="align-flex">
+                <div
+                  class="fxFlex custom-date-container filter-dates order-date-picker"
+                  style="max-width: 284px; margin-bottom: 14px"
+                >
+                  <div
+                    class="label font-600"
+                    style="
+                      color: #565656;
+                      text-transform: capitalize;
+                      font-size: 14px;
+                      letter-spacing: normal;
+                    "
+                  >
+                    Payment Date
+                  </div>
+                  <input
+                    class="datepicker"
+                    [(ngModel)]="payments.mfg_date"
+                    [matDatepicker]="picker"
+                    (click)="openCalendar(picker)"
+                    (dateChange)="datePickerChange()"
+                    (focus)="openCalendar(picker)"
+                    placeholder="Select Payment Date"
+                    readonly
+                  />
+                  <mat-datepicker-toggle
+                    matSuffix
+                    [for]="picker"
+                  ></mat-datepicker-toggle>
+                  <mat-datepicker #picker></mat-datepicker>
+                </div>
+                <div class="fxFlex side-nav-section">
+                  <mat-form-field
+                    class="custom-input custom-client"
+                    floatLabel="never"
+                    style="width: 100%; margin-top: 20px"
+                  >
+                    <label class="custom-label font-600">Status</label>
+                    <mat-select
+                      panelClass="myPanelClass"
+                      class="chips-select"
+                      placeholder="Select Status"
+                      (selectionChange)="clientChange()"
+                      [formControl]="payments.selectedStatus"
+                      (openedChange)="openedChange($event)"
+                      multiple
+                    >
+                      <mat-select-trigger>
+                        <mat-chip-list
+                          *ngIf="payments?.selectedStatus.value?.length"
+                        >
+                          <mat-chip
+                            *ngFor="let prodId of payments.selectedStatus.value"
+                            [removable]="true"
+                            (removed)="removestatus(prodId, payments.status)"
+                          >
+                            {{ getClientName(prodId, payments.status) }}
+                            <mat-icon matChipRemove>cancel</mat-icon>
+                          </mat-chip>
+                        </mat-chip-list>
+                      </mat-select-trigger>
+                      <mat-option
+                        (click)="checkboxChange(status)"
+                        [value]="status.id"
+                        class="orders-list"
+                        *ngFor="let status of payments.status"
+                      >
+                        {{ status.name }}</mat-option
+                      >
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+                <div class="fxFlex side-nav-section">
+                  <mat-form-field
+                    class="custom-input custom-client"
+                    floatLabel="never"
+                    style="width: 100%"
+                  >
+                    <label class="custom-label font-600">Clients</label>
+                    <mat-select
+                      panelClass="myPanelClass"
+                      placeholder="Select Client"
+                      (selectionChange)="clientChange()"
+                      [formControl]="payments.selectedClients"
+                      (openedChange)="openedChange($event)"
+                      class="chips-select"
+                      multiple
+                    >
+                      <mat-select-trigger>
+                        <mat-chip-list
+                          *ngIf="payments.selectedClients.value?.length"
+                        >
+                          <mat-chip
+                            *ngFor="
+                              let clientId of payments.selectedClients.value
+                            "
+                            [removable]="true"
+                            (removed)="removeClient(clientId)"
+                          >
+                            {{ getClientName(clientId, payments.clientList) }}
+                            <mat-icon matChipRemove>cancel</mat-icon>
+                          </mat-chip>
+                        </mat-chip-list>
+                      </mat-select-trigger>
+                      <mat-option
+                        *ngFor="let client of payments.clientList"
+                        [value]="client.id"
+                        (click)="checkboxChange(client)"
+                      >
+                        {{ client.name }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+                <div class="fxFlex side-nav-section">
+                  <mat-form-field
+                    class="custom-input custom-client"
+                    floatLabel="never"
+                    style="width: 100%"
+                  >
+                    <label class="custom-label font-600">Currency</label>
+                    <mat-select
+                      panelClass="myPanelClass"
+                      placeholder="Select Currency"
+                      (selectionChange)="clientChange()"
+                      [formControl]="payments.selectedCurrency"
+                      (openedChange)="openedChange($event)"
+                      class="chips-select"
+                      multiple
+                    >
+                      <mat-select-trigger>
+                        <mat-chip-list
+                          *ngIf="payments.selectedCurrency.value?.length"
+                        >
+                          <mat-chip
+                            *ngFor="
+                              let currencyId of payments.selectedCurrency.value
+                            "
+                            [removable]="true"
+                            (removed)="removeCurreny(currencyId)"
+                          >
+                            {{
+                              getClientName(currencyId, payments.currencyList)
+                            }}
+                            <mat-icon matChipRemove>cancel</mat-icon>
+                          </mat-chip>
+                        </mat-chip-list>
+                      </mat-select-trigger>
+                      <mat-option
+                        *ngFor="let currency of payments.currencyList"
+                        [value]="currency.id"
+                        (click)="checkboxChange(currency)"
+                      >
+                        {{ currency.name }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+              </div>
+              <mat-spinner
+                class="medium-spinner"
+                *ngIf="filtersLoader"
+              ></mat-spinner>
+            </perfect-scrollbar>
+
+            <div class="flex-fixed-footer" *ngIf="showFilter">
+              <button
+                class="secondarytextlink"
+                class="back-btn-ui"
+                (click)="clearFilterData()"
+              >
+                {{ language.defaults.clear }}
+              </button>
+              <span fxFlex></span>
+              <button
+                mat-raised-button
+                class="app-white-btn"
+                (click)="applyFilterData()"
+                [disabled]="disableFilter"
+              >
+                Apply Filter
+              </button>
+            </div>
+          </div>
+          <div class="center-section-scroll vh-100 d-flex body-color">
+            <div class="page-header-ui">
+              <div class="flex-fixed-header page-title container-ui">
+                <div style="align-items: baseline; gap: 29px" class="d-flex">
+                  <div class="search-ui">
+                    <input
+                      matInput
+                      placeholder=""
+                      #search
+                      (keyup)="searchInsurances(search.value, $event)"
+                      placeholder="Search By Payment ID"
+                      (blur)="
+                        !search.value.length ? (open = false) : (open = true)
+                      "
+                      [(ngModel)]="params.search"
+                    />
+                    <mat-icon
+                      matPrefix
+                      (click)="open = !open"
+                      class="org-search"
+                      >search</mat-icon
+                    >
+                    <mat-icon matSuffix *ngIf="searching" class="spinner">
+                      <mat-spinner class="small-spinner"></mat-spinner>
+                    </mat-icon>
+                    <mat-icon
+                      class="search-close"
+                      matSuffix
+                      *ngIf="!searching && search.value.length"
+                      (click)="
+                        search.value = ''; searchInsurances(search.value)
+                      "
+                      >close</mat-icon
+                    >
+                  </div>
+                </div>
+
+                <div class="d-flex" *ngIf="adminService.rolePermissions.add_payment == 1">
+                  <div>
+                    <button
+                      mat-raised-button
+                      color="warn"
+                      (click)="addInsurance()"
+                      class="create-order-btn"
+                    >
+                      Add Payment
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <perfect-scrollbar>
+              <div class="payment list-view-table">
+                <div
+                  class="table-header-ui top-sticky z-index-8"
+                  style="top: 16px"
+                  *ngIf="orders.data.length"
+                >
+                  <div class="container-ui">
+                    <mat-list-item class="mat-list-item header-cleint">
+                      <div class="item-container justify-left" fxFlex="13">
+                        Payment ID
+                      </div>
+                      <div
+                        class="item-container justify-left"
+                        fxFlex="12"
+                      >
+                        Client Name
+                      </div>
+                      <div
+                        class="item-container justify-right"
+                        style="justify-content: end"
+                        fxFlex="12"
+                      >
+                        Type of payment
+                      </div>
+                      <div class="item-container justify-left" fxFlex="10">
+                        Payment Date
+                      </div>
+                      <div class="item-container" fxFlex="8">Currency</div>
+                      <div
+                        class="item-container flex-end"
+                        fxFlex="12"
+                      >
+                        Amount
+                      </div>
+
+                      <div
+                        class="item-container flex-end"
+                        fxFlex="12"
+                      >
+                        Amount in INR
+                      </div>
+                      <div
+                        style=" text-align: center;"
+                        class="item-container justify-center"
+                        fxFlex="8"
+                      >
+                        Invoice number
+                      </div>
+                      <div
+                        class="item-container status-align"
+                        fxFlex="13"
+                        style="justify-content: flex-start"
+                      >
+                        Status
+                      </div>
+                    </mat-list-item>
+                  </div>
+                </div>
+
+                <div
+                  class="global_list_view container-ui p-b-16"
+                  infiniteScroll
+                  [infiniteScrollDistance]="1"
+                  [infiniteScrollThrottle]="50"
+                  [scrollWindow]="false"
+                >
+                  <div fxLayout="column" fxFlex="100">
+                    <div>
+                      <div *ngIf="!fetchingData" class="multi-list-ui">
+                        <mat-list
+                          @insuranceAnimate
+                          *ngFor="let orderItem of orders.data; let key = index"
+                        >
+                          <h3 mat-subheader class="list-date">
+                            {{ orderItem.date }}
+                          </h3>
+                          <!-- (click)="paymentDetails(stepper, order)" -->
+                          <div class="list-item-card">
+                            <mat-list-item
+                              class="order-list-row"
+                              *ngFor="let order of orderItem.list"
+                            >
+                              <div class="item-container" fxFlex="13">
+                                <div
+                                  class="d-flex align-items-center avatar-cell o-hidden"
+                                >
+                                  <div class="icon-sec" style="margin-right: 0;">
+                                    <img
+                                      [src]="images.ordersIcon_o"
+                                      title="Orders"
+                                    />
+                                  </div>
+                                  <div
+                                    (click)="paymentDetails(stepper, order)"
+                                    class="content-sec o-hidden ellipsis-text"
+                                  >
+                                    <h1
+                                      title="{{ order.payment_id }}"
+                                      class="col-ellipse"
+                                      style="width: 80px"
+                                    >
+                                      {{ order.payment_id }}
+                                    </h1>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div
+                                class="item-container"
+                                style="max-width: 18%"
+                                fxFlex="12"
+                              >
+                                <div
+                                  class="d-flex align-items-center avatar-cell o-hidden"
+                                >
+                                  <mat-icon
+                                    mat-list-icon
+                                    class="avatar-list"
+                                    *ngIf="order.client_image"
+                                  >
+                                    <div
+                                      class="mat-order-avatar"
+                                      [ngStyle]="{
+                                        'background-image':
+                                          'url(' + order.client_image + ')'
+                                      }"
+                                    ></div>
+                                  </mat-icon>
+                                  <div
+                                    mat-list-icon
+                                    class="no-order-image"
+                                    *ngIf="!order.client_image"
+                                  >
+                                    <span class="mat-avatar">{{
+                                      order.client_name | contactImageName : 2
+                                    }}</span>
+                                  </div>
+                                  <div
+                                    class="content-sec o-hidden ellipsis-text"
+                                  >
+                                    <h1
+                                      class="normal ellipsis-text"
+                                      title="{{ order.client_name }}"
+                                      style="width: 55px"
+                                    >
+                                      {{ order.client_name }}
+                                    </h1>
+                                  </div>
+                                </div>
+                              </div>
+                              <div
+                                class="item-container amount_container text-right col-ellipse"
+                                fxFlex="12"
+                              >
+                                <p mat-line title="{{ order.type_of_payment }}">
+                                  {{ order.type_of_payment }}
+                                </p>
+                              </div>
+                              <div
+                                class="item-container po_no"
+                                fxFlex="10"
+                                style="
+                                  display: flex;
+                                  align-items: center;
+                                  justify-content: center;
+                                "
+                              >
+                                <p mat-line title="{{ order?.payment_date }}">
+                                  {{ order?.payment_date }}
+                                </p>
+                              </div>
+                              <div
+                                class="item-container amount_container"
+                                fxFlex="8"
+                                style="
+                                  display: flex;
+                                  justify-content: center;
+                                  text-align: center;
+                                "
+                              >
+                                <p
+                                  mat-line
+                                  title="{{ order.currency }}"
+                                  style="width: 70px"
+                                >
+                                  {{ order.currency }}
+                                </p>
+                              </div>
+                              <div
+                                class="item-container po_no flex-end"
+                                style="text-align: center"
+                                fxFlex="12"
+                                *ngIf="!is_automech"
+                              >
+                                <p
+                                  mat-line
+                                  title="{{ order.amount }}"
+                                  style="max-width: 116px"
+                                >
+                                  {{ order.amount }}
+                                </p>
+                              </div>
+                              <div
+                                class="item-container amount_container text-right flex-end"
+                                fxFlex="12"
+                                style="display: flex; justify-content: flex-end"
+                              >
+                                <p mat-line title="{{ order.amount_in_inr }}">
+                                  {{ order.amount_in_inr }}
+                                </p>
+                              </div>
+                              <div
+                                class="item-container amount_container"
+                                style="text-align: center"
+                                fxFlex="8"
+                              >
+                                <div>
+                                  <ng-container
+                                    *ngFor="
+                                      let invoice of order?.invoice_no
+                                        | slice : 0 : 2
+                                    "
+                                  >
+                                    <a
+                                      style="
+                                        padding-bottom: 4px;
+                                        color: #253957;
+                                        text-decoration: underline;
+                                        font-weight: 600;
+                                      "
+                                      mat-line
+                                      class="mat-line"
+                                      (click)="
+                                        navigateToShipment(
+                                          invoice.order_id,
+                                          invoice.shipment_id
+                                        )
+                                      "
+                                      [title]="invoice.invoice_no"
+                                    >
+                                      {{ invoice?.invoice_no }}
+                                    </a>
+                                  </ng-container>
+                                  <p
+                                    style="font-size: 12px"
+                                    *ngIf="order?.invoice_no.length > 2"
+                                    mat-button
+                                    [matMenuTriggerFor]="belowMenu"
+                                  >
+                                    View More
+                                  </p>
+                                </div>
+                                <mat-menu
+                                  #belowMenu="matMenu"
+                                  yPosition="below"
+                                  class="mat-menu-custom"
+                                >
+                                  <ng-container
+                                    *ngFor="
+                                      let invoice of order?.invoice_no
+                                        | slice : 2
+                                    "
+                                  >
+                                    <a
+                                      mat-line
+                                      class="mat-line"
+                                      style="
+                                        color: #253957;
+                                        text-decoration: underline;
+                                        font-weight: 600;
+                                        line-height: 28px;
+                                        height: auto;
+                                        border-bottom: 1px solid #ebeaea;
+                                        text-align: center;
+                                      "
+                                      mat-menu-item
+                                      (click)="
+                                        navigateToShipment(
+                                          invoice.order_id,
+                                          invoice.shipment_id
+                                        )
+                                      "
+                                      [title]="invoice.invoice_no"
+                                    >
+                                      {{ invoice?.invoice_no }}
+                                    </a>
+                                  </ng-container>
+                                </mat-menu>
+                                <!-- <p
+                                  mat-line
+                                  title="{{
+                                    order.invoice_no ? order.invoice_no : '--'
+                                  }}"
+                                  style="width: 80px"
+                                >
+                                  {{
+                                    order.invoice_no ? order.invoice_no : "--"
+                                  }}
+                                </p> -->
+                              </div>
+                              <div
+                                (click)="paymentDetails(stepper, order)"
+                                class="item-container status-cell status-tag-container status-padding"
+                                fxFlex="13"
+                                style="justify-content: flex-start"
+                              >
+                                <div
+                                  class="client-status status-ellipsis"
+                                  title="{{ order.status }}"
+                                  [ngClass]="{
+                                    accepted: order.status == 'Accepted',
+                                    created: order.status == 'Created',
+                                    'in-transit': order.status == 'In-transit',
+                                    delivered: order.status == 'Delivered',
+                                    cancelled: order.status == 'Cancelled',
+                                    received: order.status == 'Received',
+                                    processing: order.status == 'Processing',
+                                    placed: order.status == 'Placed',
+                                    draft: order.status == 'Draft',
+                                    passed: order.status == 'Passed',
+                                    shipped: order.status == 'Shipped',
+                                    fulfilment: order.status == 'Fulfilment',
+                                    pending: order.status == 'Pending',
+                                    order_confirmed: order.status == 'Recorded',
+                                    order_unused: order.status == 'Unused',
+                                    order_used: order.status == 'Used',
+                                    partially_used:
+                                      order.status == 'Partially Applied'
+                                  }"
+                                >
+                                  {{ order.status }}
+                                </div>
+                                <span
+                                  *ngIf="order.merge_status"
+                                  style="padding-left: 50px"
+                                >
+                                  <img [src]="images.mergeIcons"
+                                /></span>
+
+                                <span fxFlex></span>
+
+                                <mat-icon class="go-to-details"
+                                  >keyboard_arrow_right</mat-icon
+                                >
+                              </div>
+                            </mat-list-item>
+                          </div>
+                        </mat-list>
+                      </div>
+                    </div>
+
+                    <div
+                      class="container-ui new-center-empty-ui"
+                      *ngIf="fetchingData"
+                    >
+                      <mat-spinner
+                        class="medium-spinner"
+                        *ngIf="fetchingData"
+                      ></mat-spinner>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div
+                class="container-ui new-center-empty-ui"
+                *ngIf="!orders.data.length && !fetchingData"
+              >
+                <mat-card class="no-results">
+                  <div class="empty-img-holder">
+                    <!-- <img [src]='images.ordersIcon_o'> -->
+                    <img [src]="images.ordersIcon_o" title="Orders" />
+                  </div>
+                  <p class="no-result-text">No Payments Found</p>
+                </mat-card>
+              </div>
+              <div
+                class="container-ui new-center-empty-ui"
+                *ngIf="totalSpinner"
+              >
+                <mat-spinner class="medium-spinner"></mat-spinner>
+              </div>
+            </perfect-scrollbar>
+            <div class="pagination-footer" *ngIf="totalCount != 0">
+              <div class="container-ui d-flex space-between align-items-center">
+                <div>
+                  <p>Showing {{ listCount }} out of {{ totalCount }}</p>
+                </div>
+                <div>
+                  <app-pagination
+                    [pageLimit]="totalCount"
+                    (pageloadMore)="loadMore($event)"
+                    [pageNumber]="pageNumber"
+                  ></app-pagination>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- End Orders List View -->
+        </div>
+      </mat-step>
+    </mat-horizontal-stepper>
+    <!-- <div *ngIf="totalSpinner">
+            <mat-spinner class="medium-spinner"></mat-spinner>
+        </div> -->
+  </div>
+</div>

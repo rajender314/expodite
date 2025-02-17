@@ -1,0 +1,1168 @@
+<div class="order-main-container">
+  <mat-toolbar>
+    <div class="create-order-title-wrapper">
+      <span class="img-icon">
+        <img [src]="createOrderIcon" alt="Icon" />
+      </span>
+      <h2 class="order-main-title">
+        {{ data.flag === "Edit Order" ? "Edit" : "Create" }}
+        {{ estimateslanguage }}
+      </h2>
+    </div>
+  </mat-toolbar>
+  <mat-dialog-content (scroll)="onWindowScroll($event)">
+    <div class="page-inner-container">
+      <div class="client-select">
+        <form [formGroup]="clientsForm">
+          <mat-list>
+            <mat-form-field
+              class="custom-input mandatory client"
+              floatLabel="never"
+            >
+              <input
+                placeholder="Select Client"
+                matInput
+                [matAutocomplete]="auto"
+                aria-label="Number"
+                [value]="modelData.name"
+                formControlName="client"
+                (openedChange)="selectedClients($event)"
+                (keyup)="selectedClients($event)"
+                (click)="getClients()"
+                [readonly]="data.flag === 'Edit Order'"
+                [(ngModel)]="clintName"
+                (blur)="onBlur($event)"
+              />
+
+              <button
+                style="top: -26px !important"
+                type="button"
+                mat-button
+                matSuffix
+                mat-icon-button
+                aria-label="Clear"
+                (click)="clear()"
+                class="mat-icon-downn"
+                [disabled]="data.flag == 'Edit Order'"
+              >
+                <mat-icon>keyboard_arrow_down</mat-icon>
+              </button>
+              <div>
+                <label class="custom-label mandatory">Select Client</label>
+                <mat-autocomplete #auto="matAutocomplete" auto>
+                  <mat-option
+                    (onSelectionChange)="selectionChange(client)"
+                    *ngFor="let client of order.organizations"
+                    [value]="client.name"
+                  >
+                    <span>{{ client.name }}</span>
+                  </mat-option>
+                </mat-autocomplete>
+              </div>
+              <!-- <label class="custom-label">Select Client</label>
+                              <mat-select placeholder="Select Client" formControlName="client">
+                                  <mat-option *ngFor="let client of order.organizations" [value]="client.id">
+                                      {{ client.name }}
+                                  </mat-option>
+                              </mat-select> -->
+              <mat-error
+                *ngIf="
+                  clientsForm.controls.client.hasError('required') && !showError
+                "
+              >
+                Please Select Client
+              </mat-error>
+              <p class="custom-edit-err" *ngIf="showError && !newClientadded">
+                {{ errormessage }}
+              </p>
+              <p
+                class="custom-edit-err"
+                *ngIf="
+                  pfiNbrSeriesLimit &&
+                  !clientsForm.controls.client.hasError('required') &&
+                  !showError
+                "
+              >
+                The PFI series for the selected client has reached its
+                limit.Please update the PFI end series
+              </p>
+            </mat-form-field>
+
+            <div *ngIf="!newClientadded">
+              <span
+                class="add-link mb-16"
+                style="justify-content: left"
+                *ngIf="addNew"
+                (click)="addOrganization()"
+              >
+                <mat-icon class="mat-icon material-icons">add</mat-icon>Add New
+                Client
+              </span>
+            </div>
+          </mat-list>
+        </form>
+      </div>
+      <div class="products-container">
+        <div class="details-title">
+          <h2>{{ estimateslanguage }} Details</h2>
+        </div>
+        <form [formGroup]="productsForm">
+          <div class="d-flex d-row row-ui" fxlayout="row">
+            <aside class="col-6">
+              <mat-form-field class="custom-input w-100" floatLabel="never">
+                <label class="custom-label mandatory">PO No</label>
+                <input
+                  matInput
+                  formControlName="po_no"
+                  placeholder="PO No"
+                  maxlength="15"
+                />
+                <mat-error
+                  class="error-msg"
+                  *ngIf="productsForm.controls.po_no.hasError('pattern')"
+                >
+                  Please Enter Valid PO Number
+                </mat-error>
+              </mat-form-field>
+            </aside>
+            <aside class="col-6">
+              <mat-form-field
+                class="custom-deliveryDate w-100"
+                floatLabel="never"
+              >
+                <label class="custom-labeldate po-date">PO Date</label>
+                <input
+                  matInput
+                  class="datepicker"
+                  (focus)="openCalendar(picker2)"
+                  (click)="openCalendar(picker2)"
+                  formControlName="po_date"
+                  [(ngModel)]="poDate"
+                  readonly
+                  [matDatepicker]="picker2"
+                  placeholder="PO Date"
+                />
+                <mat-datepicker-toggle
+                  class="mat-picker"
+                  matSuffix
+                  [for]="picker2"
+                ></mat-datepicker-toggle>
+                <mat-datepicker #picker2 startView="year"></mat-datepicker>
+              </mat-form-field>
+            </aside>
+          </div>
+          <div class="d-flex w-100" style="gap: 16px">
+            <div class="custom-multi-select mandatory w-100 mandatory">
+              <div class="multi-select mandatory">
+                <!-- <mat-label class="label-attention mandatory">Attention</mat-label> -->
+                <label class="custom-label mandatory"
+                  >Attention
+                  <span style="color: #ff0000; font-size: 16px">*</span></label
+                >
+                <ng-select
+                  [items]="contactsList"
+                  bindLabel="name"
+                  bindValue="name"
+                  addTagText="Add Attention"
+                  [addTag]="true"
+                  [clearable]="false"
+                  (change)="changeUser($event)"
+                  [multiple]="false"
+                  placeholder="Select User"
+                  formControlName="kindAttn"
+                  class="custom-multi-select-input"
+                >
+                </ng-select>
+                <mat-error
+                  class="error-msg"
+                  *ngIf="
+                    productSubmit &&
+                    productsForm.controls.kindAttn.hasError('required')
+                  "
+                >
+                  Please Select User
+                </mat-error>
+              </div>
+            </div>
+
+            <div class="ext-section w-100">
+              <mat-form-field
+                class="custom-input mandatory w-100"
+                floatLabel="never"
+              >
+                <label class="custom-label mandatory">Phone Number</label>
+                <!-- minlength="10" maxlength="10" -->
+                <input
+                  readonly
+                  type="text"
+                  formControlName="phone"
+                  matInput
+                  placeholder="Phone Number"
+                />
+                <mat-error
+                  class="error-msg"
+                  *ngIf="productsForm.controls.phone.hasError('required')"
+                >
+                  Please Enter Phone Number
+                </mat-error>
+                <mat-error
+                  *ngIf="productsForm.controls.phone.hasError('pattern')"
+                  >Please Enter Valid Phone Number</mat-error
+                >
+                <mat-error
+                  *ngIf="
+                    !productsForm.controls.phone.hasError('pattern') &&
+                    productsForm.controls.phone.hasError('minlength')
+                  "
+                  >Phone Number must be minimum 6 characters</mat-error
+                >
+              </mat-form-field>
+            </div>
+            <div class="ext-section w-100">
+              <mat-form-field
+                class="custom-input ext-label w-100"
+                floatLabel="never"
+              >
+                <label class="custom-label">Ext</label>
+                <input
+                  matInput
+                  placeholder="Ext"
+                  maxlength="3"
+                  formControlName="ext"
+                />
+                <mat-error *ngIf="productsForm.controls.ext.hasError('pattern')"
+                  >Please Enter Valid Ext</mat-error
+                >
+              </mat-form-field>
+            </div>
+          </div>
+
+          <div class="d-flex d-row row-ui" fxlayout="row">
+            <aside class="col-6">
+              <mat-form-field
+                class="custom-input mandatory w-100"
+                floatLabel="never"
+              >
+                <label class="custom-label mandatory">Email Address</label>
+                <input
+                  readonly
+                  matInput
+                  formControlName="email"
+                  placeholder="Email Address"
+                  (keyup)="valueChanged($event)"
+                />
+                <mat-error class="error-msg" *ngIf="showValidation">
+                  Please Enter Email Address
+                </mat-error>
+                <mat-error
+                  class="error-msg"
+                  *ngIf="
+                    !productsForm.controls.email.hasError('required') &&
+                    productsForm.controls.email.hasError('pattern')
+                  "
+                >
+                  {{ language.validations.emailValidation }}
+                </mat-error>
+              </mat-form-field>
+            </aside>
+            <aside class="col-6">
+              <mat-form-field
+                class="custom-input mandatory w-100"
+                floatLabel="never"
+              >
+                <label class="custom-label mandatory">Mode of Shipping</label>
+                <mat-select
+                  placeholder="Mode of Shipping"
+                  formControlName="transport_mode"
+                >
+                  <mat-option
+                    (click)="selectShippingMode(transportMode)"
+                    *ngFor="let transportMode of order.mode_of_transport"
+                    [value]="transportMode.id"
+                  >
+                    {{ transportMode.name }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </aside>
+          </div>
+          <div class="d-flex d-row row-ui" fxlayout="row">
+            <aside class="col-6">
+              <mat-form-field
+                class="custom-input mandatory w-100"
+                floatLabel="never"
+              >
+                <label class="custom-label mandatory">{{
+                  language.defaults.portofLoading
+                }}</label>
+                <input
+                  matInput
+                  placeholder="Enter Port of Loading"
+                  formControlName="port_of_loading"
+                  autofocus="off"
+                  autocomplete="off"
+                />
+                <mat-error
+                  style="text-transform: none"
+                  class="error-msg"
+                  *ngIf="
+                    productsForm.controls.port_of_loading.hasError(
+                      'required'
+                    ) ||
+                    productsForm.controls.port_of_loading.hasError('whitespace')
+                  "
+                >
+                  Please Enter Port of Loading
+                </mat-error>
+                <mat-error
+                  style="text-transform: none"
+                  *ngIf="
+                    !(
+                      productsForm.controls.port_of_loading.hasError(
+                        'required'
+                      ) ||
+                      productsForm.controls.port_of_loading.hasError(
+                        'whitespace'
+                      )
+                    ) &&
+                    productsForm.controls.port_of_loading.hasError(
+                      'specialcharacters'
+                    )
+                  "
+                  >Please Enter Valid Port of Loading</mat-error
+                >
+              </mat-form-field>
+            </aside>
+            <aside class="col-6">
+              <mat-form-field
+                class="custom-input mandatory w-100"
+                floatLabel="never"
+              >
+                <label class="custom-label mandatory">{{
+                  language.defaults.portofdischarge
+                }}</label>
+                <input
+                  type="text"
+                  matInput
+                  placeholder="Enter Port of Discharge"
+                  formControlName="port_of_discharge"
+                  autofocus="off"
+                  autocomplete="off"
+                />
+                <mat-error
+                  style="text-transform: none"
+                  class="error-msg"
+                  *ngIf="
+                    productsForm.controls.port_of_discharge.hasError(
+                      'required'
+                    ) ||
+                    productsForm.controls.payment_terms.hasError('whitespace')
+                  "
+                >
+                  Please Enter Port of Discharge
+                </mat-error>
+                <mat-error
+                  style="text-transform: none"
+                  *ngIf="
+                    !(
+                      productsForm.controls.port_of_discharge.hasError(
+                        'required'
+                      ) ||
+                      productsForm.controls.payment_terms.hasError('whitespace')
+                    ) &&
+                    productsForm.controls.port_of_discharge.hasError(
+                      'specialcharacters'
+                    )
+                  "
+                  >Please Enter Valid Port of Discharge</mat-error
+                >
+              </mat-form-field>
+            </aside>
+          </div>
+          <div class="d-flex d-row row-ui" fxlayout="row">
+            <aside class="col-6">
+              <mat-form-field
+                class="custom-input mandatory w-100"
+                floatLabel="never"
+              >
+                <label class="custom-label mandatory">{{
+                  is_aapl
+                    ? language.defaults.cityOfDestination
+                    : language.defaults.finaldestination
+                }}</label>
+                <input
+                  type="text"
+                  matInput
+                  placeholder="Enter {{
+                    is_aapl
+                      ? language.defaults.cityOfDestination
+                      : language.defaults.finaldestination
+                  }}"
+                  formControlName="final_destination"
+                  autofocus="off"
+                  autocomplete="off"
+                />
+                <mat-error
+                  class="error-msg"
+                  *ngIf="
+                    productsForm.controls.final_destination.hasError(
+                      'required'
+                    ) ||
+                    productsForm.controls.payment_terms.hasError('whitespace')
+                  "
+                >
+                  Please Enter
+                  {{
+                    is_aapl
+                      ? language.defaults.cityOfDestination
+                      : language.defaults.finaldestination
+                  }}
+                </mat-error>
+                <mat-error
+                  *ngIf="
+                    !(
+                      productsForm.controls.final_destination.hasError(
+                        'required'
+                      ) ||
+                      productsForm.controls.payment_terms.hasError('whitespace')
+                    ) &&
+                    productsForm.controls.final_destination.hasError(
+                      'specialcharacters'
+                    )
+                  "
+                  >Please Enter Valid Final Destination</mat-error
+                >
+              </mat-form-field>
+            </aside>
+            <aside class="col-6">
+              <mat-form-field
+                class="custom-input w-100 mandatory"
+                floatLabel="never"
+              >
+                <label class="custom-label mandatory">Account Manager </label>
+                <input
+                  type="text"
+                  matInput
+                  placeholder="Enter Account Manager"
+                  formControlName="account_manager"
+                  autofocus="off"
+                  autocomplete="off"
+                  maxlength="20"
+                />
+                <mat-error
+                  class="error-msg"
+                  *ngIf="
+                    productsForm.controls.account_manager.hasError(
+                      'required'
+                    ) ||
+                    productsForm.controls.account_manager.hasError('whitespace')
+                  "
+                >
+                  Please Enter Account Manager
+                </mat-error>
+                <mat-error
+                  *ngIf="
+                    productsForm.controls.account_manager.hasError(
+                      'specialcharacters'
+                    )
+                  "
+                  >Please Enter Valid Account Manager
+                </mat-error>
+              </mat-form-field>
+            </aside>
+          </div>
+          <div class="d-flex d-row row-ui" fxlayout="row">
+            <aside class="col-6">
+              <mat-form-field
+                class="custom-input mandatory w-100"
+                floatLabel="never"
+              >
+                <label class="custom-label mandatory">Payment Terms</label>
+                <input
+                  type="text"
+                  matInput
+                  placeholder="Enter Payment Terms"
+                  formControlName="payment_terms"
+                  autofocus="off"
+                  autocomplete="off"
+                />
+                <mat-error
+                  class="error-msg"
+                  *ngIf="
+                    productsForm.controls.payment_terms.hasError('required') ||
+                    productsForm.controls.payment_terms.hasError('whitespace')
+                  "
+                >
+                  Please Enter Payment Terms
+                </mat-error>
+                <mat-error
+                  class="error-msg"
+                  *ngIf="
+                    productsForm.controls.payment_terms.hasError('maxlength')
+                  "
+                >
+                  Payment Terms cannot exceed 255 characters
+                </mat-error>
+              </mat-form-field>
+            </aside>
+            <aside class="col-6">
+              <mat-form-field class="custom-input w-100" floatLabel="never">
+                <label class="custom-label"
+                  >Currency<span class="asterisk">*</span></label
+                >
+                <mat-select
+                  placeholder="Select Currency"
+                  formControlName="currency_id"
+                >
+                  <mat-option
+                    *ngFor="let cur of currencyX"
+                    [value]="cur.id"
+                    (click)="onSelectionChanges(cur)"
+                    >{{ cur.name }} ({{ cur.type }})</mat-option
+                  >
+                </mat-select>
+              </mat-form-field>
+            </aside>
+          </div>
+          <div class="d-flex d-row row-ui" fxlayout="row">
+            <aside class="col-6">
+              <mat-form-field
+                class="custom-input mandatory w-100"
+                floatLabel="never"
+              >
+                <label class="custom-label mandatory">Incoterms</label>
+                <mat-select
+                  class="payment-select"
+                  placeholder="Select Incoterms"
+                  [value]=""
+                  formControlName="inco_terms"
+                >
+                  <mat-option
+                    (click)="changeIncoTerms(inco.id)"
+                    *ngFor="let inco of incoTermsList"
+                    [value]="inco.id"
+                  >
+                    {{ inco.name }}
+                  </mat-option>
+                  <!-- <mat-error class="error-msg" *ngIf=" productsForm.controls.inco_terms.hasError('required')">
+                                          Please select Inco Term's
+                                      </mat-error> -->
+                </mat-select>
+              </mat-form-field>
+            </aside>
+            <aside class="col-6">
+              <mat-form-field
+                class="custom-deliveryDate w-100"
+                floatLabel="never"
+              >
+                <label class="custom-labeldate delivery"
+                  >Expected Delivery Date</label
+                >
+                <input
+                  matInput
+                  class="datepicker"
+                  [min]="now"
+                  (focus)="openCalendar1(picker3)"
+                  (click)="openCalendar1(picker3)"
+                  formControlName="delivery_date"
+                  readonly
+                  [(ngModel)]="deliveryDate"
+                  [matDatepicker]="picker3"
+                  placeholder="Select date"
+                />
+                <mat-datepicker-toggle
+                  class="mat-picker"
+                  matSuffix
+                  [for]="picker3"
+                ></mat-datepicker-toggle>
+                <mat-datepicker #picker3 startView="year"></mat-datepicker>
+              </mat-form-field>
+            </aside>
+          </div>
+          <div class="d-flex d-row row-ui" fxlayout="row">
+            <aside class="col-6">
+              <mat-form-field class="custom-input w-100" floatLabel="never">
+                <label class="custom-label mandatory"
+                  >Other Delivery Terms
+                </label>
+                <input
+                  type="text"
+                  matInput
+                  placeholder="Enter Other Delivery Terms"
+                  formControlName="other_delivery_terms"
+                  autofocus="off"
+                  autocomplete="off"
+                />
+                <mat-error
+                  class="error-msg"
+                  *ngIf="
+                    productsForm.controls.other_delivery_terms.hasError(
+                      'maxlength'
+                    )
+                  "
+                >
+                  Other Delivery Terms cannot exceed 600 characters
+                </mat-error>
+              </mat-form-field>
+            </aside>
+          </div>
+          <div class="d-flex">
+            <mat-form-field class="custom-input w-100" floatLabel="never">
+              <label class="custom-label">Special Instructions</label>
+              <textarea
+                matInput
+                formControlName="special_instructions"
+                maxlength="255"
+                placeholder="Add special instructions"
+              ></textarea>
+            </mat-form-field>
+          </div>
+
+          <div class="products-table">
+            <div
+              class="divTable"
+              [formGroup]="productsDynamicForm"
+              style="border: 1px solid #e3e3e3"
+            >
+              <div class="divTableRow product-table-header">
+                <div
+                  class="divTableCell product-data-cell"
+                  style="text-align: left; width: 300px"
+                >
+                  Product Details
+                </div>
+                <div class="divTableCell" style="text-align: left">
+                  Quantity
+                </div>
+                <div class="divTableCell" style="text-align: left">
+                  Price/Unit
+                </div>
+                <div class="divTableCell" style="text-align: left">Amount</div>
+                <div class="divTableCell" style="text-align: left">&nbsp;</div>
+              </div>
+              <div
+                class="divTableBody"
+                formArrayName="productItem"
+                *ngFor="
+                  let item of productsDynamicForm.get('productItem')[
+                    'controls'
+                  ];
+                  let i = index
+                "
+              >
+                <div class="divTableRow" [formGroupName]="i">
+                  <div class="divTableCell product-data-cell">
+                    <mat-form-field
+                      class="custom-input mandatory products"
+                      floatLabel="never"
+                      style="width: 300px; margin-top: 0px"
+                    >
+                      <input
+                        placeholder="Select Product(s)"
+                        matInput
+                        [matAutocomplete]="product"
+                        [value]="item.value.name"
+                        (keyup)="searchProducts($event)"
+                        (keydown)="clearPr($event)"
+                        (focus)="
+                          searchProducts($event); $event.stopPropagation()
+                        "
+                      />
+                      <button
+                        style="top: -26px !important"
+                        type="button"
+                        mat-button
+                        matSuffix
+                        mat-icon-button
+                        aria-label="Clear"
+                      >
+                        <!-- (click)="clear()" -->
+                        <mat-icon>keyboard_arrow_down</mat-icon>
+                      </button>
+                      <mat-autocomplete #product="matAutocomplete" auto>
+                        <mat-option
+                          class="products-custom-mat-option"
+                          *ngFor="let product of order.products"
+                          (click)="changeProduct(product, i)"
+                          [value]="product.name"
+                        >
+                          <div
+                            (click)="changeProduct(product, i)"
+                            class="product-title"
+                          >
+                            <div>
+                              <span class="product-name product-name-overlap"
+                                >{{ product.name }} </span
+                              ><span class="product-units">{{
+                                product.uom_name
+                              }}</span>
+                            </div>
+                            <span class="product-rate"
+                              >price: {{ product.price }}
+                            </span>
+                          </div>
+                        </mat-option>
+                        <div class="add-new-item" (click)="addNewProduct()">
+                          <img [src]="newItemIcon" alt="addNew" />
+                          <span>Add New Item</span>
+                        </div>
+                      </mat-autocomplete>
+                    </mat-form-field>
+                  </div>
+                  <div class="divTableCell">
+                    <mat-form-field
+                      class="custom-input mandatory"
+                      floatLabel="never"
+                      style="margin-top: 0px"
+                    >
+                      <input
+                        matInput
+                        formControlName="quantity"
+                        placeholder="Quantity"
+                        (keyup)="enterQty($event, i)"
+                        class="input-right"
+                        type="text"
+                        [value]="item.value.quantity"
+                        oninput="javascript:  if (!/^(\d+(\.\d{0,3})?)?$/.test(this.value)) this.value = this.value.slice(0, -1);"
+                      />
+                      <mat-error
+                        class="error-msg"
+                        *ngIf="item.controls.quantity.hasError('pattern')"
+                      >
+                        Enter a number with up to 3 decimals
+                      </mat-error>
+                      <mat-error
+                        class="error-msg"
+                        *ngIf="
+                          !item.controls.quantity.hasError('pattern') &&
+                          item.controls.quantity.hasError('min')
+                        "
+                      >
+                        Please Enter Value Greater Than Zero
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="divTableCell">
+                    <mat-form-field
+                      class="custom-input mandatory"
+                      floatLabel="never"
+                      style="margin-top: 0px"
+                    >
+                      <input
+                        matInput
+                        formControlName="price"
+                        placeholder="1.00"
+                        type="text"
+                        (keyup)="enterProd($event, i)"
+                        [value]="item.value.price"
+                        class="input-right"
+                        oninput="javascript:  if (!/^(\d+(\.\d{0,3})?)?$/.test(this.value)) this.value = this.value.slice(0, -1);"
+                      />
+                      <mat-error
+                        class="error-msg"
+                        *ngIf="item.controls.price.hasError('pattern')"
+                      >
+                        Enter a number with up to 3 decimals
+                      </mat-error>
+                      <mat-error
+                        class="error-msg"
+                        *ngIf="
+                          !item.controls.price.hasError('pattern') &&
+                          item.controls.price.hasError('min')
+                        "
+                      >
+                        Please Enter Value Greater Than Zero
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="divTableCell">
+                    <mat-form-field
+                      class="custom-input mandatory"
+                      floatLabel="never"
+                      style="margin-top: 0px"
+                    >
+                      <input
+                        readonly
+                        matInput
+                        formControlName="amount"
+                        placeholder="1.00"
+                        [value]="item.value.amount"
+                        class="input-right"
+                        type="number"
+                      />
+                      <!-- <mat-error class="error-msg" *ngIf="!productItem?.value.at(i)?.amount">
+                                                  Please enter Amount
+                                              </mat-error> -->
+                    </mat-form-field>
+                  </div>
+                  <div
+                    class="divTableCell"
+                    style="line-height: 72px; text-align: center"
+                  >
+                    <mat-icon
+                      title="Delete"
+                      (click)="deleteRow(i)"
+                      style="cursor: pointer; vertical-align: super"
+                      mat-button
+                      >delete</mat-icon
+                    >
+                  </div>
+                </div>
+              </div>
+              <mat-error class="error-msg" *ngIf="productError">
+                Please select atleast one product
+              </mat-error>
+              <mat-error class="error-msg" *ngIf="productselecterror">
+                Please provide the details for the product.
+              </mat-error>
+            </div>
+
+            <div class="order-totals-wrapper">
+              <div
+                class="order-left-nav d-flex"
+                style="justify-content: flex-start; gap: 8px"
+              >
+                <div
+                  class="add-new-line"
+                  (click)="addNewLine()"
+                  style="padding: 6px"
+                >
+                  <img [src]="newItemIcon" alt="" />
+                  <span>Add Product</span>
+                </div>
+                <mat-error class="error-msg" *ngIf="isAddProduct">
+                  Please select a client
+                </mat-error>
+
+                <div (click)="uploadLineItemDoc()" class="import_line_items">
+                  Import Line Items
+                  <span><img [src]="importIcon" /></span>
+                </div>
+                <!-- <div class="customer_notes">
+                                      <mat-form-field class="custom-input compny-sub-flx grid-full" floatLabel="never">
+                                          <label class="custom-label">Customer Notes</label>
+                                          <textarea maxlength="250" matInput formControlName="customer_notes"
+                                              class="customer-notes_text-area"
+                                              placeholder="Enter any notes to be displayed in your transaction"></textarea>
+                                      </mat-form-field>
+                                  </div> -->
+              </div>
+              <div class="sub-total-wrapper">
+                <div class="sub-total d-flex">
+                  <p style="flex: 1">
+                    Sub Total <span>( {{ order.currency }} )</span>
+                  </p>
+                  <p class="">
+                    {{ currencyFormatter(subTotal, order.currency) }}
+                    <!-- {{ subTotal | number : "1.3-3" }} -->
+                    <!-- {{ formattedSubTotal }} -->
+                  </p>
+                </div>
+                <div class="sub-total-freight">
+                  <div class="order-discount d-flex">
+                    <div class="discount-tag">
+                      <p class="discount-label mt-10">Freight</p>
+                      <mat-form-field
+                        class="custom-input"
+                        floatLabel="never"
+                        style="margin-top: 4px"
+                      >
+                        <input
+                          matInput
+                          formControlName="freight"
+                          type="number"
+                          placeholder="0.00"
+                          min="0"
+                          maxlength="11"
+                          step="0.01"
+                          [readonly]="subTotal == 0"
+                          [class.disableClass]="subTotal == 0"
+                          [value]=""
+                          (keyup)="enterFreight($event)"
+                          (wheel)="onWheel($event)"
+                          (keydown)="preventInputE($event)"
+                        />
+                        <mat-error
+                          class="error-msg"
+                          *ngIf="
+                            productsForm.controls.freight.hasError('pattern')
+                          "
+                          style="margin-top: 14px; font-size: 10px"
+                        >
+                          Please Enter Up To 7 Characters With 3 Decimals Max
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+                    <p class="mt-10">
+                      {{ currencyFormatter(freightamt, order.currency) }}
+                      <!-- | number : "1.3-3" -->
+                    </p>
+                  </div>
+                  <div class="order-discount d-flex">
+                    <div class="discount-tag">
+                      <p class="discount-label mt-10">Insurance</p>
+                      <mat-form-field
+                        class="custom-input"
+                        floatLabel="never"
+                        style="margin-top: 4px"
+                      >
+                        <input
+                          matInput
+                          formControlName="insurance"
+                          type="number"
+                          placeholder="0.00"
+                          min="0"
+                          maxlength="11"
+                          [readonly]="subTotal == 0"
+                          [class.disableClass]="subTotal == 0"
+                          [value]=""
+                          (keyup)="enterInsurance($event)"
+                          (wheel)="onWheel($event)"
+                          (keydown)="preventInputE($event)"
+                        />
+                        <mat-error
+                          class="error-msg"
+                          *ngIf="
+                            productsForm.controls.insurance.hasError('pattern')
+                          "
+                          style="margin-top: 14px; font-size: 10px"
+                        >
+                          Please Enter Up To 7 Characters With 3 Decimals Max
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+                    <p class="mt-10">
+                      {{ currencyFormatter(insuranceValue, order.currency) }}
+                      <!-- | number : "1.3-3" -->
+                    </p>
+                  </div>
+                  <div class="order-discount precentage d-flex scroll-error">
+                    <div class="discount-tag">
+                      <p class="discount-label mt-10">Discount</p>
+                      <mat-form-field
+                        class="custom-input percentaged"
+                        floatLabel="never"
+                        style="padding-top: 0px"
+                        style="margin-top: 4px"
+                      >
+                        <input
+                          matInput
+                          formControlName="discount"
+                          type="number"
+                          placeholder="0.00"
+                          min="0"
+                          maxlength="11"
+                          step="0.01"
+                          (keydown)="handleKeyDown($event)"
+                          [readonly]="subTotal == 0"
+                          [class.disableClass]="subTotal == 0"
+                          [value]=""
+                          (keyup)="enterDiscount($event)"
+                          (wheel)="onWheel($event)"
+                          (keydown)="preventInputE($event)"
+                        />
+                        <mat-error
+                          class="error-msg"
+                          *ngIf="
+                            !discountError &&
+                            productsForm.controls.discount.hasError('pattern')
+                          "
+                          style="margin-top: 14px; font-size: 10px"
+                        >
+                          Please Enter Up To 7 Characters With 3 Decimals Max
+                        </mat-error>
+                        <p
+                          *ngIf="
+                            discountError &&
+                            productsForm.controls.discount.value &&
+                            productsForm.controls.discount.value > 0
+                          "
+                          class="error-discount"
+                        >
+                          Discount cannot exceed sub total
+                        </p>
+                      </mat-form-field>
+                    </div>
+                    <p class="mt-10">
+                      <span style="font-size: 11px">(-)</span>
+                      {{ currencyFormatter(discount, order.currency) }}
+                      <!-- | number : "1.3-3" -->
+                    </p>
+                  </div>
+                </div>
+                <div class="sub-total d-flex">
+                  <p style="flex: 1">
+                    Total <span>( {{ order.currency }} )</span>
+                  </p>
+                  <p class="">
+                    {{ currencyFormatter(total, order.currency) }}
+                    <!-- | number : "1.3-3" -->
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="order-docs-wrapper d-flex">
+            <div class="terms-container" style="margin-left: -6px">
+              <mat-form-field
+                class="custom-input compny-sub-flx grid-full"
+                floatLabel="never"
+              >
+                <label class="custom-label">Terms & Conditions</label>
+                <textarea
+                  [(ngModel)]="textareaContent"
+                  (input)="updateWordCount()"
+                  matInput
+                  formControlName="terms_conditions"
+                  class="terms_conditions"
+                  maxlength="1024"
+                  placeholder="Enter any notes to be displayed in your transaction"
+                ></textarea>
+                <mat-error
+                  class="error-msg"
+                  *ngIf="
+                    productsForm.controls.terms_conditions.hasError('maxlength')
+                  "
+                >
+                  Terms & Conditions cannot exceed 1024 characters
+                </mat-error>
+              </mat-form-field>
+              <div style="float: right; margin-top: 0px; margin-right: 6px">
+                {{ wordCount }} /1024
+              </div>
+            </div>
+          </div>
+          <mat-dialog-content
+            class="address-content"
+            style="padding-left: 0px; padding-right: 0px"
+          >
+            <div class="address-content">
+              <mat-toolbar class="mat-toolbar-strip">
+                <h3>Select Shipping Address</h3>
+                <span fxFlex></span>
+                <span class="add-link" (click)="goToCreateAddress('client')">
+                  <mat-icon class="mat-icon material-icons">add</mat-icon>Add
+                  New
+                </span>
+              </mat-toolbar>
+              <mat-selection-list class="address-selection" #list>
+                <p class="address-error" *ngIf="order.selectedShippingError">
+                  Please Select Shipping Address
+                </p>
+                <!-- <mat-checkbox (click)="selectAddress(address, order.clientAddress, 1)"
+                                                  [(ngModel)]="address.selected"  class="product-name"
+                                                  title="{{address?.company_name}}" *ngFor="let address of order.clientAddress"><p>{{address?.company_name}}</p>
+                                                  <p>{{address.address1}}</p>
+                                                  <p>{{address.address2}}</p>
+                                                  <p>{{address.city}}</p>
+                                                  <p>{{address.state}}</p>
+                                                  <p>{{address.country_name}}</p></mat-checkbox> -->
+                <mat-list-option
+                  selected="{{ address.selected }}"
+                  (click)="selectAddress(address, order.clientAddress, 1)"
+                  class="orders-list create-order"
+                  *ngFor="let address of order.clientAddress"
+                >
+                  <p>{{ address?.company_name }}</p>
+                  <p>{{ address.address1 }}</p>
+                  <p>{{ address.address2 }}</p>
+                  <p>{{ address.address3 }}</p>
+                  <p>{{ address.address4 }}</p>
+                  <p>{{ address.city }}</p>
+                  <p>{{ address.state }}</p>
+                  <p>{{ address.country_name }}</p>
+                </mat-list-option>
+              </mat-selection-list>
+              <mat-toolbar class="mat-toolbar-strip">
+                <h3>Select Billing Address</h3>
+                <span fxFlex></span>
+                <span class="add-link" (click)="goToCreateAddress('company')">
+                  <mat-icon class="mat-icon material-icons">add</mat-icon>Add
+                  New
+                </span>
+              </mat-toolbar>
+              <mat-selection-list class="address-selection">
+                <p class="address-error" *ngIf="order.selectedBillingError">
+                  Please Select Billing Address
+                </p>
+                <!-- <span fxFlex></span> -->
+
+                <!-- <mat-checkbox    class="product-name" (click)="getAddressSame(clientAddress)"  title="Sample Order"></mat-checkbox> -->
+                <mat-list-option
+                  selected="{{ address.selected }}"
+                  (click)="selectAddress(address, order.companyAddress, 2)"
+                  class="orders-list create-order"
+                  *ngFor="let address of order.companyAddress"
+                >
+                  <p>{{ address?.company_name }}</p>
+                  <p>{{ address.address1 }}</p>
+                  <p>{{ address.address2 }}</p>
+                  <p>{{ address.address3 }}</p>
+                  <p>{{ address.address4 }}</p>
+                  <p>{{ address.city }}</p>
+                  <p>{{ address.state }}</p>
+                  <p>{{ address.country_name }}</p>
+                </mat-list-option>
+              </mat-selection-list>
+
+              <div>
+                <mat-toolbar class="mat-toolbar-strip">
+                  <h3>Select Notify Address</h3>
+                  <span fxFlex></span>
+                  <span class="add-link" (click)="goToCreateAddress('notify')">
+                    <mat-icon class="mat-icon material-icons">add</mat-icon>Add
+                    New
+                  </span>
+                </mat-toolbar>
+                <mat-selection-list class="address-selection">
+                  <p class="address-error" *ngIf="order.selectedNotifyError">
+                    Please Select Notify Address
+                  </p>
+                  <mat-list-option
+                    selected="{{ address.selected }}"
+                    (click)="selectAddress(address, order.notifyAddress, 3)"
+                    class="orders-list create-order"
+                    *ngFor="let address of order.notifyAddress"
+                  >
+                    <p>{{ address?.company_name }}</p>
+                    <p>{{ address.address1 }}</p>
+                    <p>{{ address.address2 }}</p>
+                    <p>{{ address.address3 }}</p>
+                    <p>{{ address.address4 }}</p>
+                    <p>{{ address.city }}</p>
+                    <p>{{ address.state }}</p>
+                    <p>{{ address.country_name }}</p>
+                  </mat-list-option>
+                </mat-selection-list>
+              </div>
+            </div>
+          </mat-dialog-content>
+        </form>
+      </div>
+      <mat-spinner
+        class="medium-spinner page-fixed"
+        *ngIf="fetchingData"
+      ></mat-spinner>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions>
+    <div class="cofirmOrderActionsBlock">
+      <button mat-button mat-dialog-close>Close</button>
+      <button
+        mat-raised-button
+        id="createorder"
+        color="primary"
+        [disabled]="
+          createbtnDisabled ||
+          productsForm.invalid ||
+          showError ||
+          pfiNbrSeriesLimit
+        "
+        (click)="createOrderConfirm()"
+      >
+        Confirm {{ estimateslanguage }}
+      </button>
+    </div>
+  </mat-dialog-actions>
+</div>

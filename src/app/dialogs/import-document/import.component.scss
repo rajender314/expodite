@@ -1,0 +1,129 @@
+.address-selection{
+    padding: 15px 0px;
+    .mat-list-option{
+        height: auto;   
+        margin: 0;
+        padding: 15px 0px;
+        }
+    .mat-list-item-content{
+        flex-direction: row !important;
+        align-items: left !important;
+    }
+
+    .mat-list-text{
+    font-size: 14px;
+    color: #565656;
+    letter-spacing: -0.18px;
+    line-height: 25px;
+    p{
+        &:first-child{
+            font-weight: 500;
+        }
+    }
+    }
+}
+.main{
+    display: flex;
+    justify-content: space-between;
+}
+.client-status.merge-order {
+    // color: red;
+    // background: aliceblue;
+    width: 80px;
+    /* padding: 14px; */
+    padding: 10px !important;
+}
+.heading{
+    font-size: 16px;
+    padding: 20px 0px;
+    // padding-left: 16px;
+
+}
+.merge-conform{
+    font-size: 16px;
+    padding: 20px 0px;
+    // padding-left: 16px;
+}
+.merge-conform span{
+    color: red;
+}
+mat-list-option.mat-list-item.mat-list-option.mat-focus-indicator.orders-list.merge-order-list.mat-accent:focus{
+    border: 1px solid green;
+}
+.merge-order-number{
+    color:#1badb3;
+}
+.image-uploade{
+    // background: #fbfbfb;
+    font-size: 18px;
+    text-align: center;
+    padding: 20px;
+    padding-top: 30px;
+    width: 100%;
+    height: 230px;
+    // border: 1px solid #ededed;
+    position: relative;
+    // margin-bottom: 10px;
+    border-radius: 4px;
+    background-color: rgb(242, 247, 255);
+    border: 2px dashed rgb(187, 222, 251);
+
+}
+.import{
+    padding: 30px 20px;
+}
+.file-drop-zone{
+    margin: auto;
+}
+.error-msg
+{
+    color: red;
+    font-size: 14px;
+}
+.support-format{
+    font-size: 12px;
+    font-style: normal;
+    font-weight: normal;
+    line-height: 20px;
+    margin: 0px 0px 8px;
+    color: rgb(142, 153, 178);
+ 
+}
+.import-file-heading{
+    padding-bottom: 16px;
+    font-family: Inter, sans-serif;
+    font-weight: 500;
+    font-weight: bold;
+    font-size: 16px;
+    color: rgb(78, 88, 109);
+}
+.drag-drop{
+    font-size: 18px;
+    font-weight: 400px;
+    padding: 6px 0px ;
+    font-family: Inter;
+    color: rgb(78, 88, 109);
+
+}
+.upload-success{
+    color: green;
+    font-size: 16px;
+    padding-top: 2px;
+}
+.sample-file{
+    font-family: Inter;
+    color: rgb(78, 88, 109);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin: 12px 0;
+
+}
+.file-name{
+    font-size: 16px;
+    color: rgb(78, 88, 109);
+
+}
+.sample-img{
+    padding-top: 2px;
+}

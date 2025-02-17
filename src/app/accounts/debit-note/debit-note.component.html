@@ -1,0 +1,268 @@
+<mat-spinner class="medium-spinner" *ngIf="invoiceGenerateLoader"></mat-spinner>
+
+<div class="orders">
+
+    <div>
+        <!-- <mat-horizontal-stepper #stepper> -->
+            <!-- <mat-step-header></mat-step-header> -->
+            <!-- <mat-step> -->
+                <div fxLayout="row">
+                     <!-- Orders List view filters sidebar -->
+                    <div class=" igst-fliter-menu1">
+                       
+                        <perfect-scrollbar class="flex-scroll-items p-l-8 p-r-8">                            
+                                <div @ordersAnimate>
+                                    <div class="fxFlex side-nav-section">
+                                        <div class="label">{{language.defaults.filterStatus}}</div>
+                                        <mat-selection-list class="status-selection filters-list">
+                                            <mat-list-option (click)="checkboxChange(status)" (change)="selectState()"
+                                                selected="{{status.selected}}" class="orders-list"
+                                                *ngFor="let status of invStatus">
+                                                {{status.name}}
+                                            </mat-list-option>
+                                        </mat-selection-list>
+                                        <mat-divider class="segment divider"></mat-divider>
+                                    </div>
+                                    
+                                    <div class="fxFlex side-nav-section" >
+                                            <mat-form-field class="custom-input custom-client" floatLabel="never" style="width: 100%">
+                                                <label class="custom-label">Clients</label>
+                                                <mat-select placeholder="Select Client" (selectionChange)="clientChange()"
+                                                    [formControl]="orders.selectedClients" (openedChange)="openedChange($event)"
+                                                    multiple>
+                                                   
+                                                    <mat-select-trigger>
+                                                        <span class="example-additional-selection">
+                                                            {{(orders.selectedClients.value?.length > 1)?orders.selectedClients.value.length+" Clients Selected": '1 Client Selected'}}
+                                                        </span>
+                                                    </mat-select-trigger>
+                                                    <mat-option *ngFor="let client of clientFilters" [value]="client.id">
+                                                        {{client.name}}</mat-option>
+                                                </mat-select>
+                                            </mat-form-field>
+                                        </div>
+    
+                                </div>
+                                <!-- <div class="fxFlex side-button-section animated slideInUp" fxLayout="row" fxLayoutAlign="end center" *ngIf="showFilter">
+                                    <button mat-button class="clear-link"
+                                        (click)="clearFilterData()">{{language.defaults.clear}}</button>
+                                    <span fxFlex></span>
+                                    <button mat-raised-button class="app-white-btn" (click)="applyFilterData()">Apply
+                                        Filter</button>
+                                </div> -->                            
+                        <mat-spinner class="medium-spinner" *ngIf="filtersLoader"></mat-spinner>
+                    </perfect-scrollbar>                  
+                        
+                        <div class="flex-fixed-footer" *ngIf="showFilter">
+                            <a class="secondarytextlink" (click)="clearFilterData()">{{language.defaults.clear}}</a>
+                            <span fxFlex></span>
+                            <button mat-raised-button class="app-white-btn" (click)="applyFilterData()">Apply
+                                Filter</button>
+                        </div>
+                    </div>
+                     <!-- end Orders List view filters sidebar -->
+                    
+                    <!-- Orders List view -->
+                    <div class="center-section-scroll vh-100 d-flex  body-color">
+                        <div class="page-header-ui">
+                            <div class="flex-fixed-header page-title container-ui1">
+                                <div class="d-flex">
+                                    <div class="flex-fixed-header menu-title-ac">
+                                        <h1>Debit Notes ({{totalCount}})</h1>                            
+                                    </div>
+                                    <div class="search-ui search-ui-ac" >
+                                        <input matInput placeholder=""
+                                            #search (keyup)="searchOrders(search.value, $event)"
+                                            placeholder="Search"
+                                            (blur)="!search.value.length ? open = false : open = true">
+                                        <mat-icon matPrefix (click)="open = !open" class="org-search">search</mat-icon>
+                                        <mat-icon matSuffix *ngIf="searching" class="spinner">
+                                            <mat-spinner class="small-spinner"></mat-spinner>
+                                        </mat-icon>
+                                        <mat-icon class="search-info" *ngIf="!search.value.length" title="Search with Client /Original Invoice (OI)#" matTooltip="Search with Order Number/Po Number/Invoice Name">info</mat-icon>
+                                        <mat-icon class="search-close" matSuffix *ngIf="!searching && search.value.length"
+                                            (click)="search.value = '';searchOrders(search.value)">close</mat-icon>
+                                    </div>
+                                </div>  
+
+                                <div class="d-flex">
+                                    <button mat-raised-button color="warn"  (click)="addDebit()"  class="create-order-btn">Create Debit Note </button>    
+                                </div>
+                            </div>
+                        </div>                        
+                    <perfect-scrollbar>
+                        <div class="list-view-table">
+                            <div class="table-header-ui top-sticky z-index-8" style="top: 16px" *ngIf="igstData?.length">
+                                <div class="container-ui1" *ngIf="!clientPermission">
+                                    <mat-list-item class="order-list-row mat-list-item header-cleint">
+                                        <div class="item-container  "  fxFlex="10">Client </div>
+                                        <div class="item-container p-l-16"  fxFlex="10 text-right">DEBIT NOTE (DN)#</div>
+                                        <div class="item-container p-l-16 " style="position: relative; left: 13px;"  fxFlex="10">CN DATE</div>
+                                        <div class="item-container  " fxFlex="10">CN AMOUNT</div>
+                                        <div class="item-container " fxFlex="10">ORIGINAL INVOICE (OI)#</div>
+                                        <div class="item-container " fxFlex="10">REFERENCE INVOICE (RI)#</div>
+                                        <div class="item-container " fxFlex="10">OI AMOUNT</div>
+                                        <div class="item-container " fxFlex="10">  OI DATE</div>
+                                        <div class="item-container " fxFlex="10"> NARRATION</div>
+                                        <div class="item-container " fxFlex="10"> STATUS </div>
+
+
+                                    </mat-list-item>
+                                </div>
+                               
+                            </div>
+
+                    
+                        <div class="global_list_view container-ui1 p-b-16" infiniteScroll [infiniteScrollDistance]="1"
+                        [infiniteScrollThrottle]="50" (scrolled)="onScroll()" *ngIf="igstData?.length" [scrollWindow]="false">
+                       
+                            <div fxLayout="column" fxFlex="100" >
+                                <div *ngIf="!clientPermission">
+                                    <div *ngIf="!fetchingData" class="multi-list-ui">
+
+                                        <mat-list @ordersAnimate
+                                           >
+                                            <!-- <h3 mat-subheader class="list-date">{{orderItem.client}}</h3> -->
+                                            <div class="list-item-card">
+                                                <mat-list-item class="order-list-row" 
+                                                    
+                                                    *ngFor="let order of igstData">
+                                                    <div class="item-container  " fxFlex="10">
+                                                        <p mat-line title="{{order.client}}">
+                                                            {{order.client ? order.client : '-'}} 
+                                                        </p>
+                                                        <!-- <p (click)="editAmount(order,1)"><mat-icon> edit</mat-icon> </p> -->
+                                                    </div>
+                                                    <div class="item-container" fxFlex="10">
+                                                        <div class="d-flex align-items-center avatar-cell o-hidden ">
+                                                           
+                                                            <div class="content-sec o-hidden ellipsis-text">
+                                                                <h1 title="{{order.debit_note_no}}" class="ellipsis-text">
+                                                                    {{order.debit_note_no ? order.debit_note_no : '-'}}
+                                                                 
+                                                                </h1>
+                                                               
+                                                            </div>
+                                                        </div>                                                        
+                                                    </div>
+
+                                                    <div class="item-container" fxFlex="10">
+                                                        <div class="d-flex align-items-center avatar-cell o-hidden ">
+                                                      
+                                                       
+                                                        <div class="content-sec o-hidden ellipsis-text">
+                                                            <h1 class="normal ellipsis-text" title="{{order.debit_note_date}}">
+                                                                {{order.debit_note_date ? order.debit_note_date : '-'}}
+                                                            </h1>
+                                                           
+                                                        </div>
+                                                    </div>
+                                                    </div>
+                                                    <div class="item-container po_no" fxFlex="10">
+                                                        <p mat-line title="{{order.amount}}">
+                                                            {{order.amount ? order.amount : '-'}} </p>
+                                                    </div>
+                                                    <div class="item-container amount_container " fxFlex="10">
+                                                        <p mat-line title="{{order.orig_inv}}">
+                                                            {{order.orig_inv ? order.orig_inv : '-'}} 
+                                                        </p>
+                                                        <!-- <p (click)="editAmount(order,1)"><mat-icon> edit</mat-icon> </p> -->
+                                                    </div>
+                                                    <div class="item-container amount_container " fxFlex="10">
+                                                        <p mat-line title="{{order.ref_inv}}">
+                                                            {{order.ref_inv ? order.ref_inv : '-'}} 
+                                                        </p>
+                                                        <!-- <p (click)="editAmount(order,1)"><mat-icon> edit</mat-icon> </p> -->
+                                                    </div>
+                                                    <div class="item-container amount_container " fxFlex="10">
+                                                        <p mat-line title="{{order.orig_inv_amount}}">
+                                                            {{order.orig_inv_amount ? order.orig_inv_amount : '-'}}
+                                                        </p>
+                                                    </div>
+                                                    <div class="item-container amount_container " fxFlex="10">
+                                                        <p mat-line title="{{order.orig_inv_date}}">
+                                                            {{order.orig_inv_date ? order.orig_inv_date : '-'}}
+
+                                                        </p>
+                                                        <!-- <p (click)="editAmount(order,2)"><mat-icon> edit</mat-icon> </p> -->
+                                                        
+                                                    </div>
+                                                   
+                                                    <div class="item-container amount_container " fxFlex="10">
+                                                        <p mat-line title="{{order.narration}}">
+                                                            {{order.narration ? order.narration : '-'}}
+                                                        </p>
+                                                    </div>
+                                                    <div class="item-container status-cell status-tag-container" fxFlex="10">
+
+                                                        <div class="client-status"   [ngClass]="{'Open':order.status == 'OPEN' , 
+                                                        'Applied':order.status == 'APPLIED', 'Closed':order.status == 'CLOSED' }">{{order.status}}</div>
+
+                                                        <span fxFlex></span>
+                                                        <p *ngIf="order.status =='OPEN'" [ngClass]="{'gray-out':order.status == 'CLOSED'}"  (click)="editCredit(order)"><mat-icon> edit</mat-icon></p>
+
+                                    <mat-icon class="go-to-details">keyboard_arrow_right</mat-icon>
+                                    
+                                                        <!-- <p class="client-status"
+                                                            title="{{order.orders.status}}"
+                                                            [ngClass]="{'accepted':order.orders.status == 'Accepted' , 'in-transit':order.orders.status == 'In-transit', 'delivered':order.orders.status == 'Delivered', 'cancelled':order.orders.status == 'Cancelled','received':order.orders.status == 'Received','processing':order.orders.status == 'Processing'}">
+                                                            {{order.orders.status}} </p> -->
+                                                      
+                                                    </div>
+                                                </mat-list-item>
+                                            </div>
+                                        </mat-list>
+                                    </div>
+                                </div>
+                                
+
+                                <div class=" container-ui1 new-center-empty-ui" *ngIf="fetchingData">
+                                    <mat-spinner class="medium-spinner" *ngIf="fetchingData"></mat-spinner>
+                                </div>
+                               
+                            </div>
+                       
+                    </div>
+                        </div>
+                        <div class=" container-ui1 new-center-empty-ui"  *ngIf="!igstData?.length && !fetchingData">
+                            <mat-card class="no-results">                            
+                                <div class="empty-img-holder">
+                                    <!-- <img [src]='images.ordersIcon_o'> -->
+                                    <img [src]='images.ordersIcon_o' title="Orders">
+                                </div>
+                                <p class="no-result-text">No Data Found</p>
+                            </mat-card>
+                        </div>
+                        <div class=" container-ui1 new-center-empty-ui" *ngIf="totalSpinner">
+                            <mat-spinner class="medium-spinner"></mat-spinner>
+                        </div>
+                        
+                    </perfect-scrollbar>
+                    <div class=" pagination-footer" *ngIf="totalCount!=0">
+							<div class="container-ui1 d-flex space-between  align-items-center ">
+									<div><p>Showing {{listCount}} out of {{totalCount}}</p></div>
+									<div>
+										<app-pagination [pageLimit]="totalCount" (pageloadMore)="loadMore($event)"></app-pagination>
+									</div>
+							</div>
+	
+						   
+						</div>
+                </div>
+                <!-- End Orders List View -->
+                  
+
+
+                </div>
+            <!-- </mat-step>
+
+            
+
+        </mat-horizontal-stepper> -->
+        <!-- <div *ngIf="totalSpinner">
+            <mat-spinner class="medium-spinner"></mat-spinner>
+        </div> -->
+
+
+    </div>
+</div>

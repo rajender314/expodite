@@ -1,45 +1,63 @@
-<div class="center-section-scroll vh-100 d-flex media-list-data   body-white w-100 ">
-	<div class="flex-fixed-header menu-title  " *ngIf="!noShipments" >
-		<h2 style="font-weight: 400;"  *ngIf="selectedShipment" title="{{selectedShipment.name?selectedShipment.name:'Add Courier'}}" [innerHtml]="selectedShipment.name?selectedShipment.name:'Add Courier'"></h2>
-	</div>
-	<perfect-scrollbar class="padding-16 ">
+<div
+  class="center-section-scroll vh-100 d-flex media-list-data body-white w-100"
+>
+  <div class="flex-fixed-header menu-title" *ngIf="!noShipments">
+    <h2
+      class="admin-heading"
+      *ngIf="selectedShipment"
+      title="{{
+        selectedShipment.name ? selectedShipment.name : 'Add Carrier'
+      }}"
+      [innerHtml]="
+        selectedShipment.name ? selectedShipment.name : 'Add Carrier'
+      "
+    ></h2>
+    <div *ngIf="viewActivityLogIcon">
+      <button
+        mat-icon-button
+        class="action-orderbtn"
+        (click)="openActivityModal('add_carriers')"
+      >
+        <img [src]="images.activity_log_icon" title="User Activity Tracker" />
+      </button>
+    </div>
+  </div>
+  <perfect-scrollbar class="padding-16 perfect-scroll">
+    <!-- <mat-spinner class="medium-spinner" *ngIf="fetchingData"></mat-spinner> -->
+    <div class="min-container" *ngIf="!noShipments && !fetchingData" style="height: calc(100% - 60px);overflow: auto;">
+      <app-form-builder
+        [module]="'add_carriers'"
+        (trigger)="formEmitEvent($event)"
+        [Contacts]="shipments"
+        [undoOnCancel]="undoOnCancel"
+      ></app-form-builder>
+    </div>
 
-  	<form [formGroup]="detailsForm" (ngSubmit)="createShipment(detailsForm)">
-    	<mat-spinner class="medium-spinner" *ngIf="fetchingData"></mat-spinner>
-		<div class="min-container"  *ngIf="!noShipments && !fetchingData" [class.user-footer]="detailsForm.dirty">
-			<div class="ex-row">
-				 
-					<mat-form-field   class="custom-input mandatory grid-six" floatLabel="never">
-						<label class="custom-label mandatory">{{language.defaults.shipmentName}}</label>
-						<input matInput #myInput placeholder="Courier Name" formControlName="name" id="containerName" />
-						<mat-error *ngIf="submitShipment || !detailsForm.controls.name.pristine && detailsForm.controls.name.hasError('required')">{{language.validations.name}}</mat-error>
-					</mat-form-field>
-				 
-					<mat-form-field  class="custom-input mandatory grid-six" floatLabel="never">
-						<label class="custom-label mandatory">Courier URL</label>
-						<input matInput placeholder="Courier URL" (keyup)="selectDetail()" formControlName="link_url" id="shipmentUrl">
-						<!-- <mat-error *ngIf="detailsForm.controls.link_url.hasError('required')">Please Enter Shipment URL</mat-error>
-						<mat-error *ngIf="submitShipment || !detailsForm.controls.link_url.hasError('required') && detailsForm.controls.link_url.hasError('pattern')">Please Enter Shipment URL</mat-error> --> 
-						<mat-error *ngIf="detailsForm.controls.link_url.hasError('required')">Please Enter Courier URL</mat-error>
-						<!-- <mat-error *ngIf="!detailsForm.controls.link_url.hasError('required') && detailsForm.controls.link_url.hasError('pattern')">Please Enter valid Courier URL</mat-error> -->
-					</mat-form-field>
-				 
-			</div>
-		</div>
-    	
-		<div *ngIf="noShipments" class="no-results full">
-			<div class="empty-img-holder">
-				<img [src]="images.no_shipments">
-
-			</div>
-				<p class="no-result-text">{{language.defaults.noShipments}}</p>
-			 
-		</div>
-		<div class="footer" fxLayout="row" fxLayoutAlign="start center" *ngIf="detailsForm.dirty">
-				<div class="min-container d-flex justify-content-end" > <button type="button" mat-button (click)="cancel(detailsForm)">{{language.defaults.cancel}}</button>
-				<button type="submit" mat-raised-button >{{newShipAdd}}</button></div>
-			</div>
-  </form>
-</perfect-scrollbar>
-
+    <div *ngIf="noShipments" class="no-results full">
+      <div class="empty-img-holder">
+        <img [src]="images.no_shipments" />
+      </div>
+      <p class="no-result-text">{{ language.defaults.noShipments }}</p>
+    </div>
+    <div
+      class="footer"
+      fxLayout="row"
+      fxLayoutAlign="start center"
+      *ngIf="detailsForm?.dirty"
+    >
+      <div class="min-container d-flex justify-content-end">
+        <button type="button"  class="back-btn-ui" (click)="cancel(detailsForm)">
+          {{ language.defaults.cancel }}
+        </button>
+        <button
+          type="submit"
+          mat-raised-button
+          [disabled]="detailsForm?.invalid"
+          (click)="createShipment(detailsForm)"
+        >
+          {{ newShipAdd }}
+        </button>
+      </div>
+    </div>
+  </perfect-scrollbar>
 </div>

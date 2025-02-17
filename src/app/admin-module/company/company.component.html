@@ -1,80 +1,516 @@
-<div label="Details" class="details-tab " style="border-left: solid 1px #d6d9dc;" >
-    <div class="center-section-scroll vh-100 d-flex body-white ">
-
-    
+<div label="Details" class="details-tab" style="border-left: solid 1px #d6d9dc">
+  <div class="center-section-scroll vh-100 d-flex body-white">
     <div class="page-header-ui">
-        <div class="flex-fixed-header page-title  max-container-ui">
-            <h1>Company</h1>
-        </div>
-       
+      <div class="flex-fixed-header page-title max-container-ui">
+        <h1>Company</h1>
+      </div>
     </div>
-    <perfect-scrollbar class=" padding-16">
-
-        <div class="max-container-ui" style="padding-bottom: 20px;">
-            <form [formGroup]="detailsForm" class="organisation-details compny-form">
-                <!--<button class="add-address-link" mat-button (click)="updateAddress()">
+    <perfect-scrollbar class="padding-16">
+      <div class="max-container-ui" style="padding-bottom: 20px">
+        <form
+          [formGroup]="detailsForm"
+          class="organisation-details compny-form"
+        >
+          <!--<button class="add-address-link" mat-button (click)="updateAddress()">
                 <mat-icon class="material-icons">add</mat-icon> {{language.defaults.addAddress}}
             </button>-->
 
-                <mat-list fxLayout="row" class="ex-row" >
-                 
-                        <div fxLayout="column" class="grid-ten" >
-                            <div class="page-sub-heading" style="margin-top: 16px;"><h3>Company Details <small> These details will be used in Order and Shipping Documents.</small></h3></div>
-                            <div class="ex-row">
-                                <mat-form-field class="custom-input mandatory compny-sub-flx grid-six" floatLabel="never">
-                                    <label class="custom-label mandatory">{{language.defaults.organisationName}}</label>
-                                    <input matInput placeholder={{language.defaults.organisationName}} maxlength=150 (keyup)="selectDetail()" formControlName="name">
-                                    <mat-error *ngIf="detailsForm.controls.name.hasError('required') || detailsForm.controls.name.hasError('whitespace')">{{language.validations.organisationName}}</mat-error>
-                                </mat-form-field>
-                                <mat-form-field class="custom-input compny-sub-flx  grid-six"  floatLabel="never">
-                                    <label class="custom-label">Tag Line</label>
-                                    <input matInput placeholder=" Tag Line" maxlength=150 (keyup)="selectDetail()" formControlName="tag_line">
-                                    <!-- <mat-error *ngIf="detailsForm.controls.company_name.hasError('required') || detailsForm.controls.name.hasError('whitespace')">{{language.validations.organisationName}}</mat-error> -->
-                                </mat-form-field>
-                            </div>
-                            <div class="compny-flx ex-row ">
-                                <mat-form-field class="custom-input compny-sub-flx grid-full" floatLabel="never">
-                                    <label class="custom-label">Description</label>
-                                    <textarea maxlength="250" matInput placeholder=" Description" formControlName="description"></textarea>
-                                    <!-- <mat-error *ngIf="detailsForm.controls.company_name.hasError('required') || detailsForm.controls.company_name.hasError('whitespace')">{{language.validations.organisationName}}</mat-error> -->
-                                </mat-form-field>
-                             </div>
-                            
-                            <div class="compny-flx ex-row ">
-                                <mat-form-field class="custom-input  compny-sub-flx  grid-six" floatLabel="never">
-                                    <label class="custom-label ">{{language.defaults.website}}</label>
-                                    <input matInput placeholder={{language.defaults.website}} (keyup)="selectDetail()" maxlength=150 formControlName="url">
-                                    <mat-error *ngIf="detailsForm.controls.url.hasError('required')">{{language.validations.website}}</mat-error>
-                                    <mat-error *ngIf="!detailsForm.controls.url.hasError('required') && detailsForm.controls.url.hasError('pattern')">{{language.validations.validURl}}</mat-error>
-                                </mat-form-field>
-                            <mat-form-field class="custom-input  compny-sub-flx  grid-six" floatLabel="never" *ngIf="adminUser">
-                                <label class="custom-label ">Currency</label>
-                                <mat-select placeholder=" Currency" (click)="selectDetail()" formControlName="currency_id">
-                                    <mat-option *ngFor="let cur of currencyX" [value]="cur.id">{{cur.name}} ({{cur.type}})</mat-option>
-                                </mat-select>
-                            </mat-form-field>
-                            
-                           
-    
-                                <!-- <mat-form-field fxFlex="80" class="custom-input mandatory compny-sub-flx" floatLabel="never">
+          <mat-list fxLayout="row" class="ex-row">
+            <div fxLayout="column" class="grid-ten">
+              <div class="page-sub-heading" style="margin-top: 16px">
+                <h3 class="font-600">Company Details</h3>
+                <p
+                  style="
+                    margin: 0;
+                    font-size: 12px;
+                    color: #808080;
+                    padding: 6px 0px;
+                  "
+                >
+                  These details will be used in Order and Shipping Documents.
+                </p>
+              </div>
+              <div class="ex-row">
+                <mat-form-field
+                  class="custom-input mandatory compny-sub-flx grid-six"
+                  floatLabel="never"
+                >
+                  <label class="custom-label mandatory">{{
+                    language.defaults.organisationName
+                  }}</label>
+                  <input
+                    matInput
+                    placeholder="{{ language.defaults.organisationName }}"
+                    maxlength="150"
+                    (keyup)="selectDetail()"
+                    formControlName="name"
+                  />
+                  <mat-error
+                    *ngIf="
+                      detailsForm.controls.name.hasError('required') ||
+                      detailsForm.controls.name.hasError('whitespace')
+                    "
+                    >{{ language.validations.organisationName }}</mat-error
+                  >
+                </mat-form-field>
+                <mat-form-field
+                  class="custom-input compny-sub-flx grid-six"
+                  floatLabel="never"
+                >
+                  <label class="custom-label">Tag Line</label>
+                  <input
+                    matInput
+                    placeholder=" Tag Line"
+                    maxlength="150"
+                    (keyup)="selectDetail()"
+                    formControlName="tag_line"
+                  />
+                  <!-- <mat-error *ngIf="detailsForm.controls.company_name.hasError('required') || detailsForm.controls.name.hasError('whitespace')">{{language.validations.organisationName}}</mat-error> -->
+                </mat-form-field>
+              </div>
+              <div class="compny-flx ex-row">
+                <mat-form-field
+                  class="custom-input compny-sub-flx grid-full"
+                  floatLabel="never"
+                >
+                  <label class="custom-label">Description</label>
+                  <textarea
+                    maxlength="250"
+                    matInput
+                    placeholder=" Description"
+                    formControlName="description"
+                  ></textarea>
+                  <!-- <mat-error *ngIf="detailsForm.controls.company_name.hasError('required') || detailsForm.controls.company_name.hasError('whitespace')">{{language.validations.organisationName}}</mat-error> -->
+                </mat-form-field>
+              </div>
+              <div class="ex-row" *ngIf="is_automech">
+                <mat-form-field
+                  class="custom-input mandatory compny-sub-flx grid-six"
+                  floatLabel="never"
+                >
+                  <label class="custom-label mandatory"
+                    >Insurance Policy No.</label
+                  >
+                  <input
+                    matInput
+                    placeholder="Insurance Policy No."
+                    maxlength="64"
+                    (keyup)="selectDetail()"
+                    formControlName="insurance_policy_no"
+                  />
+                  <mat-error
+                    *ngIf="
+                      detailsForm.controls.insurance_policy_no.hasError(
+                        'required'
+                      ) ||
+                      detailsForm.controls.insurance_policy_no.hasError(
+                        'whitespace'
+                      )
+                    "
+                    >Please Enter Insurance Policy No.</mat-error
+                  >
+                  <mat-error
+                    *ngIf="
+                      detailsForm.controls.insurance_policy_no.hasError(
+                        'pattern'
+                      )
+                    "
+                    >Please Enter Valid Document Code</mat-error
+                  >
+                </mat-form-field>
+                <mat-form-field
+                  class="custom-input mandatory compny-sub-flx grid-six"
+                  floatLabel="never"
+                >
+                  <label class="custom-label mandatory">Document Code</label>
+                  <input
+                    matInput
+                    placeholder="Document Code"
+                    maxlength="16"
+                    (keyup)="selectDetail()"
+                    formControlName="document_code"
+                  />
+                  <mat-error
+                    *ngIf="
+                      detailsForm.controls.document_code.hasError('required') ||
+                      detailsForm.controls.document_code.hasError('whitespace')
+                    "
+                    >Please Enter Document Code</mat-error
+                  >
+                  <mat-error
+                    *ngIf="
+                      detailsForm.controls.document_code.hasError('pattern')
+                    "
+                    >Please Enter Valid Document Code</mat-error
+                  >
+                </mat-form-field>
+              </div>
+
+              <div class="compny-flx ex-row">
+                <mat-form-field
+                  class="custom-input compny-sub-flx grid-six"
+                  floatLabel="never"
+                >
+                  <label class="custom-label">{{
+                    language.defaults.website
+                  }}</label>
+                  <input
+                    matInput
+                    placeholder="{{ language.defaults.website }}"
+                    (keyup)="selectDetail()"
+                    maxlength="150"
+                    formControlName="url"
+                  />
+                  <mat-error
+                    *ngIf="detailsForm.controls.url.hasError('required')"
+                    >{{ language.validations.website }}</mat-error
+                  >
+                  <mat-error
+                    *ngIf="
+                      !detailsForm.controls.url.hasError('required') &&
+                      detailsForm.controls.url.hasError('pattern')
+                    "
+                    >{{ language.validations.validURl }}</mat-error
+                  >
+                </mat-form-field>
+                <mat-form-field
+                  class="custom-input compny-sub-flx grid-six"
+                  floatLabel="never"
+                  *ngIf="adminUser"
+                >
+                  <label class="custom-label">Currency</label>
+                  <mat-select
+                    placeholder=" Currency"
+                    (click)="selectDetail()"
+                    formControlName="currency_id"
+                  >
+                    <mat-option *ngFor="let cur of currencyX" [value]="cur.id"
+                      >{{ cur.name }} ({{ cur.type }})</mat-option
+                    >
+                  </mat-select>
+                </mat-form-field>
+
+                <!-- <mat-form-field fxFlex="80" class="custom-input mandatory compny-sub-flx" floatLabel="never">
                                     <label class="custom-label mandatory">Bank Details</label>
                                     <textarea matInput placeholder="Bank Details" formControlName="bank_details" id="bank_details"></textarea>
                                     <mat-error *ngIf=" !detailsForm.controls.bank_details.pristine && detailsForm.controls.bank_details.hasError('required')">Please Enter Bank Details</mat-error>
                                 </mat-form-field> -->
-                                </div>
-                                <div class="ex-row">
-                                    <mat-form-field class="custom-input mandatory grid-six" floatLabel="never" >
-                                        <label class="custom-label mandatory">{{language.defaults.emailAddress}}</label>
-                                        <input matInput type="email" maxlength=100 placeholder="Email Address" formControlName="email" 
-                                        
-                                        >
-                                        <mat-error *ngIf="detailsForm.controls.email.hasError('pattern')">{{language.validations.emailValidation}}</mat-error>
-                                        <mat-error *ngIf="!detailsForm.controls.email.hasError('required')  && detailsForm.controls.email.hasError('required')">{{language.validations.email}}</mat-error>
-                                    </mat-form-field>
-                                </div>
-                <div class="page-sub-heading"><h3>Bank Details <small> These details will be used in Bank Details Documents.</small></h3></div>
-    
-                                <div class="compny-flx ex-row">
+              </div>
+              <div class="ex-row">
+                <mat-form-field
+                  class="custom-input mandatory compny-sub-flx grid-six"
+                  floatLabel="never"
+                >
+                  <label class="custom-label"
+                    >Self Sealing Permission No.</label
+                  >
+                  <input
+                    matInput
+                    placeholder="Self Sealing Permission No."
+                    maxlength="64"
+                    (keyup)="selectDetail()"
+                    formControlName="sealing_permission_no"
+                  />
+                  <mat-error
+                    *ngIf="
+                      detailsForm.controls.sealing_permission_no.hasError(
+                        'required'
+                      ) ||
+                      detailsForm.controls.sealing_permission_no.hasError(
+                        'whitespace'
+                      )
+                    "
+                    >Please Enter Self Sealing Permission No.</mat-error
+                  >
+                  <mat-error
+                    *ngIf="
+                      detailsForm.controls.sealing_permission_no.hasError(
+                        'pattern'
+                      )
+                    "
+                    >Please Enter Valid Self Sealing Permission No.</mat-error
+                  >
+                </mat-form-field>
+                <mat-form-field
+                  class="custom-input mandatory compny-sub-flx grid-six"
+                  floatLabel="never"
+                >
+                  <label class="custom-label mandatory">IE Code</label>
+                  <input
+                    matInput
+                    placeholder="IE Code"
+                    maxlength="16"
+                    (keyup)="selectDetail()"
+                    formControlName="ie_code"
+                  />
+                  <mat-error
+                    *ngIf="
+                      detailsForm.controls.ie_code.hasError('required') ||
+                      detailsForm.controls.ie_code.hasError('whitespace')
+                    "
+                    >Please Enter IE Code</mat-error
+                  >
+                  <mat-error
+                    *ngIf="detailsForm.controls.ie_code.hasError('pattern')"
+                    >Please Enter Valid IE Code</mat-error
+                  >
+                </mat-form-field>
+                <mat-form-field
+                  class="custom-input compny-sub-flx grid-six"
+                  floatLabel="never"
+                  *ngIf="is_aapl"
+                >
+                  <label class="custom-label">LUT No.</label>
+                  <input
+                    matInput
+                    placeholder="LUT No."
+                    (keyup)="selectDetail()"
+                    formControlName="lut_no"
+                  />
+                  <mat-error
+                    *ngIf="detailsForm.controls.lut_no.hasError('pattern')"
+                    >Please Enter LUT No.</mat-error
+                  >
+                  <mat-error
+                    *ngIf="detailsForm.controls.lut_no.hasError('whitespace')"
+                    >Please Enter Valid LUT No.</mat-error
+                  >
+                </mat-form-field>
+              </div>
+              <div class="ex-row">
+                <mat-form-field
+                  class="custom-input mandatory grid-six"
+                  floatLabel="never"
+                >
+                  <label class="custom-label mandatory">{{
+                    language.defaults.emailAddress
+                  }}</label>
+                  <input
+                    matInput
+                    type="email"
+                    maxlength="100"
+                    placeholder="Email Address"
+                    formControlName="email"
+                  />
+                  <mat-error
+                    *ngIf="detailsForm.controls.email.hasError('pattern')"
+                    >{{ language.validations.emailValidation }}</mat-error
+                  >
+                  <mat-error
+                    *ngIf="
+                      !detailsForm.controls.email.hasError('required') &&
+                      detailsForm.controls.email.hasError('required')
+                    "
+                    >{{ language.validations.email }}</mat-error
+                  >
+                </mat-form-field>
+                <mat-form-field
+                  class="custom-input mandatory grid-six"
+                  floatLabel="never"
+                >
+                  <label class="custom-label mandatory"> Pan No </label>
+                  <input
+                    matInput
+                    type="text"
+                    maxlength="10"
+                    placeholder="Pan Number"
+                    formControlName="pan_no"
+                  />
+                  <mat-error
+                    *ngIf="detailsForm.controls.pan_no.hasError('pattern')"
+                    >Please Enter Valid Pan Number</mat-error
+                  >
+                  <mat-error
+                    *ngIf="detailsForm.controls.pan_no.hasError('maxlength')"
+                    >Please Enter Pan Number Max 10 Charcters</mat-error
+                  >
+                  <mat-error
+                    *ngIf="
+                      !detailsForm.controls.pan_no.hasError('required') &&
+                      detailsForm.controls.pan_no.hasError('required')
+                    "
+                    >Please Enter Pan Number</mat-error
+                  >
+                </mat-form-field>
+              </div>
+              <div class="ex-row">
+                <mat-form-field
+                  class="custom-input mandatory grid-six"
+                  floatLabel="never"
+                  *ngIf="is_aapl"
+                >
+                  <label class="custom-label mandatory">
+                    Last Invoice Number
+                  </label>
+                  <input
+                    matInput
+                    type="text"
+                    maxlength="15"
+                    placeholder="Last Invoice Number"
+                    formControlName="last_invoice_number"
+                  />
+                  <mat-error
+                    *ngIf="
+                      detailsForm.controls.last_invoice_number.hasError(
+                        'pattern'
+                      )
+                    "
+                    >Please Enter Valid Invoice Number</mat-error
+                  >
+                  <mat-error
+                    *ngIf="
+                      detailsForm.controls.last_invoice_number.hasError(
+                        'required'
+                      )
+                    "
+                    >Please Enter Last Invoice Number</mat-error
+                  >
+                </mat-form-field>
+                <mat-form-field
+                  class="custom-input mandatory grid-six"
+                  floatLabel="never"
+                  *ngIf="is_aapl"
+                >
+                  <label class="custom-label mandatory">
+                    Last Joint Invoice Number
+                  </label>
+                  <input
+                    matInput
+                    type="text"
+                    maxlength="15"
+                    placeholder="Last Joint Invoice Number"
+                    formControlName="last_composite_invoice_number"
+                  />
+                  <mat-error
+                    *ngIf="
+                      detailsForm.controls.last_composite_invoice_number.hasError(
+                        'pattern'
+                      )
+                    "
+                    >Please Enter Valid Invoice Number</mat-error
+                  >
+                  <mat-error
+                    *ngIf="
+                      detailsForm.controls.last_composite_invoice_number.hasError(
+                        'required'
+                      )
+                    "
+                    >Please Enter Last Joint Invoice Number</mat-error
+                  >
+                </mat-form-field>
+                <mat-form-field
+                  class="custom-input mandatory grid-six"
+                  floatLabel="never"
+                >
+                  <label class="custom-label mandatory"> GSTIN Number </label>
+                  <input
+                    matInput
+                    type="text"
+                    maxlength="20"
+                    placeholder="GSTIN Number"
+                    formControlName="gstin_no"
+                  />
+                  <!-- <mat-error
+                    *ngIf="detailsForm.controls.gstin_no.hasError('pattern')"
+                    >Please Enter Valid GSTIN Number</mat-error
+                  > -->
+                  <mat-error
+                    *ngIf="detailsForm.controls.gstin_no.hasError('required')"
+                    >Please Enter GSTIN Number</mat-error
+                  >
+                </mat-form-field>
+                <mat-form-field
+                  class="custom-input compny-sub-flx grid-six"
+                  floatLabel="never"
+                >
+                  <label class="custom-label">CIN No.</label>
+                  <!-- (keyup)="selectDetail()" -->
+                  <input
+                    matInput
+                    placeholder="CIN No."
+                    maxlength="64"
+                    formControlName="cin_no"
+                  />
+                  <!-- <mat-error
+                    *ngIf="
+                      detailsForm.controls.cin_no.hasError(
+                        'required'
+                      ) ||
+                      detailsForm.controls.cin_no.hasError(
+                        'whitespace'
+                      )
+                    "
+                    >Please Enter Self Sealing Permission No.</mat-error
+                  >
+                  <mat-error
+                    *ngIf="
+                      detailsForm.controls.cin_no.hasError(
+                        'pattern'
+                      )
+                    "
+                    >Please Enter Valid Self Sealing Permission No.</mat-error
+                  > -->
+                </mat-form-field>
+                <mat-form-field
+                  class="custom-input mandatory grid-six"
+                  floatLabel="never"
+                >
+                  <label class="custom-label mandatory">
+                    E-Invoice Username
+                  </label>
+                  <input
+                    matInput
+                    type="text"
+                    maxlength="20"
+                    placeholder="E-Invoice Username"
+                    formControlName="einvoice_username"
+                  />
+                  <!-- <mat-error
+                *ngIf="detailsForm.controls.gstin_no.hasError('pattern')"
+                >Please Enter Valid GSTIN Number</mat-error
+              > -->
+                  <mat-error
+                    *ngIf="
+                      detailsForm.controls.einvoice_username.hasError(
+                        'required'
+                      )
+                    "
+                    >Please Enter the E-Invoice Username</mat-error
+                  >
+                </mat-form-field>
+                <mat-form-field
+                  class="custom-input mandatory grid-six"
+                  floatLabel="never"
+                >
+                  <div class="password-input-container">
+                    <label class="custom-label mandatory">
+                      E-Invoice Password
+                    </label>
+                    <input
+                      matInput
+                      [type]="hide ? 'password' : 'text'"
+                      formControlName="einvoice_password"
+                      required
+                      placeholder="E-Invoice Password"
+                    />
+                    <mat-icon matSuffix (click)="hide = !hide">{{
+                      hide ? "visibility_off" : "visibility"
+                    }}</mat-icon>
+                    <mat-error
+                      *ngIf="
+                        detailsForm.controls.einvoice_username.hasError(
+                          'required'
+                        )
+                      "
+                      >Please Enter the E-Invoice Password</mat-error
+                    >
+                  </div>
+                </mat-form-field>
+              </div>
+
+              <div class="ex-row"></div>
+
+              <!-- <div class="compny-flx ex-row">
                                     <mat-form-field   class="custom-input  grid-six" floatLabel="never">
                                         <label class="custom-label ">Bank Name</label>
                                         <input matInput placeholder="Bank Name"  maxlength=150  formControlName="bank_name">
@@ -152,194 +588,612 @@
                                         <label class="custom-label">Drug License No</label>
                                         <input matInput   maxlength=50 placeholder="Drug License No"  formControlName="drug_license_no" id="phone" />
                                         <mat-error *ngIf="detailsForm.controls.drug_license_no.hasError('pattern')">Please Enter Valid Drug License No</mat-error>
-                                        <!-- <mat-error *ngIf=" !detailsForm.controls.phone_number.pristine &&  detailsForm.controls.phone_number.hasError('required')">Please Enter valid Phone Number</mat-error> -->
+                                        <mat-error *ngIf=" !detailsForm.controls.phone_number.pristine &&  detailsForm.controls.phone_number.hasError('required')">Please Enter valid Phone Number</mat-error>
                                     </mat-form-field>
                                 </div>
-                                
-                <div class="page-sub-heading"><h3>Company Address <small> These details will be used in footer section in Order Documents.</small></h3></div>
-    
-                               
-                                <div class="compny-flx ex-row">
-                                    <mat-form-field  fxFlex="50"  class="custom-input compny-sub-flx grid-six"  floatLabel="never">
-                                        <label class="custom-label">Address 1</label>
-                                        <input matInput #myInput placeholder="Address 1"  maxlength=100 formControlName="address1" id="address1" />
-                                        
-                                        <mat-error *ngIf=" !detailsForm.controls.address1.pristine && detailsForm.controls.address1.hasError('required')">Please Enter Address 1</mat-error>
-                                    </mat-form-field>
-                                
-                               
-                                    <mat-form-field fxFlex="50" class="custom-input compny-sub-flx grid-six" floatLabel="never">
-                                        <label class="custom-label">Address 2</label>
-                                        <input matInput placeholder="Address 2" formControlName="address2" maxlength=100 id="address2" />
-                                        <mat-error *ngIf=" !detailsForm.controls.address2.pristine && detailsForm.controls.address2.hasError('required')">Please Enter Address 2</mat-error>
-                                    </mat-form-field>
-                                </div>
-                                
-                            
-                           
-                            
-    
-                                <div class="compny-flx ex-row">
-                                    <mat-form-field  class="custom-input compny-sub-flx grid-six" floatLabel="never">
-                                        <label class="custom-label">{{language.defaults.city}}</label>
-                                        <input matInput maxlength="30" placeholder="City" formControlName="city" id="city" />
-                                        <mat-error *ngIf=" !detailsForm.controls.city.pristine && detailsForm.controls.city.hasError('required')">{{language.validations.city}}</mat-error>
-                                    </mat-form-field>
-                               
-                
-                                
-                                    <mat-form-field class="custom-input compny-sub-flx grid-six" floatLabel="never" >
-                                        <label class="custom-label">Country</label>
-                                        <mat-select placeholder={{language.defaults.selectCountry}} (selectionChange)="onCountryChange($event)" formControlName="country_id"
-                                        id="country_id">
-                                            <!-- <mat-option [value]="Addcontry">Add Country</mat-option> -->
-                                            <mat-option *ngFor="let country of countries" [value]="country.id">{{country.name}}</mat-option>
-                                        </mat-select>
-                                        <mat-error *ngIf=" !detailsForm.controls.country_id.pristine && detailsForm.controls.country_id.hasError('required')">Please Select Country</mat-error>
-                                    </mat-form-field>
-                               
-                                </div>
-                               
-            
-                            
-            
-                                <div class="compny-flx ex-row">
+                                <div class="compny-flx">
                                     <mat-form-field   class="custom-input compny-sub-flx grid-six" floatLabel="never">
-                                        <label class="custom-label">{{language.defaults.selectState}}</label>
-                                        <mat-select placeholder={{language.defaults.selectState}} formControlName="state_province_id" id="state_province_id">
-                                                <!-- <mat-option [value]="">No State</mat-option> -->
-                                            <mat-option *ngFor="let state of states" [value]="state.id">{{state.name}}</mat-option>
-                                        </mat-select>
-                                        <mat-error *ngIf=" !detailsForm.controls.state_province_id.pristine && detailsForm.controls.state_province_id.hasError('required')">Please Select State</mat-error>
+                                        <label class="custom-label">FDA Registration No.</label>
+                                        <input matInput   maxlength=50 placeholder="FDA Registration No"  formControlName="fda_no" id="phone" />
+                                        <mat-error *ngIf="detailsForm.controls.fda_no.hasError('pattern')">Please Enter Valid FDA Registration No</mat-error>
+                                        <mat-error *ngIf=" !detailsForm.controls.phone_number.pristine &&  detailsForm.controls.phone_number.hasError('required')">Please Enter valid Phone Number</mat-error>
                                     </mat-form-field>
-                                
-                
-                                <!-- <div class="add-new-address" *ngIf="!detailsForm.get('state_province_id').value">
+                                </div> -->
+
+              <div class="page-sub-heading">
+                <h3 class="font-600">Company Address</h3>
+                <p
+                  style="
+                    margin: 0;
+                    font-size: 12px;
+                    color: #808080;
+                    padding: 6px 0px;
+                  "
+                >
+                  These details will be used in footer section in Order
+                  Documents.
+                </p>
+              </div>
+
+              <div class="compny-flx ex-row">
+                <mat-form-field
+                  fxFlex="50"
+                  class="custom-input compny-sub-flx grid-six"
+                  floatLabel="never"
+                >
+                  <label class="custom-label">Address 1</label>
+                  <input
+                    matInput
+                    #myInput
+                    placeholder="Address 1"
+                    maxlength="52"
+                    formControlName="address1"
+                    id="address1"
+                  />
+
+                  <mat-error
+                    *ngIf="
+                      !detailsForm.controls.address1.pristine &&
+                      detailsForm.controls.address1.hasError('whitespace')
+                    "
+                    >Please Enter Address 1</mat-error
+                  >
+                </mat-form-field>
+
+                <mat-form-field
+                  fxFlex="50"
+                  class="custom-input compny-sub-flx grid-six"
+                  floatLabel="never"
+                >
+                  <label class="custom-label">Address 2</label>
+                  <input
+                    matInput
+                    placeholder="Address 2"
+                    formControlName="address2"
+                    maxlength="52"
+                    id="address2"
+                  />
+                  <mat-error
+                    *ngIf="
+                      !detailsForm.controls.address2.pristine &&
+                      detailsForm.controls.address2.hasError('whitespace')
+                    "
+                    >Please Enter Address 2</mat-error
+                  >
+                </mat-form-field>
+              </div>
+              <div class="compny-flx ex-row">
+                <mat-form-field
+                  class="custom-input compny-sub-flx grid-six"
+                  floatLabel="never"
+                >
+                  <label class="custom-label">{{
+                    language.defaults.city
+                  }}</label>
+                  <input
+                    matInput
+                    maxlength="25"
+                    placeholder="City"
+                    formControlName="city"
+                    id="city"
+                  />
+                  <mat-error
+                    *ngIf="
+                      !detailsForm.controls.city.pristine &&
+                      detailsForm.controls.city.hasError('whitespace')
+                    "
+                    >{{ language.validations.city }}</mat-error
+                  >
+                </mat-form-field>
+
+                <mat-form-field
+                  class="custom-input compny-sub-flx grid-six"
+                  floatLabel="never"
+                >
+                  <label class="custom-label">Country</label>
+                  <mat-select
+                    placeholder="{{ language.defaults.selectCountry }}"
+                    (selectionChange)="onCountryChange($event)"
+                    formControlName="country_id"
+                    id="country_id"
+                  >
+                    <!-- <mat-option [value]="Addcontry">Add Country</mat-option> -->
+                    <mat-option
+                      *ngFor="let country of countries"
+                      [value]="country.id"
+                      >{{ country.name }}</mat-option
+                    >
+                  </mat-select>
+                  <mat-error
+                    *ngIf="
+                      !detailsForm.controls.country_id.pristine &&
+                      detailsForm.controls.country_id.hasError('required')
+                    "
+                    >Please Select Country</mat-error
+                  >
+                </mat-form-field>
+              </div>
+              <div class="compny-flx ex-row">
+                <mat-form-field
+                  class="custom-input compny-sub-flx grid-six"
+                  floatLabel="never"
+                >
+                  <label class="custom-label">{{
+                    language.defaults.selectState
+                  }}</label>
+                  <mat-select
+                    placeholder="{{ language.defaults.selectState }}"
+                    formControlName="state_province_id"
+                    id="state_province_id"
+                  >
+                    <!-- <mat-option [value]="">No State</mat-option> -->
+                    <mat-option
+                      *ngFor="let state of states"
+                      [value]="state.id"
+                      >{{ state.name }}</mat-option
+                    >
+                  </mat-select>
+                  <mat-error
+                    *ngIf="
+                      !detailsForm.controls.state_province_id.pristine &&
+                      detailsForm.controls.state_province_id.hasError(
+                        'required'
+                      )
+                    "
+                    >Please Select State</mat-error
+                  >
+                </mat-form-field>
+
+                <!-- <div class="add-new-address" *ngIf="!detailsForm.get('state_province_id').value">
                                     <mat-form-field fxFlex="80" class="custom-input mandatory" floatLabel="never">
                                         <label class="custom-label">Add State</label>
                                         <input matInput maxlength=100 placeholder="Add State" formControlName="addState">
                                     </mat-form-field>
                                     <span  class="add-new" (click)="addState(detailsForm)">Add State</span>
                                 </div> -->
-                                
-                                
-                                
-                                
-                                    <mat-form-field  class="custom-input compny-sub-flx grid-six" floatLabel="never">
-                                        <label class="custom-label">Postal Code</label>
-                                        <input type="text" matInput maxlength="10" placeholder="Postal Code" formControlName="postal_code" id="postal_code" />
-                                        <mat-error *ngIf="detailsForm.controls.postal_code.hasError('pattern')">Please Enter Valid Postal Code</mat-error>
-                                        <mat-error *ngIf=" !detailsForm.controls.postal_code.pristine && detailsForm.controls.postal_code.hasError('required')">{{language.validations.postalCode}}</mat-error>
-                                    </mat-form-field>
-                                </div>
-                            
-                                
-                           
-                            <div class="cb"></div>
-                            
-    
-    
-                        </div>
-                        <div class="grid-two">
-                            <div style="padding-top: 18px;">
-                                <div class="page-sub-heading"><h4>Company Logo<mat-icon title="This Logo will be used Order, Shipping and Invoice Documents.">info</mat-icon></h4> </div>
-                            
-                            
-                                                    <div fxLayout="column" (click)="setParameter('company')"class="image-upload org-upload compny-upload" [class.not-allowed]="pointerEvent">
-                                                        <div  ng2FileDrop [ngClass]="{'file-over': hasDropZoneOver}" (fileOver)="fileOverBase($event)" (onFileDrop)="fileDrop($event)" [uploader]="uploader" class="file-drop-zone">
-                                                            <input id="edit-org-logo" type="file" ng2FileSelect [uploader]="uploader"
-                                                              [hidden]="true" />
-                                                            <label for="edit-org-logo" class="browse-file" *ngIf="!uploads.length">
-                                                                <a>Upload Logo</a>
-                                                            </label>
-                                                            <!-- <label for="edit-org-logo" class="change-file" *ngIf="uploads.length">
-                                                                <a>{{language.defaults.changeFile}}</a>
-                                                            </label> -->
-                                                            <label for="edit-org-logo" class="image-edit-delete" *ngIf="uploads.length">
-                                                                <a class="upload-open">{{language.defaults.changeFile}}</a>
-                                                                <!-- <mat-icon>mode_edit</mat-icon> -->
-                                                            </label>
-                                                        </div>
-                                                        <div class="change-user-file">
-                                                            <span *ngIf="uploadError" class="error-msg error-strip">*You have selected an invalid file type. Only jpg, jpeg, png files are allowed.</span>
-                                                        </div>
-                                                        <div class="change-user-file">
-                                                            <span *ngIf="sizeError" class="error-msg error-strip">*File more than 5MB is not allowed.</span>
-                                                        </div>
-                                                        <div class="images">
-                                                            <ul *ngIf="uploads.length">
-                                                                <li *ngFor="let file of uploads; let i = index">
-                                                                    <img [src]="file.source_path" alt="file.filename">
-                                                                    <div class="overlay"></div>
-                                                                    <mat-icon class="delete" title="Delete" (click)="deleteItem(i)">delete</mat-icon>
-                                                                </li>
-                                                            </ul>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div style="padding-top: 24px;">
-                                                    <div class="page-sub-heading"><h4>Signature stamp <mat-icon title="This Signature stamp will be used in Invoice Documents.">info</mat-icon> </h4></div>
-                                                    <div fxLayout="column" (click)="setParameter('stamp')" class="image-upload org-upload compny-upload" [class.not-allowed]="pointerEvent">
-                                        
-                                                       
-                                                        <div ng2FileDrop [ngClass]="{'file-over': hasDropZoneOver}" 
-                                                        (fileOver)="fileOverBase($event)" (onFileDrop)="fileDrop($event)" 
-                                                        [uploader]="uploader" class="file-drop-zone">
-                                                            <input id="edit-org-logo2" type="file" ng2FileSelect [uploader]="uploader" 
-                                                            [hidden]="true" />
-                                                            <label for="edit-org-logo2" class="browse-file" *ngIf="!uploads1.length">
-                                                                <a>Upload Stamp</a>
-                                                            </label>
-                                                            <!-- <label for="edit-org-logo" class="change-file" *ngIf="uploads.length">
-                                                                <a>{{language.defaults.changeFile}}</a>
-                                                            </label> -->
-                                                            <label for="edit-org-logo2" class="image-edit-delete" *ngIf="uploads1.length">
-                                                                <a class="upload-open">{{language.defaults.changeFile}}</a>
-                                                                <!-- <mat-icon>mode_edit</mat-icon> -->
-                                                            </label>
-                                                        </div>
-                                                        <div class="change-user-file">
-                                                            <span *ngIf="uploadError1" class="error-msg error-strip">*You have selected an invalid file type. Only jpg, jpeg, png files are allowed.</span>
-                                                        </div>
-                                                        <div class="change-user-file">
-                                                            <span *ngIf="sizeError1" class="error-msg error-strip">*File more than 5MB is not allowed.</span>
-                                                        </div>
-                                                        <div class="images">
-                                                            <ul *ngIf="uploads1.length">
-                                                                <li *ngFor="let file of uploads1; let i = index">
-                                                                    <img [src]="file.source_path" alt="file.filename">
-                                                                    <div class="overlay"></div>
-                                                                    <mat-icon class="delete" title="Delete" (click)="deleteItem1(i)">delete</mat-icon>
-                                                                </li>
-                                                            </ul>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                        </div>
-                   
-                    
-                   
-                    
-                </mat-list>
-                <div class="cb"></div>
-                
-              
-            </form>
-        </div>
 
-    
+                <mat-form-field
+                  class="custom-input compny-sub-flx grid-six"
+                  floatLabel="never"
+                >
+                  <label class="custom-label">Postal Code</label>
+                  <input
+                    type="text"
+                    matInput
+                    maxlength="12"
+                    placeholder="Postal Code"
+                    formControlName="postal_code"
+                    id="postal_code"
+                  />
+                  <mat-error
+                    *ngIf="detailsForm.controls.postal_code.hasError('pattern')"
+                    >Please Enter Valid Postal Code</mat-error
+                  >
+                  <mat-error
+                    *ngIf="
+                      !detailsForm.controls.postal_code.pristine &&
+                      detailsForm.controls.postal_code.hasError('required')
+                    "
+                    >{{ language.validations.postalCode }}</mat-error
+                  >
+                </mat-form-field>
+              </div>
+              <div>
+                <div class="page-sub-heading">
+                  <h3 class="custom-label">Other Company Information</h3>
+                </div>
+                <div>
+                  <mat-form-field
+                    class="custom-input w-100"
+                    floatLabel="never"
+                    style="margin-top: 0px"
+                  >
+                    <textarea
+                      [(ngModel)]="textareaContent"
+                      (input)="updateWordCount()"
+                      matInput
+                      formControlName="other_company_details"
+                      style="height: 194px"
+                      maxlength="1024"
+                      placeholder="Add Other Company Information"
+                    ></textarea>
+                  </mat-form-field>
+                  <div style="float: right; margin-top: 0px; margin-right: 6px">
+                    {{ wordCount }} /1024
+                  </div>
+                </div>
+              </div>
+              <div>
+                <div class="page-sub-heading">
+                  <h3 class="custom-label">Terms and Conditions for Orders</h3>
+                </div>
+                <div>
+                  <mat-form-field
+                    class="custom-input w-100"
+                    floatLabel="never"
+                    style="margin-top: 0px"
+                  >
+                    <textarea
+                      matInput
+                      formControlName="terms_cond_des"
+                      style="height: 194px"
+                      maxlength="1024"
+                      placeholder="Add Terms and Conditions for Orders"
+                      [(ngModel)]="textareaContentTerms"
+                      (input)="updateWordCountterms()"
+                    ></textarea>
+                    <!-- <mat-error *ngIf="detailsForm.get('terms_cond_des').hasError('maxlength')">
+                          Maximum length exceeded (1024 characters).
+                      </mat-error> -->
+                    <!-- <p>sdgsdg</p> -->
+                  </mat-form-field>
+                  <div style="float: right; margin-top: 0px; margin-right: 6px">
+                    {{ wordCountTerms }} /1024
+                  </div>
+                </div>
+              </div>
+              <div style="margin: 16px 0px">
+                <div class="page-sub-heading">
+                  <h3 class="custom-label">Standard Declarations</h3>
+                </div>
+                <div>
+                  <!-- (keydown)="updateWordCountStanderd($event)"
+                  (input)="updateWordCountStanderd()"
+                  (paste)="
+                    handlePaste(
+                      $event,
+                      'textareaContentStandard',
+                      'wordCountStandard',
+                      512
+                    )  " -->
+                  <div style="margin-top: 8px">
+                    <quill-editor
+                      [(ngModel)]="textareaContentStandard"
+                      style="min-height: 110px"
+                      formControlName="standard_declarations"
+                      placeholder="Add Standard Declarations for Orders"
+                    ></quill-editor>
+                  </div>
+                  <!-- <mat-form-field
+                    class="custom-input w-100"
+                    floatLabel="never"
+                    style="margin-top: 0px"
+                  >
+                    <textarea
+                      [(ngModel)]="textareaContentStandard"
+                      (input)="updateWordCountStanderd()"
+                      matInput
+                      formControlName="standard_declarations"
+                      style="height: 194px"
+                      maxlength="512"
+                      placeholder="Add Standard Declarations for Orders"
+                    ></textarea>
+                  </mat-form-field> -->
+                  <!-- <div
+                    style="float: right; margin-top: 12px; margin-right: 6px"
+                  >
+                    {{ wordCountStandard }} /512
+                  </div> -->
+                </div>
+              </div>
+              <div style="margin: 16px 0px" *ngIf="is_Vendor">
+                <div class="page-sub-heading">
+                  <h3 class="custom-label">
+                    Default Vendor Terms and Conditions
+                  </h3>
+                </div>
+                <div>
+                  <!-- (paste)="
+                    handlePaste(
+                      $event,
+                      'textareaContentvendorTerms',
+                      'wordCountVendorTerms',
+                      512
+                    )
+                  " -->
+                  <!-- (keydown)="updateWordCountStanderdVendor($event)"
+                  (input)="updateWordCountStanderdVendor()" -->
+                  <div style="margin-top: 8px">
+                    <quill-editor
+                      [(ngModel)]="textareaContentvendorTerms"
+                      style="min-height: 110px"
+                      formControlName="vendor_declarations"
+                      placeholder="Add Default Vendor Terms and Conditions"
+                    ></quill-editor>
+                  </div>
+                  <!-- <div
+                    style="float: right; margin-top: 12px; margin-right: 6px"
+                  >
+                    {{ wordCountVendorTerms }} /512
+                  </div> -->
+                </div>
+              </div>
+              <div class="cb"></div>
+            </div>
+            <div class="grid-two">
+              <div style="padding-top: 18px">
+                <div class="page-sub-heading">
+                  <h4 class="custom-label">
+                    Company Logo<mat-icon
+                      title="This Logo will be used for Order, Shipping and Invoice Documents."
+                      >info</mat-icon
+                    >
+                  </h4>
+                </div>
+
+                <div
+                  fxLayout="column"
+                  (click)="setParameter('company')"
+                  class="image-upload org-upload compny-upload"
+                  [class.not-allowed]="pointerEvent"
+                >
+                  <div
+                    ng2FileDrop
+                    [ngClass]="{ 'file-over': hasDropZoneOver }"
+                    (fileOver)="fileOverBase($event)"
+                    (onFileDrop)="fileDrop($event)"
+                    [uploader]="uploader"
+                    class="file-drop-zone"
+                  >
+                    <input
+                      id="edit-org-logo"
+                      type="file"
+                      ng2FileSelect
+                      [uploader]="uploader"
+                      [hidden]="true"
+                      [disabled]="adminService.rolePermissions.edit_company == 1 ? false: true"
+                    />
+                    <label
+                      for="edit-org-logo"
+                      class="browse-file"
+                      *ngIf="!uploads.length"
+                    >
+                      <a>Upload Logo</a>
+                    </label>
+                    <!-- <label for="edit-org-logo" class="change-file" *ngIf="uploads.length">
+                                                                <a>{{language.defaults.changeFile}}</a>
+                                                            </label> -->
+                    <label
+                      for="edit-org-logo"
+                      class="image-edit-delete"
+                      *ngIf="uploads.length"
+                    >
+                      <a class="upload-open">{{
+                        language.defaults.changeFile
+                      }}</a>
+                      <!-- <mat-icon>mode_edit</mat-icon> -->
+                    </label>
+                  </div>
+                  <div class="change-user-file">
+                    <span *ngIf="uploadError" class="error-msg error-strip"
+                      >*You have selected an invalid file type. Only jpg, jpeg,
+                      png files are allowed.</span
+                    >
+                  </div>
+                  <div class="change-user-file">
+                    <span *ngIf="sizeError" class="error-msg error-strip"
+                      >*File more than 5MB is not allowed.</span
+                    >
+                  </div>
+                  <div class="images">
+                    <ul *ngIf="uploads.length">
+                      <li *ngFor="let file of uploads; let i = index">
+                        <img [src]="file.source_path" alt="file.filename" />
+                        <div class="overlay"></div>
+                        <mat-icon
+                          class="delete"
+                          title="Delete"
+                          (click)="deleteItem(i)"
+                          *ngIf="adminService.rolePermissions.edit_company == 1"
+                          >delete</mat-icon
+                        >
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div style="padding-top: 24px">
+                <div class="page-sub-heading">
+                  <h4 class="custom-label">
+                    Signature stamp
+                    <mat-icon
+                      title="This Signature stamp will be used in Invoice Documents."
+                      >info</mat-icon
+                    >
+                  </h4>
+                </div>
+                <div
+                  fxLayout="column"
+                  (click)="setParameter('stamp')"
+                  class="image-upload org-upload compny-upload"
+                  [class.not-allowed]="pointerEvent"
+                >
+                  <div
+                    ng2FileDrop
+                    [ngClass]="{ 'file-over': hasDropZoneOver }"
+                    (fileOver)="fileOverBase($event)"
+                    (onFileDrop)="fileDrop($event)"
+                    [uploader]="uploader"
+                    class="file-drop-zone"
+                  >
+                    <input
+                      id="edit-org-logo2"
+                      type="file"
+                      ng2FileSelect
+                      [uploader]="uploader"
+                      [hidden]="true"
+                      [disabled]="adminService.rolePermissions.edit_company == 1 ? false: true"
+                    />
+                    <label
+                      for="edit-org-logo2"
+                      class="browse-file"
+                      *ngIf="!uploads1.length"
+                    >
+                      <a>Upload Stamp</a>
+                    </label>
+                    <!-- <label for="edit-org-logo" class="change-file" *ngIf="uploads.length">
+                                                                <a>{{language.defaults.changeFile}}</a>
+                                                            </label> -->
+                    <label
+                      for="edit-org-logo2"
+                      class="image-edit-delete"
+                      *ngIf="uploads1.length"
+                    >
+                      <a class="upload-open">{{
+                        language.defaults.changeFile
+                      }}</a>
+                      <!-- <mat-icon>mode_edit</mat-icon> -->
+                    </label>
+                  </div>
+                  <div class="change-user-file">
+                    <span *ngIf="uploadError1" class="error-msg error-strip"
+                      >*You have selected an invalid file type. Only jpg, jpeg,
+                      png files are allowed.</span
+                    >
+                  </div>
+                  <div class="change-user-file">
+                    <span *ngIf="sizeError1" class="error-msg error-strip"
+                      >*File more than 5MB is not allowed.</span
+                    >
+                  </div>
+                  <div class="images">
+                    <ul *ngIf="uploads1.length">
+                      <li *ngFor="let file of uploads1; let i = index">
+                        <img [src]="file.source_path" alt="file.filename" />
+                        <div class="overlay"></div>
+                        <mat-icon
+                          class="delete"
+                          title="Delete"
+                          (click)="deleteItem1(i)"
+                          *ngIf="adminService.rolePermissions.edit_company == 1"
+                          >delete</mat-icon
+                        >
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- <div class="page-sub-heading"><h3>Bank Details <small> These details will be used in Bank Details Documents.</small></h3>
+                <button (click)="addBankdetails()">Add bank details </button>
+                </div> -->
+          </mat-list>
+        </form>
+        <div class="page-sub-header" >
+          <div class="d-flex justify-content-between align-items-center">
+            <h2>
+              Bank Details<span *ngIf="bankList.length != 0"
+                >({{ bankList.length }})</span
+              >
+            </h2>
+            <button
+              type="submit"
+              style="margin-left: 15px"
+              mat-raised-button
+              (click)="addBankdetails()"
+              *ngIf="adminService.rolePermissions.add_bank_details == 1"
+            >
+              {{ language.defaults.addbankdetails }}
+            </button>
+          </div>
+        </div>
+        <div class="bank-container" >
+          <div class="row w-100" style="gap: 18px">
+            <div
+              class="col-sm-6 col-lg-4 adress-card bank-card p-8"
+              *ngFor="let list of bankList; let i = index"
+            >
+              <mat-card class="card">
+                <mat-card-title class="address-title">
+                  {{ i + 1 }}.{{ list?.currency_id.label }}
+                  <span class="icon-btn-holder">
+                    <button
+                      class="btn btn-icon btn-flat-success"
+                      title="Edit"
+                      (click)="addBankdetails(list, i)"
+                      *ngIf="adminService.rolePermissions.edit_company == 1"
+                    >
+                      <mat-icon class="contact-add">edit</mat-icon>
+                    </button>
+                    <button
+                      class="btn btn-icon btn-flat-success"
+                      title="Delete"
+                      (click)="deleteBank(list, i)"
+                      *ngIf="adminService.rolePermissions.delete_bank_details == 1"
+                    >
+                      <mat-icon
+                        class="btn btn-icon btn-flat-success"
+                        class="contact-add"
+                        >delete</mat-icon
+                      >
+                    </button>
+                  </span>
+                </mat-card-title>
+                <div
+                  class="contact-details"
+                  style="justify-content: flex-start; align-items: unset"
+                >
+                  <h3
+                    class="contact-name Bank-name"
+                    title="{{ list?.bank_name }}"
+                  >
+                    {{ list?.bank_name }}
+                  </h3>
+                  <div
+                    class="contact-address text-ellipis"
+                    title="{{ list?.bank_details }}"
+                    style="white-space: pre-wrap"
+                    [innerHTML]="list?.bank_details"
+                  ></div>
+                  <!-- <p class="contact-address" title="{{list?.current_ac_no}}">{{list?.current_ac_no}}</p> -->
+                  <!-- <p class="contact-address" title="{{list?.currency_name}}">{{list?.currency_name}}</p> -->
+                  <!-- <p class="contact-address"  title="{{list?.pan_no}}">{{list?.pan_no}}</p> -->
+                  <!-- <p class="contact-address" title="{{list.drug_license_no}}">{{list.drug_license_no}}</p> -->
+                  <!-- <p class="contact-address"  title="{{list?.phone_number}}">{{list?.phone_number}}</p> -->
+                  <!-- <p class="contact-address" title="{{list.eefc_ac_no}}">{{list.eefc_ac_no}}</p>
+                        <p class="contact-address" title="{{list.iec_no}}">{{list.iec_no}}</p>
+                        <p class="contact-address" title="{{list.add_code_no}}">{{list.add_code_no}}</p> -->
+                  <!-- <p class="contact-address" title="{{list?.gstin_type}}">{{list?.gstin_type}}</p> -->
+                </div>
+
+                <div class="cb"></div>
+              </mat-card>
+            </div>
+          </div>
+          <div class="no-results" *ngIf="bankList.length == 0">
+            <div class="empty-img-holder">
+              <span class="material-icons"> business </span>
+            </div>
+            <p class="no-result-text">No Bank Detail Found</p>
+          </div>
+        </div>
+      </div>
     </perfect-scrollbar>
 
-    <div class="document-footer " fxLayout="row" fxLayoutAlign="end center" *ngIf="detailsForm.dirty || showSavePanel" >
-        <div class="w-100  max-container-ui justify-content-end d-flex">
-        <button type="button" mat-button (click)="cancel(detailsForm)">{{language.defaults.cancel}}</button>
-        <button type="submit" mat-raised-button (click)="updateOrganization(detailsForm)" [disabled]="detailsForm.invalid">{{language.defaults.save}}</button>
+    <div
+      class="document-footer"
+      fxLayout="row"
+      fxLayoutAlign="end center"
+      *ngIf="detailsForm.dirty || showSavePanel"
+    >
+      <div class="w-100 max-container-ui justify-content-end d-flex">
+        <button type="button" class="back-btn-ui" (click)="cancel(detailsForm)">
+          {{ language.defaults.cancel }}
+        </button>
+        <button
+          type="submit"
+          mat-raised-button
+          (click)="updateOrganization(detailsForm)"
+          [disabled]="detailsForm.invalid"
+        >
+          {{ language.defaults.save }}
+        </button>
+      </div>
     </div>
-    </div>
-</div>
-    <div >
-       
-        <!-- <mat-toolbar class="detail-toolbar">
+  </div>
+  <div>
+    <!-- <mat-toolbar class="detail-toolbar">
             <span class="title">Address Details</span>
         </mat-toolbar>
         <div class="contacts-billable">
@@ -413,8 +1267,11 @@
                 </mat-card>
             </div>
         </div> -->
-    </div>
-    <div class="no-record no-clients" *ngIf="!fetchingData && emptyAddressData">
-        <p>No Details Found</p>
-    </div>
+  </div>
+  <div class="no-record no-clients" *ngIf="!fetchingData && emptyAddressData">
+    <p>No Details Found</p>
+  </div>
+  <div *ngIf="totalSpinner">
+    <mat-spinner class="medium-spinner"></mat-spinner>
+  </div>
 </div>

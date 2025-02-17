@@ -1,69 +1,83 @@
 <?php
 $production = false;
 $version = 21.2;
-//$expodite_app_url = env('EXPODITE_APP_URL');
 $expodite_app_url = env('CLIENT_APP_URL');
-//dd($expodite_app_url);
-//$client_app_url = env('CLIENT_APP_URL');
+$api_url = env('API_URL');
+$isSSO = config('constant.is_sso');
 $fedFilePath = $expodite_app_url . '/' . 'dashboard/';
-$favIconPath = $expodite_app_url . '/signatures/assets/images/favicon-96x96.png';
+$favIconPath = $isSSO ? $expodite_app_url . '/signatures/assets/images/favicon-96x96.png' : $expodite_app_url . '/signatures/assets/images/'.strtolower(env('INSTANCE_NAME')).'-logo.png';
 
 ?>
 
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <!-- <title>Dashboard</title> -->
-  <title><?php echo config('constant.mainTitle'); ?></title>
-  <base href="<?php echo env('CLIENT_APP_URL'); ?>/">
+  <head>
+    <meta charset="utf-8" />
+    <title>
+      <?php echo $isSSO ? config('constant.mainTitle'): 'Dashboard'; ?>
+    </title>
+    <base href="<?php echo env('CLIENT_APP_URL'); ?>/" />
 
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" type="image/x-icon" href="<?php echo $favIconPath ?>">
-  <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="anonymous"> -->
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/x-icon" href="<?php echo $favIconPath ?>" />
+    <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="anonymous"> -->
 
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic">
-    <link href="https://fonts.googleapis.com/css?family=Lato:400,700" rel="stylesheet">
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic"
+    />
+    <link
+      href="https://fonts.googleapis.com/css?family=Lato:400,700"
+      rel="stylesheet"
+    />
 
-    <link href="dashboard/assets/css/animate.css" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="dashboard/assets/css/monthpicker.css" />
-    <link rel="stylesheet" type="text/css" href="dashboard/assets/css/jquery-ui.css" />
+    <link href="dashboard/assets/css/animate.css" rel="stylesheet" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="dashboard/assets/css/monthpicker.css"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="dashboard/assets/css/jquery-ui.css"
+    />
     <?php
     if (file_exists(storage_path('/app/Instances/') . env('INSTANCE_NAME') . '/Styles/style.css')) {
         $url = env('CLIENT_APP_URL') . '/storage/app/Instances/' . env('INSTANCE_NAME') . '/Styles/style.css';
-        echo '<link rel="stylesheet" href="' . $url . '?v=' . $version . '">';
-    }
-    ?>
+        echo '<link rel="stylesheet" href="' . $url . '?v=' . $version . '">
+    '; } ?>
     <script>
-        var App = {
-            token: '<?php echo 'Bearer ' . $client_access_token; ?>',
-            base_url: '<?php echo env('CLIENT_APP_URL'); ?>/',
-            public_url: '<?php echo $expodite_app_url; ?>/',
-        //api_url:'http://192.168.1.27/expodite_track2/api/public/v1/',
-        api_url:'<?php echo env('CLIENT_APP_URL').'/leads_api/v1/'; ?>',
-            user_details: <?php echo json_encode($userInfo) ?>,
-            loggedAs: <?php echo json_encode($loggedAs) ?>,
-            user_roles_permissions: <?php echo json_encode($accessPermissions); ?>,
-            shipper_ids: <?php echo json_encode($shipper_ids) ?>,
-            company_data: <?php echo file_get_contents(__DIR__ . "/../../product.conf"); ?>,
-            env_configurations: <?php echo json_encode($env_configurations); ?>
+      var App = {
+          token: '<?php echo $isSSO ? 'Bearer ' . $client_access_token : csrf_token(); ?>',
+          base_url: '<?php echo env('CLIENT_APP_URL'); ?>/',
+          public_url: '<?php echo $expodite_app_url; ?>/',
+          api_url: '<?php echo $api_url; ?>',
+          instance:'<?php echo env('INSTANCE_NAME'); ?>',
+          user_details: <?php echo json_encode($userInfo) ?>,
+          loggedAs: <?php echo json_encode($loggedAs) ?>,
+          user_roles_permissions: <?php echo json_encode($accessPermissions); ?>,
+          shipper_ids: <?php echo json_encode($shipper_ids) ?>,
+          company_data: <?php echo file_get_contents(__DIR__ . "/../../product.conf"); ?>,
+          env_configurations: <?php echo json_encode($env_configurations); ?>,
+          isMerchantExporter:'<?php echo env('IS_MERCHANT_EXPORTER'); ?>',
 
-        };
+      };
     </script>
-  
-  
-
-</head>
-<body>
-  <app-root>
+  </head>
+  <body>
+    <app-root>
       <div class="page-loader">
-          <div class="loader"></div>
+        <div class="loader"></div>
       </div>
-  </app-root>
+    </app-root>
 
-  <script src="dashboard/assets/js/jquery.js"></script>
-  <script src="dashboard/assets/js/jquery-ui.js"></script>
-  <script src="dashboard/assets/js/monthpicker.js"></script>
-</body>
+    <script src="dashboard/assets/js/jquery.js"></script>
+    <script src="dashboard/assets/js/jquery-ui.js"></script>
+    <script src="dashboard/assets/js/monthpicker.js"></script>
+  </body>
 </html>

@@ -1,0 +1,80 @@
+<div class="order-inner-container" #items>
+  <!-- [class.collapse]="!showItems" -->
+  <mat-toolbar class="package-toolbar">
+    <mat-icon
+      mat-list-icon
+      class="post_ship_icon icon-menu detail_view_right_icons"
+      style="background: #8b5729"
+    >
+      <img class="logo-img" [src]="images.pkgDetails_small" />
+    </mat-icon>
+    <span>Containers</span>
+    <span fxFlex></span>
+
+    <!-- <div *ngIf="viewActivityLogIcon">
+      <button
+        mat-icon-button
+        class="action-orderbtn"
+        (click)="openActivityModal('order_details')"
+      >
+        <img [src]="images.activity_log_icon" title="Activity Log" />
+      </button>
+    </div> -->
+    <!-- <a
+      *ngIf="!clientPermission && orders.selectedOrder.status != 'Cancelled'"
+      target="_blank"
+      [ngClass]="{
+        'events-none': orders.selectedOrder.status == 'Cancelled'
+      }"
+      href="generate_pdf?id={{ orders.selectedOrder.id }}&is_printable=1"
+    >
+      <button mat-icon-button class="action-orderbtn">
+        <img [src]="images.printer_icon" title="Print" />
+      </button>
+    </a> -->
+    <!-- <a
+      *ngIf="orders.selectedOrder.status != 'Cancelled'"
+      href="generate_pdf?id={{ orders.selectedOrder.id }}&is_printable=0"
+      [ngClass]="{
+        'events-none': orders.selectedOrder.status == 'Cancelled'
+      }"
+    >
+      <button mat-icon-button class="action-orderbtn">
+        <img [src]="images.download_arrow" title="Download" />
+      </button>
+    </a> -->
+    <!-- <button mat-icon-button (click)="toggleItems()">
+      <img [src]="images.grey_arrow" mat-icon-button *ngIf="show" />
+      <mat-icon class="toggle-arrow" *ngIf="!show"
+        >keyboard_arrow_down
+      </mat-icon>
+    </button> -->
+
+    <!-- <button class="add-row-btn" (click)="addContainer()" mat-raised-button>
+      Add Container
+    </button> -->
+
+    <div class="edit-delete" *ngIf="adminService.rolePermissions.add_packing == 1 && enableAddContainer">
+      <div
+        class="edit_icon"
+        title="Add Container"
+        (click)="addContainer()"
+        style="padding: 3px 3px"
+      >
+        <img [src]="images.add" alt="add" style="width: 100%; height: 100%" />
+      </div>
+    </div>
+  </mat-toolbar>
+  <!-- <div class="inner-container"> -->
+  <!-- <div class="shipping-sec" style="margin-bottom: 0"> -->
+  <app-ag-grid-view
+    [orders]="orders"
+    [tableName]="'shipment_container_details'"
+    (getContainersData)="getContainersData($event)"
+    [newColumnAdded]="newContainerAdded"
+    [isEditable]="adminService.rolePermissions.edit_packing == 1 ? true : false"
+    (editContainer)="addContainer($event)"
+  ></app-ag-grid-view>
+  <!-- </div> -->
+  <!-- </div> -->
+</div>

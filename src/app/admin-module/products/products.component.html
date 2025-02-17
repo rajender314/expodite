@@ -1,10 +1,19 @@
-<div fxLayout="row">
+<!-- <div fxLayout="row">
   <app-product-list [update]="updatedProductDetails" 
                     (getCategory)="getCategoryList($event)"
-                    (trigger)="getSelectedProductType($event)">
+                    (trigger)="getSelectedProductType($event)"
+                    [isAddPerm]="adminService.rolePermissions.add_product == 1 ? true : false"
+                    >
   </app-product-list>
   <app-product-details [productType]="selectedProduct" 
                        [categoryDt]="categoryData" style="width:100%;" 
+                       [isEditPerm]="adminService.rolePermissions.edit_product == 1 ? true : false"
                        (trigger)="updateProductDetails($event)">
   </app-product-details>
-</div>
+</div> -->
+
+<app-form-builder-list-view
+  [form_module_name]="'add_products'"
+  [noDataImage]="images.no_products"
+  [namingConvention]="'Products'"
+></app-form-builder-list-view>

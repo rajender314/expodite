@@ -319,7 +319,7 @@ mat-toolbar.address-header{
          opacity: 0.7;
         font-size: 16px;
         color: #323232;
-        font-weight: 400;
+        // font-weight: 400;
         text-transform: capitalize;
         padding: 0;
         min-width: 50px;
@@ -337,7 +337,6 @@ mat-toolbar.address-header{
         }
         .mat-ink-bar{
             height: 3px;
-            background-color: #FF5722 !important;
         }
     }
 }
@@ -748,5 +747,12 @@ mat-list-item.products-list.mat-list-item{
     
 
  }
+
+ .ellipsis {
+    width: 300px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 
 //////END of CSS///////////////////////////////

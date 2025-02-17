@@ -1,0 +1,10 @@
+<!-- <div fxLayout="row">
+  <customs-address-list [update]="updatedContactDetails" (trigger)="getSelectedContactAddress($event)"></customs-address-list >
+  <customs-address-details [globalData]="globalData" [contacts]="selectedContact" style="width:100%;" (trigger)="updateContactDetails($event)"></customs-address-details>
+</div> -->
+
+<app-form-builder-list-view
+  [form_module_name]="'customs_addresses'"
+  [noDataImage]="images.no_contacts"
+  [namingConvention]="'Customs Addresses'"
+></app-form-builder-list-view>

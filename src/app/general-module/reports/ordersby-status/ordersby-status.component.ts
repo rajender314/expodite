@@ -1,40 +1,52 @@
-import { ReportsComponent } from './../reports-list/reports.component';
-import { Router, ActivatedRoute } from '@angular/router';
-import { Component, OnInit } from '@angular/core';
-import { ReportsService } from '../../../services/reports.service';
-import { FormControl, FormBuilder, Validators, FormArray } from '@angular/forms';
-import { MatDatepicker } from '@angular/material/datepicker';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { MatStepper, MatStepperModule } from '@angular/material/stepper';
-import { SaveViewComponent } from '../../../dialogs/save-view/save-view.component';
-import { DeleteViewComponent } from '../../../dialogs/delete-view/delete-view.component';
-import { SnakbarService } from '../../../services/snakbar.service';
-import { type } from 'os';
-import { constructor } from 'moment';
-import * as moment from 'moment';
-import * as _ from 'lodash';
-import { Observable } from 'rxjs/Observable';
-import { filter } from 'rxjs/operators';
-import { Images } from '../../../images/images.module';
+import { ReportsComponent } from "./../reports-list/reports.component";
+import { Router, ActivatedRoute } from "@angular/router";
+import { Component, OnInit } from "@angular/core";
+import { ReportsService } from "../../../services/reports.service";
+import { FormControl, FormBuilder } from "@angular/forms";
+import { MatDatepicker } from "@angular/material/datepicker";
+import { MatDialog } from "@angular/material/dialog";
+import { SaveViewComponent } from "../../../dialogs/save-view/save-view.component";
+import { DeleteViewComponent } from "../../../dialogs/delete-view/delete-view.component";
+import { SnakbarService } from "../../../services/snakbar.service";
+import * as moment from "moment";
+import * as _ from "lodash";
+import { Images } from "../../../images/images.module";
+import { OrdersService } from "../../../services/orders.service";
+import { EstimateFilterComponent } from "../../../estimates-module/estimate-filter/estimate-filter.component";
+import { IServerSideDatasource } from "ag-grid-community";
+import { HttpClient } from "@angular/common/http";
+import { CustomLoadingCellRenderer } from "../../../shared/ag-grid-view/custom-ag-loader";
+import { AdminService } from "../../../services/admin.service";
 declare var App: any;
 
 @Component({
-  selector: 'app-ordersby-status',
-  templateUrl: './ordersby-status.component.html',
-  styleUrls: ['./ordersby-status.component.scss'],
-  providers:[ReportsComponent]
+  selector: "app-ordersby-status",
+  templateUrl: "./ordersby-status.component.html",
+  styleUrls: ["./ordersby-status.component.scss"],
+  providers: [ReportsComponent],
 })
 export class OrdersbyStatusComponent implements OnInit {
-  public deleteIcon: string = App.public_url + 'signatures/assets/images/delete.svg';
-  public sideBar: any;
+  public deleteIcon: string =
+    App.public_url + "signatures/assets/images/delete.svg";
+  public sideBar = {
+    toolPanels: [
+      {
+        id: "columns",
+        labelDefault: "Columns",
+        labelKey: "columns",
+        iconKey: "columns",
+        toolPanel: "agColumnsToolPanel",
+      },
+    ],
+    // hiddenByDefault: true,
+  };
   public rowData = [];
   public currentGridInfo: any = [];
   public viewsList = [];
   public dialogRef: any;
   public permissionForView: boolean = true;
   public isChanged: boolean = false;
-  public savedViewValue: any;
+  public savedViewValue: any = 1;
   public isInitial: boolean;
   public rowDataCopy: any;
   private allAutoSizeColumns = [];
@@ -58,413 +70,240 @@ export class OrdersbyStatusComponent implements OnInit {
   public yearStartDate = new Date(this.today.getFullYear(), 0, 1);
   public images = Images;
   public params = {
-    module: 'by_status'
-  }
-  filtersForm = this.fb.group({
-    status: [[]],
-    start_date: [this.yearStartDate, Validators.required],
-    end_date: [this.today, Validators.required],
-    country:[[]],
-  });
-  public gridParams = {
-    
-  }; 
-  
+    module: "by_status",
+  };
+
+  slectedStatus = new FormControl([]);
+  public gridParams: any = {
+    page: 1,
+    perPage: 12,
+    type: "orders",
+  };
+  private param: any = {
+    flag: "orders",
+  };
+  defaultColDef = {
+    sortingOrder: ["asc", "desc"],
+  };
   viewMyId: number;
   public showSaveView = true;
-  constructor(private ReportsService: ReportsService, private fb: FormBuilder, public dialog: MatDialog,
-    public reportsComponent: ReportsComponent, 
+  public showGrid = true;
+
+  constructor(
+    public ReportsService: ReportsService,
+    private OrdersService: OrdersService,
+    private fb: FormBuilder,
+    public dialog: MatDialog,
+    public reportsComponent: ReportsComponent,
     private snackbar: SnakbarService,
-    private router: Router,private activateRoute: ActivatedRoute,) { }
+    private router: Router,
+    private activateRoute: ActivatedRoute,
+    private http: HttpClient,
+    public adminService:  AdminService
+  ) {}
   openCalendar(picker: MatDatepicker<Date>) {
     picker.open();
   }
-  ngOnInit() {
-   this.viewMyId=0;  
-    this.activateRoute.params.subscribe((res: any) => {
-      console.log(res)
-      if (typeof (res.id) != 'undefined') {  
-      this.viewMyId=parseInt(res.id);  
-      this.ReportsService.viewId =  this.viewMyId;
-      this.showSaveView = false;
-      } else {
-        this.showSaveView = true;
-
-      }
-     if(this.viewMyId){
-      this.savedViewValue = 1;
-      this.isInitial = true;
-      this.params.module = 'All';
-      this.getViewsList();
-      this.getOrdersByStatusReport();
-
-      this.getFiltersData();
-      setTimeout(()=>{ 
-        this.getSelectedView(this.viewMyId);
-      }, 1000);
-      
-     }else{
-      this.savedViewValue = 1;
-      this.isInitial = true;
-      this.getOrdersByStatusReport();
-      // console.log(this.orders)
-      this.getViewsList();
-      this.getFiltersData();
-     }     
-     
-
+  async ngOnInit() {
+    this.adminService.getPermissions().subscribe(res => {
+      this.adminService.rolePermissions = res.role_details.roles_permissions;
     })
-
-
-    // if (App.user_roles_permissions.length) {
-    //   let i = _.findIndex(<any>App.user_roles_permissions, {
-    //     name: 'Orders By Status'
-    //   });
-		// 	if (!App.user_roles_permissions[i].selected) {
-    //     this.router.navigateByUrl('reports/access-denied');
-		// 	} else {
-    //     this.savedViewValue = 1;
-    //     this.isInitial = true;
-    //     this.getOrdersByStatusReport();
-    //     // console.log(this.orders)
-    //     this.getViewsList();
-    //     this.getFiltersData();
-    //   }
-		 
-    // }
-
- 
-   
+    this.viewMyId = 0;
+    this.activateRoute.params.subscribe(async (res: any) => {
+      this.viewMyId = parseInt(res.id);
+      if(this.viewMyId) {
+        this.showGrid = false;
+      } 
+      setTimeout(async () => {
+        await this.loadReportHeaders();
+      }, 0);
+    });
   }
   cellRenderStatus = (params) => {
     // console.log(params)
     return params.data
       ? `<div class="icon-render">
-              <div class="status"><span class="adStatus" 
-        "> 
+              <div class="status"><span class="adStatus"
+        ">
         ${params.data.status}
         </span></div>
           </div>`
-      : '';
+      : "";
+  };
 
-  }
-  getOrdersByStatusExportReport(): void {
-    // this.gridParams['startDate'] = moment(this.filtersForm.value.start_date).toLocaleString();    
-    // this.gridParams['endDate'] = moment(this.filtersForm.value.end_date).toLocaleString();
-    // this.gridParams['selectedStatuses'] = this.filtersForm.value.status;
-    // console.log(this.gridParams['startDate'])
-    let params = {}
+  getOrdersExportReport(): void {
+    let params = {};
+    const sortModel = this.gridApi.getSortModel();
+    const visibleColumns = this.gridColumnApi.getAllDisplayedColumns();
+    const visibleColumnFields = visibleColumns.map((col) => col.getColDef().field);
+    params["sort_key"] = sortModel.length ? sortModel[0].colId : "";
+    params["sort"] = sortModel.length ? sortModel[0].sort : "";
+    params["visible_columns"] = visibleColumnFields;
     if (this.filtersApplied) {
       params = {
-        startDate: moment(this.filtersForm.value.start_date).toLocaleString(),
-        endDate: moment(this.filtersForm.value.end_date).toLocaleString(),
-        selectedStatuses: this.filtersForm.value.status,
-        countryIds:this.filtersForm.value.country,
-        type: "excel"
-      }
+        ...params,
+        type: "orders",
+        startDate: this.savedReportData.startDate,
+        endDate: this.savedReportData.endDate,
+        selectedStatuses: this.savedReportData.selectedStatuses,
+        countryIds: this.savedReportData.countryIds,
+
+        file: "excel",
+      };
     } else {
       params = {
+        ...params,
+        type: "orders",
         startDate: "",
         endDate: "",
         selectedStatuses: [],
-        countryIds:[],
-        type: "excel"
-      }
+        countryIds: [],
+        file: "excel",
+      };
     }
-    this.ReportsService
-      .ordersByStatusReportExport(params)
-    .then(response => {
+    this.ReportsService.getReports(params).then((response) => {
       if (response.result.success) {
         let downloadPath = response.result.data.filePath;
-        window.location.href = '' + App.base_url + '' + downloadPath + '';
+        window.location.href = "" + App.base_url + "" + downloadPath + "";
       } else {
-        
       }
-
     });
   }
-  generateColumns = (data: any) => {
-    
-    let cols = [
-      {
-        headerName: 'Order #',
-        editable: false,
-        sortable: true,
-        resizable: true,
-        rowGroup: false,
-        enableRowGroup: true, 
-        field: 'order_no',
-        width: 150
-      },
-      {
-        headerName: 'Date',
-        editable: false,
-        sortable: true,
-        resizable: true,
-        rowGroup: false,
-        enableRowGroup: true, 
-        field: 'date_added',
-        width: 150
-      },
-      {
-        headerName: 'Status',
-        editable: false,
-        sortable: true,
-        resizable: true,
-        rowGroup: false,
-        enableRowGroup: true, 
-        field: 'status',
-        width: 150
-      },
-      // {
-      //   headerName: 'Product Name',
-      //   editable: false,
-      //   sortable: true,
-      //   resizable: true,
-      //   rowGroup: false,
-      //   enableRowGroup: true, 
-      //   field: 'product_name',
-      //   width: 300
-      // },
-      // {
-      //   headerName: 'Product Price',
-      //   headerClass: 'right-align',
-      //   cellClass: 'align-right',
-      //   editable: false,
-      //   sortable: true,
-      //   resizable: true,
-      //   rowGroup: false,
-      //   enableRowGroup: true, 
-      //   field: 'product_price',
-      //   width: 150
-      // },
-      // {
-      //   headerName: 'Quantity',
-      //   headerClass: 'right-align',
-      //   cellClass: 'align-right',
-      //   editable: false,
-      //   sortable: true,
-      //   resizable: true,
-      //   rowGroup: false,
-      //   enableRowGroup: true, 
-      //   field: 'quantity',
-      //   enableValue: true,
-      //   aggFunc: 'sum',
-      //   width: 150
-      // },
-      {
-        headerName: 'Client Name',
-        editable: false,
-        sortable: true,
-        resizable: true,
-        rowGroup: false,
-        enableRowGroup: true, 
-        field: 'client_name',
-        width: 200,
-
-      },
-      {
-        headerName: 'Currency',
-        editable: false,
-        sortable: true,
-        resizable: true,
-        rowGroup: false,
-        enableRowGroup: true, 
-        field: 'currency_name',
-        width: 100,
-      },
-      
-      {
-        headerName: ' Amount',
-        headerClass: 'center-align',
-        cellClass: 'align-right',
-        editable: false,
-        sortable: true,
-        resizable: true,
-        rowGroup: false,
-        enableRowGroup: true, 
-        field: 'total_amount',
-        width: 200
-      },
-      
-      // {
-      //   headerName: 'Shipping Company Name',
-      //   editable: false,
-      //   sortable: true,
-      //   resizable: true,
-      //   rowGroup: false,
-      //   enableRowGroup: true, 
-      //   field: 'shipping_company_name',
-      //   width: 200
-      // },
-      // {
-      //   headerName: 'Ship State',
-      //   editable: false,
-      //   sortable: true,
-      //   resizable: true,
-      //   rowGroup: false,
-      //   enableRowGroup: true, 
-      //   field: 'ship_state',
-      //   width: 150
-      // },
-      {
-        headerName: 'Country',
-        editable: false,
-        sortable: true,
-        resizable: true,
-        rowGroup: false,
-        enableRowGroup: true, 
-        field: 'ship_country',
-        width: 200
-      },
-      
-    ];
-    // data.map((col) => {
-
-    //   let column = {
-    //     headerName: col.headerName,
-    //     editable: false,
-    //     field: col.field,
-    //     sortable: true,
-    //     headerClass: '',
-    //     cellClass: '',
-    //     // width: 240,
-    //   }
-      
-    //   if (col.field == "status") {
-    //     column['cellRenderer'] = (params) => this.cellRenderStatus(params)
-    //   }
-    //   if (col.field == "product_price" || col.field == "quantity" || col.field == "total_amount") {
-    //     column = {
-    //       headerName: col.headerName,
-    //       editable: false,
-    //       field: col.field,
-    //       sortable: true,
-    //       headerClass: 'right-align',
-    //       cellClass: 'align-right'
-    //     }
-    //   }
-    //   cols.push(column)
-    // })
-    return cols
+  numberFormatter(params: any, f) {
+    if (params.value && params.data) {
+      return params.value.toLocaleString(
+        this.getLocaleFromCurrency(params.data.currency_name)
+      );
+    }
+    // if (params.node.group && params.node.aggData) {
+    //   const currency = params.columnApi.getRowGroupColumns().some(col => col.getColId() === "currency")
+    //     ? params.node.allLeafChildren[0]?.data?.currency
+    //     : "USD";
+    //   return params.value.toLocaleString(this.getLocaleFromCurrency(currency));
+    // }
   }
-  getOrdersByStatusReport(): void {
+  public currencyLocaleMap = {
+    USD: "en-US",
+    EUR: "en-GB", // Euro often uses UK English conventions
+    GBP: "en-GB",
+    CAD: "en-CA",
+    TRY: "tr-TR",
+    JPY: "ja-JP",
+    AUD: "en-AU",
+    CHF: "de-CH",
+    CNY: "zh-CN",
+    HKD: "zh-HK",
+    NZD: "en-NZ",
+    KRW: "ko-KR",
+    SGD: "en-SG",
+    NOK: "nb-NO",
+    MXN: "es-MX",
+    RUB: "ru-RU",
+    ZAR: "en-ZA",
+    TWD: "zh-TW",
+    PLN: "pl-PL",
+    THB: "th-TH",
+    IDR: "id-ID",
+    HUF: "hu-HU",
+    CZK: "cs-CZ",
+    ILS: "he-IL",
+    CLP: "es-CL",
+    PHP: "fil-PH",
+    AED: "ar-AE",
+    COP: "es-CO",
+    SAR: "ar-SA",
+    MYR: "ms-MY",
+    RON: "ro-RO",
+    INR: "hi-IN",
+  };
+
+  getLocaleFromCurrency(currencyCode) {
+    return this.currencyLocaleMap[currencyCode] || "en-US"; // Default to en-US if not found
+  }
+
+  getOrdersReport(): void {
     this.getGridData();
     this.sideBar = {
       toolPanels: [
         {
-          id: 'columns',
-          labelDefault: 'Columns',
-          labelKey: 'columns',
-          iconKey: 'columns',
-          toolPanel: 'agColumnsToolPanel',
+          id: "columns",
+          labelDefault: "Columns",
+          labelKey: "columns",
+          iconKey: "columns",
+          toolPanel: "agColumnsToolPanel",
         },
       ],
       // hiddenByDefault: true,
-    }
-    
+    };
   }
-  getFiltersData(): void{
-    this.ReportsService
-      .getRequiredDataForFilters({
-        status: "",
-        reportType:1
-      })
-    .then(response => {
+  getFiltersData(): void {
+    let param = {};
+    this.OrdersService.getOrderFilterData(this.param).then((response) => {
       if (response.result.success) {
-        this.statusList = response.result.data.statuses;
-        this.permissionForView = response.result.data.permissionForReportView;
+        this.statusList = response.result.data.orderTypes;
+        // this.permissionForView = response.result.data.permissionForReportView;
         // console.log(this.statusList);
-        this.countries = response.result.data.countrys;
-
+        this.countries = response.result.data.countries;
       } else {
-
       }
-
-  });
-  }
-  clearFilters(): void {
-    this.filtersApplied = false;
-    this.filtersForm = this.fb.group({
-      status: [[]],
-      start_date: ["2020-01-01"],
-      end_date: [this.today],
-      country:[[]],
     });
-    this.gridParams['startDate'] = "";    
-    this.gridParams['endDate'] = "";
-    this.gridParams['selectedStatuses'] = [];
-    this.gridParams['type'] = "aggrid";
-    
-    this.gridParams['countryIds'] = [];
+  }
+  clearFilters(e): void {
+    e.stopPropagation();
+    this.filtersApplied = false;
+    // this.gridParams["startDate"] = "";
+    // this.gridParams["endDate"] = "";
+    // this.gridParams["selectedStatuses"] = [];
+    // this.gridParams["type"] = "orders";
+    // this.gridParams["countryIds"] = [];
+    this.gridParams = {
+      page: 1,
+      perPage: 12,
+      type: "orders",
+      startDate: "",
+      endDate: "",
+      selectedStatuses: [],
+      countryIds: [],
+    };
     this.getGridData();
-    
-  }
-  filterOrdersReportData(): void {
-    this.filtersApplied = true;
-    this.isChanged = true;
-    this.gridParams['startDate'] = moment(this.filtersForm.value.start_date).toLocaleString();    
-    this.gridParams['endDate'] = moment(this.filtersForm.value.end_date).toLocaleString();
-    this.gridParams['selectedStatuses'] = this.filtersForm.value.status;
-    this.gridParams['countryIds'] = this.filtersForm.value.country;
-    this.getGridData();
-    
+    this.filterCount = "";
   }
 
-  getGridData() {
-    this.noData = false;
-    this.reportsSpinner = true;
-    this.fetchingData = true;
-    this.ReportsService
-      .ordersByStatusReport(this.gridParams)
-      .then(response => {
-        if (response.result.success) {
-          let reportData = response.result.data;
-          this.orders = reportData.finalReportData;
-          // if(this.isInitial) {
-          //   this.ordersCopy = this.orders;
-          // }
-          
-          this.totalCount = reportData.count;
-          this.fetchingData = false;
-          if (!this.orders.length) {
-            this.noData = true;
-            // this.adsService.showExportButton = false;
-          }
-          // console.log(reportData)
-          this.columnDefs = this.generateColumns(reportData.headers);
-          this.rowData = reportData.finalReportData;
-          if(this.isInitial) {
-            this.rowDataCopy = this.rowData;
-            this.isInitial = false;
-          }
-          this.reportsSpinner = false;
-        } else {
-
-        }
-
-      });
-
+  async getGridData() {
+    const datasource = this.ReportsService.getServerSideDatasource(
+      this.gridApi,
+      this.gridParams,
+      `${App.base_url}getReports`,
+      (listCount: number, totalCount: number, gridParams) => {
+        this.listCount = listCount;
+        this.totalCount = totalCount;
+        this.gridParams = gridParams;
+      },
+      this.gridColumnApi,
+      this.viewsList,
+      this.viewMyId
+    );
+    this.gridApi.setServerSideDatasource(datasource);
   }
+
   onGridChanged() {
     this.isChanged = true;
   }
-  onGridReady(params) {
-    // console.log(params)
-    params.api.sizeColumnsToFit(); 
-    this.gridApi = params.api;
-    this.gridColumnApi = params.columnApi;
-    if(this.savedViewValue != 1) {
-      this.setGridOptions(this.currentGridInfo);
-      params.api.sizeColumnsToFit(); 
-    }
-  }
-  
-  saveView() {
+  // onGridReady(params) {
+  //   // console.log(params)
+  //   params.api.sizeColumnsToFit();
+  //   this.gridApi = params.api;
+  //   this.gridColumnApi = params.columnApi;
+  //   if (this.savedViewValue != 1) {
+  //     this.setGridOptions(this.currentGridInfo);
+  //     // params.api.sizeColumnsToFit();
+  //   }
+  // }
 
+  saveView() {
     let data;
-    if(this.gridColumnApi != undefined) {
-       data = {
+    if (this.gridColumnApi != undefined) {
+      data = {
         groupInfo: this.gridColumnApi.getRowGroupColumns(),
         filterInfo: this.gridApi.getFilterModel(),
         valColumnInfo: this.gridColumnApi.getValueColumns(),
@@ -473,10 +312,10 @@ export class OrdersbyStatusComponent implements OnInit {
         allPivoteColumns: this.gridColumnApi.getPivotColumns(),
         sortColumns: this.gridApi.getSortModel(),
         // searchInfo: this.search.value,
-        columnState: this.gridColumnApi.getColumnState() //this.gridApi.columnController.allDisplayedColumns
+        columnState: this.gridColumnApi.getColumnState(), //this.gridApi.columnController.allDisplayedColumns
       };
     } else {
-       data = {
+      data = {
         groupInfo: [],
         filterInfo: [],
         valColumnInfo: [],
@@ -485,93 +324,83 @@ export class OrdersbyStatusComponent implements OnInit {
         allPivoteColumns: [],
         sortColumns: [],
         // searchInfo: this.search.value,
-        columnState: [] //this.gridApi.columnController.allDisplayedColumns
+        columnState: [], //this.gridApi.columnController.allDisplayedColumns
       };
     }
     var filteredGridValues = this.ReportsService.getGridInfo(data);
     // console.log(filteredGridValues)
     this.dialogRef = this.dialog.open(SaveViewComponent, {
-      width: '550px',
-      height: '340px',
+      width: "550px",
+      height: "340px",
+      disableClose: true,
       data: {
-        filterData: this.filtersForm.value,
+        filterData: this.gridParams,
         gridData: filteredGridValues,
         isFiltersApplied: this.filtersApplied,
-        module: 'by_status'
-      }
+        module: "by_status",
+      },
     });
-    this.dialogRef.afterClosed().subscribe(res => {
+    this.dialogRef.afterClosed().subscribe(async (res) => {
       if (res) {
         this.isChanged = false;
-          this.params.module = 'All'
-          // this.reportsComponent.getViewsList('flag');
-          this.ReportsService.setTriggerData(true)
+        this.params.module = "by_status";
+        // this.reportsComponent.getViewsList('flag');
+        this.ReportsService.setTriggerData(true);
 
-         this.getViewsList();
-         setTimeout(() => {
+        this.getViewsList();
+        this.fetchingData = false;
+        this.reportsSpinner = false;
+        setTimeout(() => {
           this.savedViewValue = res;
-         }, 100);
-        
+        }, 100);
       }
     });
   }
   setInitialFilters() {
-    this.filtersForm = this.fb.group({
-      status: [[]],
-      start_date: ["2020-01-01"],
-      end_date: [this.today],
-      country:[[]],
-    });
-    this.gridParams['startDate'] = moment(this.filtersForm.value.start_date).toLocaleString();    
-    this.gridParams['endDate'] = moment(this.filtersForm.value.end_date).toLocaleString();
-    this.gridParams['selectedStatuses'] = this.filtersForm.value.status;
-    this.gridParams['countryIds'] = this.filtersForm.value.country;
+    this.gridParams["startDate"] = moment(this.yearStartDate).toLocaleString();
+    this.gridParams["endDate"] = moment(this.today).toLocaleString();
+    this.gridParams["selectedStatuses"] = [];
+    this.gridParams["countryIds"] = [];
+    this.filterCount = "";
   }
+  public savedReportData;
   getSelectedView(id) {
     this.isChanged = false;
-    if(id == 1) {
+    if (id == 1) {
       this.currentGridInfo = [];
       this.setInitialFilters();
-      this.getOrdersByStatusReport();
+      this.getGridData();
       // this.getViewsList();
       this.getFiltersData();
       this.filtersApplied = false;
-
     } else {
       this.filtersApplied = true;
       //this.savedViewValue = id;
       this.savedViewValue = id;
       const index = _.findIndex(this.viewsList, { view_id: id });
-      const filterDataInfo = index > 0 ? this.viewsList[index].applied_filters : [];
-       
-      if(filterDataInfo != "") {
-        this.filtersForm.value.start_date = filterDataInfo.start_date;
-        this.filtersForm.value.end_date = filterDataInfo.end_date;
-        this.filtersForm.value.status = filterDataInfo.status;
-        this.filtersForm.value.country = filterDataInfo.country;
+      const filterDataInfo =
+        index > 0 ? this.viewsList[index].applied_filters : [];
+      this.savedReportData = filterDataInfo;
+      if (filterDataInfo != "") {
+        this.gridParams["startDate"] = moment(
+          filterDataInfo.startDate
+        ).toLocaleString();
+        this.gridParams["endDate"] = moment(
+          filterDataInfo.endDate
+        ).toLocaleString();
+        this.gridParams["selectedStatuses"] = filterDataInfo.selectedStatuses;
+        this.gridParams["countryIds"] = filterDataInfo.countryIds;
 
-        this.filtersForm = this.fb.group({
-          status: [this.filtersForm.value.status],
-          start_date: [this.filtersForm.value.start_date],
-          end_date: [this.filtersForm.value.end_date],
-          country: [this.filtersForm.value.country],
-        });
-        this.gridParams['startDate'] = moment(this.filtersForm.value.start_date).toLocaleString();    
-        this.gridParams['endDate'] = moment(this.filtersForm.value.end_date).toLocaleString();
-        this.gridParams['selectedStatuses'] = this.filtersForm.value.status;
-        this.gridParams['countryIds'] = this.filtersForm.value.country;
+        this.filterCount =
+          filterDataInfo?.selectedStatuses?.length +
+          filterDataInfo?.countryIds?.length +
+          2;
         this.getGridData();
-        //this.gridApi.sizeColumnsToFit(); 
-        
       } else {
         this.setInitialFilters();
-        this.gridApi.setRowData(this.rowDataCopy);
+        // this.gridApi.setRowData(this.rowDataCopy);
+        this.getGridData();
       }
-      
-     
-        this.currentGridInfo = index > 0 ? this.viewsList[index].grid_info : [];
-        this.setGridOptions(this.currentGridInfo);
-      
     }
   }
   setGridOptions(gridinfo) {
@@ -583,97 +412,265 @@ export class OrdersbyStatusComponent implements OnInit {
       pivoteMode = false,
       pivoteColumns = [],
       sortColumns = [],
-      searchInfo = '',
+      searchInfo = "",
       columnState = [];
     // console.log(gridinfo)
-      if (gridinfo) {
-        colKeys = gridinfo['inVisibleColumnsInfo'] || [];
-        filters = gridinfo['filterInfo'] ? gridinfo['filterInfo'][0] || [] : [];
-        rowGroupFields = gridinfo['groupInfo'] || [];
-        pivoteMode = gridinfo['pivoteMode'] || false;
-        pivoteColumns = gridinfo['pivoteColumns'] || [];
-        sortColumns = gridinfo['sortColumns'] || [];
-        searchInfo = gridinfo['searchInfo'] || '';
-        columnState = gridinfo['columnState'] || [];
-      }
-      if (this.gridColumnApi) {
-        const columns = this.gridColumnApi.getAllColumns();
-        columns.forEach(column => {
-          allFields.push(column['colId']);
-          if (!column['visible']) {
-            this.gridColumnApi.setColumnVisible(column['colId'], true);
-          }
-        });
-        // this.visibleColumnsCount = columns.length - colKeys.length;
-        this.gridColumnApi.removeRowGroupColumns(allFields);
-        this.gridColumnApi.setColumnsVisible(colKeys, false);
-        this.gridColumnApi.setPivotMode(pivoteMode);
-        this.gridColumnApi.addRowGroupColumns(rowGroupFields);
-        this.gridColumnApi.removePivotColumns(allFields);
-        this.gridColumnApi.setPivotColumns(pivoteColumns);
-        this.gridApi.setFilterModel(filters);
-        this.gridApi.setSortModel(sortColumns);
-        this.gridApi.setQuickFilter(searchInfo);
-        if (columnState.length > 0) {
-          this.gridColumnApi.setColumnState(columnState);
-        } else {
-          this.gridColumnApi.resetColumnState();
+    if (gridinfo) {
+      colKeys = gridinfo["inVisibleColumnsInfo"] || [];
+      filters = gridinfo["filterInfo"] ? gridinfo["filterInfo"][0] || [] : [];
+      rowGroupFields = gridinfo["groupInfo"] || [];
+      pivoteMode = gridinfo["pivoteMode"] || false;
+      pivoteColumns = gridinfo["pivoteColumns"] || [];
+      sortColumns = gridinfo["sortColumns"] || [];
+      searchInfo = gridinfo["searchInfo"] || "";
+      columnState = gridinfo["columnState"] || [];
+    }
+    if (this.gridColumnApi) {
+      const columns = this.gridColumnApi.getAllColumns();
+      columns.forEach((column) => {
+        allFields.push(column["colId"]);
+        if (!column["visible"]) {
+          this.gridColumnApi.setColumnVisible(column["colId"], true);
         }
-        // this.applyStickyFilters();
+      });
+      // this.visibleColumnsCount = columns.length - colKeys.length;
+      this.gridColumnApi.removeRowGroupColumns(allFields);
+      this.gridColumnApi.setColumnsVisible(colKeys, false);
+      this.gridColumnApi.setPivotMode(pivoteMode);
+      this.gridColumnApi.addRowGroupColumns(rowGroupFields);
+      this.gridColumnApi.removePivotColumns(allFields);
+      this.gridColumnApi.setPivotColumns(pivoteColumns);
+      this.gridApi.setFilterModel(filters);
+      this.gridApi.setSortModel(sortColumns);
+      this.gridApi.setQuickFilter(searchInfo);
+      if (columnState.length > 0) {
+        this.gridColumnApi.setColumnState(columnState);
+      } else {
+        this.gridColumnApi.resetColumnState();
       }
+      // this.applyStickyFilters();
+    }
   }
-  deleteView = function(id, i) {
+  deleteView = function (id, i) {
     event.stopPropagation();
     const params = {
-      view_id : id
-    }
+      view_id: id,
+    };
     let dialogRef = this.dialog.open(DeleteViewComponent, {
-      width: '550px',
+      width: "550px",
       data: {
-        
-        module: 'by_status'
-      }
+        module: "by_status",
+      },
+      disableClose: true,
     });
-    dialogRef.afterClosed().subscribe(res => {
+    dialogRef.afterClosed().subscribe((res) => {
       if (res) {
-        this.ReportsService.deleteViewItem(params)
-        .then(response => {
+        this.fetchingData = true;
+        this.ReportsService.deleteViewItem(params).then((response) => {
+          this.fetchingData = false;
           if (response.result.success) {
             this.isChanged = false;
-          
-            if(id == this.savedViewValue) {
-                this.savedViewValue = 1;
-                this.getSelectedView(this.savedViewValue)
+
+            if (id == this.savedViewValue) {
+              this.savedViewValue = 1;
+              this.getSelectedView(this.savedViewValue);
             }
             this.viewsList.splice(i, 1);
             let toastMsg: object;
-                toastMsg = { msg: 'View deleted successfully', status: 'success' };
-                this.snackbar.showSnackBar(toastMsg);
-          } 
-        })
+            toastMsg = { msg: "View deleted successfully", status: "success" };
+            this.snackbar.showSnackBar(toastMsg);
+          }
+        });
       }
     });
-    
-  }
-  getViewsList = function() {
+  };
+  public newSpinnerFlag = false;
+  getViewsList = async function () {
     // const params = {
     //   module: 'by_status'
     // }
-    this.ReportsService.getViewsList(this.params)
-      .then(response => {
-        if (response.result.success) {
-          this.viewsList = response.result.data;
-          this.viewsList.forEach(element => {
-            element.grid_info = JSON.parse(element.grid_info);
-            element.applied_filters = JSON.parse(element.applied_filters);
-          });
-          if(this.viewsList.length) {
-            this.viewsList.unshift({ view_name: 'Default View', view_id: 1 });
+    // this.fetchingData = true;
+    // this.reportsSpinner  = true;
+    this.newSpinnerFlag = true;
+    await this.ReportsService.getViewsList(this.params).then((response) => {
+      this.newSpinnerFlag = false;
+      if (response.result.success) {
+        this.viewsList = response.result.data;
+        this.viewsList.forEach((element) => {
+          element.grid_info = JSON.parse(element.grid_info);
+          element.applied_filters = JSON.parse(element.applied_filters);
+        });
+        if (this.viewsList.length) {
+          this.viewsList.unshift({ view_name: "Default View", view_id: 1 });
+        }
+
+        if (this.viewMyId) {
+          const index = _.findIndex(this.viewsList, { view_id: this.viewMyId });
+          const filterDataInfo =
+            index > 0 ? this.viewsList[index].applied_filters : [];
+            console.log(filterDataInfo)
+          if (filterDataInfo != "") {
+            this.filterCount =
+              filterDataInfo?.selectedStatuses?.length +
+              filterDataInfo?.countryIds?.length +
+              2;
+          } else {
+            this.gridParams = {
+              page: 1,
+              perPage: 12,
+              type: "orders",
+              startDate: "",
+              endDate: "",
+              selectedStatuses: [],
+              countryIds: [],
+            };
           }
-          
-          // console.log(this.viewsList)
-        } 
-      })
+        } else {
+          this.setInitialFilters();
+        }
+      }
+    });
+  };
+  getClientName(clientId: string, options): string {
+    const client = options.find((client) => client.id === clientId);
+    return client ? client.name : "";
+  }
+
+  removeClient(clientId: string, selectedList): void {
+    const selectedClients = selectedList.value.filter((id) => id !== clientId);
+    selectedList.setValue(selectedClients);
+  }
+  public filterCount = "";
+  openFilters() {
+    this.dialogRef = this.dialog.open(EstimateFilterComponent, {
+      width: "20%",
+      height: "100vh",
+      position: { right: "0" },
+      disableClose: true,
+      data: {
+        module: "orders",
+        statusList: this.statusList,
+        filterParams: this.gridParams,
+        countries: this.countries,
+      },
+    });
+    this.dialogRef.afterClosed().subscribe(async (res) => {
+      if (res.success) {
+        this.filterCount =
+          res?.selectedFilters?.status?.length +
+          res?.selectedFilters?.countryIds?.length +
+          2;
+        this.filtersApplied = true;
+        this.isChanged = true;
+        this.gridParams["startDate"] = moment(
+          res.selectedFilters.start_date
+        ).toLocaleString();
+        this.gridParams["endDate"] = moment(
+          res.selectedFilters.end_date
+        ).toLocaleString();
+        this.gridParams["selectedStatuses"] = res.selectedFilters.status;
+        this.gridParams["countryIds"] = res.selectedFilters.countryIds;
+        this.savedReportData = this.gridParams;
+
+        await this.getGridData();
+
+        // this.getSelectedView();
+      }
+    });
+  }
+  async onGridReady(params: any) {
+    this.gridApi = params.api;
+    this.gridColumnApi = params.columnApi;
+
+    await this.getFiltersData();
+    await this.getViewsList();
+
+    if (this.gridApi) {
+      const datasource = this.ReportsService.getServerSideDatasource(
+        this.gridApi,
+        this.gridParams,
+        `${App.base_url}getReports`,
+        (listCount: number, totalCount: number, gridParams) => {
+          this.listCount = listCount;
+          this.totalCount = totalCount;
+          this.gridParams = gridParams;
+          // this.filterCount = filterCount;
+          const index = _.findIndex(this.viewsList, { view_id: this.viewMyId });
+          if (index > 0) {
+            this.savedViewValue = this.viewsList[index].view_id;
+          }
+        },
+        this.gridColumnApi,
+        this.viewsList,
+        this.viewMyId
+      );
+      params.api.setServerSideDatasource(datasource);
+    }
+  }
+  public listCount = 0;
+
+  async loadReportHeaders() {
+    try {
+      this.columnDefs = await this.ReportsService.getReportHeaders({
+        type: "orders",
+      });
+      this.showGrid = true;
+
+    } catch (error) {
+      console.error("Error fetching report headers:", error);
+    }
+  }
+  public sortModel = [];
+  public rowModelType: any = "serverSide";
+  onSortChanged(ev) {
+    this.sortModel = ev.api.getSortModel();
+  }
+  public pageNumber = false;
+  loadMore(ev) {
+    this.gridParams.page = ev.page;
+    this.gridParams.perPage = ev.perPage;
+    const datasource = this.ReportsService.getServerSideDatasource(
+      this.gridApi,
+      this.gridParams,
+      `${App.base_url}getReports`,
+      (listCount: number, totalCount: number, gridParams) => {
+        this.listCount = listCount;
+        this.totalCount = totalCount;
+        this.gridParams = gridParams;
+      },
+      this.gridColumnApi,
+      this.viewsList,
+      this.viewMyId
+    );
+    this.gridApi.setServerSideDatasource(datasource);
+  }
+  getGridInfo() {
+    let data;
+    if (this.gridColumnApi != undefined) {
+      data = {
+        groupInfo: this.gridColumnApi.getRowGroupColumns(),
+        filterInfo: this.gridApi.getFilterModel(),
+        valColumnInfo: this.gridColumnApi.getValueColumns(),
+        allColumnsInfo: this.gridColumnApi.getAllColumns(),
+        pivoteMode: this.gridColumnApi.isPivotMode(),
+        allPivoteColumns: this.gridColumnApi.getPivotColumns(),
+        sortColumns: this.gridApi.getSortModel(),
+        // searchInfo: this.search.value,
+        columnState: this.gridColumnApi.getColumnState(), //this.gridApi.columnController.allDisplayedColumns
+      };
+    } else {
+      data = {
+        groupInfo: [],
+        filterInfo: [],
+        valColumnInfo: [],
+        allColumnsInfo: [],
+        pivoteMode: [],
+        allPivoteColumns: [],
+        sortColumns: [],
+        // searchInfo: this.search.value,
+        columnState: [], //this.gridApi.columnController.allDisplayedColumns
+      };
+    }
+    return data;
   }
 }
-

@@ -1,0 +1,170 @@
+<div class="pfi-main-container">
+  <mat-toolbar style="display: flex; justify-content: space-between">
+    <div class="create-pfi-title-wrapper">
+      <span class="img-icon">
+        <img [src]="createOrderIcon" alt="Icon" />
+      </span>
+      <h2 class="pfi-main-title">{{ data.title }} {{ estimateslanguage }}</h2>
+    </div>
+    <mat-icon
+      *ngIf="!submiteBtnClicked"
+      mat-dialog-close
+      style="cursor: pointer"
+      aria-hidden="false"
+      aria-label="Example home icon"
+      >close</mat-icon
+    >
+  </mat-toolbar>
+  <mat-dialog-content
+    (scroll)="onWindowScroll($event)"
+    class="create-quote-popup"
+    style="position: relative"
+  >
+    <div>
+      <div class="products-container create-pfi-conatiner">
+        <div class="test">
+          <mat-tab-group #allTabs (selectedIndexChange)="onTabChange($event)">
+            <mat-tab class="pfi-tab" label="Buyer & Shipping Information">
+              <div class="inner-content">
+                <div class="estimate-error">
+                  <app-form-builder
+                    [module]="'create_estimate'"
+                    (changeAddress)="getSelectedAddress($event)"
+                    (trigger)="formEmitEvent($event)"
+                    (changeclietId)="changeclietId($event)"
+                    [Contacts]="data.estimate_id ? data.estimate_id : ''"
+                    [isSubmitBtnClicked]="submiteBtnClicked"
+                    [editTypeForRestrict]="data.title === 'Edit' ? true : false"
+                  ></app-form-builder>
+                </div>
+                <div class="select-address-error" *ngIf="estimate_form_id">
+                  <app-select-address
+                    [module]="'pfi_address_form'"
+                    [totalFormFields]="returnedDynmicDropdowns"
+                    [clientSelectedId]="clientSelectedId"
+                    (trigger)="getSelectedAddress($event)"
+                    [Contacts]="data.estimate_id ? data.estimate_id : ''"
+                  ></app-select-address>
+                </div>
+              </div>
+            </mat-tab>
+            <mat-tab class="pfi-tab" label="{{ language.pageNavbar.products }}">
+              <div class="inner-content">
+                <!-- <app-form-builder
+                    [module]="'add_product_in_create'"
+                    (changeProducts)="emitNewProductsData($event)"
+                    (trigger)="productFormEmit($event)"
+                    (emitProducts)="emitProducts($event)"
+                  ></app-form-builder> -->
+                <div class="product-error">
+                  <app-products-form
+                    [module]="'add_product_in_create'"
+                    [clientSelectedId]="clientSelectedId"
+                    (trigger)="emitNewProductsData($event)"
+                    [Contacts]="data.estimate_id ? data.estimate_id : ''"
+                    [isSubmitBtnClicked]="submiteBtnClicked"
+                  >
+                  </app-products-form>
+                </div>
+                <div class="subtotal-error">
+                  <app-sub-total-form
+                    [disableEdit]="pfiProductsPayload.valid ? false : true"
+                    [module]="'subtotal_form'"
+                    [subTotalSum]="subTotalVal"
+                    [selectedCurrency]="selectedCurrency"
+                    (trigger)="subTotalFormEvent($event)"
+                    [Contacts]="data.estimate_id ? data.estimate_id : ''"
+                    [isSubmitBtnClicked]="submiteBtnClicked"
+                  ></app-sub-total-form>
+                </div>
+              </div>
+            </mat-tab>
+
+            <mat-tab
+              class="pfi-tab"
+              label="{{ language.pageNavbar.paymentAndDelivery }}"
+            >
+              <div class="inner-content">
+                <app-form-builder
+                  [module]="'add_payment_terms'"
+                  (trigger)="paymentformEmitEvent($event)"
+                  [isSubmitBtnClicked]="submiteBtnClicked"
+                  [Contacts]="data.estimate_id ? data.estimate_id : ''"
+                ></app-form-builder>
+              </div>
+            </mat-tab>
+
+            <mat-tab class="pfi-tab" label="Regulatory Details">
+              <div class="inner-content">
+                <app-form-builder
+                  [module]="'pfi_other_specifications'"
+                  (trigger)="specificationsformEmitEvent($event)"
+                  [isSubmitBtnClicked]="submiteBtnClicked"
+                  [Contacts]="data.estimate_id ? data.estimate_id : ''"
+                ></app-form-builder>
+              </div>
+            </mat-tab>
+            <!-- <mat-tab class="pfi-tab" label="Packing">
+              <div class="inner-content">
+                <p>Packing Contents</p>
+              </div>
+            </mat-tab>
+            <mat-tab class="pfi-tab" label="Documents">
+              <div class="inner-content">
+                <p>Documents</p>
+              </div>
+            </mat-tab> -->
+          </mat-tab-group>
+        </div>
+      </div>
+      <mat-spinner
+        class="medium-spinner page-fixed"
+        *ngIf="fetchingData"
+      ></mat-spinner>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions>
+    <div class="conformPFi">
+      <button
+        (click)="onClose(allTabs, tabIndex)"
+        class="back-btn-ui"
+        *ngIf="!submiteBtnClicked"
+      >
+        {{ closeBtnLabel }}
+      </button>
+      <!-- [disabled]="isDisableBtn" -->
+      <button
+        mat-raised-button
+        color="primary"
+        (click)="savePfi(allTabs, tabIndex)"
+        [disabled]="disableBtn || submiteBtnClicked"
+        style="margin-left: 0"
+      >
+        {{ btnLabel }}
+        <span *ngIf="submiteBtnClicked">
+          <mat-icon style="height: 16px; width: 16px"
+            ><mat-spinner
+              class="white-spinner"
+              diameter="20"
+            ></mat-spinner></mat-icon
+        ></span>
+      </button>
+      <!-- <button
+        mat-raised-button
+        id="createorder"
+        color="primary"
+        (click)="moveToNextTab(allTabs)"
+      >
+        {{ confirmButtonText }}
+      </button> -->
+    </div>
+    <!-- <div class="conformPFi" *ngIf="submiteBtnClicked">
+      <button mat-raised-button disabled="true">
+        <mat-icon>
+          <mat-spinner class="white-spinner" diameter="20"></mat-spinner
+        ></mat-icon>
+      </button>
+    </div> -->
+  </mat-dialog-actions>
+</div>

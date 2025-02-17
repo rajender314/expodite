@@ -1,0 +1,692 @@
+<!-- *ngIf="preShipDocs && showSID" -->
+<div class="inner-container" style="min-height: unset !important">
+  <mat-toolbar class="package-toolbar">
+    <img class="shipping-image" [src]="images.pdf_download" />
+    <span>Shipping Instructions Draft</span>
+
+    <span fxFlex></span>
+    <div *ngIf="viewActivityLogIcon">
+      <button
+        mat-icon-button
+        class="action-orderbtn"
+        (click)="openActivityModal('shipping_instruction_draft')"
+      >
+        <img [src]="images.activity_log_icon" title="Activity Log" />
+      </button>
+    </div>
+    <!-- *ngIf="selectedOrderStatus != 'Delivered'" -->
+
+    <button (click)="editSIDraft()" mat-icon-button>
+      <mat-icon class="edit-icon" title="Edit" mat-icon-button
+        >mode_edit
+      </mat-icon>
+    </button>
+    <a
+      target="_blank"
+      href="generateSIDraft?orders_id={{ orderId }}&is_printable=1"
+    >
+      <button mat-icon-button>
+        <img [src]="images.printer_icon" title="Print" />
+      </button>
+    </a>
+    <a href="generateSIDraft?orders_id={{ orderId }}&is_printable=0">
+      <button mat-icon-button>
+        <img [src]="images.download_arrow" title="Download" />
+      </button>
+    </a>
+    <button (click)="toggleDiv()" mat-icon-button>
+      <img
+        class="expand-icon"
+        [class.close]="!showDiv"
+        [src]="images.grey_arrow"
+        mat-icon-button
+      />
+    </button>
+  </mat-toolbar>
+  <!--Shipping Instructions Draft-->
+  <div
+    class="Fema-declration table-container layout"
+    [class.minimize-div]="!showDiv"
+  >
+    <div class="fema-container">
+      <div class="VGM-table">
+        <p
+          style="
+            margin: 0;
+            margin-bottom: 14px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 16px;
+            text-decoration: underline;
+          "
+        >
+          SI DRAFT
+        </p>
+        <table>
+          <tr>
+            <td></td>
+            <td
+              style="display: flex; flex-direction: column; border: none"
+              class="pl"
+            >
+              <p>
+                B/L NO :
+                <span *ngIf="!editModeSIDraft">{{ siData?.bol_no }} </span>
+              </p>
+              <mat-form-field
+                style="position: relative; right: 5px"
+                class="custom-input mat-input-custom-spacing mt-0 ml-1"
+                floatLabel="never"
+                *ngIf="editModeSIDraft"
+              >
+                <input
+                  [(ngModel)]="siData.bol_no"
+                  matInput
+                  maxlength="20"
+                  style="margin-top: 2px"
+                  placeholder="B/L NO."
+                  class="price-value"
+                />
+              </mat-form-field>
+
+              <span
+                >BOOKING NO :
+                <span *ngIf="!editModeSIDraft"> {{ siData?.booking_no }}</span>
+              </span>
+              <mat-form-field
+                style="position: relative; bottom: 6px; right: 5px"
+                class="custom-input mat-input-custom-spacing mt-0 ml-1"
+                floatLabel="never"
+                *ngIf="editModeSIDraft"
+              >
+                <input
+                  [(ngModel)]="siData.booking_no"
+                  matInput
+                  maxlength="20"
+                  style="margin-top: 2px"
+                  placeholder="BOOKING NO"
+                  class="price-value"
+                />
+              </mat-form-field>
+            </td>
+          </tr>
+          <tr>
+            <td class="pl">
+              <p style="margin: 0; padding: 4px 0px">SHIPPER:</p>
+              <p>{{ compnayDetails?.name }}</p>
+              <p style="margin: 0px">
+                {{
+                  compnayDetails?.address1 != ""
+                    ? compnayDetails?.address1 + ","
+                    : ""
+                }}
+                <br />
+
+                {{
+                  compnayDetails?.address2 != ""
+                    ? compnayDetails?.address2 + ","
+                    : ""
+                }}
+              </p>
+              <p style="margin: 0px">
+                {{
+                  compnayDetails?.city != "" ? compnayDetails?.city + "," : ""
+                }}- {{ compnayDetails?.postal_code }}
+              </p>
+              <p style="margin: 0px">
+                {{
+                  compnayDetails?.state != "" ? compnayDetails?.state + "," : ""
+                }}
+              </p>
+              <p style="margin: 0px">
+                {{
+                  compnayDetails?.country != ""
+                    ? compnayDetails?.country + ","
+                    : ""
+                }}
+              </p>
+              <p style="margin: 0px">Contact Person:</p>
+              <p style="margin: 0px">Ph No.:</p>
+            </td>
+            <td class="pl" style="vertical-align: top; text-align: left">
+              <p style="margin: 0; padding: 4px 0px">EXPORT REFERENCES:</p>
+              <span
+                *ngIf="!editModeSIDraft"
+                [innerHTML]="siData?.export_ref"
+              ></span>
+              <mat-form-field
+                class="custom-input block-ele grid-full"
+                floatLabel="never"
+                *ngIf="editModeSIDraft"
+                style="
+                  margin-top: 0px;
+                  position: relative;
+                  left: -5px;
+                  top: 7px;
+                "
+              >
+                <textarea
+                  [(ngModel)]="export_ref"
+                  matInput
+                  placeholder="Enter EXPORT REFERENCES"
+                  autofocus="on"
+                  style="
+                    height: 126px;
+                    line-height: 1.4;
+                    padding: 4px 10px;
+                    border-width: 2px;
+                  "
+                  rows="3"
+                >
+                </textarea>
+              </mat-form-field>
+            </td>
+          </tr>
+          <tr>
+            <td class="pl">
+              <p style="margin: 0; padding: 4px 0px">
+                CONSIGNEE: (Complete Address and Fax#):
+              </p>
+              <p class="shippers-text shipper-hdng">
+                {{ orderData.billingAddr.company_name }}
+              </p>
+              <p class="shippers-text">
+                {{ orderData.billingAddr.bill_address1 }}
+              </p>
+              <p class="shippers-text">
+                {{ orderData.billingAddr.bill_address2 }}
+              </p>
+              <p class="shippers-text">
+                {{ orderData.billingAddr.bill_address3 }}
+              </p>
+              <p class="shippers-text">
+                {{ orderData.billingAddr.bill_address4 }}
+              </p>
+              <p class="shippers-text">
+                {{ orderData.billingAddr.bill_city }}
+              </p>
+              <p class="shippers-text">
+                {{ orderData.billingAddr.bill_state }}
+              </p>
+              <p class="shippers-text">
+                {{ orderData.billingAddr.bill_countrty }}
+              </p>
+              <p class="shippers-text">
+                {{ orderData.billingAddr.bill_postal_code }}
+              </p>
+            </td>
+            <td class="pl" style="vertical-align: top">
+              <p style="margin: 0; padding: 4px 0px">
+                SHIPPING: (Complete Address and Fax#):
+              </p>
+              <p>{{ orderData.shippingAddr.company_name }}</p>
+              <p>{{ orderData.shippingAddr.ship_address1 }}</p>
+              <p>{{ orderData.shippingAddr.ship_address2 }}</p>
+              <p>{{ orderData.shippingAddr?.ship_address3 }}</p>
+              <p>{{ orderData.shippingAddr?.ship_address4 }}</p>
+              <p>
+                {{ orderData.shippingAddr.ship_city }} -
+                {{ orderData.shippingAddr.ship_postal_code }}
+              </p>
+              <p>{{ orderData.shippingAddr.ship_state }}</p>
+              <p>{{ orderData.shippingAddr.ship_countrty }}</p>
+            </td>
+          </tr>
+          <tr>
+            <td class="pl">
+              <p style="margin: 0; padding: 4px 0px">
+                NOTIFY: (Complete Address and Fax#):
+              </p>
+              <p>{{ orderData.notifyAddr.company_name }}</p>
+              <p>{{ orderData.notifyAddr.notify_address1 }}</p>
+              <p>{{ orderData.notifyAddr.notify_address2 }}</p>
+              <p>{{ orderData.notifyAddr?.notify_address3 }}</p>
+              <p>{{ orderData.notifyAddr?.notify_address4 }}</p>
+              <p>
+                {{ orderData.notifyAddr.notify_city }}-
+                {{ orderData.notifyAddr.notify_postal_code }}
+              </p>
+              <p>{{ orderData.notifyAddr.notify_state }}</p>
+              <p>{{ orderData.notifyAddr.notify_country }}</p>
+            </td>
+            <td class="pl" style="vertical-align: top">
+              <p style="margin: 0; padding: 4px 0px">
+                ALSO NOTIFY (Complete Address and Fax#):
+                <span *ngIf="!editModeSIDraft" [innerHTML]="siData?.notify">
+                </span>
+                <mat-form-field
+                  class="custom-input block-ele grid-full"
+                  floatLabel="never"
+                  *ngIf="editModeSIDraft"
+                  style="
+                    margin-top: 0px;
+                    position: relative;
+                    left: -5px;
+                    top: 7px;
+                  "
+                >
+                  <textarea
+                    [(ngModel)]="notify"
+                    matInput
+                    placeholder="Enter Complete Address and Fax#"
+                    style="
+                      height: 126px;
+                      line-height: 1.4;
+                      padding: 4px 10px;
+                      border-width: 2px;
+                    "
+                    rows="3"
+                  >
+                  </textarea>
+                </mat-form-field>
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td class="pl word-break">
+              <p class="adc-data">
+                VESSEL-VOYAGE NO :
+
+                <span *ngIf="!editModeSIDraft">
+                  {{ siData?.vessel_no ? siData?.vessel_no : "" }}
+                </span>
+              </p>
+
+              <mat-form-field
+                style="position: relative; bottom: 5px"
+                class="custom-input mat-input-custom-spacing mt-0 ml-1"
+                floatLabel="never"
+                *ngIf="editModeSIDraft"
+              >
+                <input
+                  [(ngModel)]="siData.vessel_no"
+                  type="text"
+                  matInput
+                  maxlength="50"
+                  style="margin-top: 2px"
+                  placeholder="Vessel-Voyage No."
+                  class="price-value"
+                />
+              </mat-form-field>
+            </td>
+            <td class="pl word-break">
+              <p>
+                PLACE OF RECEIPT :
+                <span *ngIf="!editModeSIDraft">{{
+                  siData?.place_of_receipt
+                }}</span>
+              </p>
+              <mat-form-field
+                style="position: relative; bottom: 5px"
+                class="custom-input mat-input-custom-spacing mt-0 ml-1"
+                floatLabel="never"
+                *ngIf="editModeSIDraft"
+              >
+                <input
+                  [(ngModel)]="siData.place_of_receipt"
+                  type="text"
+                  matInput
+                  maxlength="20"
+                  style="margin-top: 2px"
+                  placeholder="PLACE OF RECEIPT"
+                  class="price-value"
+                />
+              </mat-form-field>
+            </td>
+          </tr>
+          <tr>
+            <td class="pl word-break"></td>
+            <td class="pl word-break">
+              <p>
+                PORT OF LOADING :<span *ngIf="!editModeSIDraft">
+                  {{ siData?.port_of_loading }}</span
+                >
+              </p>
+              <mat-form-field
+                style="position: relative; bottom: 5px"
+                class="custom-input mat-input-custom-spacing mt-0 ml-1"
+                floatLabel="never"
+                *ngIf="editModeSIDraft"
+              >
+                <input
+                  [(ngModel)]="siData.port_of_loading"
+                  type="text"
+                  matInput
+                  maxlength="20"
+                  style="margin-top: 2px"
+                  placeholder="PORT OF LOADING "
+                  class="price-value"
+                />
+              </mat-form-field>
+            </td>
+          </tr>
+          <tr>
+            <td class="pl word-break">
+              PORT OF DISCHARGE : {{ portOfDischarge }}
+            </td>
+            <td class="pl word-break">
+              <p>
+                PLACE OF DELIVERY :<span *ngIf="!editModeSIDraft">
+                  {{ siData?.place_of_delivery }}</span
+                >
+              </p>
+              <mat-form-field
+                style="position: relative; bottom: 5px"
+                class="custom-input mat-input-custom-spacing mt-0 ml-1"
+                floatLabel="never"
+                *ngIf="editModeSIDraft"
+              >
+                <input
+                  [(ngModel)]="siData.place_of_delivery"
+                  type="text"
+                  matInput
+                  maxlength="20"
+                  style="margin-top: 2px"
+                  placeholder="PLACE OF DELIVERY "
+                  class="price-value"
+                />
+              </mat-form-field>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <table class="red" style="border-collapse: collapse">
+                <tr>
+                  <td style="border-bottom: 1px solid #565656" class="pl">
+                    Marks & Numbers
+                  </td>
+                  <td style="border-bottom: 1px solid #565656" class="pl">
+                    Number of Packages
+                  </td>
+                  <td style="border-bottom: 1px solid #565656" class="pl">
+                    Description of Goods
+                  </td>
+                </tr>
+
+                <tr>
+                  <td style="padding: 10px">
+                    <p
+                      class="adc-data"
+                      *ngIf="!editModeSIDraft"
+                      class="invoice-contact ql-snow ql-editor"
+                      [innerHTML]="siData?.marks_and_nos"
+                    ></p>
+                    <quill-editor
+                      *ngIf="editModeSIDraft"
+                      [(ngModel)]="marks_and_nos"
+                      (onContentChanged)="onContentChanged($event)"
+                      (onSelectionChanged)="onSelectionChanged($event)"
+                      placeholder="Enter Marks and No's"
+                      style="display: inline-block; width: 300px"
+                    ></quill-editor>
+
+                    <!-- <mat-form-field
+                      class="custom-input block-ele grid-full"
+                      floatLabel="never"
+                      *ngIf="editModeSIDraft"
+                      style="
+                        margin-top: 0px;
+                        position: relative;
+                        left: -5px;
+                        top: 7px;
+                      "
+                    >
+                      <textarea
+                        [(ngModel)]="marks_and_nos"
+                        matInput
+                        placeholder="Marks & Numbers"
+                        autofocus="on"
+                        style="
+                          height: 126px;
+                          line-height: 1.4;
+                          padding: 4px 10px;
+                          border-width: 2px;
+                        "
+                        rows="3"
+                      >
+                      </textarea>
+                    </mat-form-field> -->
+                  </td>
+                  <td class="pl word-break">
+                    <p
+                      class="adc-data"
+                      *ngIf="!editModeSIDraft"
+                      [innerHTML]="siData?.no_of_packages"
+                    ></p>
+                    <mat-form-field
+                      class="custom-input block-ele grid-full"
+                      floatLabel="never"
+                      *ngIf="editModeSIDraft"
+                      style="
+                        margin-top: 0px;
+                        position: relative;
+                        left: -5px;
+                        top: 7px;
+                      "
+                    >
+                      <textarea
+                        [(ngModel)]="no_of_packages"
+                        matInput
+                        placeholder="Number of Packages"
+                        autofocus="on"
+                        style="
+                          height: 126px;
+                          line-height: 1.4;
+                          padding: 4px 10px;
+                          border-width: 2px;
+                        "
+                        rows="3"
+                      >
+                      </textarea>
+                    </mat-form-field>
+                    <!-- <mat-form-field
+                      style="position: relative; bottom: 5px; right: 5px"
+                      *ngIf="editModeSIDraft"
+                      class="custom-input mat-input-custom-spacing mt-0 ml-1"
+                      floatLabel="never"
+                    >
+                      <input
+                        [(ngModel)]="siData.no_of_packages"
+                        type="text"
+                        matInput
+                        maxlength="20"
+                        style="margin-top: 2px"
+                        placeholder="Number of Packages"
+                        class="price-value"
+                      />
+                    </mat-form-field> -->
+                  </td>
+                  <td class="pl word-break">
+                    <p
+                      *ngIf="!editModeSIDraft"
+                      class="adc-data"
+                      [innerHTML]="siData?.decription_of_goods"
+                    ></p>
+                    <mat-form-field
+                      class="custom-input block-ele grid-full"
+                      floatLabel="never"
+                      *ngIf="editModeSIDraft"
+                      style="
+                        margin-top: 0px;
+                        position: relative;
+                        left: -5px;
+                        top: 7px;
+                      "
+                    >
+                      <textarea
+                        [(ngModel)]="decription_of_goods"
+                        matInput
+                        placeholder="Description of Goods"
+                        autofocus="on"
+                        style="
+                          height: 126px;
+                          line-height: 1.4;
+                          padding: 4px 10px;
+                          border-width: 2px;
+                        "
+                        rows="3"
+                      >
+                      </textarea>
+                    </mat-form-field>
+                  </td>
+                </tr>
+              </table>
+            </td>
+            <td>
+              <table class="red">
+                <tr>
+                  <td
+                    style="border-bottom: 1px solid #565656; padding-left: 8px"
+                  >
+                    Gross Weight (Kgs)
+                  </td>
+                </tr>
+                <tr>
+                  <td class="pl word-break">
+                    <p class="adc-data" *ngIf="!editModeSIDraft">
+                      {{ siData?.gross_weight }}
+                    </p>
+
+                    <mat-form-field
+                      style="position: relative; bottom: 5px; right: 5px"
+                      *ngIf="editModeSIDraft"
+                      class="custom-input mat-input-custom-spacing mt-0 ml-1"
+                      floatLabel="never"
+                    >
+                      <input
+                        [(ngModel)]="siData.gross_weight"
+                        type="text"
+                        matInput
+                        maxlength="20"
+                        style="margin-top: 2px"
+                        placeholder="Gross Weight"
+                        class="price-value"
+                      />
+                    </mat-form-field>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td class="pl">
+              <p>
+                Number of OBLs/Non-Negotiable:<span
+                  *ngIf="!editModeSIDraft"
+                  [innerHTML]="siData?.no_of_bls"
+                ></span>
+              </p>
+              <mat-form-field
+                class="custom-input block-ele grid-full"
+                floatLabel="never"
+                *ngIf="editModeSIDraft"
+                style="
+                  margin-top: 0px;
+                  position: relative;
+                  left: -5px;
+                  top: 7px;
+                "
+              >
+                <textarea
+                  [(ngModel)]="no_of_bls"
+                  matInput
+                  placeholder="Number of OBLs/Non-Negotiable"
+                  autofocus="on"
+                  style="
+                    height: 126px;
+                    line-height: 1.4;
+                    padding: 4px 10px;
+                    border-width: 2px;
+                  "
+                  rows="3"
+                >
+                </textarea>
+              </mat-form-field>
+            </td>
+            <td class="pl">
+              BL Date:<span *ngIf="!editModeSIDraft">{{
+                siData.bol_date | date : "dd-MM-yyyy"
+              }}</span>
+
+              <div
+                *ngIf="editModeSIDraft"
+                class="custom-date-container pdf-date"
+              >
+                <input
+                  [class.disable]="!editModeSIDraft"
+                  class="datepicker"
+                  readonly="true"
+                  (focus)="openCalendar(picker3)"
+                  (click)="openCalendar(picker3)"
+                  [(ngModel)]="bol_date"
+                  [matDatepicker]="picker3"
+                  placeholder="Bill of Lading Date"
+                />
+                <mat-datepicker-toggle matSuffix [for]="picker3">
+                </mat-datepicker-toggle>
+                <mat-datepicker #picker3 startView="year"></mat-datepicker>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="pl">
+              <p>
+                REMARKS:<span
+                  *ngIf="!editModeSIDraft"
+                  [innerHTML]="siData?.remarks"
+                ></span>
+              </p>
+              <mat-form-field
+                class="custom-input block-ele grid-full"
+                floatLabel="never"
+                *ngIf="editModeSIDraft"
+                style="
+                  margin-top: 0px;
+                  position: relative;
+                  left: -5px;
+                  top: 7px;
+                "
+              >
+                <textarea
+                  [(ngModel)]="remarks"
+                  matInput
+                  placeholder="Remarks"
+                  autofocus="on"
+                  style="
+                    height: 126px;
+                    line-height: 1.4;
+                    padding: 4px 10px;
+                    border-width: 2px;
+                  "
+                  rows="3"
+                >
+                </textarea>
+              </mat-form-field>
+            </td>
+            <td class="pl">Special Instructions: {{ specialInstructions }}</td>
+          </tr>
+        </table>
+      </div>
+      <div
+        *ngIf="editModeSIDraft"
+        class="footer-bottom fxflex"
+        style="padding: 14px"
+        fxLayout="row"
+        fxLayoutAlign="end center"
+      >
+        <span fxFlex></span>
+        <section class="section-right">
+          <button (click)="editSIDraft()" type="button" mat-button>
+            Cancel
+          </button>
+
+          <button (click)="saveSiDraft('save')" type="submit" mat-raised-button>
+            Save
+          </button>
+        </section>
+        <div class="cb"></div>
+      </div>
+    </div>
+    <!-- </div> -->
+  </div>
+</div>

@@ -28,6 +28,8 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatChipsModule } from "@angular/material/chips";
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import {MatBadgeModule} from '@angular/material/badge';
+
 declare var App: any;
 
 import { DateAdapter, MAT_DATE_FORMATS } from '@angular/material/core';
@@ -76,6 +78,7 @@ import { MyDateAdapter } from './data-picker/my-date-adapter';
     MatInputModule,
     MatSelectModule,
     MatFormFieldModule,
+    MatBadgeModule
   ],
   exports: [
    // FlexLayoutModule,
@@ -106,6 +109,7 @@ import { MyDateAdapter } from './data-picker/my-date-adapter';
     MatInputModule,
     MatSelectModule,
     MatFormFieldModule,
+    MatBadgeModule
   ],
   providers: [
     { provide: DateAdapter, useClass: MyDateAdapter },

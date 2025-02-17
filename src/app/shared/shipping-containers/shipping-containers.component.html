@@ -1,0 +1,313 @@
+<div
+[formGroup]="shippingContainer"
+class="shippingForm"
+>
+<div
+  formArrayName="shippingContainerArray"
+  *ngFor="
+    let item of shippingContainer.get(
+      'shippingContainerArray'
+    )['controls'];
+    let i = index
+  "
+  style="margin-top: 14px;"
+>
+  <div
+    [formGroupName]="i"
+    class="shipping-sec"
+    style="
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    "
+  >
+    <div style="border-bottom: 1px solid #dfe3e9">
+      <div style="display: flex; gap: 10px">
+        <mat-form-field
+          class="custom-input"
+          floatLabel="never"
+          style="width: 250px"
+        >
+          <label class="custom-label mandatory"
+            >Freight Cost per Container</label
+          >
+          <input
+            matInput
+            maxlength="100"
+            [class.disableClass]="
+              selectedOrderStatus == 'Delivered'
+            "
+            placeholder="Freight Cost per Container"
+            formControlName="freight_cost_container"
+            oninput="javascript:  if (!/^(-?\d+(\.\d{0,3})?)?$/.test(this.value)) this.value = this.value.slice(0, -1);"
+
+          />
+          <mat-error
+            *ngIf="
+              shippingContainer
+                .get('shippingContainerArray')
+                .controls[
+                  i
+                ].controls.freight_cost_container.hasError(
+                  'pattern'
+                )
+            "
+            >Please Enter Valid Freight Cost per
+            Container</mat-error
+          >
+        </mat-form-field>
+
+        <mat-form-field
+          class="custom-input mandatory"
+          floatLabel="never"
+          *ngIf="is_aapl"
+          style="width: 250px"
+        >
+          <label class="custom-label"
+            >Carrier Seal Number</label
+          >
+          <input
+            matInput
+            maxlength="100"
+            [class.disableClass]="
+              selectedOrderStatus == 'Delivered'
+            "
+            placeholder="Carrier Seal Number"
+            formControlName="carrier_seal_number"
+          />
+          <mat-error
+            *ngIf="
+              shippingContainer
+                .get('shippingContainerArray')
+                .controls[
+                  i
+                ].controls.carrier_seal_number.hasError(
+                  'pattern'
+                )
+            "
+            >Please Enter Valid Carrier Seal
+            Number</mat-error
+          >
+        </mat-form-field>
+        <mat-form-field
+          class="custom-input-field mandatory w-250"
+          floatLabel="always"
+          *ngIf="is_automech"
+          style="margin-top: -4px"
+        >
+          <div class="label-container">
+            <mat-label
+              class="custom-label freight permissible-weight"
+              style="color: #565656"
+              >Max. Wt. of Container</mat-label
+            >
+            <mat-icon
+              matSuffix
+              class="icon-shipping"
+              title="Maximum permissible weight of container as per the CSC Plate"
+              >info</mat-icon
+            >
+          </div>
+          <input
+            matInput
+            maxlength="16"
+            [class.disableClass]="
+              selectedOrderStatus == 'Delivered'
+            "
+            [readonly]="
+              selectedOrderStatus == 'Delivered'
+            "
+            placeholder="Max. Wt. of Container"
+            formControlName="max_permissible_weight"
+          />
+          <mat-error
+            *ngIf="
+              shippingContainer
+                .get('shippingContainerArray')
+                .controls[
+                  i
+                ].controls.max_permissible_weight.hasError(
+                  'pattern'
+                )
+            "
+            >Please Enter Valid Max. Wt. of
+            Container</mat-error
+          >
+        </mat-form-field>
+        <mat-form-field
+          class="custom-input"
+          floatLabel="never"
+          style="width: 250px"
+        >
+          <label class="custom-label mandatory"
+            >Customs Seal Number</label
+          >
+          <input
+            matInput
+            maxlength="16"
+            [class.disableClass]="
+              selectedOrderStatus == 'Delivered'
+            "
+            placeholder="Customs Seal Number"
+            formControlName="customs_seal_number"
+          />
+          <mat-error
+            *ngIf="
+              shippingContainer
+                .get('shippingContainerArray')
+                .controls[
+                  i
+                ].controls.customs_seal_number.hasError(
+                  'pattern'
+                )
+            "
+            >Please Enter Valid Customs Seal
+            Number</mat-error
+          >
+        </mat-form-field>
+        <mat-form-field
+          class="custom-input"
+          floatLabel="never"
+          style="width: 250px"
+          *ngIf="is_aapl"
+        >
+          <label class="custom-label mandatory"
+            >RFID Number</label
+          >
+          <input
+            matInput
+            maxlength="100"
+            [class.disableClass]="
+              selectedOrderStatus == 'Delivered'
+            "
+            placeholder="RFID Number"
+            formControlName="rfid_number"
+          />
+          <mat-error
+            *ngIf="
+              shippingContainer
+                .get('shippingContainerArray')
+                .controls[
+                  i
+                ].controls.rfid_number.hasError(
+                  'pattern'
+                )
+            "
+            >Please Enter Valid RFID
+            Number</mat-error
+          >
+        </mat-form-field>
+      </div>
+      <div style="display: flex; gap: 10px">
+        <mat-form-field
+          class="custom-input"
+          floatLabel="never"
+          style="width: 250px"
+        >
+          <label class="custom-label mandatory"
+            >Container Number</label
+          >
+          <input
+            matInput
+            maxlength="16"
+            [class.disableClass]="
+              selectedOrderStatus == 'Delivered'
+            "
+            placeholder="Container Number"
+            formControlName="container_number"
+          />
+          <mat-error
+            *ngIf="
+              shippingContainer
+                .get('shippingContainerArray')
+                .controls[
+                  i
+                ].controls.container_number.hasError(
+                  'pattern'
+                )
+            "
+            >Please Enter Valid Container
+            Number</mat-error
+          >
+        </mat-form-field>
+        <mat-form-field
+          class="custom-input"
+          floatLabel="never"
+          style="width: 250px"
+          *ngIf="is_aapl"
+        >
+          <label
+            class="custom-label mandatory freight"
+            >Transport Vehicle Number</label
+          >
+          <input
+            matInput
+            maxlength="100"
+            [class.disableClass]="
+              selectedOrderStatus == 'Delivered'
+            "
+            [readonly]="
+              selectedOrderStatus == 'Delivered'
+            "
+            placeholder="Transport Vehicle Number"
+            formControlName="transport_vehicle_number"
+          />
+          <mat-error
+            *ngIf="
+              shippingContainer
+                .get('shippingContainerArray')
+                .controls[
+                  i
+                ].controls.transport_vehicle_number.hasError(
+                  'pattern'
+                )
+            "
+            >Please Enter Valid Transport Vehicle
+            Number</mat-error
+          >
+        </mat-form-field>
+        <mat-form-field
+          class="custom-input"
+          floatLabel="never"
+          style="width: 250px"
+          *ngIf="is_aapl"
+        >
+          <label
+            class="custom-label mandatory freight"
+            >Transport Cost per Truck</label
+          >
+          <input
+            matInput
+            maxlength="100"
+            [class.disableClass]="
+              selectedOrderStatus == 'Delivered'
+            "
+            [readonly]="
+              selectedOrderStatus == 'Delivered'
+            "
+            placeholder="Transport Cost per Truck"
+            formControlName="transport_cost_per_truck"
+            oninput="javascript:  if (!/^(-?\d+(\.\d{0,3})?)?$/.test(this.value)) this.value = this.value.slice(0, -1);"
+
+          />
+          <mat-error
+            *ngIf="
+              shippingContainer
+                .get('shippingContainerArray')
+                .controls[
+                  i
+                ].controls.transport_cost_per_truck.hasError(
+                  'pattern'
+                )
+            "
+            >Please Enter Valid Transport Cost per
+            Truck</mat-error
+          >
+        </mat-form-field>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</div>

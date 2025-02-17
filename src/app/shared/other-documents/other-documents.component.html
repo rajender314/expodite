@@ -1,0 +1,51 @@
+<div class="order-inner-container">
+    <mat-toolbar class="package-toolbar">
+      <img [src]="images.Pre_Shipping_Generation_Icon" />
+      <span
+        >Uploaded Documents
+      </span>
+      <span fxFlex></span>
+    </mat-toolbar>
+    <div style="margin: 26px;">
+        <app-form-builder
+        module="other_documents"
+        (trigger)="formEmitEvent($event)"
+        (emitUploadInfo)="emitUploadInfo($event)"
+        [related_to_id]="shipmentId"
+        [undoOnCancel]="undoOnCancel"
+        [PermissionKey]="'edit_shipment'"
+      ></app-form-builder>
+
+
+      <mat-list
+        class="footer-bottom fxflex"
+        fxLayout="row"
+        fxLayoutAlign="end center"
+        *ngIf="activeState"
+      >
+        <span fxFlex></span>
+        <section class="section-right" *ngIf="!saveBtnClicked">
+          <button type="button" class="back-btn-ui" (click)="cancelFreight()">
+            Cancel
+          </button>
+          <button
+            type="submit"
+            mat-raised-button
+            (click)="saveStoreAttributeApi()"
+            [disabled]="freightandlogistics?.invalid || saveSubmmitFreight"
+          >
+            Save
+          </button>
+        </section>
+        <section class="section-right" *ngIf="saveBtnClicked">
+          <button mat-raised-button disabled="true">
+            <mat-icon>
+              <mat-spinner class="white-spinner" diameter="20"></mat-spinner
+            ></mat-icon>
+          </button>
+        </section>
+        <div class="cb"></div>
+      </mat-list>
+    </div>
+  </div>
+  

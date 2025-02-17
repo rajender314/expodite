@@ -1,0 +1,482 @@
+<div class="orders insurance">
+  <div>
+    <mat-horizontal-stepper #stepper>
+      <mat-step>
+        <div fxLayout="row">
+          <div class="center-section-scroll vh-100 d-flex secundory-menu">
+            <div class="flex-fixed-header menu-title">
+              <h1>Insurances ({{ totalCount }})</h1>
+            </div>
+            <perfect-scrollbar
+              class="flex-scroll-items p-l-8 p-r-8"
+              style="margin-top: 8px"
+            >
+              <div @insuranceAnimate class="display-align-flex">
+                <div
+                  class="fxFlex insurance-filter custom-date-container filter-dates order-date-picker"
+                  style="margin-bottom: 14px"
+                >
+                  <div
+                    class="label font-600"
+                    style="
+                      color: #565656;
+                      text-transform: capitalize;
+                      font-size: 14px;
+                      padding-top: 2px;
+                      letter-spacing: normal;
+                    "
+                  >
+                    Policy Date
+                  </div>
+                  <input
+                    class="datepicker"
+                    [(ngModel)]="insurances.selectStartDate"
+                    [matDatepicker]="picker"
+                    (click)="openStartCalendar(picker)"
+                    (dateChange)="datePickerChange()"
+                    (focus)="openStartCalendar(picker)"
+                    placeholder="Select Date"
+                    readonly
+                  />
+                  <mat-datepicker-toggle
+                    matSuffix
+                    [for]="picker"
+                  ></mat-datepicker-toggle>
+                  <mat-datepicker #picker></mat-datepicker>
+                </div>
+
+                <div class="fxFlex side-nav-section" *ngIf="blockContent">
+                  <mat-form-field
+                    class="custom-input custom-client"
+                    floatLabel="never"
+                    style="width: 100%; margin-top: 20px"
+                  >
+                    <label class="custom-label font-600">Policy Provider</label>
+                    <mat-select
+                      panelClass="myPanelClass"
+                      class="chips-select"
+                      placeholder="Select Policy Provider"
+                      (selectionChange)="NumberChange($event)"
+                      [formControl]="insurances.selectedProvider"
+                      (openedChange)="openedChange($event)"
+                      [multiple]="true"
+                    >
+                      <!-- [multiple]="insurances.providerList.length ? true : false" -->
+                      <mat-select-trigger>
+                        <mat-chip-list
+                          *ngIf="insurances.selectedProvider.value?.length"
+                        >
+                          <mat-chip
+                            *ngFor="
+                              let prodId of insurances.selectedProvider.value
+                            "
+                            [removable]="true"
+                            (removed)="
+                              removeClient(prodId, insurances.selectedProvider)
+                            "
+                          >
+                            {{ getClientName(prodId, insurances.providerList) }}
+                            <mat-icon matChipRemove>cancel</mat-icon>
+                          </mat-chip>
+                        </mat-chip-list>
+                      </mat-select-trigger>
+                      <mat-option
+                        (click)="checkboxChange(status)"
+                        [value]="status.id"
+                        class="orders-list"
+                        *ngFor="let status of insurances.providerList"
+                      >
+                        {{ status.name }}</mat-option
+                      >
+                      <mat-option
+                        *ngIf="insurances.providerList.length === 0"
+                        disabled
+                        >No options available</mat-option
+                      >
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+
+                <div class="fxFlex side-nav-section" *ngIf="blockContent">
+                  <mat-form-field
+                    class="custom-input custom-client"
+                    floatLabel="never"
+                    style="width: 100%; margin-top: 20px"
+                  >
+                    <label class="custom-label font-600">Policy Type</label>
+                    <mat-select
+                      panelClass="myPanelClass"
+                      class="chips-select"
+                      placeholder="Select Policy Type"
+                      (selectionChange)="NumberChange()"
+                      [formControl]="insurances.selectedType"
+                      (openedChange)="openedChange($event)"
+                      [multiple]="true"
+                    >
+                      <!-- [multiple]="insurances.typesList.length ? true : false" -->
+                      <mat-select-trigger>
+                        <mat-chip-list
+                          *ngIf="insurances.selectedType.value?.length"
+                        >
+                          <mat-chip
+                            *ngFor="let prodId of insurances.selectedType.value"
+                            [removable]="true"
+                            (removed)="
+                              removeClient(prodId, insurances.selectedType)
+                            "
+                          >
+                            {{
+                              getClientName(prodId, insurances.typesList)
+                                | slice : 0 : 15
+                            }}{{
+                              getClientName(prodId, insurances.typesList)
+                                ?.length > 15
+                                ? "..."
+                                : ""
+                            }}
+                            <mat-icon matChipRemove>cancel</mat-icon>
+                          </mat-chip>
+                        </mat-chip-list>
+                      </mat-select-trigger>
+                      <mat-option
+                        (click)="checkboxChange(status)"
+                        [value]="status.id"
+                        class="orders-list"
+                        *ngFor="let status of insurances.typesList"
+                      >
+                        {{ status.name }}</mat-option
+                      >
+                      <mat-option
+                        *ngIf="insurances.typesList.length === 0"
+                        disabled
+                        >No options available</mat-option
+                      >
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+              </div>
+
+              <mat-spinner
+                class="medium-spinner"
+                *ngIf="filtersLoader"
+              ></mat-spinner>
+            </perfect-scrollbar>
+
+            <div class="flex-fixed-footer" *ngIf="showFilter">
+              <button class="back-btn-ui" (click)="clearFilterData()">
+                {{ language.defaults.clear }}
+              </button>
+              <span fxFlex></span>
+              <button
+                mat-raised-button
+                class="app-white-btn"
+                (click)="applyFilterData()"
+                [disabled]="disableFilter"
+              >
+                Apply Filter
+              </button>
+            </div>
+          </div>
+
+          <div class="center-section-scroll vh-100 d-flex body-color">
+            <div class="page-header-ui">
+              <div class="flex-fixed-header page-title container-ui">
+                <div class="d-flex">
+                  <div class="search-ui">
+                    <input
+                      matInput
+                      placeholder=""
+                      #search
+                      (input)="searchInsurances(search.value, $event)"
+                      placeholder="Search By Policy Number"
+                      (blur)="
+                        !search.value.length ? (open = false) : (open = true)
+                      "
+                    />
+                    <mat-icon
+                      matPrefix
+                      (click)="open = !open"
+                      class="org-search"
+                      >search</mat-icon
+                    >
+                    <mat-icon matSuffix *ngIf="searching" class="spinner">
+                      <mat-spinner class="small-spinner"></mat-spinner>
+                    </mat-icon>
+                    <!-- <mat-icon class="search-info" *ngIf="!search.value.length" matTooltip="Search with Batch Number...">info</mat-icon> -->
+                    <mat-icon
+                      class="search-close"
+                      matSuffix
+                      *ngIf="!searching && search.value.length"
+                      (click)="
+                        search.value = ''; searchInsurances(search.value)
+                      "
+                      >close</mat-icon
+                    >
+                  </div>
+                </div>
+                <div class="d-flex" *ngIf="adminService.rolePermissions.add_insurance == 1">
+                  <button
+                    mat-raised-button
+                    color="warn"
+                    (click)="addInsurance()"
+                    class="create-order-btn"
+                  >
+                    Add Insurance
+                  </button>
+                </div>
+                <!-- <div class="d-flex"></div> -->
+              </div>
+            </div>
+            <perfect-scrollbar>
+              <div class="list-view-table p-b-16 customized-table-list">
+                <div fxLayout="column" class="container-ui">
+                  <div class="table-view-for-list">
+                    <mat-table
+                      *ngIf="totalCount"
+                      #table
+                      [dataSource]="formBuilderBatchList"
+                    >
+                      <ng-container matColumnDef="policy_number">
+                        <mat-header-cell *matHeaderCellDef fxFlex="20">
+                          POLICY NAME</mat-header-cell
+                        >
+                        <mat-cell *matCellDef="let Inventory" fxFlex="20">
+                          <div
+                            class="d-flex align-items-center avatar-cell o-hidden w-100"
+                          >
+                            <div class="icon-sec">
+                              <img
+                                [src]="images.invoice_green"
+                                title="Inventory"
+                              />
+                            </div>
+                            <div class="content-sec o-hidden ellipsis-text">
+                              <div
+                                class="d-flex"
+                                style="
+                                  display: flex;
+                                  -webkit-box-align: center;
+                                  align-items: center;
+                                  color: rgb(145, 158, 171);
+                                  overflow: hidden;
+                                "
+                              >
+                                <div
+                                  style="
+                                    max-width: calc(100% - 20px);
+                                    overflow: hidden;
+                                    text-overflow: ellipsis;
+                                  "
+                                >
+                                  <h1
+                                    class="ellipse"
+                                    style="width: 60px"
+                                    title="{{ Inventory.policy_name }}"
+                                  >
+                                    {{ Inventory.policy_name }}
+                                  </h1>
+                                </div>
+                                <span
+                                  style="
+                                    position: relative;
+                                    display: inline-block;
+                                    height: 18px;
+                                    width: 18px;
+                                  "
+                                >
+                                  <mat-icon
+                                    style="
+                                      color: #ff4842;
+                                      font-size: 16px;
+                                      width: 16px;
+                                      height: 16px;
+                                      position: absolute;
+                                      top: -1px;
+                                    "
+                                    *ngIf="Inventory.spcl_inst_flag"
+                                    class="flag-inventory"
+                                    title="{{ Inventory.special_instructions }}"
+                                    >flag</mat-icon
+                                  >
+                                </span>
+                              </div>
+                              <small
+                                class="ellipsis-text"
+                                title="{{ Inventory.category_name }}"
+                                >{{ Inventory.category_name }}</small
+                              >
+                              <p>
+                                <small
+                                  class="ellipsis-text"
+                                  title="{{ Inventory.product_name }}"
+                                  >{{ Inventory.product_name }}</small
+                                >
+                              </p>
+                            </div>
+                          </div>
+                        </mat-cell>
+                      </ng-container>
+
+                      <ng-container matColumnDef="policy_name">
+                        <mat-header-cell *matHeaderCellDef fxFlex="15">
+                          Policy Number</mat-header-cell
+                        >
+                        <mat-cell
+                          class="secound-cell"
+                          *matCellDef="let Inventory"
+                          fxFlex="15"
+                          title=" {{
+                            Inventory.policy_number
+                              ? Inventory.policy_number
+                              : '-'
+                          }}"
+                          ><div class="ellipse align-left">
+                            {{
+                              Inventory.policy_number
+                                ? Inventory.policy_number
+                                : "-"
+                            }}
+                          </div></mat-cell
+                        >
+                      </ng-container>
+
+                      <ng-container matColumnDef="policy_provider">
+                        <mat-header-cell *matHeaderCellDef fxFlex="15">
+                          POLICY PROVIDER
+                        </mat-header-cell>
+                        <mat-cell
+                          class="secound-cell"
+                          *matCellDef="let Inventory"
+                          fxFlex="15"
+                          title="{{ Inventory.policy_provider }}"
+                          ><div class="ellipse align-left">
+                            {{ Inventory.policy_provider }}
+                          </div></mat-cell
+                        >
+                      </ng-container>
+
+                      <ng-container matColumnDef="policy_type">
+                        <mat-header-cell fxFlex="20" *matHeaderCellDef
+                          >POLICY TYPE</mat-header-cell
+                        >
+                        <mat-cell
+                          class="secound-cell"
+                          *matCellDef="let Inventory"
+                          fxFlex="20"
+                          title="{{ Inventory.policy_type }}"
+                        >
+                          <!-- {{ Inventory.remain_quan + "/" + Inventory.tot_qty }} -->
+                          <div class="ellipse align-left">
+                            {{ Inventory.policy_type }}
+                          </div>
+                        </mat-cell>
+                      </ng-container>
+
+                      <ng-container matColumnDef="policy_end_date">
+                        <mat-header-cell fxFlex="10" *matHeaderCellDef
+                          >POLICY END DATE</mat-header-cell
+                        >
+                        <mat-cell
+                          class="secound-cell"
+                          *matCellDef="let Inventory"
+                          fxFlex="10"
+                          title="{{ Inventory.policy_end_date }}"
+                        >
+                          <!-- {{ Inventory.remain_quan + "/" + Inventory.tot_qty }} -->
+                          <div class="ellipse align-left">
+                            {{ Inventory.policy_end_date }}
+                          </div>
+                        </mat-cell>
+                      </ng-container>
+                      <ng-container matColumnDef="balance_amount">
+                        <mat-header-cell
+                          fxFlex="25"
+                          *matHeaderCellDef
+                          class="justify-right"
+                          >BALANCE AMOUNT
+                        </mat-header-cell>
+                        <mat-cell
+                          class="secound-cell justify-right"
+                          *matCellDef="let Inventory"
+                          fxFlex="25"
+                          title="{{ Inventory.balance_amount }}"
+                        >
+                          <!-- {{ Inventory.remain_quan + "/" + Inventory.tot_qty }} -->
+                          <div class="ellipse align-left justify-right">
+                            {{ Inventory.balance_amount }}
+                          </div>
+                        </mat-cell>
+                      </ng-container>
+                      <ng-container matColumnDef="coverage_amount">
+                        <mat-header-cell
+                          *matHeaderCellDef
+                          fxFlex="25"
+                          class="justify-center"
+                          >COVERAGE AMOUNT
+                        </mat-header-cell>
+                        <mat-cell
+                          *matCellDef="let Inventory"
+                          fxFlex="25"
+                          class="status-cell status-tag-container secound-cell justify-right"
+                          title="{{ Inventory.coverage_amount }}"
+                        >
+                          <div class="ellipse align-left justify-right">
+                            {{ Inventory.coverage_amount }}
+                          </div>
+                          <span fxFlex></span>
+                          <mat-icon class="go-to-details arrow-right"
+                            >keyboard_arrow_right</mat-icon
+                          >
+                        </mat-cell>
+                      </ng-container>
+
+                      <mat-header-row
+                        class="table-row"
+                        *matHeaderRowDef="displayedColumns"
+                      ></mat-header-row>
+                      <mat-row
+                        (click)="orderDetails(stepper, row)"
+                        *matRowDef="let row; columns: displayedColumns"
+                      ></mat-row>
+                    </mat-table>
+                  </div>
+                </div>
+                <div
+                  class="container-ui new-center-empty-ui"
+                  *ngIf="totalCount == 0 && !searching"
+                >
+                  <mat-card class="no-results">
+                    <div class="empty-img-holder">
+                      <img [src]="images.invoice_green" />
+                    </div>
+                    <p class="no-result-text">No Insurance Found</p>
+                  </mat-card>
+                </div>
+              </div>
+
+              <mat-spinner
+                class="medium-spinner"
+                *ngIf="fetchingData"
+              ></mat-spinner>
+            </perfect-scrollbar>
+
+            <div class="pagination-footer" *ngIf="totalCount != 0">
+              <div class="container-ui d-flex space-between align-items-center">
+                <div>
+                  <p>Showing {{ listCount }} out of {{ totalCount }}</p>
+                </div>
+                <div>
+                  <app-pagination
+                    [pageLimit]="totalCount"
+                    (pageloadMore)="loadMore($event)"
+                  >
+                  </app-pagination>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-step>
+    </mat-horizontal-stepper>
+  </div>
+</div>

@@ -1,2350 +1,2753 @@
-import { Component, OnInit, ElementRef, TemplateRef, ViewChild } from '@angular/core';
-import { FormControl } from '@angular/forms';
-import * as moment from 'moment';
-import { Title } from '@angular/platform-browser';
-import { MatCardModule } from '@angular/material/card';
-import { MatTableDataSource } from '@angular/material/table';
-import { ViewEncapsulation } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ElementRef,
+  Input,
+  TemplateRef,
+  ViewChild,
+  EventEmitter,
+  Output,
+} from "@angular/core";
 
-
-
-
-
-
-
-import { Images } from '../../images/images.module';
-import { InventoryService } from '../../services/inventory.service';
-import { OrdersService } from '../../services/orders.service';
-import { OrganizationsService } from '../../services/organizations.service';
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { MatStepper, MatStepperModule } from '@angular/material/stepper';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { AddInventoryComponent } from '../../dialogs/add-inventory/add-inventory.component';
-import { SnakbarService } from '../../services/snakbar.service';
-import { FileUploader, FileUploadModule } from 'ng2-file-upload';
-import { language } from '../../language/language.module';
-import { MatDatepicker } from '@angular/material/datepicker';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { trigger, style, transition, animate, keyframes, query, stagger } from '@angular/animations';
-import { AddBatchNumberComponent } from '../../../app/dialogs/add-batch-number/add-batch-number.component';
-import { AddLineItemComponent } from '../../../app/dialogs/add-line-item/add-line-item.component';
-import { DeleteLineItemComponent } from '../../../app/dialogs/delete-line-item/delete-line-item.component';
-import { MarkAsPaidComponent } from '../../../app/dialogs/mark-as-paid/mark-as-paid.component';
-import { OrderDownloadComponent } from '../../../app/dialogs/order-download/order-download.component';
-import { PdfPreviewComponent } from '../../dialogs/pdf-preview/pdf-preview.component';
-import { CookieService } from 'ngx-cookie-service';
-import { MatExpansionModule } from '@angular/material/expansion';
-import { CancelOrderComponent } from '../../../app/dialogs/cancel-order/cancel-order.component';
-import { DeliverOrderComponent } from '../../../app/dialogs/deliver-order/deliver-order.component';
-import { ChangeShipperAddressComponent } from '../../../app/dialogs/change-shipper-address/change-shipper-address.component';
-import { AddDrumsComponent } from '../../../app/dialogs/add-drums/add-drums.component';
-import { EmailDocumentsComponent } from '../../../app/dialogs/email-documents/email-documents.component';
-import { ReplaySubject, Subject } from 'rxjs';
-import { take, takeUntil } from 'rxjs/operators';
-import { validateBasis, CLASS_NAME } from '@angular/flex-layout';
-import { Lightbox } from 'ngx-lightbox';
-import * as $ from 'jquery';
-import { CreateOrderComponent } from '../../dialogs/create-order/create-order.component';
-import { Router, ActivatedRoute } from '@angular/router';
+import { FormControl } from "@angular/forms";
+import * as moment from "moment";
+import { DomSanitizer, SafeHtml, Title } from "@angular/platform-browser";
+import { MatTableDataSource } from "@angular/material/table";
+import { ViewEncapsulation } from "@angular/core";
+import { Images } from "../../images/images.module";
+import { OrdersService } from "../../services/orders.service";
+import { OrganizationsService } from "../../services/organizations.service";
+import { MatDialog } from "@angular/material/dialog";
+import { MatStepper } from "@angular/material/stepper";
+import { SnakbarService } from "../../services/snakbar.service";
+import { FileUploader } from "ng2-file-upload";
+import { language } from "../../language/language.module";
+import { MatDatepicker } from "@angular/material/datepicker";
+import { trigger, style, transition, animate } from "@angular/animations";
+import { AddLineItemComponent } from "../../dialogs/add-line-item/add-line-item.component";
+import { DeleteLineItemComponent } from "../../dialogs/delete-line-item/delete-line-item.component";
+import { PdfPreviewComponent } from "../../dialogs/pdf-preview/pdf-preview.component";
+import { CookieService } from "ngx-cookie-service";
+import { CancelOrderComponent } from "../../dialogs/cancel-order/cancel-order.component";
+import { DeliverOrderComponent } from "../../dialogs/deliver-order/deliver-order.component";
+import { ChangeShipperAddressComponent } from "../../dialogs/change-shipper-address/change-shipper-address.component";
+import { EmailDocumentsComponent } from "../../dialogs/email-documents/email-documents.component";
+import { Subject } from "rxjs";
+import { Lightbox } from "ngx-lightbox";
+import * as $ from "jquery";
+import { Router, ActivatedRoute } from "@angular/router";
+import { ImportDocumentComponent } from "../../dialogs/import-document/import.component";
+import { DescriptionUpload } from "../../dialogs/description/add-description.component";
+import { OrderActivityLogComponent } from "../order-activity-log/order-activity-log.component";
+import { LeadsService } from "../../leads/leads.service";
+import { UtilsService } from "../../services/utils.service";
+import { ErrorDialogComponent } from "../../dialogs/error-dialog/error-dialog.component";
+import { NewCreateShipmentComponent } from "../new-create-shipment/new-create-shipment.component";
+import { POCreateComponent } from "../../po-module/po-create/po-create.component";
+import { OrdersCreateComponent } from "../order-create/order-create.component";
+import { AdminService } from "../../services/admin.service";
 declare var App: any;
 
-
-
+const {
+  language: {
+    orders: { value: commercial_name },
+  },
+} = App.env_configurations;
 @Component({
-  selector: 'app-order-details',
-  templateUrl: './order-details.component.html',
-  styleUrls: ['./order-details.component.scss'],
+  selector: "app-order-details",
+  templateUrl: "./order-details.component.html",
+  styleUrls: ["./order-details.component.scss"],
+
   encapsulation: ViewEncapsulation.None,
-	animations: [
-		trigger('ordersAnimate', [
-			transition(':enter', [
-				style({ transform: 'translateX(-100px)', opacity: 0 }),
-				animate('500ms cubic-bezier(0.35, 1, 0.25, 1)', style('*'))
-			])
-		])
-	]
+  animations: [
+    trigger("ordersAnimate", [
+      transition(":enter", [
+        style({ transform: "translateX(-100px)", opacity: 0 }),
+        animate("500ms cubic-bezier(0.35, 1, 0.25, 1)", style("*")),
+      ]),
+    ]),
+  ],
 })
 export class OrderDetailsComponent implements OnInit {
+  @Output() trigger = new EventEmitter<object>();
+  public commercialName = commercial_name;
+  @Input() roles;
+  private App = App;
+  public userDetails: any;
+  public orderButton: any;
+  public collapseOut: any;
+  public clientPermission: any;
+  public factoryPermission: boolean;
+  containsMilk: boolean;
+  public containerError;
+  public language = language;
+  public images = Images;
+  public open = false;
+  blockContent: boolean;
+  isSampleDocs: boolean = false;
+  checked: boolean;
+  totalSpinner: boolean;
+  private timeout;
+  public sailing_date;
+  public carrier_data;
+  packagePrint: boolean;
+  buttonName: boolean;
+  packageCompleted: boolean;
+  disablePayment = true;
+  fetchingData = true;
+  fetchOrder: boolean;
+  downloadStatus: boolean;
+  showDrumsList = false;
+  filtersLoader = true;
+  public show: boolean = true;
+  public activePayment = false;
+  public showNoDatFound = false;
+  activeState: boolean;
+  shippingActiveState: boolean;
+  freightandlogisticsState: boolean = false;
+  othersCostState: boolean;
+  public modPoNum: any;
+  public selectedOrderStatus: any;
+  searching: boolean;
+  totalPages: number = 2500;
+  ActivityLog: boolean;
+  editShipping: boolean = true;
+  disableCancel: boolean = undefined;
+  ordersDownload: boolean;
+  added: boolean;
+  hideShipperAddress: boolean = false;
+  public matSelectOpen = false;
+  orderFormCompanyDetails: any;
+  public hidePaidBtn: boolean = true;
+  containerId: any;
+  public imagUploadFlag: any;
+  public getFileFlag: any;
+  public refreshShow = true;
+  public enableCustomDocs = false;
+  public customSidePannel: boolean = true;
+  public shippingnoSdf: boolean;
+  textareaContent: string = "";
+  textareaContents: string = "";
+  textCount: string = "";
+  wordCount: number = 0;
+  wordCountotherinfo: number = 0;
+  wordCountStand1: number = 0;
+  public currentDate;
+  public saveconverisonEnable: boolean = true;
+  public is_automech = App.env_configurations.is_automech;
+  public billLading;
+  public packageEdit;
+  public PostpackageData;
+  public freightDataPack;
+  public inlineVGMData;
+  public inlineSelfSealData;
+  public commercialInvoiceData: any;
+  public editaddlineItem: any;
+  params = {
+    pageSize: 25,
+    page: 1,
+    search: "",
+  };
+  maxCharLimit = 10;
+  toppings = new FormControl();
 
-  private css = '@page { size: landscape; }';
-	private head = document.head || document.getElementsByClassName('adc-sheet');
-	private style = document.createElement('style');
-	private App = App;
-	public userDetails: any;
-	public orderButton: any;
-	public collapseOut: any;
-	public clientPermission: any;
-	public factoryPermission: boolean;
-	containsMilk: boolean;
-	getExportData: any;
-	totalCount: any;
-	public submitShippingForm: boolean = false;
-	public language = language;
-	public images = Images;
-	public open = false;
-	blockContent: boolean;
-	private productList: Array<any> = [];
-	batchNum: string;
-	batchNumArray: Array<any>
-	getSdfData: any;
-	getConcernData: any;
-	checked: boolean;
-	totalSpinner: boolean;
-	private timeout;
-	packagePrint: boolean;
-	buttonName: boolean;
-	packageCompleted: boolean;
-	disablePayment = true;
-	private showFilter = false;
-	fetchingData = true;
-	fetchOrder: boolean;
-	downloadStatus: boolean;
-	showDrumsList = false;
-	filtersLoader = true;
-	public icon: boolean = false;
-	public postIcon:boolean = false;
-	public show: boolean = true;
-	public activePayment = false;
-	public showPackage: boolean = true;
-	public showShipping: boolean = true;
-	public showUom: boolean = true;
-	public showMsds: boolean = true;
-	public showNonhazardous: boolean = true;
-	public showSdf: boolean = true;
-	public showExportvalue: boolean = true;
-	public showDeclaration: boolean = true;
-	public showShippers: boolean = true;
-	public showAdcsheet: boolean = true;
-	public showDeclarationIncentive: boolean = true;
-	public showScomatDeclaration: boolean = true;
-	public showNoDatFound = false;
-	public concern: boolean = true;
-	invoiceGenerateLoader:boolean = false;
-	noShippingBill = false;
-	noShippingExportBill = false;
-	noShippingExportDate = false;
-	noShippingDate = false;
-	activeState: boolean;
-	editable: boolean;
-	editExport: boolean;
-	coaShow: any;
-	editCoa: boolean;
-	concernEditable: boolean;
-	shippingActiveState: boolean;
-	public modPoNum:any
-	public showInvoice = true;
-	public showTaxInvoice = true;
-	public showCoa: boolean = true;
-	public showOrigin: boolean = true;
-	public showinsurance: boolean = true;
-	public showAirway: boolean = true;
-	public selectedOrderStatus: any;
-	searching: boolean;
-	shippingForm: FormGroup;
-	totalPages: number = 2500;
-	ActivityLog: boolean;
-	editShipping: boolean = true;
-	disableCancel: boolean;
-	ordersDownload: boolean;
-	added: boolean;
-	hideShipperAddress: boolean = false;
-	public matSelectOpen = false;
-	orderFormCompanyDetails: any;
-	public hidePaidBtn: boolean = true;
-	// priceQuantityDisable: boolean = false;
-	containerId: any;
-	public imagUploadFlag: any;
-	public getFileFlag: any;
+  private timestamp: any;
+  enableInvoice: boolean = false;
+  clickedPackageDetails: boolean = false;
+  isPackageAdded = false;
+  invoiceGenerated = false;
+  showDocuments = false;
+  taxInvoiceDocument = true;
+  pvm_mark_nos: string = "";
+  pvm_pre_carriage_by: string = "";
+  pvm_container_no: string = "";
+  pvm_lut_arn: string = "";
+  pvm_lut_date: string = "";
+  public orders: any = {
+    packageStatus: 0,
+    data: [],
+    status: [],
+    shippingAddress: [],
+    productsList: [],
+    organizations: [],
+    shipping_data: [],
+    expectedDeliveryDate: [
+      {
+        id: 1,
+        name: "Expected Delivery Date",
+        selected: false,
+      },
+    ],
+    selectedClients: new FormControl([]),
+    client_search: "",
+    mfg_date: "",
+    selectedOrder: {
+      client_name: "",
+      client_image: "",
+      date_added: "",
+      id: "",
+      order_no: "",
+      image: "",
+      po_nbr: "",
+      po_url: "",
+      product_name: "",
+      status: "",
+      total_amount: "",
+      total_quantity: "",
+      status_id: "",
+      status_slug: "",
+      tareWeight: 0,
+      netWeight: 0,
+      grossWeight: 0,
+      special_instructions: "",
+      po_date: "",
+      line_item: "",
+      is_order_ready: false,
+      confirm_sales: false,
+      status_color_code: "",
+      add_line_items: [],
+      freight: "",
+      insurance: "",
+      discount: "",
+      sub_total: "",
+      totals: {},
+    },
+    billingAddr: {
+      bill_address1: "",
+      bill_address2: "",
+      bill_countrty: "",
+      bill_postal_code: "",
+      bill_state: "",
+    },
+    shippingAddr: {
+      ship_address1: "",
+      ship_address2: "",
+      ship_countrty: "",
+      ship_postal_code: "",
+      ship_state: "",
+    },
+    notifyAddr: {},
+    companyShpAddrDt: {
+      ksm_address1: "",
+      ksm_address2: "",
+      ksm_city: "",
+      ksm_state: "",
+      ksm_countrty: "",
+      ksm_postal_code: "",
+      ksm_gstin_no: "",
+    },
+    productsData: new MatTableDataSource(),
+    showDetailView: false,
+    packageOrders: [],
+    packing: [],
+    packageOrdersloop: [],
+    sum: {},
+    invoice: [],
+    shipping_id: 0,
+    mode_transport_ids: [],
+    mode_of_transport: [],
+    CoaDetails: [],
 
-	displayedColumns = ['order_product_id', 'product_name', 'product_quantity', 'product_uom', 'product_price', 'product_price_total'];
-	params = {
-		pageSize: 25,
-		page: 1,
-		search: ''
-	}
+    activityDetails: [],
+  };
 
-	toppings = new FormControl();
-	paymentType = [
-		
-	];
-	public docsList = {
-		standardLinks:[
-			{ id: 0, name: "Activity", selected: true, class: "activity", function: 'moveToActivity', imgSrc: this.images.activity_small },
-			{ id: 1, name: "Order Details", selected: true, class: "details", function: "moveToDetails", imgSrc: this.images.orders_small },
-			{ id: 2, name: "Invoice", selected: true, class: "invoice", function: "moveToInvoice", imgSrc: this.images.invoice_small },
-			{ id: 3, name: "Packing Details", selected: true, class: "packaging", function: "moveToPackaging", imgSrc: this.images.pkgDetails_small },
-			{ id: 5, name: "UOM", selected: true, class: "uom", function: "moveToUom", imgSrc: this.images.pkgDetails_small },
-			{ id: 5, name: "moveToPackaging", selected: true, class: "moveToPackaging", function: "moveToPackaging", imgSrc: this.images.pkgDetails_small },
+  public paymentStatus = false;
+  public showNotifyAddress = false;
 
-			{ id: 4, name: "COA", selected: true, class: "coa", function: "moveToCoa", imgSrc: this.images.coa_small },
-			{ id: 99, name: "Shipping Details", selected: true, class: "shipping", function: "moveToShipping", imgSrc: this.images.shippingDetails_small },
-		],
-		preShip:[
-			{ id: 5, name: "MSDS Form", selected: true, class: "msdsForm", function: "moveToMsdsForm", imgSrc: this.images.pdf_download },
-			{ id: 6, name: "Non Hazardous Certificate", selected: true, class: "nonHazardous", function: "moveToNonHazardous", imgSrc: this.images.pdf_download },
-			{ id: 7, name: "Form SDF", selected: true, class: "Formsdf", function: "moveToFormSdf", imgSrc: this.images.pdf_download },
-			{ id: 8, name: "Export Value Declaration", selected: false, class: "Exportvalue", function: "moveToExportValue", imgSrc: this.images.pdf_download },
-			{ id: 9, name: "Declaration", selected: false, class: "Declaration", function: "moveToDeclaration", imgSrc: this.images.pdf_download },
-			{ id: 10, name: "Shipper's Letter", selected: false, class: "Shipperletter", function: "moveToShipperLetter", imgSrc: this.images.pdf_download },
-			{ id: 11, name: "ADC Sheet", selected: false, class: "Adcsheet", function: "moveToAdcSheet", imgSrc: this.images.pdf_download },
-			{ id: 12, name: "Declaration For Incentive", selected: false, class: "Incentivedeclaration", function: "moveToIncentive", imgSrc: this.images.pdf_download },
-			{ id: 13, name: "Scomat Declaration", selected: false, class: "Scomatdeclaration", function: "moveToScomat", imgSrc: this.images.pdf_download },
-			{ id: 14, name: "Turn Over Declaration", selected: false, class: "Concern", function: "moveToConcern", imgSrc: this.images.pdf_download },
-			{ id: 15, name: "Ad Code", selected: false, class: "Adcode", function: "moveToAdcode", imgSrc: this.images.pdf_download },
-			{ id: 16, name: "SSI", selected: false, class: "Ssi", function: "moveToSsi", imgSrc: this.images.pdf_download },
-			{ id: 17, name: "Check List", selected: false, class: "Unit", function: "moveToUnit", imgSrc: this.images.pdf_download },
-		],
-		postShip: [
-			{ id: 15, name: "Country Of Origin", selected: true, class: "Origin", function: "moveToOrigin", imgSrc: this.images.pdf_download },
-			{ id: 16, name: "Insurance", selected: true, class: "insurance", function: "moveToInsurance", imgSrc: this.images.pdf_download },
-			{ id: 17, name: "Shipping Bill", selected: true, class: "airway", function: "moveToAirway", imgSrc: this.images.pdf_download }]
-	};
-	private timestamp: any;
-	enableInvoice: boolean = false;
-	clickedGenerateInvoice: boolean = false;
-	showDocuments = false;
-	taxInvoiceDocument = true;
-	public orders = {
-		packageStatus: '',
-		data: [],
-		status: [],
-		shippingAddress: [],
-		productsList: [],
-		organizations: [],
-		shipping_data: [],
-		expectedDeliveryDate: [
-			{
-				id: 1,
-				name: 'Expected Delivery Date',
-				selected: false
-			}
-		],
-		selectedClients: new FormControl([]),
-		client_search: '',
-		mfg_date: '',
-		selectedOrder: {
-			client_name: '',
-			client_image: '',
-			date_added: '',
-			id: '',
-			order_no: '',
-			image: '',
-			po_nbr: '',
-			po_url: '',
-			product_name: '',
-			status: '',
-			total_amount: '',
-			total_quantity: '',
-			orders_types_id: '',
-			tareWeight: 0,
-			netWeight: 0,
-			grossWeight: 0,
-			special_instructions: '',
-			po_date: '',
-			line_item: ''
-		},
-		billingAddr: {
-			bill_address1: '',
-			bill_address2: '',
-			bill_countrty: '',
-			bill_postal_code: '',
-			bill_state: ''
-		},
-		shippingAddr: {
-			ship_address1: '',
-			ship_address2: '',
-			ship_countrty: '',
-			ship_postal_code: '',
-			ship_state: ''
-		},
-		notifyAddr: {},
-		companyShpAddrDt: {
-			ksm_address1: '',
-			ksm_address2: '',
-			ksm_city: '',
-			ksm_state: '',
-			ksm_countrty: '',
-			ksm_postal_code: '',
-			ksm_gstin_no: '',
-		},
-		productsData: new MatTableDataSource(),
-		showDetailView: false,
-		packageOrders: [],
-		packing: [],
-		sum: {},
-		invoice: [],
-		shipping_id: 0,
-		mode_transport_ids: [],
-		mode_of_transport:[],
-		CoaDetails: [],
+  public packageDescription;
+  public pkgDeclaration;
 
-		activityDetails: []
-	};
-	public transportModeList = [
-		{id: 1, name: 'Air'},
-		{id: 2, name: 'Sea'}
-	]
-	public paymentStatus = false;
-	public showNotifyAddress = false;
-	public CoaDetails = [];
-	public reports = {
-		batchReportDt: {},
-		batchesCoaDt: [],
-		batch_id: ''
-	};
-	private checkOrdersPdf = {
-		checkOrders: [],
-		checkOrdersId: ''
-	}
-	private sdfData = {
-		shipping_bill_no: '',
-		orders_id: this.orders.selectedOrder.id || 0,
-		entry_date: '',
-		check_date: '',
-		id: ''
-	};
-	public sdfFormDates: FormGroup;
-	public exportValue = {
-		e_shipping_bill_no: '',
-		orders_id: this.orders.selectedOrder.id || 0,
-		e_entry_date: '',
+  public taxBilltoParty;
+  public taxShiptoparty;
+  data = {
+    id: "",
+    selectedStatus: [],
+    selectedProducts: [],
+    selectedClients: this.orders.selectedClients.value,
+    client_search: this.orders.client_search,
+    manifacture_date: this.orders.mfg_date,
+    search: this.params.search,
+    pageSize: 0,
+    page: 0,
+  };
+  private concernData = {
+    price: "",
+    year1: "",
+    year2: "",
+    export1: "",
+    export2: "",
+    domestic1: "",
+    domestic2: "",
+  };
 
-	}
-	public packageDescription;
-	data = {
-		id: '',
-		selectedStatus: [],
-		selectedProducts: [],
-		selectedClients: this.orders.selectedClients.value,
-		client_search: this.orders.client_search,
-		manifacture_date: this.orders.mfg_date,
-		search: this.params.search,
-		pageSize: this.params.pageSize,
-		page: this.params.page,
-	};
-	private concernData = {
-		price: '',
-		year1: '',
-		year2: '',
-		export1: '',
-		export2: '',
-		domestic1: '',
-		domestic2: ''
-	}
+  public clientsFilterCtrl: FormControl = new FormControl();
+  protected _onDestroy = new Subject<void>();
+  public activeTab = "activity";
+  reportsFooter: boolean;
+  private activateScroll = true;
+  public otherDocs = [];
+  private param: any = {
+    page: 1,
+    perPage: 25,
+    sort: "ASC",
+    search: "",
+  };
+  @ViewChild("stepper") stepper: TemplateRef<any>;
+  @ViewChild("scrollContainer") scrollContainer: TemplateRef<any>;
+  @ViewChild("activity") activity: TemplateRef<any>;
+  @ViewChild("details") details: TemplateRef<any>;
+  @ViewChild("packaging") packaging: TemplateRef<any>;
+  @ViewChild("items") item: TemplateRef<any>;
+  @ViewChild("shipments") shipment: TemplateRef<any>;
+  @ViewChild("uploadSales") uploadSale: TemplateRef<any>;
 
+  @ViewChild("freight") freight: TemplateRef<any>;
+  @ViewChild("payments") payment: TemplateRef<any>;
+  @ViewChild("Specs") specs: TemplateRef<any>;
 
-	public clientsFilterCtrl: FormControl = new FormControl();
-	protected _onDestroy = new Subject<void>();
-	public activeTab = 'activity';
-	reportsFooter: boolean;
-	private activateScroll = true;
-	public otherDocs = [];
-	private param: any = {
-		page: 1,
-		perPage: 25,
-		sort: 'ASC',
-		search: '',
-	}
-	@ViewChild('stepper') stepper: TemplateRef<any>;
-	@ViewChild('scrollContainer') scrollContainer: TemplateRef<any>;
-	@ViewChild('activity') activity: TemplateRef<any>;
-	@ViewChild('details') details: TemplateRef<any>;
-	@ViewChild('packaging') packaging: TemplateRef<any>;
-	@ViewChild('uom') uom: TemplateRef<any>;
-	@ViewChild('primaryPackaging') primaryPackaging: TemplateRef<any>;
-	@ViewChild('invoice') invoice: TemplateRef<any>;
-	@ViewChild('coa') coa: TemplateRef<any>;
-	@ViewChild('shipping') shipping: TemplateRef<any>;
-	@ViewChild('msdsForm') msdsForm: TemplateRef<any>;
-	@ViewChild('nonHazardous') nonHazardous: TemplateRef<any>;
-	@ViewChild('Formsdf') Formsdf: TemplateRef<any>;
-	@ViewChild('Exportvalue') Exportvalue: TemplateRef<any>;
-	@ViewChild('Declaration') Declaration: TemplateRef<any>;
-	@ViewChild('Shippersletter') Shippersletter: TemplateRef<any>;
-	@ViewChild('Adcsheet') Adcsheet: TemplateRef<any>;
-	@ViewChild('Incentivedeclaration') Incentivedeclaration: TemplateRef<any>;
-	@ViewChild('Scomatdeclaration') Scomatdeclaration: TemplateRef<any>;
-	@ViewChild('Concern') Concern: TemplateRef<any>;
-	@ViewChild('Adcode') Adcode: TemplateRef<any>;
-	@ViewChild('Lut') Lut: TemplateRef<any>;
-	@ViewChild('Iec') Iec: TemplateRef<any>;
-	@ViewChild('Ssi') Ssi: TemplateRef<any>;
-	@ViewChild('Unit') Unit: TemplateRef<any>;
-	@ViewChild('SezUnit') SezUnit: TemplateRef<any>;
+  @ViewChild("orderDetailEditInput") orderDetailEditInput: ElementRef;
+  @ViewChild("orderDetailEditInsurance") orderDetailEditInsurance: ElementRef;
+  @ViewChild("orderDetailEditFright") orderDetailEditFright: ElementRef;
+  @ViewChild("orderDetailEditDiscount") orderDetailEditDiscount: ElementRef;
+  @ViewChild("notifyTextarea1") notifyTextarea1: ElementRef;
+  @ViewChild("buyerTextarea1") buyerTextarea1: ElementRef;
+  @ViewChild("shipperTextarea1") shipperTextarea1: ElementRef;
+  @ViewChild("notifyTextarea2") notifyTextarea2: ElementRef;
+  @ViewChild("orderDetailEditAddline") orderDetailEditAddline: ElementRef;
+  attachments = [];
+  originFileAttachments = [];
+  insuranceAttachments = [];
+  airwayAttachments = [];
+  suppllierDocuments = [];
+  salesDocuments = [];
+  shippingAttachments = [];
+  otherOrderAttachments = [];
+  pointerEvent: boolean;
+  invalidText: boolean;
+  uploadError: boolean;
+  sizeError: boolean;
+  public onLoadFiles = [
+    "origin",
+    "insuranceFlag",
+    "shipping",
+    "Bill",
+    "landing",
+    "supplier",
+    "sales",
+    "otherOrderSupplier",
+  ];
 
-	@ViewChild('taxInvoice') taxInvoice: TemplateRef<any>;
-	@ViewChild('Otherdocs') Otherdocs: TemplateRef<any>;
+  public fileTypes = [
+    "image/png",
+    "image/jpeg",
+    "image/jpg",
+    "application/pdf",
+    "application/msword",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "application/xlsx",
+  ];
+  public imageUploadUrl =
+    App.base_url + "addOrderAtt?orders_id=" + this.orders.selectedOrder.id;
+  public is_ictt = App.env_configurations
+    ? App.env_configurations.is_ictt
+    : true;
+  public is_pvm_commercial = App.env_configurations
+    ? App.env_configurations.is_pvm_commercial
+    : true;
+  public is_pvm_proforma = App.env_configurations
+    ? App.env_configurations.is_pvm_proforma
+    : true;
+  public is_sealed_report = App.env_configurations
+    ? App.env_configurations.is_sealed_report
+    : true;
+  public is_draft_bl = App.env_configurations
+    ? App.env_configurations.is_draft_bl
+    : true;
+  public is_sso = App.env_configurations ? App.env_configurations.is_sso : true;
+  public is_aapl = App.env_configurations
+    ? App.env_configurations.is_aapl
+    : true;
+  private hasDropZoneOver: boolean = false;
+  public isMerchantExporter: boolean = true;
+  private uploader: FileUploader = new FileUploader({
+    url: this.imageUploadUrl,
+    maxFileSize: 5 * 1024 * 1024,
+    autoUpload: true,
+  });
 
-	@ViewChild('origin') origin: TemplateRef<any>;
-	@ViewChild('insurance') insurance: TemplateRef<any>;
-	@ViewChild('airway') airway: TemplateRef<any>;
-	attachments = [];
-	originFileAttachments = [];
-	insuranceAttachments = [];
-	airwayAttachments = [];
-	shippingAttachments = [];
-	pointerEvent: boolean;
-	invalidText: boolean;
-	uploadError: boolean;
-	sizeError: boolean;
-	public onLoadFiles = ['origin', 'insuranceFlag', 'shipping', 'Bill', 'landing'];
-	
-	// public imageUploadUrl = "";
-	public fileTypes = ['image/png', 'image/jpeg', 'image/jpg', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/xlsx',];
-	public imageUploadUrl = App.base_url + 'addOrderAtt?orders_id=' + this.orders.selectedOrder.id;
-	// public screenOrientation: any;
-	private hasDropZoneOver: boolean = false;
-	private uploader: FileUploader = new FileUploader({
-		url: this.imageUploadUrl,
-		// allowedMimeType: ['image/png', 'image/jpeg', 'image/jpg', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'],
-		maxFileSize: 5 * 1024 * 1024,
-		autoUpload: true
-	});
-	
+  public containerName: any = [];
+  sendDocumentMails: boolean = false;
+  adminUser: boolean;
+  admin_access: boolean;
+  poDate: boolean = true;
+  coalineItem: any;
+  shipperId: any;
+  public preShipDocs: boolean = false;
+  public postShipDocs: boolean = false;
+  public customDocs: boolean = false;
 
+  public po_date2 = new Date(
+    this.orders.selectedOrder.po_date ? this.orders.selectedOrder.po_date : ""
+  );
+  public selectedOrderData = {};
+  orderId: any;
+  order_no_po: any;
+  estimated_date: Date;
+  selectedOptions: any;
+  selectedOptionsBuyer: any;
+  saveKey: any;
+  originalOrdersData: any;
+  originalOrdersProductData: any;
+  originalTaxInvData: any;
+  editClosePOPup: boolean = false;
+  editOrdersPONo: any;
+  editUpdatedPonoValue: any;
+  initialValues: any;
+  disablegenrateCommercial: boolean;
+  updatedValueinsurance: any;
+  updatedFreight: any;
+  editdescountValue: any;
+  editinsurancevalueState: boolean;
+  editfreightState: boolean;
+  editDescountstateState: boolean;
+  selectedUom: any;
+  paymentForm: any;
+  disbleChangeShipper: boolean = true; // disable for change shipper address for api fail
+  fileOverBase(event): void {
+    this.hasDropZoneOver = event;
+  }
 
-	public containerName: any = [];
-	public coaCompanyName: any;
-	sendDocumentMails: boolean = false;
-	adminUser: boolean;
-	admin_access: boolean;
-	coaLineItemEdit: boolean = false;
-	poDate: boolean = true;
-	coalineItem: any;
-	shipperId: any;
-	public po_date2 = new Date(this.orders.selectedOrder.po_date ? this.orders.selectedOrder.po_date : "");
+  fileDrop(event): void {}
+  fileSelected(event): void {}
+  setImageUrl() {
+    this.imageUploadUrl =
+      App.base_url + "addOrderAtt?orders_id=" + this.orders.selectedOrder.id;
+    this.uploader.setOptions({ url: this.imageUploadUrl });
+  }
 
-	fileOverBase(event): void {
-		this.hasDropZoneOver = event;
-	}
+  addLineItem(): void {
+    let dialogRef = this.dialog.open(AddLineItemComponent, {
+      panelClass: "alert-dialog",
+      width: "550px",
+      data: {
+        invoice: this.orders.invoice[0].Inovice,
+        pannel: "sales-contract",
+        module_id: this.data.id,
+      },
+      disableClose: true,
+    });
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result && result.success) {
+        this.orders.invoice = result.response.result.data.Invioce;
+        let toast: object;
+        toast = { msg: "Line Item Added Successfully", status: "success" };
+        this.snackbar.showSnackBar(toast);
+      }
+    });
+  }
 
-	fileDrop(event): void {
-	}
-	fileSelected(event): void {
-		console.log(event)
-	}
-	setImageUrl() {
-		this.imageUploadUrl = App.base_url + 'addOrderAtt?orders_id=' + this.orders.selectedOrder.id;
-		this.uploader.setOptions({ url : this.imageUploadUrl})
-	}
+  deleteAttachment(index: number, file: any): void {
+    this.OrdersService.deleteAttachment({
+      id: file.id,
+      att_id: file.att_id,
+    }).then((response) => {
+      if (response.result.success) {
+        this.pointerEvent = false;
+        this.attachments.splice(index, 1);
+      }
+    });
+  }
+  updatedGetViewDetails(type: string, updateProduct?: any) {
+    this.data.id = this.orders.selectedOrder.id;
+    this.OrdersService.getViewDetails({
+      id: this.data.id,
+      type: type,
+    }).then((response) => {
+      let selectedOrderDetails = response.result.data;
+      if (type === "order_details") {
+        this.orders.selectedOrder = {
+          ...selectedOrderDetails.subtotal_form[0],
+          ...selectedOrderDetails.create_order[0],
+          add_line_items: selectedOrderDetails.add_line_items || [],
+        };
+        this.originalOrdersData = {
+          ...selectedOrderDetails.subtotal_form[0],
+          ...selectedOrderDetails.create_order[0],
+          add_line_items: selectedOrderDetails.add_line_items || [],
+        };
+        this.orders.companyShpAddrDt =
+          selectedOrderDetails.create_order[0].shipper_address;
+        this.timeout = setTimeout(() => {
+          this.selectedOrderStatus = this.orders.selectedOrder.status;
+        }, 100);
+        if (this.order_Permissions.enable_shipments) this.getDynamicDocuments();
+        if (!updateProduct) this.updatedGetViewDetails("order_product_details");
+      } else {
+        this.orders.productsData.data = selectedOrderDetails.row_data;
+        this.originalOrdersProductData = selectedOrderDetails.row_data.map(
+          (data: any) => ({ ...data })
+        );
+      }
+    });
+  }
+  public compnayDetails: any;
+  public standard_declaration: string = "";
+  getComapnyDetails() {
+    this.organizationsService.getCompanyDetails().then((response) => {
+      if (response.result.success) {
+        this.compnayDetails = response.result.data;
+      }
+    });
+  }
+  changeAddress(): void {
+    this.closeEdit();
+    let dialogRef = this.dialog.open(ChangeShipperAddressComponent, {
+      width: "550px",
+      data: { module_id: this.orders.selectedOrder.id, type: "order" },
+      disableClose: true,
+      autoFocus: false,
+    });
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result.success) {
+        let shippingAddress = {
+          address1: "",
+          address2: "",
+          city: "",
+          state: "",
+          country_name: "",
+          postal_code: "",
+          gstin_no: "",
+        };
 
-	addLineItem(): void {
-		let dialogRef = this.dialog.open(AddLineItemComponent, {
-			panelClass: 'alert-dialog',
-			width: '550px',
-			data: { invoice: this.orders.invoice[0].Inovice }
-		});
-		dialogRef.afterClosed().subscribe(result => {
-			if (result && result.success) {
-				this.orders.invoice = result.response.result.data.Invioce;
-			}
-		});
-	}
+        result.data.map(function (value) {
+          if (value.selected) {
+            shippingAddress = value;
+          }
+        });
+        this.orders.companyShpAddrDt.ksm_address1 = shippingAddress.address1;
+        this.orders.companyShpAddrDt.ksm_address2 = shippingAddress.address2;
+        this.orders.companyShpAddrDt.ksm_city = shippingAddress.city;
+        this.orders.companyShpAddrDt.ksm_state = shippingAddress.state;
+        this.orders.companyShpAddrDt.ksm_countrty =
+          shippingAddress.country_name;
+        this.orders.companyShpAddrDt.ksm_postal_code =
+          shippingAddress.postal_code;
+        this.orders.companyShpAddrDt.ksm_gstin_no = shippingAddress.gstin_no;
+        this.orderPermissions(true);
+      }
+      let showTax = this.orders.companyShpAddrDt.ksm_postal_code;
+      if (showTax == "500001") {
+        this.taxInvoiceDocument = true;
+      } else {
+        this.taxInvoiceDocument = false;
+      }
+    });
+  }
 
-	deleteAttachment(index: number, file: any): void {
-		this.OrdersService
-			.deleteAttachment({ id: file.id, att_id: file.att_id })
-			.then(response => {
-				if (response.result.success) {
-					this.pointerEvent = false;
-					this.attachments.splice(index, 1);
-				}
-			});
-	}
-	moveToOtherdocs(file: any) {
-		// console.log(file);
-		this.otherDocs.push(file);
-		// console.log(this.otherDocs)
-		this.activateScroll = false;
-		this.activeTab = 'Otherdocs';
-		if (this.Otherdocs && this.Otherdocs['nativeElement'].offsetTop) {
-			this.scrollContainer['nativeElement'].scrollTop = this.Otherdocs['nativeElement'].offsetTop - 46;
-		}
-		setTimeout(() => {
-			this.activateScroll = true;
-		}, 100);
-	}
-	changePrice(product: any, event: any, value: any) {
-		let numberRegex = /[0-9]/g;
-		let price: any;
-		let productId: any;
-		let quantity: any;
-		let amount: any;
-		// console.log(product)
-		if (numberRegex.test(event.key) || event.key == 'Backspace' || event.key == 'Delete') {
-			if (this.timestamp) clearTimeout(this.timestamp);
-			this.timestamp = setTimeout(() => {
-				if (event.target.innerText != '') {
-					if (value == 0) {
-						price = event.target.innerText;
-						productId = product.order_product_id
-						this.OrdersService
-							.changePrice({ price: price, order_product_id: productId, quantity: product.product_quantity })
-							.then(response => {
-								if (response.result.success) {
-									this.productPriceChange(response.result.data)
-									this.getInvoiceData();
-									let toast: object;
-									toast = { msg: 'Updated Succesfully', status: 'success' };
-									this.snackbar.showSnackBar(toast); 
-								} 
-								else {
-									let toast: object;
-									toast = { msg: 'Failed to Update', status: 'error' };
-									this.snackbar.showSnackBar(toast); 
-								}
-							});
-					} else if (value == 1) {
-						quantity = event.target.innerText;
-						productId = product.order_product_id
-						this.OrdersService
-							.changePrice({ quantity: quantity, order_product_id: productId, price: product.product_price_number })
-							.then(response => {
-								if (response.result.success) {
-									this.productPriceChange(response.result.data)
-									this.getInvoiceData();
-									let toast: object;
-									toast = { msg: 'Updated Succesfully', status: 'success' };
-									this.snackbar.showSnackBar(toast); 
-								}
-								else {
-									let toast: object;
-									toast = { msg: response.result.message, status: 'error' };
-									this.snackbar.showSnackBar(toast); 
-								}
-							});
+  updateKeyValue(pvmForm: any = null) {
+    let toast: object;
+    let param = Object.assign({}, this.orders.invoice[0].Inovice);
+    param.pack_charge = param.pack_charge.toString().split(",").join("");
+    param.tax_csgt = param.tax_csgt.toString().split(",").join("");
+    param.tax_gst = param.tax_gst.toString().split(",").join("");
+    param.tax_igst = param.tax_igst.toString().split(",").join("");
+    if (!this.is_sso) {
+      param.pre_carriage_by =
+        pvmForm && pvmForm.value.pre_carriage_by
+          ? pvmForm.value.pre_carriage_by
+          : param.pre_carriage_by.toString().split(",").join("");
+      param.mark_nos =
+        pvmForm && pvmForm.value.mark_nos
+          ? pvmForm.value.mark_nos
+          : param.mark_nos.toString().split(",").join("");
+      param.container_no =
+        pvmForm && pvmForm.value.container_no
+          ? pvmForm.value.container_no
+          : param.container_no.toString().split(",").join("");
+      param.lut_arn =
+        pvmForm && pvmForm.value.lut_arn
+          ? pvmForm.value.lut_arn
+          : param.lut_arn.toString().split(",").join("");
+      param.lut_arn =
+        pvmForm && pvmForm.value.lut_arn
+          ? pvmForm.value.lut_arn
+          : param.lut_arn.toString().split(",").join("");
+      param.lut_date =
+        pvmForm && pvmForm.value.lut_date
+          ? pvmForm.value.lut_date
+          : param.lut_date.toString().split(",").join("");
+    }
 
-					}
+    this.OrdersService.generateInvoice(param).then((response) => {
+      this.orders.invoice = response.result.data.Invioce;
+      toast = { msg: "Updated successfully.", status: "success" };
+      this.snackbar.showSnackBar(toast);
+    });
+    if (param.payment_type == "Advance") {
+      this.hidePaidBtn = false;
+    } else {
+      this.hidePaidBtn = true;
+    }
+  }
 
-				}
-			}, 1000);
-		} else {
-			return false;
-		}
-	}
-	changeInvoicePackCharge(index, event) {
-		let numberRegex = /[0-9]/g
-		if (numberRegex.test(event.key) || event.key == 'Backspace' || event.key == 'Delete') {
-			if (this.timestamp) clearTimeout(this.timestamp);
-			this.timestamp = setTimeout(() => {
-				if (event.target.innerText != '') {
-					this.orders.invoice[0].Inovice.pack_charge = event.target.innerText;
-					this.updateKeyValue();
-				}
-			}, 1000);
-		} else {
-			return false;
-		}
-	}
+  public now: Date = new Date();
+  public threeMonthsAgo: Date = new Date(this.now);
 
-	productPriceChange(data: any) {
-		this.data.id = data.orders_id;
-		this.OrdersService
-			.getOrdersList(this.data)
-			.then(response => {
-				let selectedOrderDetails = response.result.data.totalordersDt[0].list[0]
-				this.orders.selectedOrder = selectedOrderDetails.orders;
-				console.log(this.orders.selectedOrder)
-				this.orders.productsData.data = selectedOrderDetails.productsData;
-				// console.log(this.orders.productsData)
+  public transistTime;
 
-			});
-	}
-	public compnayDetails: any;
-	getComapnyDetails() {
-		this.organizationsService
-			.getCompanyDetails()
-			.then(response => {
-				if(response.result.success) {
-					this.compnayDetails = response.result.data;	
-				}
-				// console.log(this.orders.productsData)
-
-			});
-	}
-	cancelsdf() {
-		this.editable = false
-		// this.noShippingBill = false;
-		// this.noShippingDate = false;
-	}
-	cancelShip() {
-		this.shippingActiveState = false;
-		this.getShippingAddressDetails();
-		this.editShipping = true;
-	}
-	cancelConcern() {
-		this.concernEditable = false
-	}
-	cancelExport() {
-		this.editExport = false
-		this.noShippingExportBill = false;
-		this.noShippingExportDate = false;
-	}
-	changeCoaData(coaIndex: any) {
-		// console.log(coaIndex);
-		this.editCoa = false;
-		this.coaShow = 'Show';
-		// console.log(this.orders.selectedOrder.po_date)
-		this.OrdersService
-			.changePoNumbr(
-				{
-					id: this.orders.selectedOrder.id,
-					flag: coaIndex,
-					po_nbr: this.orders.selectedOrder.po_nbr ? this.orders.selectedOrder.po_nbr : '',
-					line_item: this.orders.selectedOrder.line_item ? this.orders.selectedOrder.line_item : '',
-					po_date: this.orders.selectedOrder.po_date ? this.orders.selectedOrder.po_date : '',
-				})
-			.then(response => {
-				this.getReportsData();
-			});
-
-	}
-	changeAddress(): void {
-		let dialogRef = this.dialog.open(ChangeShipperAddressComponent, {
-			width: '550px',
-			data: this.orders.selectedOrder.id
-		});
-		dialogRef.afterClosed().subscribe(result => {
-			if (result.success) {
-				let shippingAddress = { address1: '', address2: '', city: '', state: '', country_name: '', postal_code: '', gstin_no: '' };
-
-				result.data.map(function (value) {
-					if (value.selected) {
-						shippingAddress = value;
-
-					}
-				});
-				// console.log(shippingAddress)
-				this.orders.companyShpAddrDt.ksm_address1 = shippingAddress.address1;
-				this.orders.companyShpAddrDt.ksm_address2 = shippingAddress.address2;
-				this.orders.companyShpAddrDt.ksm_city = shippingAddress.city;
-				this.orders.companyShpAddrDt.ksm_state = shippingAddress.state;
-				this.orders.companyShpAddrDt.ksm_countrty = shippingAddress.country_name;
-				this.orders.companyShpAddrDt.ksm_postal_code = shippingAddress.postal_code;
-				this.orders.companyShpAddrDt.ksm_gstin_no = shippingAddress.gstin_no;
-			}
-			let showTax = this.orders.companyShpAddrDt.ksm_postal_code
-			if (showTax == '500001') {
-				this.taxInvoiceDocument = true;
-			} else {
-				this.taxInvoiceDocument = false;
-			}
-
-		});
-	}
-
-	updateKeyValue() {
-		let param = Object.assign({}, this.orders.invoice[0].Inovice);
-		param.pack_charge = param.pack_charge.toString().split(',').join('');
-		param.tax_csgt = param.tax_csgt.toString().split(',').join('');
-		param.tax_gst = param.tax_gst.toString().split(',').join('');
-		param.tax_igst = param.tax_igst.toString().split(',').join('');
-		param.tax_others = param.tax_others.toString().split(',').join('');
-
-		this.OrdersService
-			.generateInvoice(param)
-			.then(response => {
-				this.orders.invoice = response.result.data.Invioce;
-			});
-			if (param.payment_type == 'Advance') {
-				this.hidePaidBtn = false;
-				// console.log("false")
-			} else {
-				this.hidePaidBtn = true;
-				// console.log("true")
-			}
-	}
+  public order_Permissions: any = {};
 
   constructor(
     private titleService: Title,
-		private InventoryService: InventoryService,
-		private OrdersService: OrdersService,
-		private organizationsService: OrganizationsService,
-		private snackbar: SnakbarService,
-		private formBuilder: FormBuilder,
-		public dialog: MatDialog,
+    private OrdersService: OrdersService,
+    private organizationsService: OrganizationsService,
+    private snackbar: SnakbarService,
+    public dialog: MatDialog,
     private cookie: CookieService,
     private activatedRoute: ActivatedRoute,
-		private _lightbox: Lightbox,
-		private router: Router,
-  ) { }
-
-  ngOnInit(): void {
-    this.activatedRoute.params.subscribe(param => this.data.id = param.id);
-	this.titleService.setTitle(App['company_data'].ordersTitle);
-	this.orderFormCompanyDetails = App['company_data'];
-	this.orderDetails();
-	this.sdfFormData();
-	this.getComapnyDetails();
-	this.getPaymentTypes();
-     	this.sdfFormData();
-		this.getclientDocPermissions();
-		this.userDetails = App.user_details;
-		let permission: boolean;
-		let profile: boolean;
-		let admin_profile: boolean;
-		App.user_roles_permissions.map(function (value) {
-			switch (value.code) {
-				case 'factory_user':
-					if (value.selected) {
-						permission = false;
-					} else {
-						permission = true;
-					}
-					break;
-				case 'client_interface':
-					if (value.selected) {
-						profile = true;
-					} else {
-						profile = false;
-					}
-					break;
-				case 'admin':
-					if (value.selected) {
-						admin_profile = true;
-					} else {
-						admin_profile = false;
-					}
-					break;
-
-
-			}
-
-		})
-
-	this.factoryPermission = true;
-		this.clientPermission = profile;
-		this.adminUser = admin_profile;
-
-		this.downloadStatus = false;
-
-		// if (this.cookie.check('order_id')) {
-		// 	let order_id = this.cookie.get('order_id');
-		// 	this.assignDetailView(order_id);
-		// 	setTimeout(() => {
-				
-		// 		this.stepper['selectedIndex'] = 1;
-		// 	}, 500);
-		// 	this.cookie.delete('order_id');
-		// 	this.searching = false;
-		// } else {
-		// 	this.getOrdersList(true);
-
-
-		// }
-
-	this.generateShippingAddressForm();
-	this.setUserCategoryValidators();
-	this.userDetailsType();
-	this.getOrganizations();
-	this.getProductTypesData();
-	
-	// console.log(this.activatedRoute)
-	
-	this.uploader.onSuccessItem = (item, response, status, headers) => {
-		this.getAddedFiles(this.shipmentType);
-		this.getAttachmentsList();
-	} 
-
-	setTimeout(() => {
-		this.getUomData();
-		
-	}, 1000);
-
-
+    private _lightbox: Lightbox,
+    private router: Router,
+    private service: LeadsService,
+    private utilsService: UtilsService,
+    private sanitizer: DomSanitizer,
+    public adminService: AdminService
+  ) {
+    this.now.setDate(this.now.getDate() + 1);
+    this.now.setHours(0, 0, 0, 0);
   }
-  public UomData = [];
-  getUomData() {
-	this.OrdersService
-	.getUomData({  })
-	.then(response => {
-		if(response.result.success) {
-			this.UomData = response.result.data;
-			this.selectedUom = this.UomData[2].id;
-			this.getPrimaryPackageData();
+  public acceptOrderbutton: boolean = false;
+  public generatesalesContract: boolean = false;
+  public purchaseOrder: boolean = false;
+  public setReadybutton: boolean = false;
+  public viewActivityLogIcon: boolean = false;
+  public viewExcelIcon: boolean = false;
+  public getInputValidationTypes = [];
 
-		}
-		
-	});
+  async ngOnInit() {
+    this.adminService.getPermissions().subscribe((res) => {
+      this.adminService.rolePermissions = res.role_details.roles_permissions;
+    });
+    this.getValidationTypes();
+    console.log(App);
+    this.threeMonthsAgo.setMonth(this.now.getMonth() - 3);
+    this.currentDate = new Date();
+    this.activatedRoute.params.subscribe((param) => (this.data.id = param.id));
+    this.titleService.setTitle(App["company_data"].ordersTitle);
+    this.orderFormCompanyDetails = App["company_data"];
+    this.getViewDetails(this.data.id, "order_details");
+    this.orderShipments();
+    this.userDetails = App.user_details;
+    let aaceptpermission: boolean;
+    let generatesales: boolean;
+    let profile: boolean;
+    let admin_profile: boolean;
+    let purchaseorder: boolean;
+    let viewActivityLog: boolean;
+    let viewExcelDownload: boolean;
+    let setReady: boolean;
+    App.user_roles_permissions.map(function (value) {
+      switch (value.code) {
+        case "factory_user":
+          if (value.selected) {
+            permission = false;
+          } else {
+            permission = true;
+          }
+          break;
+        case "client_interface":
+          if (value.selected) {
+            profile = true;
+          } else {
+            profile = false;
+          }
+          break;
+        case "admin":
+          if (value.selected) {
+            admin_profile = true;
+          } else {
+            admin_profile = false;
+          }
+
+          break;
+        case "generate_sales_contract":
+          if (value.selected === true) {
+            generatesales = true;
+          } else {
+            generatesales = false;
+          }
+          break;
+        case "accept_orders":
+          if (value.selected === true) {
+            aaceptpermission = true;
+          } else {
+            aaceptpermission = false;
+          }
+          break;
+        case "purchase_order":
+          if (value.selected === true) {
+            purchaseorder = true;
+          } else {
+            purchaseorder = false;
+          }
+          break;
+        case "set_order_ready":
+          if (value.selected === true) {
+            setReady = true;
+          } else {
+            setReady = false;
+          }
+          break;
+        case "activity_log":
+          if (value.selected === true) {
+            viewActivityLog = true;
+          } else {
+            viewActivityLog = false;
+          }
+          break;
+        case "excel_download":
+          if (value.selected === true) {
+            viewExcelDownload = true;
+          } else {
+            viewExcelDownload = false;
+          }
+          break;
+      }
+    });
+    this.acceptOrderbutton = aaceptpermission;
+    this.generatesalesContract = generatesales;
+    this.factoryPermission = true;
+    this.clientPermission = profile;
+    this.adminUser = admin_profile;
+    this.purchaseOrder = purchaseorder;
+    this.downloadStatus = false;
+    this.setReadybutton = setReady;
+
+    this.viewActivityLogIcon = viewActivityLog;
+    this.viewExcelIcon = viewExcelDownload;
+    this.userDetailsType();
+    this.uploader.onSuccessItem = (item, response, status, headers) => {
+      let toast: object;
+      let result = JSON.parse(response);
+      if (result.result.data.error) {
+        toast = { msg: result.result.data.error, status: "error" };
+        this.snackbar.showSnackBar(toast);
+        return;
+      }
+      this.getAddedFiles(this.shipmentType);
+      this.getAttachmentsList();
+    };
+    let permission: boolean;
+    App.user_roles_permissions.map(function (val) {
+      if (val.code == "inventory") {
+        permission = val.selected;
+      }
+    });
+    this.isMerchantExporter = App.isMerchantExporter;
+    this.orderPermissions(false);
+    this.getOrderProducts();
+    this.getPoProducts();
   }
-  public selectedUom;
-  public showUOMSavePanel = false;
-  changeUomType(uom) {
-	this.selectedUom = uom.id;
-	this.showUOMSavePanel = true;
+
+  async getValidationTypes() {
+    await this.service.getValidationTypes().then((res) => {
+      if (res.result && res.result.success) {
+        this.getInputValidationTypes = res.result.data;
+      }
+    });
   }
-  editformSdf() {
-	if (!this.editable) {
-		this.editable = true;
-	} else {
-		this.editable = false;
-	}
 
-}
-saveUomData() {
-	this.getPrimaryPackageData();
-	this.showUOMSavePanel = false;
-}
-cancelUomChange() {
-	this.selectedUom = this.UomData[2].id;
-	this.showUOMSavePanel = false;
-
-}
-public primaryPackageData = [];
-getPrimaryPackageData() {
-	let param = {
-		uom_id: this.selectedUom ,
-		orders_id: this.orders.selectedOrder.id
-	}
-	this.OrdersService
-	.getPrimaryPackageData(param)
-	.then(response => {
-		if(response.result.success) {
-			this.primaryPackageData = response.result.data;
-		}
-		
-	});
-}
-public disabledSave = false;
-cancelPackages(): void {
-	this.disabledSave = true;
-	this.OrdersService
-		.acceptOrder({ id: this.orders.selectedOrder.id, orders_types_id: 5 })
-		.then(response => {
-			if(response.result.success) {
-				this.orders.selectedOrder.orders_types_id = '5';
-				this.selectedOrderStatus = 'Cancelled';
-			} else {
-				this.disabledSave = false;
-			}
-			
-		});
-}
-editExportValue() {
-	if (!this.editExport) {
-		this.editExport = true;
-	} else {
-		this.editExport = false;
-	}
-
-}
+  order_shipments = [];
+  orderShipments() {
+    this.OrdersService.orderShipments(this.data.id).then((response) => {
+      if (response.result.success) {
+        this.order_shipments = response.result.data;
+      }
+    });
+  }
+  orderPermissions(notOnInit?: boolean) {
+    this.OrdersService.getOrderPermissions({ id: this.data.id, type: "order" })
+      .then((response) => {
+        if (response.result.success) {
+          this.order_Permissions = response.result.data;
+          if (notOnInit) this.updatedGetViewDetails("order_details");
+          this.getOrdersActivityDetails();
+        }
+      })
+      .catch((error) => console.log(error));
+  }
+  receivedData: string;
+  public disabledSave = false;
   deliverOrder(): void {
-	//   console.log(1)
-	let dialogRef = this.dialog.open(DeliverOrderComponent, {
-		panelClass: 'alert-dialog',
-		width: '550px',
-		height: '300px',
-		data: {
-			id: this.orders.selectedOrder.id,
-			flag: this.selectedOrderStatus
-		}
-	});
-	dialogRef.afterClosed().subscribe(result => {
-		if (result.success) {
-			
-			this.selectedOrderStatus = 'Delivered';
-			this.getOrdersActivityDetails();
-			this.disablePayment = true;
-			this.orders.selectedOrder.orders_types_id = '4';
-		}
-	});
-}
-sendMails(data?: any): void {
-	let dialogRef = this.dialog.open(EmailDocumentsComponent, {
-		panelClass: 'alert-dialog',
-		width: '640px',
-		data: { order_id: this.orders.selectedOrder.id, invoice_id: this.orders.invoice.length ? this.orders.invoice[0].Inovice.id : '', other_docs: this.attachments}
-	});
-	dialogRef.afterClosed().subscribe(result => {
-		if (result && result.success) {
-			// let toast: object;
-			// toast = { msg: 'The documents are being processed, we will notify you once the email has been sent.', status: 'success' };
-			// this.snackbar.showSnackBar(toast);
-			// this.OrdersService
-			// 	.sendDocumentsMail({ orders_id: this.orders.selectedOrder.id, invoice_id: this.orders.invoice[0].Inovice.id })
-			// 	.then(response => {
-			// 		if (response.result.success) {
-			// 			toast = { msg: 'Email has been sent successfully.', status: 'success' };
-			// 			this.snackbar.showSnackBar(toast);
-			// 		} else {
-			// 			toast = { msg: 'Error Sending Email.', status: "error" };
-			// 			this.snackbar.showSnackBar(toast);
-			// 		}
-			// 	});
-		}
-	});
-	
-}
+    this.editClosePOPup = true;
 
-orderDownload() {
-	let toast: object;
-	toast = { msg: 'The documents are being processed, Download will begin shortly...', status: 'success' };
-	this.snackbar.showSnackBar(toast); 
-	let params = { id: this.orders.selectedOrder.id, invoice_id: this.orders.invoice[0].Inovice.id }
-	this.OrdersService
-		.exportOrdersPdf(params)
-		.then(response => {
-			if (response.result.success) {
-				if (response.result.data){
-					let downloadPath = response.result.data;
-					window.open(downloadPath, '_blank');
-				}
-			}
-			else {
-				toast = { msg: 'Error in Downloading documents.', status: "error" };
-				this.snackbar.showSnackBar(toast);
-			}
-		});
-
-		// this.checkOrders();
-		// // let modelData = this.checkOrdersPdf;
-		// let modelData = this.orders.selectedOrder.id;
-		// let invoice_id =  this.orders.invoice[0].Inovice.id;
-		// let dialogRef = this.dialog.open(OrderDownloadComponent, {
-		// 	width: '550px',
-		// 	data: { modelData, invoice_id}
-		// });
-		// dialogRef.afterClosed().subscribe(result => {
-		// 	setTimeout(() => {
-		// 		this.ordersDownload = false;
-	
-		// 	}, 3000);
-		// });
-}
-
-  addBatchNumber(product: any): void {
-	this.orders.packing.forEach((n) => {
-		let batchData = n.batchesData;
-		batchData.map((i) => {
-			let container_name = i.contains;
-			container_name.map((v) => {
-				if (v.packing_id == product.packing_id)
-					this.containerId = v.packing_id
-			})
-
-		})
-	})
-	let dialogRef = this.dialog.open(AddBatchNumberComponent, {
-		panelClass: 'alert-dialog',
-		width: '550px',
-		data: { product: product, selectedOrder: this.orders.selectedOrder, container: this.containerId }
-	});
-	dialogRef.afterClosed().subscribe(result => {
-		if (result && result.success) {
-			// this.priceQuantityDisable = false;
-			this.showDrumsList = true;
-			this.getPackagingDetails();
-			this.downloadStatus = true;
-		}
-	});
-}
-public transportMode;
-selectShipping() {
-	this.shippingActiveState = true;
-}
-selectShippingMode(transportName) {
-	console.log(transportName);
-	this.transportMode = transportName.name;
-	this.shippingActiveState = true;
-}
-
-  generateShippingAddressForm(): void {
-	this.shippingForm = this.formBuilder.group({
-		aws_number: [null],
-		bol_number: [null],
-		road_number: [null],
-		terms: [],
-		mode_transport_id: [null, Validators.required],
-		transport_mode: [1, Validators.required]
-	});
-}
-getProductTypesData(): void {
-	this.organizationsService
-		.getProductsList({ org_id: this.App.user_details.org_id })
-		.then(response => {
-			if (response.result.success) {
-				this.orders.productsList = response.result.data.productTypesDt;
-				this.orders.productsList.map(function (value) {
-					value.selected = false;
-				});
-
-			}
-		})
-
-		.catch(error => console.log(error));
-	// console.log(this.orders.productsList);
-}
-
-moveToSsi() {
-	this.activateScroll = false;
-	this.activeTab = 'Ssi';
-	if (this.Ssi && this.Ssi['nativeElement'].offsetTop) {
-		this.scrollContainer['nativeElement'].scrollTop = this.Ssi['nativeElement'].offsetTop - 46;
-	}
-	setTimeout(() => {
-		this.activateScroll = true;
-	}, 100);
-}
-moveToUnit() {
-	this.activateScroll = false;
-	this.activeTab = 'Unit';
-	if (this.Unit && this.Unit['nativeElement'].offsetTop) {
-		this.scrollContainer['nativeElement'].scrollTop = this.Unit['nativeElement'].offsetTop - 46;
-	}
-	setTimeout(() => {
-		this.activateScroll = true;
-	}, 100);
-}
-
-moveToShipperLetter() {
-	this.activateScroll = false;
-	this.activeTab = 'Shippersletter';
-	if (this.Shippersletter && this.Shippersletter['nativeElement'].offsetTop) {
-		this.scrollContainer['nativeElement'].scrollTop = this.Shippersletter['nativeElement'].offsetTop - 46;
-	}
-	setTimeout(() => {
-		this.activateScroll = true;
-	}, 100);
-}
-
-moveToAdcSheet() {
-	this.activateScroll = false;
-	this.activeTab = 'Adcsheet';
-	if (this.Adcsheet && this.Adcsheet['nativeElement'].offsetTop) {
-		this.scrollContainer['nativeElement'].scrollTop = this.Adcsheet['nativeElement'].offsetTop - 46;
-	}
-	setTimeout(() => {
-		this.activateScroll = true;
-	}, 100);
-}
-
-moveToIncentive() {
-	this.activateScroll = false;
-	this.activeTab = 'Incentivedeclaration';
-	if (this.Incentivedeclaration && this.Incentivedeclaration['nativeElement'].offsetTop) {
-		this.scrollContainer['nativeElement'].scrollTop = this.Incentivedeclaration['nativeElement'].offsetTop - 46;
-	}
-	setTimeout(() => {
-		this.activateScroll = true;
-	}, 100);
-}
-moveToScomat() {
-	this.activateScroll = false;
-	this.activeTab = 'Scomatdeclaration';
-	if (this.Scomatdeclaration && this.Scomatdeclaration['nativeElement'].offsetTop) {
-		this.scrollContainer['nativeElement'].scrollTop = this.Scomatdeclaration['nativeElement'].offsetTop - 46;
-	}
-	setTimeout(() => {
-		this.activateScroll = true;
-	}, 100);
-}
-
-moveToConcern() {
-	this.activateScroll = false;
-	this.activeTab = 'Concern';
-	if (this.Concern && this.Concern['nativeElement'].offsetTop) {
-		this.scrollContainer['nativeElement'].scrollTop = this.Concern['nativeElement'].offsetTop - 46;
-	}
-	setTimeout(() => {
-		this.activateScroll = true;
-	}, 100);
-}
-
-moveToAdcode() {
-	this.activateScroll = false;
-	this.activeTab = 'Adcode';
-	if (this.Adcode && this.Adcode['nativeElement'].offsetTop) {
-		this.scrollContainer['nativeElement'].scrollTop = this.Adcode['nativeElement'].offsetTop - 46;
-	}
-	setTimeout(() => {
-		this.activateScroll = true;
-	}, 100);
-}
-public shipmentType;
-setAddedFilesUrl(flag) {
-	if(flag == 'origin') {
-		this.imagUploadFlag = 'country';
-		this.shipmentType = flag;
-		// console.log(2)
-	} else if(flag == 'insuranceFlag') {
-		this.imagUploadFlag = 'insurance';
-		this.shipmentType = flag;
-	}  else if(flag == 'shipping') {
-		this.imagUploadFlag = 'shipping';
-		this.shipmentType = flag;
-	}
-	else if(flag == 'landing') {
-		this.imagUploadFlag = 'landing';
-		this.shipmentType = flag;
-	}
-	else{
-		this.imagUploadFlag = 'Bill';
-		this.shipmentType = flag;
-	}
-	this.uploader.setOptions({ url : App.base_url + 'addFiles?orders_id=' + this.orders.selectedOrder.id + '&type='+ this.imagUploadFlag})
-
-	
-}
-
-fileUpload() {
-	
-}
-public showEditIcon = true;
-saveShippingAddress(form): void {
-	// console.log(form)
-	this.setUserCategoryValidators();
-	this.submitShippingForm = true;
-	this.shippingForm.get('transport_mode').markAsTouched({ onlySelf: true });
-	this.shippingForm.get('mode_transport_id').markAsTouched({ onlySelf: true });
-	this.shippingForm.get('aws_number').markAsTouched({ onlySelf: true });
-	this.shippingForm.get('bol_number').markAsTouched({ onlySelf: true });
-	this.shippingForm.get('road_number').markAsTouched({ onlySelf: true });
-	let toast: object;
-	if (form.valid) {
-		console.log(this.shippingForm.value.bol_number)
-		console.log(this.shippingForm.value.road_number)
-
-		this.totalSpinner = true;
-		this.shippingActiveState = false;
-		this.invoiceGenerateLoader = true;
-		this.OrdersService
-			.addInvoiceShipping({
-				id: this.orders.shipping_id,
-				invoice_id: this.orders.invoice[0].Inovice.id,
-				terms: this.shippingForm.value.terms,
-				transport_mode: this.shippingForm.value.transport_mode,
-				mode_transport_id: this.shippingForm.value.mode_transport_id,
-				shipping_id: this.shippingForm.value.aws_number,
-				bol_id: this.transportMode == 'Sea' ? this.shippingForm.value.bol_number : this.shippingForm.value.road_number,
-			})
-			.then(response => {
-				this.invoiceGenerateLoader = false; 
-				
-				this.submitShippingForm = false;
-				// this.totalSpinner = false;
-				if (response.result.success) {
-					this.totalSpinner = false;
-					this.sendDocumentMails = true;
-					this.orders.shipping_id = response.result.data.shipDt.id;
-					toast = { msg: 'Shipping Details saved successfully.', status: 'success' };
-					this.snackbar.showSnackBar(toast);
-					this.editShipping = false;
-					this.getShippingAddressDetails();
-					this.orders.selectedOrder.status = 'In-transit';
-					this.showEditIcon = false;
-				} else {
-					this.sendDocumentMails = true;
-					this.showEditIcon = true;
-					this.editShipping = false;
-					this.getShippingAddressDetails();
-				}
-			});
-	} 
-}
-generateInvoice() {
-	this.invoiceGenerateLoader = true;
-	this.clickedGenerateInvoice = true;
-	this.totalSpinner = true;
-	this.OrdersService
-	
-		.generateInvoice({ orders_id: this.orders.selectedOrder.id })
-		.then(response => {
-			
-			this.hideShipperAddress = true;
-			this.totalSpinner = false;
-			this.orders.selectedOrder.orders_types_id = '6';
-			this.getInvoiceData();
-
-			this.clickedGenerateInvoice = false;
-			this.selectedOrderStatus = 'Processing';
-		});
-}
-
-paidInvoice() {
-	let dialogRef = this.dialog.open(MarkAsPaidComponent, {
-		width: '550px',
-		data: ''
-	});
-	dialogRef.afterClosed().subscribe(result => {
-		if (result.success) {
-			this.OrdersService
-				.invoiceStatus({ id: this.orders.invoice[0].Inovice.id })
-				.then(response => {
-					if (response.result.success) {
-						this.paymentStatus = true;
-						this.orders.invoice[0].Inovice.status = 'Paid';
-						this.added = true;
-						this.disablePayment = true;
-						let toast: object;
-						toast = { msg: 'Paid Successfully...', status: 'success' };
-						this.snackbar.showSnackBar(toast);
-					}
-				});
-		}
-	});
-}
-getOrganizations() {
-	this.param.search = '';
-	this.organizationsService
-		.getOrganizationsList(this.param)
-		.then(response => {
-			if (response.result.success) {
-				this.orders.organizations = response.result.data.organization;
-			}
-		});
-}
-
-setUserCategoryValidators() {
-	const AWSCtrl = this.shippingForm.get('aws_number');
-	const BOLCtrl = this.shippingForm.get('bol_number');
-	const ROADCtrl = this.shippingForm.get('road_number');
-
-	this.shippingForm.get('transport_mode').valueChanges
-  .subscribe(userCategory => {  
-	//   console.log(userCategory)
-	if (userCategory == 1) {
-		BOLCtrl.setValidators(null);
-		AWSCtrl.setValidators([Validators.required]);
-		ROADCtrl.setValidators(null);
-	} else if (userCategory == 15 || userCategory == 16) {
-		BOLCtrl.setValidators(null);
-		AWSCtrl.setValidators(null);
-		ROADCtrl.setValidators([Validators.required]);
-	} else {
-		AWSCtrl.setValidators(null);
-		BOLCtrl.setValidators([Validators.required]);
-		ROADCtrl.setValidators(null);
-	}
-
-	AWSCtrl.updateValueAndValidity();
-	BOLCtrl.updateValueAndValidity();
-  })
-}
-userDetailsType() {
-	if (this.userDetails.log_type == 1) {
-		this.blockContent = true
-	} else {
-		this.blockContent = false
-	}
-}
-public productDetails = '';
-  orderDetails() {
-	//   console.log(2)
-		// stepper.next();
-		this.totalSpinner = true
-		let showDocs;
-		let tax;
-		this.data.id = this.data.id;
-		this.fetchingData = true;
-		this.selectedOrderStatus = '';
-		this.orders.notifyAddr = {};
-		// this.enableInvoice = false;
-		// this.priceQuantityDisable = false;
-		this.OrdersService
-			.getOrdersList(this.data)
-			.then(response => {
-				this.totalSpinner = false;
-				if(response.result.data.totalordersDt.length) {
-					this.showNoDatFound = false;
-				} else {
-					this.showNoDatFound = true;
-				}
-				let selectedOrderDetails = response.result.data.totalordersDt[0].list[0];
-				this.productDetails = selectedOrderDetails ? selectedOrderDetails.productsDetails : '';
-				// console.log(selectedOrderDetails)
-				if (selectedOrderDetails.orders.line_item) {
-					this.saveAddLineItem = true;
-				} else {
-					this.saveAddLineItem = false;
-				}
-				let showTax = response.result.data.totalordersDt[0].list[0].ksmAddr.ksm_postal_code
-				this.orders.selectedOrder = selectedOrderDetails.orders;
-				// console.log(this.orders.selectedOrder);
-				this.po_date2 = new Date(this.orders.selectedOrder.po_date ? this.orders.selectedOrder.po_date : "");
-				this.timeout = setTimeout(() => {
-					this.selectedOrderStatus = this.orders.selectedOrder.status;
-				}, 100);
-				this.orders.billingAddr = selectedOrderDetails.billingAddr;
-				this.orders.shippingAddr = selectedOrderDetails.shippingAddr;
-				if (selectedOrderDetails.notifyingAddr) {
-					this.showNotifyAddress = true;
-					this.orders.notifyAddr = Object.assign(selectedOrderDetails.notifyingAddr);
-					// console.log(this.orders.notifyAddr)
-				} else {
-					this.showNotifyAddress = false;
-					this.orders.notifyAddr = {}
-				}
-				this.orders.productsData.data = selectedOrderDetails.productsData;
-				// console.log(this.orders.productsData.data)
-				selectedOrderDetails.productsData.map(function (value) {
-					if (
-						value.category_name.includes('Vegan') ||
-						value.category_name.includes('Organic KSM-66 Ashwagandha Extract - 80 Mesh' ||
-							value.category_name.includes('Organic KSM-66 Ashwagandha Extract -300 Mesh'))) {
-						showDocs = true
-					}
-					if (value.category_name.includes('spectrum')) {
-						// this.containsMilk = true;
-					}
-				});
-				if (showDocs == true) {
-					this.showDocuments = showDocs;
-				}
-				if (showTax == 500001) {
-					this.taxInvoiceDocument = true;
-				} else {
-					this.taxInvoiceDocument = false;
-				}
-				this.orders.companyShpAddrDt = selectedOrderDetails.ksmAddr;
-
-				this.getAttachmentsList();
-				this.onLoadFiles.forEach(element => {
-					this.getAddedFiles(element);
-				});
-				this.getReportsData();
-
-				this.getOrdersActivityDetails();
-				this.getOrdersSdf();
-				this.getOrdersExport();
-				this.getOrdersConcern();
-
-
-				if (this.orders.selectedOrder.orders_types_id != '1') {
-					this.getPackagingDetails();
-				}
-				if (this.orders.selectedOrder.orders_types_id == '6') {
-					this.getInvoiceData();
-				}
-				this.fetchingData = false
-				if (this.selectedOrderStatus != 'In-transit' && this.selectedOrderStatus != 'cancel' && this.selectedOrderStatus != 'Delivered') {
-					this.disablePayment = false;
-				} else {
-					this.disablePayment = true;
-				}
-
-				if (this.orders.selectedOrder.orders_types_id == '1' || this.orders.selectedOrder.orders_types_id == '2' || this.orders.selectedOrder.orders_types_id == '6') {
-					this.sendDocumentMails = false;
-				} else {
-					this.sendDocumentMails = true
-				}
-			});
+    let dialogRef = this.dialog.open(DeliverOrderComponent, {
+      panelClass: "alert-dialog",
+      width: "550px",
+      height: "300px",
+      data: {
+        id: this.orders.selectedOrder.id,
+        flag: this.selectedOrderStatus,
+      },
+      disableClose: true,
+    });
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result.success) {
+        this.selectedOrderStatus = "Delivered";
+        this.orders.selectedOrder.status_color_code = "#9d573b";
+        // this.getOrdersActivityDetails();
+        this.disablePayment = true;
+        this.orders.selectedOrder.status_slug = "delivered";
+      }
+      this.editClosePOPup = false;
+    });
   }
-  
+  sendMails(data?: any): void {
+    this.editClosePOPup = true;
+
+    let dialogRef = this.dialog.open(EmailDocumentsComponent, {
+      panelClass: "alert-dialog",
+      width: "640px",
+      data: {
+        order_id: this.orders.selectedOrder.id,
+        invoice_id: this.orders.invoice.length
+          ? this.orders.invoice[0].Inovice.id
+          : "",
+        other_docs: this.attachments,
+        uom_id: this.selectedUom,
+      },
+      disableClose: true,
+    });
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result && result.success) {
+        this.editClosePOPup = false;
+      }
+    });
+  }
+
+  orderDownload() {
+    let toast: object;
+    toast = {
+      msg: "The documents are being processed, Download will begin shortly...",
+      status: "success",
+    };
+    this.snackbar.showSnackBar(toast);
+    let params = {
+      id: this.orders.selectedOrder.id,
+      invoice_id: this.orders.invoice[0].Inovice.id,
+      uom_id: this.selectedUom,
+    };
+    this.OrdersService.exportOrdersPdf(params).then((response) => {
+      if (response.result.success) {
+        if (response.result.data) {
+          let downloadPath = response.result.data;
+          window.open(downloadPath, "_blank");
+        }
+      } else {
+        toast = { msg: "Error in Downloading documents.", status: "error" };
+        this.snackbar.showSnackBar(toast);
+      }
+    });
+  }
+  public packageData = [];
+  public containers = [];
+  public defaultContainer = [];
+  public defaultPackage = [];
+  public transportMode;
+  public nameValidators(control: FormControl) {
+    const nameRegexp: RegExp = /[!@#$%^&*()_+\-=\[\]{};':"\\|<>\/?]/;
+    if (control.value && nameRegexp.test(control.value)) {
+      return { specialcharacters: true };
+    }
+  }
+  getProductTypesData(): void {
+    this.organizationsService
+      .getProductsList({ org_id: this.App.user_details.org_id })
+      .then((response) => {
+        if (response.result.success) {
+          this.orders.productsList = response.result.data.productTypesDt;
+          this.orders.productsList.map(function (value) {
+            value.selected = false;
+          });
+        }
+      })
+
+      .catch((error) => console.log(error));
+  }
+  public shipmentType;
+  setAddedFilesUrl(flag) {
+    if (flag == "origin") {
+      this.imagUploadFlag = "country";
+    } else if (flag == "insuranceFlag") {
+      this.imagUploadFlag = "insurance";
+    } else if (flag == "shipping") {
+      this.imagUploadFlag = "shipping";
+    } else if (flag == "landing") {
+      this.imagUploadFlag = "landing";
+    } else if (flag == "supplier") {
+      this.imagUploadFlag = "supplier";
+    } else if (flag == "sales") {
+      this.imagUploadFlag = "sales";
+    } else if (flag == "otherOrder") {
+      this.imagUploadFlag = "otherOrder";
+    } else {
+      this.imagUploadFlag = "Bill";
+    }
+    this.shipmentType = flag;
+    this.uploader.setOptions({
+      url:
+        App.base_url +
+        "addFiles?orders_id=" +
+        this.orders.selectedOrder.id +
+        "&type=" +
+        this.imagUploadFlag,
+    });
+  }
+
+  fileUpload() {}
+
+  type_size;
+
+  getContainerTypes(containers: any[]): string {
+    // Use optional chaining (?) to handle potential null or undefined values
+    return containers
+      ?.map((container) => container?.container_number)
+      .join(", ");
+  }
+  public showEditIcon = true;
+  public shipContainer;
+  public shipingDate;
+  public disableSaveShipping;
+  public disableFreecharge = true;
+  public proformaInvData = [];
+  public enableProforma = false;
+  public inv_placement;
+  public bankDetails;
+  userDetailsType() {
+    if (this.userDetails.log_type == 1) {
+      this.blockContent = true;
+    } else {
+      this.blockContent = false;
+    }
+  }
+  public productDetails = "";
+  public productId;
+  public totalorderdetails;
+  public orderApiSuccess: boolean = false;
+  public package: boolean = true;
+  public orderDatapassing;
+
+  public displayTabs = {
+    order_details: true,
+    shipments: true,
+
+    items: true,
+  };
+
+  hideTabs(tabName: string) {
+    this.displayTabs[tabName] = !this.displayTabs[tabName];
+  }
   getAttachmentsList() {
-	//   console.log(256556)
-		this.OrdersService
-			.getAttachmentsList({ orders_id: this.orders.selectedOrder.id })
-			.then(response => {
-				if (response.result.success) {
-					this.attachments = response.result.data.OrdersAtt;
-					this.downloadStatus = response.result.data.dwmStatus;
-				} else {
-					this.attachments = [];
-				}
-			});
+    this.OrdersService.getAttachmentsList({
+      orders_id: this.orders.selectedOrder.id,
+    }).then((response) => {
+      if (response.result.success) {
+        this.attachments = response.result.data.OrdersAtt;
+        this.downloadStatus = response.result.data.dwmStatus;
+      } else {
+        this.attachments = [];
+      }
+    });
   }
+  public supplierDescr;
   getAddedFiles(flag) {
-	//   console.log(flag)
-		if(flag == 'origin') {
-			this.getFileFlag = 'country';
-		} else if(flag == 'insuranceFlag') {
-			this.getFileFlag = 'insurance';
-		} else if(flag == 'shipping'){
-			this.getFileFlag = 'shipping';
-		}else if(flag == 'landing'){
-			this.getFileFlag = 'landing';
-		}else{
-			this.getFileFlag = 'Bill';
-		}
-		
-		this.OrdersService
-			.getoriginFileAttachments({ id: this.orders.selectedOrder.id, type: this.getFileFlag })
-			.then(response => {
-				if (response.result.success) {
-					response.result.data.OrdersAtt.forEach(element => {
-						element.src = '';
-						
-						if(element.link_url.lastIndexOf('.pdf') > -1) {
-							element.src = this.images.pdf_download;
-						} else if(element.link_url.lastIndexOf('.doc') > -1 || 
-						element.link_url.lastIndexOf('.docx') > -1 || element.link_url.lastIndexOf('.xlsx') > -1){
-							// element.link_url = 'https://expodite.enterpi.com/storage/app/public/uploads/AddedFiles/1603190571.xlsx';
-							// element.src = 'http://docs.google.com/gview?url='+ element.link_url +'&embedded=true';
-						}  else {
-							element.src = element.link_url;
-						}
-						
-					});
-					if(flag == 'origin') {
-						this.originFileAttachments = response.result.data.OrdersAtt;
-					}  if(flag == 'insuranceFlag') {
-						// console.log('ggggg')
-						this.insuranceAttachments = response.result.data.OrdersAtt;
-					}  if(flag == 'shipping'){
-						this.shippingAttachments = response.result.data.OrdersAtt;
-					} else if(flag == 'landing'){
-						this.airwayAttachments = response.result.data.OrdersAtt;
-					}
-					
-				} else {
-					this.originFileAttachments = [];
-				}
-			});
+    if (flag == "origin") {
+      this.getFileFlag = "country";
+    } else if (flag == "insuranceFlag") {
+      this.getFileFlag = "insurance";
+    } else if (flag == "shipping") {
+      this.getFileFlag = "shipping";
+    } else if (flag == "landing") {
+      this.getFileFlag = "landing";
+    } else if (flag == "supplier") {
+      this.getFileFlag = "supplier";
+    } else if (flag == "sales") {
+      this.getFileFlag = "sales";
+    } else if (flag == "otherOrderSupplier") {
+      this.getFileFlag = "otherOrderSupplier";
+    } else {
+      this.getFileFlag = "Bill";
+    }
+
+    this.OrdersService.getoriginFileAttachments({
+      id: this.orders.selectedOrder.id,
+      type: this.getFileFlag,
+    }).then((response) => {
+      if (response.result.success) {
+        response.result.data.OrdersAtt.forEach((element) => {
+          element.src = "";
+
+          if (element.link_url.lastIndexOf(".pdf") > -1) {
+            element.src = this.images.pdf_download;
+          } else if (
+            element.link_url.lastIndexOf(".doc") > -1 ||
+            element.link_url.lastIndexOf(".docx") > -1 ||
+            element.link_url.lastIndexOf(".xlsx") > -1
+          ) {
+            // element.link_url = 'https://expodite.enterpi.com/storage/app/public/uploads/AddedFiles/1603190571.xlsx';
+            // element.src = 'http://docs.google.com/gview?url='+ element.link_url +'&embedded=true';
+          } else {
+            element.src = element.link_url;
+          }
+        });
+        if (flag == "origin") {
+          this.originFileAttachments = response.result.data.OrdersAtt;
+        }
+        if (flag == "insuranceFlag") {
+          this.insuranceAttachments = response.result.data.OrdersAtt;
+        }
+        if (flag == "shipping") {
+          this.shippingAttachments = response.result.data.OrdersAtt;
+        } else if (flag == "landing") {
+          this.airwayAttachments = response.result.data.OrdersAtt;
+        } else if (flag == "supplier") {
+          this.suppllierDocuments = response.result.data.OrdersAtt;
+          this.suppllierDocuments.map((x) => {
+            this.supplierDescr = x;
+          });
+        } else if (flag == "sales") {
+          this.salesDocuments = response.result.data.OrdersAtt;
+          this.salesDocuments.map((x) => {
+            this.supplierDescr = x;
+          });
+        } else if (flag == "otherOrderSupplier") {
+          this.otherOrderAttachments = response.result.data.OrdersAtt;
+        }
+      } else {
+        this.originFileAttachments = [];
+      }
+    });
   }
-  
-  getReportsData(data?: any): void {
-		let hideHplc: boolean;
-		this.OrdersService
-			.OrderCoaData({ orders_id: this.orders.selectedOrder.id })
-			.then(response => {
-				if (response.result.success) {
-					this.CoaDetails = response.result.data.coa;
-					// console.log(this.CoaDetails)
-					// this.coaCompanyName = response.result.data.company_name  ;
-					// this.coaCompanyName = response.result.data.coa.length ? response.result.data.coa[0].batchDt.product_name : '';
-					this.coaCompanyName = response.result.data.coa.length ? response.result.data.coa[0].batchDt.client_name : '';
-
-					// console.log(this.coaCompanyName);
-					this.CoaDetails.map(function (value) {
-						value.batchCoaDt.map(function (coapermission) {
-							// console.log(coapermission)
-							if (coapermission.id == 34) {
-							}
-						})
-					});
-					// this.CoaDetails.map(function (value) {
-					// 	value.batchDt.map(function () {
-
-					// 	})
-					// });
-
-				}
-			});
-  }
-
-  moveToOrigin() {
-	this.activateScroll = false;
-	this.activeTab = 'origin';
-	if (this.origin && this.origin['nativeElement'].offsetTop) {
-		this.scrollContainer['nativeElement'].scrollTop = this.origin['nativeElement'].offsetTop - 46;
-	}
-	// this.getAddedFiles();
-	setTimeout(() => {
-		this.activateScroll = true;
-	}, 100);
-}
-
-moveToAirway() {
-	this.activateScroll = false;
-	this.activeTab = 'airway';
-	if (this.airway && this.airway['nativeElement'].offsetTop) {
-		this.scrollContainer['nativeElement'].scrollTop = this.airway['nativeElement'].offsetTop - 46;
-	}
-	// this.getAddedFiles();
-	setTimeout(() => {
-		this.activateScroll = true;
-	}, 100);
-}
-moveToInsurance() {
-	this.activateScroll = false;
-	this.activeTab = 'insurance';
-	if (this.insurance && this.insurance['nativeElement'].offsetTop) {
-		this.scrollContainer['nativeElement'].scrollTop = this.insurance['nativeElement'].offsetTop - 46;
-	}
-	// this.getAddedFiles();
-	setTimeout(() => {
-		this.activateScroll = true;
-	}, 100);
-}
   getOrdersActivityDetails(): void {
-	//   console.log('calleddd')
-		this.OrdersService
-			.getActivtyDetails({ id: this.orders.selectedOrder.id })
-			.then(response => {
-				if (response.result.success) {
-					this.orders.activityDetails = response.result.data;
-				} else {
-					this.orders.activityDetails = [];
-				}
-			});
-  }
-  getOrdersSdf(): void {
-		this.OrdersService
-			.getOrdersSdf({ orders_id: this.orders.selectedOrder.id })
-			.then(response => {
-				if (response.result.success) {
-					// if (response.result.data.length > 0) {
-						this.editable = false
-						this.getSdfData = response.result.data;
-						this.sdfFormDates.patchValue({
-							entry_date: new Date(this.getSdfData.entry_date),
-							check_date: new Date(this.getSdfData.check_date),
-							shipping_bill_no: this.getSdfData.shipping_bill_no
-						})
-						if (response.result.data.length > 0) {
-						this.sdfData.entry_date = moment(response.result.data.entry_date.value).format('"YYYY-MM-DD');
-						this.sdfData.check_date = moment(response.result.data.check_date.value).format('"YYYY-MM-DD');
-						this.sdfData.shipping_bill_no = response.result.data.shipping_bill_no.value;
-						}
-						// console.log(response.result.data, 'Hi');
-					// } else {
-					// 	this.getSdfData = ''
-
-					// }
-
-				}
-			});
+    this.OrdersService.getEstimateActivtyDetails({
+      id: this.data.id,
+    }).then((response) => {
+      if (response.result.success) {
+        this.orders.activityDetails = response.result.data;
+      } else {
+        this.orders.activityDetails = [];
+      }
+    });
   }
 
-  sdfFormData() {
-	this.sdfFormDates = this.formBuilder.group({
-		entry_date: '',
-		check_date: '',
-		shipping_bill_no: ''
-	})
-
-}
-addSdfData(): void {
-	// this.noShippingBill = true;
-	// this.noShippingDate = true;
-	this.sdfData.check_date = this.sdfFormDates.controls.check_date ? this.sdfFormDates.controls.check_date.value : "";
-	this.sdfData.entry_date = this.sdfFormDates.controls.entry_date ? this.sdfFormDates.controls.entry_date.value : "";
-	this.sdfData.shipping_bill_no = this.sdfFormDates.controls.shipping_bill_no.value;
-	this.sdfData.orders_id = this.orders.selectedOrder.id
-	this.OrdersService
-		.addOrdersSdf({ orders_id: this.sdfData.orders_id, shipping_bill_no: this.sdfData.shipping_bill_no, check_date: this.sdfData.check_date, entry_date: this.sdfData.entry_date, id: this.getSdfData.id || 0 })
-		.then(response => {
-			if (response.result.success) {
-				this.editable = false
-				this.getSdfData = response.result.data
-				// console.log(this.getSdfData)
-			}
-		});
-}
-  getOrdersExport(): void {
-		this.OrdersService
-			.getOrdersExport({ orders_id: this.orders.selectedOrder.id })
-			.then(response => {
-				if (response.result.success) {
-					if (response.result.data != null) {
-						this.editExport = false
-						this.getExportData = response.result.data;
-
-					} else {
-						this.getExportData = ''
-
-					}
-
-				}
-			});
-  }
-  getOrdersConcern(): void {
-		this.OrdersService
-			.getOrdersConcern({ orders_id: this.orders.selectedOrder.id })
-			.then(response => {
-				if (response.result.success) {
-					if (response.result.data.concern_data) {
-						this.concernEditable = false
-						this.getConcernData = response.result.data
-					} else {
-						this.getConcernData = {
-							concern_data: {
-								price: '',
-								year1: '',
-								year2: '',
-								export1: '',
-								export2: '',
-								domestic1: '',
-								domestic2: ''
-							}
-						}
-					}
-
-				}
-			});
-  }
   public allowProductEditing = true;
-  getPackagingDetails(): void {
-		this.containerName = [];
-		this.OrdersService
-			.getPackagingOrderDetails({ id: this.orders.selectedOrder.id })
-			.then(response => {
-				if (response.result.success) {
-					this.orders.packageOrders = response.result.data;
-					this.packageDescription = response.result.data.description;
-					this.orders.packing = response.result.data.packing;
-					if(response.result.data.packing.length) {
-						this.allowProductEditing = false;
-					} else {
-						this.allowProductEditing = true;
-					}
-					console.log(this.allowProductEditing)
-
-					this.orders.packing.forEach((n) => {
-						let batchData = n.batchesData;
-						batchData.map((i) => {
-							let container_name = i.contains;
-							container_name.map((v) => {
-								this.containerName.push(v);
-								this.containerName.map((child, i) => {
-									if(child.packing_id== v.packing_id) {
-										v.itemCount = i+1;
-									}
-								})
-							})
-
-						})
-					})
-
-					if (response.result.data.packing.length) {
-						this.showDrumsList = false;
-					} else {
-						this.showDrumsList = true;
-					}
-					if (response.result.data.invStatus == '2') {
-						// console.log(3)
-						this.getInvoiceData();
-						this.getOrdersActivityDetails();
-						this.packageCompleted = true;
-					} else {
-						this.orders.packageOrders['invStatus'] = response.result.data.invStatus;
-					}
-					if (response.result.data.invStatus == '1') {
-						// console.log(4)
-						this.packageCompleted = true
-						this.selectedOrderStatus = 'Processing';
-						this.getOrdersActivityDetails();
-					}
-				} else {
-					this.orders.packageOrders = [];
-					this.orders.sum = {};
-					this.orders.packing = [];
-				}
-			});
-  }
+  public volWeight = false;
+  public batchesdataArray = [];
+  public productArray = [];
+  public container_strg;
+  public sum_ofGross;
+  public PackageVerifiedGross;
   deleteLineItemAccess(index: any) {
-	this.orders.invoice[0].Inovice.extra_col.splice(index, 1);
-	let param = Object.assign({}, this.orders.invoice[0].Inovice);
-	this.OrdersService
-		.generateInvoice(param)
-		.then(response => {
-			this.orders.invoice = response.result.data.Invioce;
-		});
-}
-toggle() {
-	this.show = !this.show;
-	if (this.show) {
-		this.orderButton = 'Hide';
-	} else {
-		this.orderButton = 'Show';
-	}
-	this.collapseOut = !this.collapseOut;
-}
-printCertificate: boolean;
-printInvoice: boolean;
-printTaxInvoice: boolean;
-printPackage: boolean;
-printMsdsForm: boolean;
-printhazardous: boolean;
-printFormSdf: boolean;
-printExport: boolean;
-printDecl: boolean;
-printShipper: boolean;
-printAdc: boolean;
-printInc: boolean;
-printSco: boolean;
-printCon: boolean;
-printOrigin: boolean;
-printInsurance: boolean;
-printAirway: boolean;
-public printPrimaryPackage: boolean;
-public showPrimaryPackage: boolean = true;
-toggleCoa() {
-	this.showCoa = !this.showCoa;
-	this.printCertificate = !this.printCertificate;
-}
-toggleInvoice() {
-	this.showInvoice = !this.showInvoice;
-	this.printInvoice = !this.printInvoice;
-}
-toggleTaxInvoice() {
-	this.showTaxInvoice = !this.showTaxInvoice;
-	this.printTaxInvoice = !this.printTaxInvoice;
-}
-togglePackage() {
-	this.showPackage = !this.showPackage;
-	this.printPackage = !this.printPackage;
-}
-togglePrimaryPackage() {
-	this.showPrimaryPackage = !this.showPrimaryPackage;
-	this.printPrimaryPackage = !this.printPrimaryPackage;
-}
-toggleUom() {
-	this.showUom = !this.showUom;
-}
-toggleShipping() {
-	this.showShipping = !this.showShipping;
-}
-toggleMsds() {
-	this.showMsds = !this.showMsds;
-	this.printMsdsForm = !this.printMsdsForm;
-}
-
-toggleNonHazardus() {
-	this.showNonhazardous = !this.showNonhazardous;
-	this.printhazardous = !this.printhazardous;
-}
-toggleSdf() {
-	this.showSdf = !this.showSdf;
-	this.printFormSdf = !this.printFormSdf;
-}
-toggleExportValue() {
-	this.showExportvalue = !this.showExportvalue;
-	this.printExport = !this.printExport;
-}
-toggleDeclaration() {
-	this.showDeclaration = !this.showDeclaration;
-	this.printDecl = !this.printDecl;
-}
-toggleShippers() {
-	this.showShippers = !this.showShippers;
-	this.printShipper = !this.printShipper;
-}
-toggleAdcsheet() {
-	this.showAdcsheet = !this.showAdcsheet;
-	this.printAdc = !this.printAdc;
-}
-toggleDeclarationIncentive() {
-	this.showDeclarationIncentive = !this.showDeclarationIncentive;
-	this.printInc = !this.printInc;
-}
-toggleScomatDeclaration() {
-	this.showScomatDeclaration = !this.showScomatDeclaration;
-	this.printSco = !this.printSco;
-}
-toggleConcern() {
-	this.concern = !this.concern;
-	this.printCon = !this.printCon;
-}
-toggleOrigin() {
-	this.showOrigin = !this.showOrigin;
-	this.printOrigin = !this.printOrigin;
-}
-toggleInsurance() {
-	this.showinsurance = !this.showinsurance;
-	this.printInsurance = !this.printInsurance;
-}
-toggleAirway() {
-	this.showAirway = !this.showAirway;
-	this.printAirway = !this.printAirway;
-}
-deleteLineItem(index: any) {
-	let dialogRef = this.dialog.open(DeleteLineItemComponent, {
-		panelClass: 'alert-dialog',
-		width: '550px',
-		data: {}
-	});
-
-	dialogRef.afterClosed().subscribe(result => {
-		if (result && result.success) {
-			this.deleteLineItemAccess(index);
-		}
-	});
-}
-checkboxDisable(event) {
-	event.preventDefault();
-}
-editConcern() {
-	if (!this.concernEditable) {
-		this.concernEditable = true;
-	} else {
-		this.concernEditable = false;
-	}
-
-}
-getPaymentTypes() {
-	this.OrdersService
-	.getPaymentTypes()
-	.then(response => {
-		// console.log(response)
-		if(response.result.success) {
-			this.paymentType = response.result.data;
-		}
-	})
+    this.orders.invoice[0].Inovice.add_line_items.splice(index, 1);
+    let param = Object.assign({}, this.orders.invoice[0].Inovice);
+    this.OrdersService.generateInvoice(param).then((response) => {
+      this.orders.invoice = response.result.data.Invioce;
+    });
   }
-addExportValueData(): void {
-	this.exportValue.orders_id = this.orders.selectedOrder.id
-	this.OrdersService
-		.addOrdersExp({ orders_id: this.exportValue.orders_id, e_entry_date: this.exportValue.e_entry_date, e_shipping_bill_no: this.exportValue.e_shipping_bill_no || 0 })
-		.then(response => {
-			if (response.result.success) {
-				this.editExport = false
-				this.getExportData = response.result.data
-			}
-		});
-}
+  toggle() {
+    this.show = !this.show;
+    if (this.show) {
+      this.orderButton = "Hide";
+    } else {
+      this.orderButton = "Show";
+    }
+    this.collapseOut = !this.collapseOut;
+  }
+  printInvoice: boolean;
+
+  deleteLineItem(index: any) {
+    let dialogRef = this.dialog.open(DeleteLineItemComponent, {
+      panelClass: "alert-dialog",
+      width: "550px",
+      data: {},
+      disableClose: true,
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result && result.success) {
+        this.deleteLineItemAccess(index);
+        let toast: object;
+        toast = { msg: " Item Deleted Successfully", status: "success" };
+        this.snackbar.showSnackBar(toast);
+      }
+    });
+  }
+  isChecked: false;
+  checkboxDisable(event, value?) {
+    if (value && event.checked == true) {
+      // this.exportValueDecl.nature_of_traction = value;
+    }
+    // event.preventDefault();
+  }
   cancelAllOrder(): void {
-	let dialogRef = this.dialog.open(CancelOrderComponent, {
-		panelClass: 'alert-dialog',
-		width: '550px',
-		data: this.orders.selectedOrder.id
-	});
-	dialogRef.afterClosed().subscribe(result => {
-		if (result.success) {
-			console.log(5)
-			this.orders.selectedOrder.orders_types_id = '5';
-			this.selectedOrderStatus = 'Cancelled';
-			this.orders.selectedOrder.status == 'Cancelled';
-			this.getOrdersActivityDetails();
-			this.orderDetails();
-		}
-	});
-}
-  getInvoiceData() {
-	// console.log(6)
-		this.enableInvoice = true;
-		// this.getOrdersActivityDetails();
-		// this.selectedOrderStatus = 'Processing';
-		
-		this.OrdersService
-			.getInvoiceData({ orders_id: this.orders.selectedOrder.id })
-			.then(response => {
-				if (response.result.success) {
-					this.invoiceGenerateLoader = false;
-					this.hideShipperAddress = true;
-					this.orders.invoice = response.result.data.Invioce;
-					if(response.result.data.Invioce.length) {
-						this.batchNum = response.result.data.Invioce[0].productsData[0].batch_nbr;
+    this.editClosePOPup = true;
+    // this.closeEditTax();
+    // this.closeEdit();
+    let dialogRef = this.dialog.open(CancelOrderComponent, {
+      panelClass: "alert-dialog",
+      width: "550px",
+      data: {
+        id: this.orders.selectedOrder.id,
+        module: "Order",
+        type: "order_cancelled",
+      },
+      disableClose: true,
+    });
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result.success) {
+        this.orders.selectedOrder.status_slug = "cancelled";
 
-					}
-					if (this.batchNum != null) {
-						this.batchNumArray = this.batchNum.split(',');
-						this.batchNumArray = this.batchNumArray && this.batchNumArray.length ? this.batchNumArray : []
-					}
-
-					// if(this.orders.invoice[0].productsData[0].batch_nbr == null) {
-					// 	this.priceQuantityDisable = true;
-					// } else {
-					// 	this.priceQuantityDisable = false;
-					// }
-
-					// console.log(this.priceQuantityDisable)
-
-					// this.batchNum=this.batchNum.split(',').join('\n');
-					// console.log(this.batchNumArray)
-
-					// console.log(this.orders.invoice)
-					this.orders.packageStatus = response.result.data.packageStatus
-					if (this.orders.invoice.length && this.orders.invoice[0].Inovice.status == 'Paid') {
-						this.disablePayment = true
-					}
-					if (this.orders.packageStatus == '2') {
-						this.downloadStatus = true;
-					} else {
-						this.downloadStatus = false
-					}
-					this.getReportsData();
-					this.getShippingAddressDetails();
-				}
-			});
+        this.orders.selectedOrder.status_id = "5";
+        this.selectedOrderStatus = "Cancelled";
+        this.orders.selectedOrder.status == "Cancelled";
+        // this.getOrdersActivityDetails();
+        this.orderPermissions(true);
+      }
+      this.editClosePOPup = false;
+    });
   }
-  getShippingAddressDetails(): void {
-		// console.log(123)
-		this.OrdersService
-			.getShippingDetails({
-				invoice_id: this.orders.invoice.length ? this.orders.invoice[0].Inovice.id: ''
-			})
-			.then(response => {
-				// console.log(response)
-				if (response.result.success) {
-					if (response.result.data.shipDt && response.result.data.shipDt.id) {
-						this.orders.shipping_id = response.result.data.shipDt.id;
-						this.orders.shipping_data = response.result.data.shipDt;
-						this.setShippingAddressForm(response.result.data.shipDt);
-						this.disableCancel = true;
-						this.editShipping = true;
-						this.selectedOrderStatus = 'In-transit';
-						this.downloadStatus = true;
-						this.disablePayment = true
-						if (this.orders.selectedOrder.orders_types_id == '4') {
-							this.selectedOrderStatus = 'Delivered';
-						}
-					} else {
-						this.editShipping = true;
-						this.disableCancel = false;
-					}
-					this.orders.mode_transport_ids = response.result.data.modeTransportDt;
-					this.orders.mode_of_transport = response.result.data.transportType;
+  public batchshow = false;
+  public filteredProducts = [];
+  public productTax;
+  public Prcurrency;
+  public showtaxinvoiceinaapl: boolean = true;
+  public extraColumninvoice;
+  public ordersInvoiceData;
+  jsonDataString: string;
+  valuesArray;
+  shipArray;
+  concatenatedString: string;
+  concateShip: string;
+  public freightCostvalue;
+  public InsuranceValue;
+  public productArra = [];
 
-					
-				}
-				// this.disableCancel = true;
-			});
-  }
-  setShippingAddressForm(data: any): void {
-		this.shippingForm.patchValue({
-			aws_number: data.shipping_id
-		});
-		this.shippingForm.patchValue({
-			terms: data.terms
-		});
-		this.shippingForm.patchValue({
-			mode_transport_id: data.mode_transport_id
-		});
-		this.shippingForm.patchValue({
-			transport_mode: data.transport_mode
-		});
-		this.shippingForm.patchValue({
-			bol_number: data.bol_id
-		});
-		this.shippingForm.patchValue({
-			road_number: data.bol_id
-		});
+  public Packagetax;
+  public vessel;
+  public bill_of;
+  public voyageno;
+  public bl_date;
+  public shipping_bill_no;
+  public shipping_bill_date;
+  public transport_name;
+  scrollOrdersContainer(event?: any) {
+    if (this.activateScroll) {
+      let scrollTop =
+        this.scrollContainer &&
+        this.scrollContainer["nativeElement"] &&
+        this.scrollContainer["nativeElement"].scrollTop
+          ? this.scrollContainer["nativeElement"].scrollTop
+          : 0;
+      let activityTop =
+        this.activity &&
+        this.activity["nativeElement"] &&
+        this.activity["nativeElement"].offsetTop
+          ? this.activity["nativeElement"].offsetTop
+          : 0;
+      let detailsTop =
+        this.details &&
+        this.details["nativeElement"] &&
+        this.details["nativeElement"].offsetTop
+          ? this.details["nativeElement"].offsetTop
+          : 0;
+      let itemsTop =
+        this.item &&
+        this.item["nativeElement"] &&
+        this.item["nativeElement"].offsetTop
+          ? this.item["nativeElement"].offsetTop
+          : 0;
+      let paymentsTop =
+        this.payment &&
+        this.payment["nativeElement"] &&
+        this.payment["nativeElement"].offsetTop
+          ? this.payment["nativeElement"].offsetTop
+          : 0;
+      let regulatoryTop =
+        this.specs &&
+        this.specs["nativeElement"] &&
+        this.specs["nativeElement"].offsetTop
+          ? this.specs["nativeElement"].offsetTop
+          : 0;
+      let uploadSalesTop =
+        this.uploadSale &&
+        this.uploadSale["nativeElement"] &&
+        this.uploadSale["nativeElement"].offsetTop
+          ? this.uploadSale["nativeElement"].offsetTop
+          : 0;
+      let shipmentTop =
+        this.shipment &&
+        this.shipment["nativeElement"] &&
+        this.shipment["nativeElement"].offsetTop
+          ? this.shipment["nativeElement"].offsetTop
+          : 0;
+      // let packagingTop =
+      //   this.packaging &&
+      //   this.packaging["nativeElement"] &&
+      //   this.packaging["nativeElement"].offsetTop
+      //     ? this.packaging["nativeElement"].offsetTop
+      //     : 0;
 
-  }
-  
-  scrollOrdersContainer(event) {
-		// console.log(this.scrollContainer)
-		if (this.activateScroll) {
-			let scrollTop = ((this.scrollContainer && this.scrollContainer['nativeElement'] && this.scrollContainer['nativeElement'].scrollTop) ? this.scrollContainer['nativeElement'].scrollTop : 0);
-			let activityTop = ((this.activity && this.activity['nativeElement'] && this.activity['nativeElement'].offsetTop) ? this.activity['nativeElement'].offsetTop : 0);
-			let detailsTop = ((this.details && this.details['nativeElement'] && this.details['nativeElement'].offsetTop) ? this.details['nativeElement'].offsetTop : 0);
-			let packagingTop = ((this.packaging && this.packaging['nativeElement'] && this.packaging['nativeElement'].offsetTop) ? this.packaging['nativeElement'].offsetTop : 0);
-			let invoiceTop = ((this.invoice && this.invoice['nativeElement'] && this.invoice['nativeElement'].offsetTop) ? this.invoice['nativeElement'].offsetTop : 0);
-			let coaTop = ((this.coa && this.coa['nativeElement'] && this.coa['nativeElement'].offsetTop) ? this.coa['nativeElement'].offsetTop : 0);
-			let shippingTop = ((this.shipping && this.shipping['nativeElement'] && this.shipping['nativeElement'].offsetTop) ? this.shipping['nativeElement'].offsetTop : 0);
-			let msdsFormTop = ((this.msdsForm && this.msdsForm['nativeElement'] && this.msdsForm['nativeElement'].offsetTop) ? this.msdsForm['nativeElement'].offsetTop : 0);
-			let nonHazardousTop = ((this.nonHazardous && this.nonHazardous['nativeElement'] && this.nonHazardous['nativeElement'].offsetTop) ? this.nonHazardous['nativeElement'].offsetTop : 0);
-			let FormsdfTop = ((this.Formsdf && this.Formsdf['nativeElement'] && this.Formsdf['nativeElement'].offsetTop) ? this.Formsdf['nativeElement'].offsetTop : 0);
-			let ExportvalueTop = ((this.Exportvalue && this.Exportvalue['nativeElement'] && this.Exportvalue['nativeElement'].offsetTop) ? this.Exportvalue['nativeElement'].offsetTop : 0);
-			let DeclarationTop = ((this.Declaration && this.Declaration['nativeElement'] && this.Declaration['nativeElement'].offsetTop) ? this.Declaration['nativeElement'].offsetTop : 0);
-			let ShippersletterTop = ((this.Shippersletter && this.Shippersletter['nativeElement'] && this.Shippersletter['nativeElement'].offsetTop) ? this.Shippersletter['nativeElement'].offsetTop : 0);
-			let AdcsheetTop = ((this.Adcsheet && this.Adcsheet['nativeElement'] && this.Adcsheet['nativeElement'].offsetTop) ? this.Adcsheet['nativeElement'].offsetTop : 0);
-			let IncentivedeclarationTop = ((this.Incentivedeclaration && this.Incentivedeclaration['nativeElement'] && this.Incentivedeclaration['nativeElement'].offsetTop) ? this.Incentivedeclaration['nativeElement'].offsetTop : 0);
-			let ScomatdeclarationTop = ((this.Scomatdeclaration && this.Scomatdeclaration['nativeElement'] && this.Scomatdeclaration['nativeElement'].offsetTop) ? this.Scomatdeclaration['nativeElement'].offsetTop : 0);
-			let ConcernTop = ((this.Concern && this.Concern['nativeElement'] && this.Concern['nativeElement'].offsetTop) ? this.Concern['nativeElement'].offsetTop : 0);
-		// console.log(shippingTop)
-			if (scrollTop <= activityTop) {
-				this.activeTab = 'activity';
-			} else if (activityTop < scrollTop && (scrollTop < detailsTop || detailsTop == 0)) {
-				this.activeTab = 'details';
-			} else if (detailsTop < scrollTop && (scrollTop < invoiceTop || invoiceTop == 0)) {
-				this.activeTab = 'invoice';
-			} else if (invoiceTop < scrollTop && (scrollTop < packagingTop)) {
-				this.activeTab = 'packaging';
-			} else if (coaTop < scrollTop && scrollTop < shippingTop) {
-				this.activeTab = 'coa';
-			} else if (shippingTop < scrollTop && scrollTop < msdsFormTop) {
-				this.activeTab = 'shipping';
-			} else if (shippingTop < scrollTop && scrollTop < nonHazardousTop) {
-				this.activeTab = 'msdsForm';
-			} else if ((shippingTop + 1000 )< scrollTop && scrollTop < FormsdfTop) {
-				console.log(shippingTop)
-				console.log(scrollTop)	// console.log(scrollTop)
-				console.log(FormsdfTop)
-				console.log('===========')
-				this.activeTab = 'nonHazardous';
-				// this.moveToNonHazardous();
-			} else if (shippingTop < scrollTop && scrollTop < ExportvalueTop) {
-				this.activeTab = 'Formsdf';
-			} else if (shippingTop < scrollTop && scrollTop < DeclarationTop) {
-				this.activeTab = 'Exportvalue';
-			} else if (shippingTop < scrollTop && scrollTop < ShippersletterTop) {
-				this.activeTab = 'Declaration';
-			} else if (shippingTop < scrollTop && scrollTop < AdcsheetTop) {
-				this.activeTab = 'Shippersletter';
-			} else if (shippingTop < scrollTop && scrollTop < IncentivedeclarationTop) {
-				this.activeTab = 'Adcsheet';
-			} else if (shippingTop < scrollTop && scrollTop < ScomatdeclarationTop) {
-				this.activeTab = 'Incentivedeclaration';
-			} else if (shippingTop < scrollTop && scrollTop < ConcernTop) {
-				this.activeTab = 'Scomatdeclaration';
-			} else if (ConcernTop < scrollTop) {
-				this.activeTab = 'Concern';
-			}
-		}
+      if (scrollTop <= activityTop) {
+        this.activeTab = "activity";
+      } else if (
+        activityTop < scrollTop &&
+        (scrollTop < detailsTop || detailsTop == 0)
+      ) {
+        this.activeTab = "details";
+      } else if (
+        detailsTop < scrollTop &&
+        (scrollTop < itemsTop || itemsTop == 0)
+      ) {
+        this.activeTab = "items";
+      } else if (
+        itemsTop < scrollTop &&
+        (scrollTop < paymentsTop || paymentsTop == 0)
+      ) {
+        this.activeTab = "payments";
+      } else if (
+        paymentsTop < scrollTop &&
+        (scrollTop < regulatoryTop || regulatoryTop == 0)
+      ) {
+        this.activeTab = "specs";
+      } else if (
+        regulatoryTop < scrollTop &&
+        (scrollTop < uploadSalesTop || uploadSalesTop == 0)
+      ) {
+        this.activeTab = "uploadSales";
+      } else if (
+        uploadSalesTop < scrollTop &&
+        (scrollTop < shipmentTop || shipmentTop == 0)
+      ) {
+        this.activeTab = "shipments";
+      } else {
+        this.dymanicdocumentdata.forEach((item, index) => {
+          const element = document.getElementById("invoice-" + item.id);
+          const prvElement =
+            index > 0
+              ? document.getElementById(
+                  "invoice-" + this.dymanicdocumentdata[index - 1]?.id
+                )
+              : null;
+
+          if (!element) return;
+
+          const elementTop = element.offsetTop || 0;
+          const prvElementTop = prvElement?.offsetTop || 0;
+
+          if (index === 0 && scrollTop < elementTop) {
+            this.activeTab = item.type;
+          } else if (prvElementTop < scrollTop && scrollTop < elementTop) {
+            this.activeTab = item.type;
+          }
+        });
+      }
+
+      // else if (detailsTop + 1000 < scrollTop && scrollTop < packagingTop) {
+      //   this.activeTab = "packaging";
+      // }
+    }
   }
   public paymentSelected;
   changePaymentType(event: any): void {
-	//   console.log(event)
-	  this.paymentSelected = event;
-	this.activePayment = true;
-	if (event != '') {
-		// console.log(event)
-		this.orders.invoice[0].Inovice.payment_type = event;
-	}
+    this.paymentSelected = event;
+    this.activePayment = true;
+    if (event != "") {
+      this.orders.invoice[0].Inovice.payment_type = event;
+    }
+  }
 
-}
-  
+  enableSave(event: any): void {
+    this.activePayment = true;
+  }
+
+  changeIncoTerms(event: any): void {
+    this.activePayment = true;
+    if (event != "") {
+      this.orders.invoice[0].Inovice.inco_terms_id = event;
+    }
+  }
+
   moveToActivity() {
-		this.activateScroll = false;
-		this.activeTab = 'activity';
-		this.ActivityLog = true;
-		this.activity['nativeElement'].show = true;
-		if (this.activity && this.activity['nativeElement'].offsetTop) {
-			this.scrollContainer['nativeElement'].scrollTop = this.activity['nativeElement'].offsetTop - 46;
-		}
-		setTimeout(() => {
-			this.activateScroll = true;
-		}, 100);
-	}
-
-	savePaymentType() {
-		// console.log(this.paymentSelected)
-		if(this.paymentSelected == 'Advance') {
-			this.disablePayment = true;
-		} else {
-			this.disablePayment = false;
-		}
-		this.updateKeyValue();
-		this.activePayment = false;
-	}
-	moveToDetails() {
-		this.activateScroll = false;
-		this.activeTab = 'details';
-		if (this.details && this.details['nativeElement'].offsetTop) {
-			this.scrollContainer['nativeElement'].scrollTop = this.details['nativeElement'].offsetTop - 46;
-		}
-		setTimeout(() => {
-			this.activateScroll = true;
-		}, 100);
-	}
-
-	moveToPackaging() {
-		this.activateScroll = false;
-		this.ActivityLog = false;
-		this.activeTab = 'packaging';
-
-		if (this.packaging && this.packaging['nativeElement'].offsetTop) {
-			this.scrollContainer['nativeElement'].scrollTop = this.packaging['nativeElement'].offsetTop - 46;
-		}
-		setTimeout(() => {
-			this.activateScroll = true;
-		}, 100);
+    this.removeDocHighlight = true;
+    this.activateScroll = false;
+    this.activeTab = "activity";
+    this.ActivityLog = true;
+    this.activity["nativeElement"].show = true;
+    if (this.activity && this.activity["nativeElement"].offsetTop) {
+      this.scrollContainer["nativeElement"].scrollTop =
+        this.activity["nativeElement"].offsetTop - 74;
+    }
+    setTimeout(() => {
+      this.activateScroll = true;
+    }, 100);
   }
 
-  moveToUom() {
-	this.activateScroll = false;
-	this.ActivityLog = false;
-	this.activeTab = 'uom';
-
-	if (this.uom && this.uom['nativeElement'].offsetTop) {
-		this.scrollContainer['nativeElement'].scrollTop = this.uom['nativeElement'].offsetTop - 46;
-	}
-	setTimeout(() => {
-		this.activateScroll = true;
-	}, 100);
-}
-
-moveToPrimaryPackage() {
-	this.activateScroll = false;
-	this.ActivityLog = false;
-	this.activeTab = 'primary-packaging';
-
-	if (this.primaryPackaging && this.primaryPackaging['nativeElement'].offsetTop) {
-		this.scrollContainer['nativeElement'].scrollTop = this.primaryPackaging['nativeElement'].offsetTop - 46;
-	}
-	setTimeout(() => {
-		this.activateScroll = true;
-	}, 100);
-}
-  
-  moveToInvoice() {
-		this.activateScroll = false;
-		this.activeTab = 'invoice';
-		if (this.invoice && this.invoice['nativeElement'].offsetTop) {
-			this.scrollContainer['nativeElement'].scrollTop = this.invoice['nativeElement'].offsetTop - 46;
-		}
-		setTimeout(() => {
-			this.activateScroll = true;
-		}, 100);
+  cancelpay() {
+    this.activePayment = false;
   }
-  moveToCoa() {
-		this.activateScroll = false;
-		this.activeTab = 'coa';
-		if (this.coa && this.coa['nativeElement'].offsetTop) {
-			this.scrollContainer['nativeElement'].scrollTop = this.coa['nativeElement'].offsetTop - 46;
-		}
-		setTimeout(() => {
-			this.activateScroll = true;
-		}, 100);
+
+  savePaymentType(form: any) {
+    if (this.paymentSelected == "Advance") {
+      this.disablePayment = true;
+    } else {
+      this.disablePayment = false;
+    }
+    this.updateKeyValue(form);
+    this.activePayment = false;
   }
-  
-  moveToShipping() {
-		this.activateScroll = false;
-		this.activeTab = 'shipping';
-		if (this.shipping && this.shipping['nativeElement'].offsetTop) {
-			this.scrollContainer['nativeElement'].scrollTop = this.shipping['nativeElement'].offsetTop - 46;
-		}
-		// this.getAddedFiles();
-		setTimeout(() => {
-			this.activateScroll = true;
-		}, 100);
-		
-	}
-	
-	moveToMsdsForm() {
-		this.activateScroll = false;
-		this.activeTab = 'msdsForm';
-		if (this.msdsForm && this.msdsForm['nativeElement'].offsetTop) {
-			this.scrollContainer['nativeElement'].scrollTop = this.msdsForm['nativeElement'].offsetTop - 46;
-		}
-		setTimeout(() => {
-			this.activateScroll = true;
-		}, 100);
-	}
+  public removeDocHighlight = false;
+  moveToElement(elementRef: any, tabName: string, offset: number = 74) {
+    this.removeDocHighlight = true;
+    // Deactivate scroll temporarily
+    this.activateScroll = false;
 
-	moveToNonHazardous() {
-		this.activateScroll = false;
-		this.activeTab = 'nonHazardous';
-		if (this.nonHazardous && this.nonHazardous['nativeElement'].offsetTop) {
-			this.scrollContainer['nativeElement'].scrollTop = this.nonHazardous['nativeElement'].offsetTop - 46;
-		}
-		setTimeout(() => {
-			this.activateScroll = true;
-		}, 100);
-	}
-	moveToFormSdf() {
-		this.activateScroll = false;
-		this.activeTab = 'Formsdf';
-		if (this.Formsdf && this.Formsdf['nativeElement'].offsetTop) {
-			this.scrollContainer['nativeElement'].scrollTop = this.Formsdf['nativeElement'].offsetTop - 46;
-		}
-		setTimeout(() => {
-			this.activateScroll = true;
-		}, 100);
-	}
-	moveToExportValue() {
-		this.activateScroll = false;
-		this.activeTab = 'Exportvalue';
-		if (this.Exportvalue && this.Exportvalue['nativeElement'].offsetTop) {
-			this.scrollContainer['nativeElement'].scrollTop = this.Exportvalue['nativeElement'].offsetTop - 46;
-		}
-		setTimeout(() => {
-			this.activateScroll = true;
-		}, 100);
-	}
-	moveToDeclaration() {
-		this.activateScroll = false;
-		this.activeTab = 'Declaration';
-		if (this.Declaration && this.Declaration['nativeElement'].offsetTop) {
-			this.scrollContainer['nativeElement'].scrollTop = this.Declaration['nativeElement'].offsetTop - 46;
-		}
-		setTimeout(() => {
-			this.activateScroll = true;
-		}, 100);
-	}
-	changePoNo(event: any) {
-		let poNumber: any;
-		
-		if (this.timestamp) clearTimeout(this.timestamp);
-		this.timestamp = setTimeout(() => {
-			if (event.target.innerText != '') {
-				
-				poNumber = event.target.innerText;
-				this.modPoNum =poNumber;
-				this.OrdersService
-					.changePoNumbr(
-						{
-							id: this.orders.selectedOrder.id,
-							po_nbr: poNumber,
-							po_date: this.orders.selectedOrder.po_date ? this.orders.selectedOrder.po_date : '',
-							line_item: this.orders.selectedOrder.line_item ? this.orders.selectedOrder.line_item : ''
-						})
-					.then(response => {
-						// this.orders.selectedOrder.po_nbr = response.result.data.po_nbr
-					});
-			}
-		}, 1500);
-	}
-	openCalendar(picker: MatDatepicker<Date>) {
-		picker.open();
-	}
-	savePoDate() {
-		// console.log(2525)
-		let poDate: any;
-		if (this.po_date2) {
-			poDate = moment(this.po_date2).format('YYYY-MM-DD');
-			this.OrdersService
-				.changePoNumbr(
-					{
-						id: this.orders.selectedOrder.id,
-						po_nbr: this.modPoNum ?this.modPoNum : this.orders.selectedOrder.po_nbr,
-						po_date: poDate,
-						line_item: this.orders.selectedOrder.line_item ? this.orders.selectedOrder.line_item : ''
-					})
-				.then(response => {
-					//  this.orders.selectedOrder.po_date = response.result.data.po_date
-				});
-		}
-	}
+    // Change the active tab, if provided
+    this.activeTab = tabName;
 
-	getclientDocPermissions(): void{
-		this.OrdersService
-			.getclientDocPermissions({ id: this.orders.selectedOrder.id })
-			.then(response => {
-				if (response.result.success) {
-					// console.log(response.result.data);
-				} else {
-					// console.log('failed');
-				}
-			});
-	}
-	addConcernData(): void {
-		let id: any
-		id = this.orders.selectedOrder.id
-		this.OrdersService
-			.addOrdersConcern({ orders_id: id, concern_data: this.concernData, id: this.getConcernData.id || 0 })
-			.then(response => {
-				if (response.result.success) {
-					this.concernEditable = false
-					this.getConcernData = response.result.data
-				}
-			});
-	}
-	public saveAddLineItem = false;
-	addCoaLineItem(): void {
-		this.OrdersService
-			.changePoNumbr(
-				{
-					id: this.orders.selectedOrder.id,
-					line_item: this.orders.selectedOrder.line_item,
-					po_nbr: this.orders.selectedOrder.po_nbr ? this.orders.selectedOrder.po_nbr : '',
-					po_date: this.orders.selectedOrder.po_date ? this.orders.selectedOrder.po_date : ''
+    // Check if elementRef is defined and has an offsetTop
+    if (elementRef && elementRef["nativeElement"]?.offsetTop) {
+      this.scrollContainer["nativeElement"].scrollTop =
+        elementRef["nativeElement"].offsetTop - offset;
+    }
 
-				})
-			.then(response => {
-				if (response.result.success) {
-					this.editable = false;
-					
-					this.coaLineItemEdit = false;
-					this.orders.selectedOrder.line_item = response.result.data.line_item;
-					this.saveAddLineItem = this.orders.selectedOrder.line_item ? true : false;
-					this.coalineItem = response.result.data.line_item;
-				}
-			});
-	}
+    // Re-activate the scroll after a short delay
+    setTimeout(() => {
+      this.activateScroll = true;
+    }, 100);
+  }
+
+  moveToDetails() {
+    this.removeDocHighlight = true;
+    this.activateScroll = false;
+    this.activeTab = "details";
+    if (this.details && this.details["nativeElement"].offsetTop) {
+      this.scrollContainer["nativeElement"].scrollTop =
+        this.details["nativeElement"].offsetTop - 74;
+    }
+    setTimeout(() => {
+      this.activateScroll = true;
+    }, 100);
+  }
+
+  moveToPackaging() {
+    this.activateScroll = false;
+    this.ActivityLog = false;
+    this.activeTab = "packaging";
+
+    if (this.packaging && this.packaging["nativeElement"].offsetTop) {
+      this.scrollContainer["nativeElement"].scrollTop =
+        this.packaging["nativeElement"].offsetTop - 74;
+    }
+    setTimeout(() => {
+      this.activateScroll = true;
+    }, 100);
+  }
+  public errormes;
+  editInLineitems(value: any, key: string, id: number) {
+    this.closeEdit();
+
+    let poNumber: any;
+    if (this.timestamp) clearTimeout(this.timestamp);
+    this.timestamp = setTimeout(() => {
+      if (value != "") {
+        if (value != "") {
+          // poNumber = event.target.innerText;
+          this.modPoNum = poNumber;
+          // let value = event.target.value || event.target.innerText;
+          let params = {
+            id: id,
+            key: key,
+            value: value,
+          };
+          this.OrdersService.editInLine(params)
+            .then((res: any) => {
+              if (res.result.success) {
+                this.updatedGetViewDetails("order_details", true);
+              }
+            })
+            .catch((error) => console.log(error));
+        } else {
+          let toast: object;
+          toast = {
+            msg: "PO Number should not exceed 15 characters. ",
+            status: "error",
+          };
+          this.snackbar.showSnackBar(toast);
+        }
+      }
+    }, 1500);
+  }
+  openCalendar(picker: MatDatepicker<Date>) {
+    picker.open();
+  }
+  onDateSelected(picker: MatDatepicker<Date>, value?: any) {
+    if ((value = 1)) {
+      this.shippingActiveState = true;
+      picker.open();
+    }
+    // this.shippingActiveState = true;
+  }
+  savePoDate(event) {
+    this.closeEdit();
+
+    let poDate: any;
+    if (this.po_date2) {
+      poDate = moment(this.po_date2).format("YYYY-MM-DD");
+      this.OrdersService.changePoNumbr({
+        id: this.orders.selectedOrder.id,
+        po_nbr: this.modPoNum
+          ? this.modPoNum
+          : this.orders.selectedOrder.po_nbr,
+        po_date: poDate,
+        line_item: this.orders.selectedOrder.line_item
+          ? this.orders.selectedOrder.line_item
+          : "",
+        insurance: this.orders.selectedOrder?.totals.insurance.value
+          ? this.orders.selectedOrder?.totals.insurance.value.replace(/,/g, "")
+          : "",
+        freight: this.orders.selectedOrder?.totals.freight.value
+          ? this.orders.selectedOrder?.totals.freight.value.replace(/,/g, "")
+          : "",
+        discount: this.orders.selectedOrder?.totals.discount.value
+          ? this.orders.selectedOrder?.totals.discount.value.replace(/,/g, "")
+          : "",
+      }).then((response) => {
+        if (response.result.success) {
+          let toast: object;
+          toast = {
+            msg: "Order Details Updated Successfully",
+            status: "success",
+          };
+          this.snackbar.showSnackBar(toast);
+        }
+      });
+    }
+  }
+
+  getclientDocPermissions(): void {
+    let id: any;
+    id = this.orders.selectedOrder.id;
+    this.OrdersService.getclientDocPermissions({
+      orders_id: this.data.id,
+    }).then((response) => {
+      if (response.result.success) {
+        this.isSampleDocs = response.result.data.is_sample_order;
+      } else {
+      }
+    });
+  }
+  public saveAddLineItem = false;
 
   backToOrders(stepper: MatStepper) {
-    this.router.navigate(['/orders']);
-	}
+    this.router.navigate(["/orders"]);
+  }
+  bigImg(x) {
+    x.style.color = "red";
+  }
 
   acceptOrder(event: any): void {
-		event.target.disabled = true;
-		this.OrdersService
-			.acceptOrder({ id: this.orders.selectedOrder.id, orders_types_id: 2 })
-			.then(response => {
-				// console.log(7)
-				this.orders.selectedOrder.orders_types_id = '2';
-				this.selectedOrderStatus = 'Accepted';
-				this.getOrdersActivityDetails();
-			});
-	}
+    event.target.disabled = true;
+    this.OrdersService.acceptOrder({
+      id: this.orders.selectedOrder.id,
+      status_id: 2,
+    }).then((response) => {
+      this.orders.selectedOrder.status_id = "2";
+      this.orders.selectedOrder.status_slug = "accepted";
 
-	editformCoa() {
-		if (!this.editable) {
-			this.editable = true;
-		} else {
-			this.editable = false;
-		}
-		if (this.orders.selectedOrder.line_item) {
-			this.coaLineItemEdit = true;
-		} else {
-			this.coaLineItemEdit = false;
-		}
-	}
-	onCoaLineItem(event: any) {
-		// console.log(event)
-		this.coaLineItemEdit = true
-	}
-	cancelCoaLineItem() {
-		this.editable = false;
-		this.coaLineItemEdit = false;
-		this.orders.selectedOrder.line_item = this.coalineItem;
-	}
+      this.selectedOrderStatus = "Accepted";
+      this.orders.selectedOrder.status_color_code = "#0000FF";
+      if (this.isSampleDocs || this.is_automech) {
+        // this.disableFreecharge = false;
+        // this.getInvoiceData();
+        // this.generateInvoice("false");
+      }
+      // this.getOrdersActivityDetails();
+    });
+  }
 
-	deleteUploads(file, i, flag) {
-		// console.log(flag)
-		this.OrdersService
-			.deleteFileAttachments({ id: file.id, att_id: file.att_id })
-			.then(response => {
-				if (response.result.success) {
-					let toast: object;
-					toast = { msg: 'File deleted successfully', status: 'success' };
-					this.snackbar.showSnackBar(toast);
-					if(flag == 'origin') {
-						this.originFileAttachments.splice(i, 1);
-					} else if(flag == 'insurance') {
-						this.insuranceAttachments.splice(i, 1);
-					} else if (flag == 'shipping'){
-						this.shippingAttachments.splice(i, 1)
-					} else {
-						this.airwayAttachments.splice(i, 1);
-					};
-				}
-			})
-		
-	}
-	public editDescription = false;
-	public showPackageSavePanel = false;
-	valChanged(event) {
-		// console.log(event)
-		this.showPackageSavePanel = true;
-		this.packageDescription = event.target.value;
-	}
-	descriptionEdit() {
-		this.editDescription = true;
-	}
-	editPackageDescription() {
-		// console.log(this.data)
-		let param = {
-			id: this.data.id,
-			description: this.packageDescription
-		}
-		this.OrdersService
-			.updateOrdersPackage(param)
-			.then(response => {
-				if (response.result.success) {
-					let toast: object;
-					toast = { msg: 'Package details updated successfully', status: 'success' };
-					this.snackbar.showSnackBar(toast);
-					this.showPackageSavePanel = false;
-					this.editDescription = false;
-				} else {
-					let toast: object;
-					toast = { msg: 'Failed To Update', status: 'success' };
-					this.snackbar.showSnackBar(toast);
-				}
-			})
-	}
-	cancelPackageDescription() {
-		this.getPackagingDetails();
-		this.showPackageSavePanel = false;
-		this.editDescription = false;
-	}
-	openPreview(file, i: number, flag): void {console.log(file.link_url)
-		if(file.link_url.lastIndexOf('.pdf') == -1 && file.link_url.lastIndexOf('.doc') == -1 && file.link_url.lastIndexOf('.docx') == -1 && file.link_url.lastIndexOf('.xlsx') == -1) {
-			if(flag == 'origin') {
-				this._lightbox.open(this.originFileAttachments, i);
-			} else if(flag == 'insurance') {
-				this._lightbox.open(this.insuranceAttachments, i);
-			} else if (flag == 'shipping'){
-				this._lightbox.open(this.shippingAttachments, i);
-			} else {
-				this._lightbox.open(this.airwayAttachments, i);
-			};
-		} else {
-			let dialogRef = this.dialog.open(PdfPreviewComponent, {
-				width: '850px',
-				data: file
-			});
-		}
-		
-	}
-	downloadFile(file, i, flag) {
-		var downloadUrl = App.base_url + 'downloadFile?link_url='+ file.link_url + '&original_name=' + file.original_name;
-        window.open(downloadUrl, '_blank');
-		
-		
-	}
+  deleteUploads(file, i, flag) {
+    this.OrdersService.deleteFileAttachments({
+      id: file.id,
+      att_id: file.att_id,
+    }).then((response) => {
+      if (response.result.success) {
+        let toast: object;
+        toast = { msg: "File Deleted Successfully", status: "success" };
+        this.snackbar.showSnackBar(toast);
+        if (flag == "origin") {
+          this.originFileAttachments.splice(i, 1);
+        } else if (flag == "insurance") {
+          this.insuranceAttachments.splice(i, 1);
+        } else if (flag == "shipping") {
+          this.shippingAttachments.splice(i, 1);
+        } else if (flag == "supplier") {
+          this.suppllierDocuments.splice(i, 1);
+        } else if (flag == "sales") {
+          this.salesDocuments.splice(i, 1);
+        } else if (flag == "otherOrderSupplier") {
+          this.otherOrderAttachments.splice(i, 1);
+        } else {
+          this.airwayAttachments.splice(i, 1);
+        }
+      }
+    });
+  }
+  public editDescription = false;
+  public showPackageSavePanel = false;
+  valChanged(event) {
+    this.showPackageSavePanel = true;
+    this.packageDescription = event.target.value;
+  }
+  descriptionEdit() {
+    this.editDescription = true;
+    this.packageDescription = this.packageDescription.replace(/<br>/gi, "\n");
+  }
+  public editPkgDeclaration = false;
+  pkgDeclarationEdit() {
+    this.editPkgDeclaration = true;
+    this.pkgDeclaration = this.pkgDeclaration.replace(/<br>/gi, "\n");
+  }
+  editPakgDeclaration() {
+    let param = {
+      id: this.data.id,
+      description: this.pkgDeclaration,
+      type: "declaration",
+    };
+    this.OrdersService.updateOrdersPackage(param).then((response) => {
+      if (response.result.success) {
+        this.pkgDeclaration = this.pkgDeclaration.replace(/\n/g, "<br>");
+        let toast: object;
+        toast = {
+          msg: "Package details updated successfully",
+          status: "success",
+        };
+        this.snackbar.showSnackBar(toast);
+        this.showPackageSavePanel = false;
+        this.editPkgDeclaration = false;
+      } else {
+        let toast: object;
+        toast = { msg: "Failed To Update", status: "success" };
+        this.snackbar.showSnackBar(toast);
+      }
+    });
+  }
+  openPreview(file, i: number, flag): void {
+    this.closeEdit();
+    if (flag === "product_image") {
+      let imgObj = {
+        src: file,
+        thumb: "name",
+      };
+      this._lightbox.open([{ ...imgObj }], 0);
+    } else if (
+      file.link_url.lastIndexOf(".pdf") == -1 &&
+      file.link_url.lastIndexOf(".doc") == -1 &&
+      file.link_url.lastIndexOf(".docx") == -1 &&
+      file.link_url.lastIndexOf(".xlsx") == -1
+    ) {
+      if (flag == "origin") {
+        this._lightbox.open(this.originFileAttachments, i);
+      } else if (flag == "insurance") {
+        this._lightbox.open(this.insuranceAttachments, i);
+      } else if (flag == "shipping") {
+        this._lightbox.open(this.shippingAttachments, i);
+      } else if (flag == "supplier") {
+        this._lightbox.open(this.suppllierDocuments, i);
+      } else if (flag == "sales") {
+        this._lightbox.open(this.salesDocuments, i);
+      } else if (flag == "otherOrderSupplier") {
+        this._lightbox.open(this.otherOrderAttachments, i);
+      } else {
+        this._lightbox.open(this.airwayAttachments, i);
+      }
+    } else {
+      let dialogRef = this.dialog.open(PdfPreviewComponent, {
+        width: "850px",
+        data: file,
+      });
+    }
+  }
+  downloadFile(file, i, flag) {
+    var downloadUrl =
+      App.base_url +
+      "downloadFile?link_url=" +
+      file.link_url +
+      "&original_name=" +
+      file.original_name;
+    window.open(downloadUrl, "_blank");
+  }
+
+  uploadSupplier(flag?: any) {
+    if (flag == "country") {
+      this.getFileFlag = "country";
+    }
+    if (flag == "otherOrderSupplier") {
+      this.getFileFlag = "otherOrderSupplier";
+    }
+    this.setAddedFilesUrl(flag);
+    this.uploader.setOptions({
+      url:
+        App.base_url +
+        "addFiles?orders_id=" +
+        this.orders.selectedOrder.id +
+        "&type=" +
+        this.imagUploadFlag,
+    });
+
+    let toast: object;
+    let dialogRef = this.dialog.open(ImportDocumentComponent, {
+      width: "550px",
+      data: { id: this.orders.selectedOrder.id, flage: flag },
+      disableClose: true,
+    });
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result.success == true) {
+        const config = this.router.config.map((route) =>
+          Object.assign({}, route)
+        );
+        this.router.resetConfig(config);
+        this.getAddedFiles(flag);
+        //  this.getOrganizationsList(this.param);
+      }
+    });
+  }
+  descriptionupdate;
+  descriptionvalue(event) {
+    this.descriptionupdate = event.target.value;
+  }
+  saveupload(product: any, any, value: any) {
+    this.OrdersService.generateSavefiles({
+      orders_id: this.data.id,
+      attachments_id: product.att_id,
+      type: "sales",
+      description: this.descriptionupdate,
+      order_type: true,
+      id: product.id,
+    }).then((response) => {
+      if (response.result.success) {
+        let toast: object;
+        toast = { msg: " updated successfully", status: "success" };
+        this.snackbar.showSnackBar(toast);
+        this.getAddedFiles("sales");
+        // this.suppllierDocuments=
+      }
+    });
+  }
+  SaveDescription(data: any) {
+    let toast: object;
+    let dialogRef = this.dialog.open(DescriptionUpload, {
+      panelClass: "alert-dialog",
+      width: "300px",
+      data: {
+        orders_id: this.orders.selectedOrder.id,
+        attachments_id: data.att_id,
+        type: "supplier",
+        order_type: true,
+        id: data.id,
+        discription: data.description,
+      },
+      disableClose: true,
+    });
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result.success) {
+        const config = this.router.config.map((route) =>
+          Object.assign({}, route)
+        );
+        this.getAddedFiles("supplier");
+        this.router.resetConfig(config);
+      }
+    });
+  }
+  skippackage() {
+    this.OrdersService.updateEstimateApi({
+      id: this.orders.selectedOrder.id,
+      type: "ready_for_dispatch",
+    }).then((response) => {
+      if (response.result.success) {
+        this.orders.selectedOrder.is_order_ready = true;
+        this.orders.selectedOrder.status_id = response.result.data.id;
+        this.selectedOrderStatus = "Ready for Dispatch";
+        this.orders.selectedOrder.status_color_code =
+          response.result.data.color_code;
+        this.orderPermissions(true);
+      } else {
+        this.clickedPackageDetails = false;
+      }
+    });
+  }
+
+  statusAfterShipping() {
+    this.OrdersService.updateEstimateApi({
+      id: this.orders.selectedOrder.id,
+      type: "shipped_on_board",
+    }).then((response) => {
+      if (response.result.success) {
+        this.orders.selectedOrder.is_order_ready = true;
+        this.orders.selectedOrder.status_id = response.result.data.id;
+        this.selectedOrderStatus = "SHIPPED ON BOARD";
+        this.orders.selectedOrder.status_color_code =
+          response.result.data.color_code;
+        this.orderPermissions(true);
+      } else {
+        this.clickedPackageDetails = false;
+      }
+    });
+  }
+  setOrderReady(): void {
+    // event.target.disabled = true;
+    let status = 10;
+    this.clickedPackageDetails = true;
+    this.OrdersService.updateEstimateApi({
+      id: this.orders.selectedOrder.id,
+      type: "order_confirmed",
+    }).then((response) => {
+      if (response.result.success) {
+        this.orders.selectedOrder.is_order_ready = true;
+        this.orders.selectedOrder.status_id = response.result.data.id;
+        // this.selectedOrderStatus = "Order Ready";
+        this.orders.selectedOrder.status_color_code =
+          response.result.data.color_code;
+        this.orderPermissions(true);
+      } else {
+        this.clickedPackageDetails = false;
+      }
+    });
+  }
+  updateStatus(type) {
+    this.OrdersService.updateEstimateApi({
+      id: this.orders.selectedOrder.id,
+      type: type,
+    }).then((response) => {
+      if (response.result.success) {
+        this.orderPermissions(true);
+      }
+    });
+  }
+
+  public closeIcon = false;
+  captureInitialValue(event: FocusEvent, field: number) {
+    const target = event.target as HTMLTextAreaElement;
+    this.initialValues = target.value;
+  }
+  addlineitemorders() {
+    let dialogRef = this.dialog.open(AddLineItemComponent, {
+      panelClass: "alert-dialog",
+      width: "550px",
+      data: {
+        order_product_id: this.productId,
+        id: this.orders.selectedOrder.id,
+        po_nbr: this.orders.selectedOrder.po_nbr
+          ? this.orders.selectedOrder.po_nbr
+          : "",
+        po_date: this.orders.selectedOrder.po_date
+          ? this.orders.selectedOrder.po_date
+          : "",
+        line_item: this.orders.selectedOrder.line_item
+          ? this.orders.selectedOrder.line_item
+          : "",
+        add_line_items: this.orders.selectedOrder.add_line_items,
+        insurance: this.orders.selectedOrder?.totals.insurance.value
+          ? this.orders.selectedOrder?.totals.insurance.value.replace(/,/g, "")
+          : "",
+        freight: this.orders.selectedOrder?.totals.freight.value
+          ? this.orders.selectedOrder?.totals.freight.value.replace(/,/g, "")
+          : "",
+        discount: this.orders.selectedOrder?.totals.discount.value
+          ? this.orders.selectedOrder?.totals.discount.value.replace(/,/g, "")
+          : "",
+        pannel: "order-details",
+        key: "add_line_items",
+        module_id: this.data.id,
+      },
+      disableClose: true,
+    });
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result && result.success) {
+        // this.orders.invoice = result.response.result.data.Invioce;
+        let toast: object;
+        // this.generateSubTotals("add_product_in_create", this.data.id);
+        this.updatedGetViewDetails("order_details", true);
+        this.orders.selectedOrder.add_line_items.push(result.response);
+        toast = { msg: "Line Item Added Successfully", status: "success" };
+        this.snackbar.showSnackBar(toast);
+      }
+    });
+  }
+  deleteLineItemorderDetails(lineItem: any) {
+    let dialogRef = this.dialog.open(DeleteLineItemComponent, {
+      panelClass: "alert-dialog",
+      width: "550px",
+      data: { lineItem, type: "add_product_in_order", module_id: this.data.id },
+      disableClose: true,
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result && result.success) {
+        this.updatedGetViewDetails("order_details", true);
+
+        // this.deleteLineItemAccessOrders(index);
+        let toast: object;
+        toast = { msg: " Line Item Deleted Successfully", status: "success" };
+        this.snackbar.showSnackBar(toast);
+      }
+    });
+  }
+  canEditFreight(): boolean {
+    // Add your condition logic here
+    return !(
+      this.orders.selectedOrder.status === "Cancelled" ||
+      this.orders.selectedOrder.status === "Delivered"
+    );
+  }
+  onTdInput(event: InputEvent) {
+    const target = event.target as HTMLTableCellElement;
+    if (!/^(\d+(\.\d{0,3})?)?$/.test(target.innerText)) {
+      target.innerText = target.innerText.slice(0, -1);
+      event.preventDefault();
+    }
+  }
+  public discva;
+  editDiscount(event, value, flag) {
+    this.discva = event.target.innerText;
+    if (this.discva <= Number(this.orders.selectedOrder.sub_total)) {
+      this.editInsuranceFreight(event, value, flag);
+    } else {
+      let toast = { msg: "Updated Successfully.", status: "error" };
+      this.snackbar.showSnackBar(toast);
+    }
+  }
+
+  getFormattedValue(updatedValue, selectedOrderValue) {
+    if (typeof updatedValue === "string" && updatedValue.trim() !== "") {
+      return updatedValue.replace(/,/g, "");
+    }
+    if (
+      typeof selectedOrderValue === "string" &&
+      selectedOrderValue.trim() !== ""
+    ) {
+      return selectedOrderValue.replace(/,/g, "");
+    }
+    return updatedValue != null ? updatedValue : selectedOrderValue;
+  }
+
+  subToatlId;
+  public moduleName = "";
+  editInsuranceFreight(event, value, flag, msg?: any) {
+    let insurance;
+    let freight;
+    let discount;
+    let numberRegex = /[0-9.]/g;
+
+    this.clickedIconId = flag;
+    if (this.timestamp) clearTimeout(this.timestamp);
+    this.timestamp = setTimeout(() => {
+      if (
+        this.orders.selectedOrder?.totals.insurance.value ||
+        this.orders.selectedOrder?.totals.freight.value ||
+        this.orders.selectedOrder?.totals.discount.value
+      ) {
+        if (value == 1 || value == 2 || value == 3) {
+          const innerTextWithoutCommas = event.target.innerText.replace(
+            /,/g,
+            ""
+          );
+
+          this.moduleName = "subtotal_form";
+
+          let insurance = this.getFormattedValue(
+            this.updatedValueinsurance,
+            this.orders.selectedOrder?.totals.insurance.value
+          );
+          let freight = this.getFormattedValue(
+            this.updatedFreight,
+            this.orders.selectedOrder?.totals.freight.value
+          );
+          let discount = this.getFormattedValue(
+            this.editdescountValue,
+            this.orders.selectedOrder?.totals.discount.value
+          );
+
+          let param = {
+            form_data: {
+              ...this.prefillObject,
+              insurance,
+              discount,
+              freight,
+            },
+            id: this.subToatlId,
+            organization_id:
+              typeof this.data.id === "string"
+                ? parseInt(this.data.id)
+                : this.data.id,
+            module_id: this.data.id,
+            moduleName: this.moduleName,
+          };
+          let toast: object;
+          this.utilsService.saveStoreAttribute(param).then((res) => {
+            if (res.success) {
+              this.editinsurancevalueState = false;
+              this.editfreightState = false;
+              this.orders.selectedOrder.totals.insurance.value = insurance;
+              this.orders.selectedOrder.totals.discount.value = discount;
+              this.orders.selectedOrder.totals.freight.value = freight;
+              this.editinsurancevalueState = false;
+              this.editfreightState = false;
+              this.editDescountstateState = false;
+              // this.generateSubTotals("add_product_in_create", this.data.id);
+
+              this.updatedGetViewDetails("order_details", true);
+
+              toast = {
+                msg: `${msg} Updated Successfully`,
+                status: "success",
+              };
+              this.snackbar.showSnackBar(toast);
+            } else {
+              this.editinsurancevalueState = false;
+              this.editfreightState = false;
+              toast = {
+                msg: res.message ? res.message : "Unable to Update",
+                status: "error",
+              };
+              this.updatedGetViewDetails("order_details", true);
+              this.snackbar.showSnackBar(toast);
+            }
+          });
+        }
+      }
+    });
+  }
+  capitalizeFirstLetter(str) {
+    if (str.length === 0) return str;
+  } // If the string is empty, return it as isreturn str.charAt(0).toUpperCase() + str.slice(1); }
+  public orderOtherDetails: any;
+
+  updateWordCount(event): void {
+    this.wordCount = this.textareaContent.length;
+    this.wordCountotherinfo = this.textareaContents.length;
+    this.wordCountStand1 = this.textCount.length;
+  }
+  routingPac() {
+    this.router.navigate(["/createOrders"]);
+  }
+
+  public adc_product;
+  public adcProductsvalues = new Map();
+  storeProduct_id(product) {
+    this.adc_product = product.order_product_id;
+  }
+  selectedDate: Date;
+  valueupdate(key, index, event) {
+    const formatDate = (date) =>
+      moment(date, "YYYY-MM-DD", true).isValid()
+        ? moment(date).format("YYYY-MM-DD")
+        : null;
+
+    const updatedDate = this.selectedDate;
+
+    if (key === "mfd_date" || key === "exp_date") {
+      this.orders.invoice[0].ADCproductsData[index][key] = formatDate(
+        event.target.value
+      );
+    } else {
+      this.orders.invoice[0].ADCproductsData[index][key] = event.target.value; // Assign the formatted date to the property
+    }
+  }
+  onArrivalDateChanged(event, dateType) {
+    if (this.estimated_date && this.sailing_date) {
+      const selectedDate: Date = dateType
+        ? event.target.value
+        : new Date(this.estimated_date);
+      const currentDate: Date = dateType
+        ? new Date(this.sailing_date)
+        : event.target.value;
+
+      // Calculate the time difference in milliseconds
+      const timeDifferenceMs: number =
+        selectedDate.getTime() - currentDate.getTime();
+
+      // Convert milliseconds to days, hours, minutes, and seconds
+      let daysDifference: number = Math.floor(
+        timeDifferenceMs / (1000 * 60 * 60 * 24)
+      );
+      daysDifference = daysDifference < 0 ? 0 : daysDifference;
+      const hoursDifference: number = Math.floor(
+        (timeDifferenceMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+      );
+      const minutesDifference: number = Math.floor(
+        (timeDifferenceMs % (1000 * 60 * 60)) / (1000 * 60)
+      );
+      const secondsDifference: number = Math.floor(
+        (timeDifferenceMs % (1000 * 60)) / 1000
+      );
+      if (hoursDifference > 4 || daysDifference === 0) {
+        this.transistTime = daysDifference + 1 + " Days";
+      } else this.transistTime = daysDifference + " Days";
+    }
+  }
+
+  onSelectionChanged = (event) => {
+    if (event.oldRange == null) {
+      this.onFocus();
+    }
+    if (event.range == null) {
+      // this.onBlur();
+    }
+  };
+
+  onContentChanged = (event) => {
+    // console.log(event, 453);
+    // this.packageDescription = event.html;
+  };
+
+  onFocus = () => {};
+  // onBlur = () => {};
+  openActivityModal(type): void {
+    // this.closeEdit();
+    // this.closeEditTax();
+    const dialogRef = this.dialog.open(OrderActivityLogComponent, {
+      width: "50%", // Set the width to 50% of the viewport
+      height: "100%", // Set the height to 100% of the viewport
+      panelClass: "half-page-dialog", // Apply custom styling for the half-page modal
+      position: {
+        right: "0", // Align the modal to the right side of the viewport
+      },
+      data: {
+        module: type,
+        id: this.data.id,
+      },
+    });
+  }
+
+  public freightForm;
+  public shippingform;
+  getFormEvent(ev) {
+    // if (ev.module === "frieght_form") {
+    //   this.freightForm = ev;
+    //   if (ev.hasOwnProperty("stuffing") && ev?.stuffing == "Factory Stuffing") {
+    //   }
+    // } else if (ev.module === "shipping_details") {
+    //   this.shippingform = ev;
+    // }
+    // if (ev.hasOwnProperty("enableCustomDocs"))
+    //   this.enableCustomDocs = ev.enableCustomDocs;
+    // if (ev.hasOwnProperty("displayScomet"))
+    //   this.displayScomet = ev.displayScomet;
+    // if (ev.hasOwnProperty("displayNonScomet"))
+    //   this.displayNonScomet = ev.displayNonScomet;
+    // if (ev.hasOwnProperty("displayAdc")) this.displayAdcHaz = ev.displayAdcHaz;
+    // if (ev.hasOwnProperty("displayAdcNonHaz"))
+    //   this.displayAdcNonHaz = ev.displayAdcNonHaz;
+    // if (ev.hasOwnProperty("displayAdc")) this.displayAdc = ev.displayAdc;
+    // if (ev.hasOwnProperty("selectedOrderStatus"))
+    //   this.selectedOrderStatus = ev.selectedOrderStatus;
+    // if (ev.hasOwnProperty("status_id"))
+    //   this.orders.selectedOrder.status_id = ev.status_id;
+    // if (ev.hasOwnProperty("status_color_code"))
+    //   this.orders.selectedOrder.status_color_code = ev.status_color_code;
+  }
+
+  public saveFreightFlag = 1;
+  public saveShippedFlag = 1;
+  public carrierFlag;
+
+  formEmitEvent(obj: any) {
+    this.moduleName = obj.module;
+    obj.parentform.markAsDirty();
+    if (obj.form.invalid === true) {
+      obj.parentform.setErrors({ invalid: true });
+    } else {
+      obj.parentform.setErrors(null);
+      obj.parentform.updateValueAndValidity();
+    }
+  }
+
+  parseDateStringToDate(dateString, limit?: boolean) {
+    var parts = dateString.split("/");
+    var day = parseInt(parts[0], 10);
+    var month = parseInt(parts[1], 10) - 1; // Month in JavaScript starts from 0
+    var year = parseInt(parts[2], 10);
+
+    var date = new Date(year, month, day);
+
+    if (limit) {
+      date.setDate(date.getDate() + 1);
+    }
+
+    return date;
+  }
+  onRadioButtonClicked(option: string) {
+    // Update the selectedOptions model with the clicked option
+    this.selectedOptions = option;
+    // Perform any other necessary actions based on the selected option
+  }
+  closeEdit() {
+    setTimeout(() => {
+      this.orders.selectedOrder = { ...this.originalOrdersData };
+      this.orders.selectedOrder = {
+        ...this.orders.selectedOrder,
+        add_line_items: JSON.parse(
+          JSON.stringify(this.originalOrdersData.add_line_items)
+        ),
+      }; // Force a re-render
+      this.updatedGetViewDetails("order_details", true);
+    }, 100);
+
+    // Restore the original invoice data
+    this.editfreightState = false;
+    this.editinsurancevalueState = false;
+    this.editDescountstateState = false;
+    this.editOrdersPONo = null;
+    this.updatedFreight = null;
+    this.updatedValueinsurance = null;
+    this.editdescountValue = null;
+    this.editaddlineItem = null;
+  }
+
+  public existingAttributesData = [];
+  public form_id = "";
+  async getOrgStoreAttribute() {
+    await this.service
+      .getOrgStoreAttributeList({
+        module: "subtotal_form",
+      })
+      .then(async (response) => {
+        if (response.result.success) {
+          this.existingAttributesData =
+            response.result.data.attributes.base_attributes;
+
+          this.form_id = response.result.data.attributes.form_id;
+          this.getAttributesPrefillData();
+        }
+      })
+      .catch((error) => console.log(error));
+  }
+
+  public prefillObject: any;
+  async getAttributesPrefillData() {
+    let data;
+    let isSaveFreight: string;
+    await this.service
+      .getAttributes({
+        module: this.form_id,
+        id: this.data.id,
+      })
+      .then(async (response) => {
+        if (response.result.success && response.result.data) {
+          data = response.result.data[0].meta_data;
+          this.prefillObject = data;
+        }
+      });
+  }
+  editInsurancefre(key, colIndex?) {
+    this.getOrgStoreAttribute();
+    this.editOrdersPONo = null;
+    setTimeout(() => {
+      if (key == "freight") {
+        this.editfreightState = true;
+        this.editinsurancevalueState = false;
+        this.editDescountstateState = false;
+        this.editaddlineItem = null;
+        setTimeout(() => {
+          this.orderDetailEditFright.nativeElement.focus();
+        }, 100);
+      } else if (key == "insurance") {
+        this.editinsurancevalueState = true;
+        this.editfreightState = false;
+        this.editDescountstateState = false;
+        this.editaddlineItem = null;
+        setTimeout(() => {
+          this.orderDetailEditInsurance.nativeElement.focus();
+        }, 100);
+      } else if (key == "discount") {
+        this.editDescountstateState = true;
+        this.editfreightState = false;
+        this.editinsurancevalueState = false;
+        setTimeout(() => {
+          this.orderDetailEditDiscount.nativeElement.focus();
+        }, 100);
+      } else if (key == "add_line") {
+        this.editDescountstateState = false;
+        this.editfreightState = false;
+        this.editinsurancevalueState = false;
+        this.editaddlineItem = colIndex;
+        setTimeout(() => {
+          this.orderDetailEditAddline.nativeElement.focus();
+        }, 100);
+      }
+    }, 100);
+  }
+  savefreighdescount(event, key) {
+    this.moduleName = "subtotal_form";
+
+    if (key === "freight") {
+      this.updatedFreight = event.target.value;
+    } else if (key === "insurance") {
+      this.updatedValueinsurance = event.target.value;
+    } else if (key === "discount") {
+      this.editdescountValue = event.target.value;
+    }
+  }
+  extracolEdit = new Set();
+
+  removeCommas(event) {
+    event.target.value = event.target.value.replace(/,/g, "");
+  }
+  public clickedIconId = null;
+
+  onBlur(event: FocusEvent, productId: number): void {
+    const relatedTarget = event.relatedTarget as HTMLElement;
+    if (this.clickedIconId === productId || this.clickedIconId === "edit") {
+      this.clickedIconId = null; // Reset the flag
+      return;
+    }
+
+    this.closeEdit();
+    // this.closeEditTax();
+  }
+
+  handleDocumentEventId(data) {
+    this.activeTab = "";
+    this.removeDocHighlight = false;
+    if (data) {
+      this.moveTotax(data);
+    }
+  }
+  moveTotax(id: number) {
+    this.activateScroll = false;
+
+    const element = document.getElementById("invoice-" + id);
+    if (
+      element &&
+      this.scrollContainer &&
+      this.scrollContainer["nativeElement"]
+    ) {
+      this.scrollContainer["nativeElement"].scrollTop = element.offsetTop - 74;
+    }
+
+    setTimeout(() => {
+      this.activateScroll = true;
+    }, 100);
+  }
+
+  public orderDocuments = new Map();
+  public orderDocumentsArr: any = [];
+  public dynamicDocLoader = false;
+  dymanicdocumentdata: any = [];
+
+  getDynamicDocuments(): void {
+    this.orderDocuments = new Map();
+    this.OrdersService.getOrderDocuments({
+      id: this.data.id,
+      type: "order",
+    })
+      .then((response) => {
+        let data = response.result.data;
+        data?.some((item) => {
+          if (this.orderDocuments.has(item.document_template_types_id)) {
+            let itemsArr = this.orderDocuments.get(
+              item.document_template_types_id
+            );
+            this.orderDocuments.set(item.document_template_types_id, [
+              ...itemsArr,
+              item,
+            ]);
+          } else {
+            this.orderDocuments.set(item.document_template_types_id, [item]);
+          }
+        });
+        this.orderDocumentsArr = Array.from(this.orderDocuments.keys());
+        let concatedArray = [];
+        this.orderDocuments.forEach((items, key) => {
+          concatedArray = concatedArray.concat(items);
+          items.forEach((obj) => {
+              obj.is_display = true;
+          });
+          // this.dymanicdocumentdata = this.dymanicdocumentdata.concat(items);
+        });
+        
+        this.dymanicdocumentdata = [...concatedArray];
+        this.dynamicDocLoader = true;
+      })
+      .catch((error) => console.log(error));
+  }
+
+  com_inv_id;
+  orderInfo;
+  getViewDetails(id, type: string) {
+    // stepper.next();
+
+    let showDocs;
+    let tax;
+    // this.data.id = this.data.id;
+    if (type === "order_details") {
+      this.fetchingData = true;
+      this.totalSpinner = true;
+      this.selectedOrderStatus = "";
+    }
+    this.orders.notifyAddr = {};
+    // this.enableInvoice = false;
+    // this.priceQuantityDisable = false;
+    this.OrdersService.getViewDetails({ id, type }).then(async (response) => {
+      if (response.result.success) {
+        if (type === "order_details") {
+          this.fetchingData = false;
+          this.totalSpinner = false;
+        }
+        if (type === "commercial_invoice") {
+          this.getViewDetails(
+            response.result.data.commercial_invoice[0].id,
+            "commercial_invoice_details"
+          );
+          this.com_inv_id = response.result.data.commercial_invoice[0].id;
+        } else if (type == "commercial_invoice_details") {
+          this.commercialInvoiceData = response.result.data;
+        } else if (type === "order_details") {
+          if (response.result.data) {
+            this.showNoDatFound = false;
+          } else {
+            this.showNoDatFound = true;
+          }
+          let selectedOrderDetails = response.result.data;
+          // this.order_no_po = selectedOrderDetails.orders;
+          this.orderId = selectedOrderDetails.create_order[0].id;
+          this.subToatlId = response.result.data.subtotal_form[0].id;
+          this.totalorderdetails = {
+            ...response.result.data.create_order[0],
+            ...response.result.data.subtotal_form[0],
+          };
+          if (selectedOrderDetails.create_order[0].line_item) {
+            this.saveAddLineItem = true;
+          } else {
+            this.saveAddLineItem = false;
+          }
+          this.orderDatapassing = { ...selectedOrderDetails.create_order[0] };
+          this.orders.companyShpAddrDt = this.orderDatapassing.shipper_address;
+          this.orders.selectedOrder = {
+            ...selectedOrderDetails.subtotal_form[0],
+            ...selectedOrderDetails.create_order[0],
+            add_line_items: selectedOrderDetails.add_line_items || [],
+          };
+          this.updatedPoNo = selectedOrderDetails.create_order[0].order_no;
+          this.originalOrdersData = { ...this.orders.selectedOrder };
+          this.po_date2 = new Date(
+            this.orders.selectedOrder.po_date
+              ? this.orders.selectedOrder.po_date
+              : ""
+          );
+          this.timeout = setTimeout(() => {
+            this.selectedOrderStatus = this.orders.selectedOrder.status;
+          }, 100);
+          this.orders.billingAddr = selectedOrderDetails.add_billing_address[0];
+          this.orders.shippingAddr = selectedOrderDetails.add_address[0];
+          setTimeout(() => {
+            if (
+              selectedOrderDetails?.add_notify_address &&
+              selectedOrderDetails.add_notify_address.length
+            ) {
+              this.showNotifyAddress = true;
+
+              this.orders.notifyAddr =
+                selectedOrderDetails.add_notify_address[0];
+            } else {
+              this.showNotifyAddress = false;
+              this.orders.notifyAddr = {};
+            }
+          }, 1000);
+          // this.getOrdersActivityDetails();
+
+          if (selectedOrderDetails.shipper_id) {
+            this.orders.companyShpAddrDt = selectedOrderDetails.shipper_id;
+          }
+
+          this.getDynamicDocuments();
+          // }
+          this.orderInfo = {
+            selectedOrder: selectedOrderDetails,
+          };
+          // this.getViewDetails(this.data.id, "commercial_invoice");
+
+          this.getViewDetails(this.data.id, "order_product_details");
+        } else if (type === "order_product_details") {
+          this.totalSpinner = false;
+          this.fetchingData = false;
+          this.productDetails = response.result.data.row_data;
+          this.orders.productsData.data = response.result.data.row_data;
+          this.originalOrdersProductData = response.result.data.row_data.map(
+            (data: any) => ({ ...data })
+          );
+        } else {
+        }
+      }
+    });
+  }
+  sanitizeHtml(html: string): SafeHtml {
+    return this.sanitizer.bypassSecurityTrustHtml(html);
+  }
+
+  generateSubTotals(type: string, id) {
+    this.OrdersService.generateSubTotals({
+      type: type,
+      id: id,
+    }).then((response) => {
+      if (response.result.success) {
+        if (type === "edit_product_in_commercial_inv") {
+          this.getViewDetails(id, "commercial_invoice_details");
+        }
+        if (type === "add_product_in_create") {
+          this.updatedGetViewDetails("order_details", true);
+        }
+      }
+    });
+  }
+  triggerGridEvent(ev) {
+    if (ev.editdone) {
+      if (ev.tableName == "orderDetail") {
+        // this.generateSubTotals("add_product_in_create", this.data.id);
+        this.updatedGetViewDetails("order_details", true);
+        this.getOrderProducts();
+      } else if (ev.tableName == "customInvoice") {
+        // this.getTaxInv();
+        // this.getIgstInv();
+      } else if (ev.tableName == "commercialInvoice") {
+      }
+    }
+  }
+  public fetchingShipments = false;
+  public shipmentsList = [];
+  shipmentsDetailsRoute(stepper: MatStepper, data: any) {
+    this.router.navigate([
+      "/orders",
+      // 213
+      data.id,
+    ]);
+    return;
+  }
+  ErrorDiaologe(headers?: string, message?: string, button: string = "Close") {
+    let dialogRef = this.dialog.open(ErrorDialogComponent, {
+      panelClass: "alert-dialog",
+      width: "400px",
+      data: {
+        heading: headers,
+        message: message,
+        button: button,
+        icon: "error",
+      },
+    });
+    dialogRef.afterClosed().subscribe((result) => {
+      // this.onCancleRecordActions();
+    });
+  }
+  conformshipment() {
+    this.service
+      .verifyShipment({
+        selected_order_ids: [this.data.id],
+      })
+      .then((response) => {
+        if (response.result.success) {
+          this.createShipment();
+        } else {
+          this.ErrorDiaologe(
+            "Error in Creating Shipment",
+            response.result.message
+          );
+        }
+      });
+  }
+  shipmetOrderProducts;
+  createShipment() {
+    if(this.order_Permissions.show_numbering_error) {
+      return ;
+    }
+    let arr = [];
+    arr.push({ id: this.orders.selectedOrder.id });
+    let dialogRef = this.dialog.open(
+      NewCreateShipmentComponent,
+      // CreateShipmentComponent,
+      {
+        panelClass: "alert-dialog",
+        width: "100%",
+        data: {
+          title: "Create Shipment",
+          flag: "Create Shipment",
+          orders: arr,
+          ordersId: [this.data.id],
+          shipmetOrderProducts: this.shipmetOrderProducts,
+          selectedCurrency: { type: this.orderDatapassing?.currency_type },
+        },
+        disableClose: true,
+      }
+    );
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result.success) {
+        const config = this.router.config.map((route) =>
+          Object.assign({}, route)
+        );
+        this.router.resetConfig(config);
+        this.cookie.set("shipments_id", result.response);
+        this.router.navigate([
+          `/orders/${this.data.id}/shipments`,
+          result.response,
+        ]);
+        let toast: object;
+        toast = { msg: "Shipment Created Successfully...", status: "success" };
+        this.snackbar.showSnackBar(toast);
+      }
+    });
+  }
+  paymentformEmitEvent(obj) {
+    this.moduleName = obj.module;
+
+    this.paymentForm = obj.form;
+  }
+
+  createPO() {
+    let toast: object;
+    let dialogRef = this.dialog.open(POCreateComponent, {
+      panelClass: "alert-dialog",
+      width: "60%",
+      data: {
+        flag: "Create PO",
+        ordersId: [this.data.id],
+        shipmetOrderProducts: this.poProducts,
+        // productArr:
+        //   this.invoiceProducts.length !== 0 ? this.invoiceProducts : null,
+        order_id: this.orders.selectedOrder.id,
+        // po_suffix: this.orders.selectedOrder.po_suffix,
+        // rowIds: this.rowIds,
+      },
+      disableClose: true,
+    });
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result.success) {
+        const config = this.router.config.map((route) =>
+          Object.assign({}, route)
+        );
+        this.router.resetConfig(config);
+        // this.cookie.set("estimate_id", result.response);
+        this.router.navigate(["/po", result.response]);
+        let toast: object;
+        toast = {
+          msg: " PO Created Successfully...",
+          status: "success",
+        };
+        this.snackbar.showSnackBar(toast);
+      }
+    });
+  }
+
+  getOrderProducts() {
+    this.service
+      .getOrderProducts({
+        order_id: this.data.id,
+      })
+      .then((response) => (this.shipmetOrderProducts = response))
+      .catch((error) => console.log(error));
+  }
+
+  public poProducts = [];
+  getPoProducts() {
+    this.service
+      .getPoProducts({
+        order_id: this.data.id,
+      })
+      .then((response) => (this.poProducts = response))
+      .catch((error) => console.log(error));
+  }
+
+  minimizeAll = false;
+
+  setMinimizeAll() {
+    this.minimizeAll = true;
+    this.displayTabs = {
+      order_details: false,
+      shipments: false,
+      items: false,
+    };
+  }
+  editOrderBtn: boolean = false;
+  editOrder() {
+    this.openEditOrderDialog("Edit");
+  }
+  public newColumnAdded = false;
+  // public editDone = true;
+
+  openEditOrderDialog(title) {
+    let toast: object;
+    let dialogRef = this.dialog.open(OrdersCreateComponent, {
+      panelClass: "alert-dialog",
+      width: "100%",
+      data: {
+        estimate_id: this.data.id,
+        title: title,
+        type: "edit",
+      },
+      disableClose: true,
+    });
+    dialogRef.afterClosed().subscribe((result) => {
+      this.editOrderBtn = false;
+      if (result && result.success) {
+        toast = {
+          msg: "Order Updated Successfully",
+
+          status: "success",
+        };
+        this.snackbar.showSnackBar(toast);
+        this.getViewDetails(this.data.id, "order_details");
+        this.getOrderProducts();
+        this.newColumnAdded = true;
+        setTimeout(() => {
+          this.newColumnAdded = false;
+        }, 100);
+
+        // this.editDone = false;
+        // setTimeout(() => {
+        //   this.editDone = true;
+        // }, 50);
+      } else if (result && !result.success) {
+        toast = {
+          msg: "Failed to Update Order ",
+          status: "error",
+        };
+
+        this.snackbar.showSnackBar(toast);
+      }
+    });
+  }
+  saveAddline(column: any, colIndex: number) {
+    let param = {
+      line_item: column.line_item,
+      value: column.value,
+    };
+    this.timestamp = setTimeout(() => {
+      let params = {
+        form_data: {
+          ...param,
+        },
+        organization_id:
+          typeof this.data.id === "string"
+            ? parseInt(this.data.id)
+            : this.data.id,
+        id: column.id,
+        form_id: "43",
+        module_id: this.data.id,
+        moduleName: this.moduleName,
+      };
+      this.utilsService.saveStoreAttribute(params).then((res) => {
+        if (res.success) {
+          this.updatedGetViewDetails("order_details", true);
+          this.editaddlineItem = null;
+          this.snackbar.showSnackBar({
+            msg: "Add Line Item Update Successfully",
+            status: "success",
+          });
+        } else {
+          this.editaddlineItem = null;
+          this.snackbar.showSnackBar({
+            msg: res.message,
+            status: "error",
+          });
+          this.updatedGetViewDetails("order_details", true);
+        }
+      });
+    });
+  }
+  editAddline(event, columnType: string, colIndex: number) {
+    // Get the current value of the input field
+    const inputValue = (event.target as HTMLInputElement).value;
+    // Logic to update the value in your data structure
+    this.orders.selectedOrder.add_line_items[colIndex].value = inputValue;
+
+    // Optionally, you can trigger further actions, like API calls
+  }
+
+  validateDecimalInput(event) {
+    const input = event.target;
+    let value = input.value;
+
+    // Remove any non-numeric characters except the decimal point
+    value = value.replace(/[^0-9.]/g, "");
+
+    // Ensure there is only one decimal point
+    const parts = value.split(".");
+    if (parts.length > 2) {
+      value = parts[0] + "." + parts.slice(1).join("");
+    }
+
+    // Limit to 3 decimal places
+    if (parts.length === 2 && parts[1].length > 3) {
+      value = parts[0] + "." + parts[1].slice(0, 3);
+    }
+
+    // Only update the value if it has changed
+    if (input.value !== value) {
+      input.value = value;
+
+      const event = new Event("input", { bubbles: true });
+      input.dispatchEvent(event);
+    }
+
+    // Angular's two-way binding should automatically update the model,
+    // no need to manually dispatch input events unless you have a specific need for it.
+  }
+  isValidDate(date: any): boolean {
+    return !isNaN(new Date(date).getTime());
+  }
+
+  public editQuoteNoState = false;
+  editQuoteNo(ev) {
+    let toast: object;
+    this.editQuoteNoState = false;
+    this.OrdersService.editNumberingSeries({
+      id: this.orders.selectedOrder.id,
+      number_series: this.updatedPoNo,
+    }).then(async (response) => {
+      if (response.result.success) {
+        toast = {
+          msg: response.result.message,
+          status: "success",
+        };
+        this.snackbar.showSnackBar(toast);
+        this.getViewDetails2(this.data.id, "order_details");
+        this.orderPermissions();
+      } else {
+        toast = {
+          msg: response.result.message,
+          status: "error",
+        };
+        this.snackbar.showSnackBar(toast);
+      }
+    });
+  }
+  closeNumberEdit() {
+    this.editQuoteNoState = false;
+  }
+  public updatedPoNo = "";
+  savechangesPO(ev) {
+    this.updatedPoNo = ev.target.value;
+  }
+  editpoQPD() {
+    this.editQuoteNoState = true;
+  }
+
+  getViewDetails2(id, type: string) {
+    this.OrdersService.getViewDetails({ id, type }).then(async (response) => {
+      if (response.result.success) {
+        let selectedOrderDetails = response.result.data;
+
+        this.orders.selectedOrder = {
+          ...selectedOrderDetails.create_order[0],
+        };
+      }
+    });
+  }
 }

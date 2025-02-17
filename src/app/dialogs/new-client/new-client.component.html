@@ -1,0 +1,203 @@
+<mat-toolbar>
+  <h2 mat-dialog-title></h2>
+  <span fxFlex>{{ language.defaults.addOrganisation }}</span>
+</mat-toolbar>
+<mat-dialog-content>
+  <form [formGroup]="detailsForm" class="multy-forms">
+    <!-- [class.not-allowed]="pointerEvent" -->
+
+    <div fxLayout="row" style="padding-top: 0">
+      <div fxlayout="column">
+        <div class="w-100">
+          <mat-form-field
+            class="w-100 custom-input mandatory"
+            floatLabel="never"
+            style="margin-top: 18px"
+          >
+            <label class="custom-label mandatory" maxlength="150"
+              >Organization Name</label
+            >
+            <input
+              matInput
+              placeholder="Enter Organization Name"
+              #firstname
+              formControlName="company_name"
+              autofocus="off"
+              autocomplete="off"
+            />
+            <mat-error
+              *ngIf="detailsForm.controls.company_name.hasError('required')"
+              >{{ language.validations.organisationName }}</mat-error
+            >
+          </mat-form-field>
+        </div>
+
+        <div fxlayout="row" class="row-ui">
+          <!-- <mat-form-field fxFlex class="custom-input" floatLabel="never">
+                    <label class="custom-label">Website URL</label>
+                    <input matInput maxlength="150" placeholder="Enter Website URL" formControlName="website">
+                    <mat-error *ngIf="detailsForm.controls.website.hasError('required')">{{language.validations.website}}</mat-error>
+                    <mat-error *ngIf="!detailsForm.controls.website.hasError('required') && detailsForm.controls.website.hasError('pattern')">Please Enter Valid URL</mat-error>
+                </mat-form-field> -->
+
+          <mat-form-field class="custom-input mandatory" floatLabel="never">
+            <label class="custom-label mandatory"> Status</label>
+            <mat-select
+              placeholder="Select Status"
+              id="status"
+              formControlName="status"
+              [(ngModel)]="selectedtype"
+            >
+              <mat-option
+                [value]="stat.param"
+                *ngFor="let stat of status"
+                [innerHtml]="stat.value"
+              ></mat-option>
+              <!-- <mat-option value="true">{{language.defaults.active}}</mat-option>
+                        <mat-option value="false">{{language.defaults.inactive}}</mat-option> -->
+            </mat-select>
+            <mat-error
+              *ngIf="detailsForm.controls.status.hasError('required')"
+              >{{ language.validations.status }}</mat-error
+            >
+          </mat-form-field>
+        </div>
+        <div fxlayout="row" class="row-ui">
+          <mat-form-field class="custom-input mandatory" floatLabel="never">
+            <label class="custom-label mandatory"> Currency</label>
+            <mat-select
+              placeholder="Select Currency"
+              id="currency"
+              formControlName="currency_id"
+            >
+              <mat-option *ngFor="let cur of currencyX" [value]="cur.id"
+                >{{ cur.name }} ({{ cur.type }})</mat-option
+              >
+            </mat-select>
+            <mat-error
+              *ngIf="detailsForm.controls.currency_id.hasError('required')"
+              >Please Select Currency</mat-error
+            >
+          </mat-form-field>
+          <mat-form-field class="custom-input mandatory" floatLabel="never">
+            <label class="custom-label mandatory">Country</label>
+            <mat-select
+              placeholder="{{ language.defaults.selectCountry }}"
+              (selectionChange)="onCountryChange($event)"
+              formControlName="country_id"
+            >
+              <!-- <mat-option>Add Country</mat-option> -->
+              <mat-option
+                *ngFor="let country of countries"
+                [value]="country.id"
+                >{{ country.name }}</mat-option
+              >
+            </mat-select>
+            <mat-error
+              *ngIf="detailsForm.controls.country_id.hasError('required')"
+              >Please select country</mat-error
+            >
+          </mat-form-field>
+        </div>
+        <div fxlayout="row">
+          <div
+            class="add-new-address d-flex align-items-center"
+            *ngIf="submitCountry"
+          >
+            <mat-form-field
+              fxFlex="50"
+              class="custom-input mandatory"
+              floatLabel="never"
+            >
+              <label class="custom-label">Add Country</label>
+              <input
+                matInput
+                placeholder="Add Country"
+                maxlength="10"
+                placeholder="Add Country"
+                formControlName="addCountry"
+              />
+              <!-- <mat-error *ngIf="detailsForm.controls.addCountry.hasError('required')">Please enter country</mat-error> -->
+            </mat-form-field>
+            <span
+              class="add-new primary-text-link"
+              (click)="addCountry(detailsForm)"
+              >Add Country</span
+            >
+          </div>
+        </div>
+      </div>
+      <div fxlayout="column" style="margin-left: 16px; width: 50%">
+        <div class="image-upload address-upload">
+          <div
+            ng2FileDrop
+            [ngClass]="{ 'file-over': hasDropZoneOver }"
+            (fileOver)="fileOverBase($event)"
+            (onFileDrop)="fileDrop($event)"
+            [uploader]="uploader"
+            class="file-drop-zone"
+          >
+            <input
+              id="address-org-logo"
+              type="file"
+              ng2FileSelect
+              [uploader]="uploader"
+              (change)="fileSelected($event)"
+              [hidden]="true"
+              multiple
+            />
+            <label
+              for="address-org-logo"
+              class="browse-file"
+              *ngIf="!uploads.length"
+            >
+              <a>Upload Logo</a>
+            </label>
+            <label
+              for="address-org-logo"
+              class="image-edit-delete"
+              *ngIf="uploads.length"
+            >
+              <a class="upload-open">{{ language.defaults.changeFile }}</a>
+            </label>
+          </div>
+
+          <div class="images">
+            <ul *ngIf="uploads.length">
+              <li *ngFor="let file of uploads; let i = index">
+                <img [src]="file.source_path" alt="file.filename" />
+                <div class="overlay"></div>
+                <mat-icon class="delete" (click)="deleteItem(i)"
+                  >delete</mat-icon
+                >
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="change-user-file address-upload-error">
+          <p *ngIf="uploadError">
+            *You have selected an invalid file type. Only jpg, jpeg, png files
+            are allowed.
+          </p>
+        </div>
+        <div class="change-user-file address-size-error">
+          <p *ngIf="sizeError">*File more than 5MB is not allowed.</p>
+        </div>
+      </div>
+    </div>
+  </form>
+</mat-dialog-content>
+<mat-spinner class="medium-spinner" *ngIf="showSpinner"></mat-spinner>
+<mat-dialog-actions>
+  <span fxFlex></span>
+  <button class="back-btn-ui" mat-dialog-close (click)="cancelOrg()">
+    Cancel
+  </button>
+  <button
+    mat-raised-button
+    (click)="addOrg(detailsForm)"
+    [disabled]="disabledSave"
+  >
+    {{ language.defaults.addOrganisation }}
+  </button>
+</mat-dialog-actions>

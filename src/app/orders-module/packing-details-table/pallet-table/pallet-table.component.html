@@ -1,0 +1,334 @@
+<table class="package-details-table">
+  <tbody>
+    <tr class="product-details">
+      <td colspan="6" class="package-head" style="padding: 0px; height: 36px">
+        <mat-toolbar
+          class="package-head"
+          style="
+            display: flex;
+            justify-content: space-between;
+            background-color: #9db5d92e;
+            padding: 0px 4px;
+          "
+        >
+          <div>
+            <div class="info-line" style="font-size: 13.5px">
+              {{ productIndex + 1 }} .
+
+              <span class="label">Packing Label : </span>
+              <strong>
+                {{ package?.total_meta_data?.starting_label_no }}
+              </strong>
+              <span
+                class="divider"
+                *ngIf="
+                  package?.packing_meta_data?.height != 0 ||
+                  package?.packing_meta_data?.width != 0 ||
+                  package?.packing_meta_data?.depth != 0
+                "
+                >|</span
+              >
+              <span
+                *ngIf="
+                  package?.packing_meta_data?.height != 0 ||
+                  package?.packing_meta_data?.width != 0 ||
+                  package?.packing_meta_data?.depth != 0
+                "
+                class="label"
+                >Dimensions :
+              </span>
+              <span
+                *ngIf="
+                  package?.packing_meta_data?.height != 0 ||
+                  package?.packing_meta_data?.width != 0 ||
+                  package?.packing_meta_data?.depth != 0
+                "
+                class="value"
+                >{{ package?.packing_meta_data?.height }}x{{
+                  package?.packing_meta_data?.width
+                }}x{{ package?.packing_meta_data?.depth }} ({{
+                  package?.packing_meta_data?.uom_label
+                }})
+              </span>
+              <!-- <span class="label"
+                >{{ package?.packing_meta_data?.name }} :
+              </span> -->
+              <span
+                *ngIf="package?.total_meta_data?.net_weight_per_pallet != 0"
+                class="divider"
+                >|</span
+              >
+
+              <span
+                *ngIf="package?.total_meta_data?.net_weight_per_pallet != 0"
+                class="label"
+                >Net Wt. per Pallet :
+              </span>
+              <strong
+                *ngIf="package?.total_meta_data?.net_weight_per_pallet != 0"
+              >
+                {{ package?.total_meta_data?.net_weight_per_pallet }}
+                Kgs</strong
+              >
+              <span
+                *ngIf="package?.packing_meta_data?.tare_weight != 0"
+                class="divider"
+                >|</span
+              >
+
+              <span
+                *ngIf="package?.packing_meta_data?.tare_weight != 0"
+                class="label"
+                >Tare Wt. per Pallet:
+              </span>
+              <strong *ngIf="package?.packing_meta_data?.tare_weight != 0">
+                {{ package?.packing_meta_data?.tare_weight }} Kgs</strong
+              >
+              <!-- <strong>{{ package?.packing_meta_data?.quantity }}</strong> -->
+              <span
+                class="divider"
+                *ngIf="package?.total_meta_data?.gross_weight_per_pallet != 0"
+                >|</span
+              >
+              <span
+                *ngIf="package?.total_meta_data?.gross_weight_per_pallet != 0"
+                class="label"
+                >Gross Wt. per Pallet :
+              </span>
+              <strong
+                *ngIf="package?.total_meta_data?.gross_weight_per_pallet != 0"
+                >{{
+                  package?.total_meta_data?.gross_weight_per_pallet
+                }}
+                Kgs</strong
+              >
+
+              <span *ngIf="package?.cbm_info?.per_label" class="divider"
+                >|</span
+              >
+              <span *ngIf="package?.cbm_info?.per_label" class="label"
+                >{{ package?.cbm_info?.per_label }} :
+              </span>
+              <strong *ngIf="package?.cbm_info?.per_label">
+                {{ package?.cbm_info?.per_value }}
+              </strong>
+            </div>
+          </div>
+          <div style="display: flex; align-items: center">
+            <!-- <span
+              class="add-batch add-Line m_t_10"
+              title=""
+              style="margin-top: 2px; justify-content: flex-end; gap: 4px"
+              (click)="packageEdit(package.packing_id)"
+            >
+              <mat-icon>edit</mat-icon>
+            </span> -->
+
+            <div
+              class="edit_icon"
+              (click)="packageEdit(package.packing_id)"
+              *ngIf="!order_Permissions.disable_edit_package"
+              title="Edit"
+            >
+              <img [src]="EditIcon" alt="edit" />
+            </div>
+          </div>
+        </mat-toolbar>
+      </td>
+    </tr>
+    <tr class="after-batch">
+      <td colspan="6" class="after-batch-data">
+        <table class="package-tables">
+          <thead>
+            <tr>
+              <th style="text-align: center; border-left: 0">SL.No</th>
+              <th style="text-align: center">Item</th>
+              <th style="text-align: center; width: 18%">
+                Description Of Item
+              </th>
+              <!-- <th style="text-align: center">Batch</th> -->
+
+              <th class="table-right" style="width: 150px; text-align: center">
+                U/M
+              </th>
+              <th style="text-align: center" class="table-right">
+                Sub Packaging Type
+              </th>
+              <th style="text-align: center" class="table-right">
+                Number of Sub Packages
+              </th>
+              <th style="text-align: center" class="table-right align-right">
+                Item Quantity
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let product of package.products; index as batchIndex">
+              <td class="package-sno" style="border-left: 0">
+                {{ batchIndex + 1 }}
+              </td>
+              <td class="package-sno">
+                {{ product?.product_name }}
+              </td>
+              <td title="{{ product?.product_desc }}">
+                <div class="ellipsis">
+                  {{ product?.description }}
+                </div>
+              </td>
+              <!-- <td>{{ product?.batch_number }}</td> -->
+
+              <td class="table-right">
+                <span class="package-weight" style="width: 200px">{{
+                  product?.unit_of_measurement
+                }}</span>
+              </td>
+              <td class="table-right gross-details">
+                {{ product?.packing_type }}
+              </td>
+              <td class="table-right gross-details">
+                {{ product?.number_of_sub_packages }}
+              </td>
+              <td class="table-right align-right">
+                {{ product?.quantity }}
+              </td>
+            </tr>
+            <!-- style="text-align: end" -->
+            <tr class="package-total">
+              <td colspan="8" style="border-left: 0">
+                <div class="info-line">
+                  <span
+                    *ngIf="package?.total_meta_data?.total_tare_weight != 0"
+                    class="label"
+                    >Total Tare Wt. :
+                  </span>
+                  <strong
+                    *ngIf="package?.total_meta_data?.total_tare_weight != 0"
+                    >{{
+                      package?.total_meta_data?.total_tare_weight
+                    }}
+                    Kgs</strong
+                  >
+                  <span
+                    class="divider"
+                    *ngIf="package?.total_meta_data?.total_tare_weight != 0"
+                    >|</span
+                  >
+
+                  <span
+                    class="label"
+                    *ngIf="package?.total_meta_data?.quantity != 0"
+                  >
+                    Total No of Pallets:
+                    <!-- Quantity per
+                        {{ package?.packing_meta_data?.name }} : -->
+                  </span>
+                  <strong *ngIf="package?.total_meta_data?.quantity != 0">
+                    {{ package?.total_meta_data?.quantity }}</strong
+                  >
+
+                  <span
+                    class="divider"
+                    *ngIf="package?.total_meta_data?.total_net_weight != 0"
+                    >|</span
+                  >
+
+                  <span
+                    class="label"
+                    *ngIf="package?.total_meta_data?.total_net_weight != 0"
+                  >
+                    Total Net Wt. :
+
+                    <!-- {{ package?.packing_meta_data?.name }} : -->
+                  </span>
+                  <strong
+                    *ngIf="package?.total_meta_data?.total_net_weight != 0"
+                  >
+                    {{ package?.total_meta_data?.total_net_weight }}
+                    <!-- {{
+              package?.packing_meta_data?.is_pallet
+                ? package?.total_meta_data?.net_weight_per_pallet
+                : package?.total_meta_data?.net_weight_of_package
+            }} -->
+                    Kgs</strong
+                  >
+                  <span
+                    class="divider"
+                    *ngIf="package?.total_meta_data?.total_gross_weight != 0"
+                    >|</span
+                  >
+                  <span
+                    class="label"
+                    *ngIf="package?.total_meta_data?.total_gross_weight != 0"
+                  >
+                    Total Gross Wt. :
+                    <!-- {{ package?.packing_meta_data?.name }} : -->
+                  </span>
+                  <strong
+                    *ngIf="package?.total_meta_data?.total_gross_weight != 0"
+                  >
+                    {{ package?.total_meta_data?.total_gross_weight }}
+                    <!-- {{
+              package?.packing_meta_data?.is_pallet
+                ? package?.total_meta_data?.gross_weight_per_pallet
+                : package?.total_meta_data?.gross_weight_of_package
+            }} -->
+                    Kgs</strong
+                  >
+                  <span
+                    class="divider"
+                    *ngIf="package?.total_meta_data?.total_gross_weight != 0"
+                    >|</span
+                  >
+                  <span
+                    class="label"
+                    *ngIf="package?.total_meta_data?.total_quantity != 0"
+                  >
+                    Total Item(s) Quantity:
+                    <!-- {{ package?.packing_meta_data?.name }} : -->
+                  </span>
+                  <strong *ngIf="package?.total_meta_data?.total_quantity != 0">
+                    {{ package?.total_meta_data?.total_quantity }}
+                    <!-- {{
+              package?.packing_meta_data?.is_pallet
+                ? package?.total_meta_data?.gross_weight_per_pallet
+                : package?.total_meta_data?.gross_weight_of_package
+            }} -->
+                  </strong>
+                  <span class="divider" *ngIf="package?.cbm_info?.cbm_label"
+                    >|</span
+                  >
+                  <span *ngIf="package?.cbm_info?.cbm_label" class="label"
+                    >Total {{ package?.cbm_info?.cbm_label }} :
+                  </span>
+                  <strong *ngIf="package?.cbm_info?.cbm_label">
+                    {{ package?.cbm_info?.total_cbm }}
+                  </strong>
+                  <!-- <span *ngIf="package?.cbm_info?.cbm_label" class="divider"
+                    >|</span
+                  > -->
+                </div>
+                <!-- <div class="info-line">
+                  <span class="label">Packing Label : </span>
+                  <strong>
+                    {{ package?.total_meta_data?.starting_label_no }}
+                  </strong>
+                </div> -->
+                <!-- <div class="info-line" style="padding-top: 6px">
+                      <span class="label">Package Label : </span>
+                      <strong>{{ package?.packing_meta_data?.name }}</strong>
+                      <span class="divider">|</span>
+                      <span class="label">
+                        {{ package?.packing_meta_data?.cal_label }} :
+                      </span>
+                      <strong>
+                        {{ package?.packing_meta_data?.cal_val }}</strong
+                      >
+                    </div> -->
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </td>
+    </tr>
+  </tbody>
+</table>

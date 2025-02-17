@@ -1,0 +1,44 @@
+<!-- <div class="order-main-container">
+  <mat-toolbar>
+    <mat-icon class = "info-icon">info</mat-icon>
+    <h2 style="margin-left: 8px;">Please confirm your action</h2>
+  </mat-toolbar>
+    <mat-dialog-content style="align-content: center;"(scroll)="onWindowScroll($event)">
+      <div class="page-inner-container">
+        <div class="client-select">
+          <div class="button-container" >
+            <mat-spinner
+            class="medium-spinner"
+            *ngIf="genEinvLoading"
+          ></mat-spinner>
+          <button mat-raised-button mat-stroked-button cdkFocusInitial (click)="onConfirm()">CONFIRM</button>
+          <button mat-raised-button mat-stroked-button (click)="onCancel()">CANCEL</button>
+        </div>
+        </div>
+      </div>
+    </mat-dialog-content>
+
+
+  </div> -->
+
+
+  <div class="order-main-container">
+    <mat-toolbar>
+      <div class="create-order-title-wrapper">
+        <h2 class="order-main-title">Generate E-Invoice</h2>
+      </div>
+    </mat-toolbar>
+    <mat-dialog-content style="display: flex; align-items: center">
+      <div>
+        <p>
+          Are you sure you want to generate e-invoice ?
+        </p>
+      </div>
+    </mat-dialog-content>
+    <mat-dialog-actions>
+      <span fxFlex></span>
+      <button  class="back-btn-ui" mat-dialog-close (click)="onCancel()">Cancel</button>
+      <button mat-raised-button (click)="onConfirm()">Yes</button>
+    </mat-dialog-actions>
+  </div>
+  

@@ -1,0 +1,36 @@
+.custom-cell {
+  display: flex;
+  align-items: center;
+  margin-top: 1px;
+  gap: 6px;
+  &.ag-qty {
+    justify-content: space-around;
+  }
+  .qty-split {
+    color: #075da8;
+    cursor: pointer;
+    // margin-right: 6px;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+.custom-cell-image {
+  width: 30px;
+  height: 30px;
+  // margin-right: 8px;
+}
+.custom-cell-name {
+  font-size: 14px;
+}
+
+.overflow-hiden {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.prodcuct-ellipsis {
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

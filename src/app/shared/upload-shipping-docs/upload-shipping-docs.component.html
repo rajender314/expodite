@@ -1,0 +1,151 @@
+
+<div class="shipping-sec" fxLayout="row">
+  <div class="address-container shipping-status2">
+    <div
+      class="image-upload"
+      [ngClass]="{
+        justify: shippingAttachments.length
+      }"
+      style="gap: 14px"
+    >
+      <!-- <div
+        *ngIf="editShipping && blockContent"
+        ng2FileDrop
+        [ngClass]="{ 'file-over': hasDropZoneOver }"
+        (fileOver)="fileOverBase($event)"
+        (onFileDrop)="fileDrop($event)"
+        [uploader]="uploader"
+        class="file-zone"
+        [ngClass]="{
+          disableClass: selectedOrderStatus == 'Delivered'
+        }"
+        multiple
+      >
+        <input
+          id="shippingFiles"
+          type="file"
+          ng2FileSelect
+          [uploader]="uploader"
+          (change)="fileSelected($event)"
+          [hidden]="true"
+          multiple
+        /> -->
+      <div
+        class="pdf-upload attachment_upload layout-column"
+        [class.cursor-allowed]="pointerEvent || isDisabled"
+      >
+        <label
+          for="shippingFiles"
+          [class.not-allowed]="pointerEvent || isDisabled || adminService.rolePermissions[PermissionKey] == 2 ? true : false"
+          
+        >
+          <div class="upload_post">
+            <div class="upload_section" (click)="uploadSupplier('sales')">
+              <mat-icon
+                class="contact-add mat-icon notranslate material-icons mat-icon-no-color"
+                role="img"
+                aria-hidden="true"
+              >
+                add</mat-icon
+              >
+              <h3 class="contact-text" [class.diableColor]="adminService.rolePermissions[PermissionKey] == 2 ? true : false">{{ labelName }}</h3>
+            </div>
+          </div>
+        </label>
+      </div>
+      <!-- </div> -->
+      <div
+        class="image_wrap"
+        *ngFor="let file of shippingAttachments; let i = index"
+      >
+        <div class="upload_post">
+          <div class="upload_section">
+            <a target="_blank" style="padding-bottom: 20px;">
+              <div class="delete-value">
+                <button
+                  mat-icon-button
+                  class="dots"
+                  [matMenuTriggerFor]="menu"
+                  aria-label="Example icon-button with a menu"
+                >
+                  <mat-icon>more_vert</mat-icon>
+                </button>
+
+                <span class="img-icon" *ngIf="!isDisabled && adminService.rolePermissions[PermissionKey] == 1">
+                  <a
+                    style="display: contents"
+                    class="click delete"
+                    title="Delete"
+                    (click)="deleteUploads(file, i, 'sales')"
+                  >
+                    <span class="material-icons"> delete </span>
+                  </a>
+                </span>
+              </div>
+
+              <img
+                *ngIf="
+                  file.filepath.lastIndexOf('.pdf') == -1 &&
+                  file.filepath.lastIndexOf('.doc') == -1 &&
+                  file.filepath.lastIndexOf('.doc') == -1 &&
+                  file.filepath.lastIndexOf('.xlsx') == -1
+                "
+                class="list-upload-img"
+                [src]="file.filepath"
+              />
+              <div *ngIf="file.filepath.lastIndexOf('.pdf') > -1">
+                <img
+                  [src]="images.pdf_png"
+                  style="height: 100%; width: 100%; object-fit: contain"
+                />
+              </div>
+              <div *ngIf="file.filepath.lastIndexOf('.xlsx') > -1">
+                <img
+                  [src]="images.xlsx_png"
+                  style="height: 100%; width: 100%; object-fit: contain"
+                />
+              </div>
+              <div
+                *ngIf="
+                  file.filepath.lastIndexOf('.doc') > -1 ||
+                  file.filepath.lastIndexOf('.docx') > -1
+                "
+              >
+                <img
+                  [src]="images.docx_png"
+                  style="height: 100%; width: 100%; object-fit: contain"
+                />
+              </div>
+              <p class="file-name truncate" title="{{file.original_name}}">{{file.original_name}}</p>
+            </a>
+          </div>
+          <mat-menu #menu="matMenu" class="custom-menu-list">
+            <div class="upload-drop">
+              <span class="img-icon">
+                <a
+                  class="click"
+                  title="Download"
+                  (click)="downloadFile(file, i, 'sales')"
+                >
+                  <span class="pointer"> Download </span>
+                </a>
+              </span>
+              <!-- <span class="img-icon">
+              <a
+                class="click"
+                title="notes"
+                (click)="SaveDescription(file)"
+              >
+                <span class="pointer"> Notes </span>
+              </a>
+            </span> -->
+            </div>
+          </mat-menu>
+          <div class="icon-sections">
+            <div class="icon-content"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,5 +1,5 @@
 import { AdminService } from './../../../../../dashboard/src/app/services/admin.service';
-import { Component, OnInit, ViewChild, ElementRef, OnChanges, Renderer2 } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, OnChanges, Renderer2, NgModule } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Location } from '@angular/common';
 import { CustomValidation } from '../../custom-format/custom-validation';
@@ -24,7 +24,7 @@ export class ChangePasswordComponent implements OnInit {
   public language = language;
   enterInputDisable:boolean;
   public inputFocus = false;
-  public urlPath ;
+  public urlPath =null;
   constructor(
     private renderer : Renderer2,
     private fb: FormBuilder,
@@ -38,12 +38,14 @@ export class ChangePasswordComponent implements OnInit {
     }
 
   ngOnInit() {
-    // const element = this.renderer.selectRootElement('#changePwd');
-    // setTimeout(() => element.focus(), 0);
-    // this.createForm();
-    // console.log(this.adminService.manageAccount)
-    this.urlPath = this._sanitizer.bypassSecurityTrustResourceUrl(this.adminService.manageAccount);
-    this.titleService.setTitle('Expodite - Manage Account');
+    
+    this.urlPath = this.adminService.manageAccount !== '' ? this._sanitizer.bypassSecurityTrustResourceUrl(this.adminService.manageAccount) : false;
+    if(this.urlPath != null){
+      this.createForm();
+      // this.titleService.setTitle('Expodite - Manage Account');
+      // const element = this.renderer.selectRootElement('#changePwd');
+      // setTimeout(() => element.focus(), 0);
+    }
   }
   
   createForm(): void {

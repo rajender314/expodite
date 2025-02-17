@@ -1,0 +1,26 @@
+<mat-toolbar style="height: 54px" color="primary" class="hai">
+  <h2 mat-dialog-title style="font-size: 18px">{{ data?.heading }}</h2>
+  <span fxFlex></span>
+  <button mat-icon-button mat-dialog-close *ngIf="data?.is_notError">
+    <mat-icon>close</mat-icon>
+  </button>
+</mat-toolbar>
+<mat-dialog-content class="delete-body">
+  <mat-icon mat-suffix color="warn">{{ data.icon }}</mat-icon>
+  <p style="padding-left: 12px">{{ data?.message }}</p>
+</mat-dialog-content>
+<!-- <mat-spinner class="medium-spinner" *ngIf="showSpinner"></mat-spinner> -->
+
+<mat-dialog-actions style="height: 54px">
+  <span fxFlex></span>
+  <button mat-raised-button mat-dialog-close *ngIf="!data?.is_notError">
+    {{ data?.button }}
+  </button>
+  <button mat-raised-button *ngIf="data?.is_notError" (click)="onButtonClick()">
+    {{ data?.button }}
+  </button>
+  <!-- <button mat-raised-button (click)="deleteOrder()" [disabled]="disabledSave">
+    Yes
+  </button> -->
+  <!--<button *ngIf="!success" mat-raised-button mat-dialog-close color="warn" (click)="confirm()"></button>-->
+</mat-dialog-actions>

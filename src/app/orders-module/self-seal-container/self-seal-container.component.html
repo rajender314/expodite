@@ -1,0 +1,547 @@
+<div class="inner-container" [class.collapse]="!showSealedContainer">
+  <mat-toolbar class="package-toolbar">
+    <img class="shipping-image" [src]="images.pdf_download" />
+    <span>Self Sealed Container</span>
+    <span fxFlex></span>
+    <button (click)="onEdit()" mat-icon-button>
+      <mat-icon class="edit-icon" title="Edit" mat-icon-button
+        >mode_edit
+      </mat-icon>
+    </button>
+    <a
+      *ngIf="!clientPermission"
+      target="_blank"
+      href="generateSealedContainerPdf?orders_id={{
+        orders.selectedOrder.id
+      }}&is_printable=1"
+    >
+      <button mat-icon-button>
+        <img [src]="images.printer_icon" title="Print" />
+      </button>
+    </a>
+    <a
+      href="generateSealedContainerPdf?orders_id={{
+        orders.selectedOrder.id
+      }}&is_printable=0"
+    >
+      <button mat-icon-button>
+        <img [src]="images.download_arrow" title="Download" />
+      </button>
+    </a>
+    <button mat-icon-button (click)="toggleSealedContainer()">
+      <img
+        [src]="images.grey_arrow"
+        mat-icon-button
+        *ngIf="showSealedContainer"
+      />
+      <mat-icon class="toggle-arrow" *ngIf="!showSealedContainer">
+        keyboard_arrow_down</mat-icon
+      >
+    </button>
+  </mat-toolbar>
+  <div class="table-container" *ngIf="showSealedContainer">
+    <div class="sealed-container" style="font-size: 14px; color: #565656">
+      <table style="width: 100%">
+        <tbody style="width: 100%">
+          <tr>
+            <td colspan="2">
+              <h1
+                style="
+                  text-align: center;
+                  font-size: 16px;
+                  font-weight: 700;
+                  text-decoration: underline;
+                  padding: 24px 0px;
+                "
+              >
+                DETAILS OF SELF - SEALED CONTAINERS
+              </h1>
+            </td>
+          </tr>
+          <tr>
+            <td style="width: 48%; padding-bottom: 10px">
+              <p style="text-align: left; font-weight: 700">
+                1.INVOICE NO & DATE
+              </p>
+            </td>
+            <td
+              style="padding-bottom: 10px"
+              *ngFor="let invoice of orders.invoice"
+            >
+              <p style="text-align: left; font-weight: 700">
+                {{ invoice.Inovice.inv_nbr }} & DT.
+                {{ invoice.Inovice.date_added }}
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td style="width: 48%; padding-bottom: 10px">
+              <p style="text-align: left; font-weight: 700">2(A) IEC NO.</p>
+            </td>
+            <td style="padding-bottom: 10px">
+              <p style="text-align: left; font-weight: 700">
+                {{ compnayDetails?.ie_code }}
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td style="width: 48%; padding-bottom: 10px">
+              <p style="text-align: left; font-weight: 700; padding-left: 10px">
+                (B) BRANCH CODE
+              </p>
+            </td>
+            <td style="padding-bottom: 10px">
+              <p style="text-align: left; font-weight: 700">NA</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="width: 48%; padding-bottom: 10px" valign="top">
+              <p style="text-align: left; font-weight: 700; padding-left: 10px">
+                (C) PAN NO.
+              </p>
+            </td>
+            <td style="padding-bottom: 10px" valign="top">
+              <p style="text-align: left; font-weight: 700">
+                {{ compnayDetails?.pan_no }}
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td style="width: 48%; padding-bottom: 10px" valign="top">
+              <p style="text-align: left; font-weight: 700; padding-left: 10px">
+                (D) GSTIN
+              </p>
+            </td>
+            <td style="padding-bottom: 10px" valign="top">
+              <p style="text-align: left; font-weight: 700">
+                {{ compnayDetails?.gstin_no }}
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td style="width: 48%; padding-bottom: 10px" valign="top">
+              <p style="text-align: left; font-weight: 700">
+                3.NAME OF MARCHANT EXPORTER
+              </p>
+            </td>
+            <td style="padding-bottom: 10px" valign="top">
+              <p class="shipper-head-address" style="font-weight: bold">
+                {{ compnayDetails?.name }}
+              </p>
+              <p class="shipper-head-address" style="font-weight: bold">
+                {{ compnayDetails?.address1 }}
+              </p>
+              <p class="shipper-head-address" style="font-weight: bold">
+                {{ compnayDetails?.address2 }}
+              </p>
+              <p class="shipper-head-address" style="font-weight: bold">
+                {{ compnayDetails?.city }}
+              </p>
+              <p class="shipper-head-address" style="font-weight: bold">
+                {{ compnayDetails?.state }}
+              </p>
+              <p class="shipper-head-address" style="font-weight: bold">
+                {{ compnayDetails?.country }}
+              </p>
+              <p class="shipper-head-address" style="font-weight: bold">
+                {{ compnayDetails?.postal_code }}
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td style="width: 48%; padding-bottom: 40px" valign="top">
+              <p style="text-align: left; font-weight: 700">
+                4.FACTORY STUFFING ADDRESS
+              </p>
+            </td>
+            <td style="padding-bottom: 40px" valign="top">
+              <p
+                *ngIf="!isEditing"
+                class="shipper-head-address"
+                [innerHTML]="factoryAddress"
+                style="text-align: left; font-weight: 700; line-height: 20px"
+              ></p>
+              <mat-form-field
+                *ngIf="isEditing"
+                class="custom-input block-ele grid-full"
+                floatLabel="never"
+                style="
+                  margin-top: 0px;
+                  position: relative;
+                  left: -5px;
+                  top: 7px;
+                "
+              >
+                <textarea
+                  [(ngModel)]="data.factoryAddress"
+                  matInput
+                  placeholder="Enter Factory Stuffing Address"
+                  autofocus="on"
+                  style="
+                    height: 126px;
+                    line-height: 1.4;
+                    padding: 4px 10px;
+                    border-width: 2px;
+                  "
+                  rows="3"
+                >
+                </textarea>
+              </mat-form-field>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="2" style="padding-bottom: 10px">
+              <p style="text-align: left; line-height: 24px">
+                5.
+                {{ freightData.number_of_containers }}
+                Containers is received and loaded/ stuffed at
+                {{ productDetails }} with
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="2" style="padding-bottom: 10px">
+              <p style="text-align: left; line-height: 24px">
+                6. after selection. Ascertained quantity / gross weight / net
+                weight. The goods described in the invoice have been stuffed in
+                the following containers
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="2">
+              <table
+                style="
+                  width: 100%;
+                  border-collapse: collapse;
+                  border: 1px solid #ccc;
+                  margin-bottom: 20px;
+                "
+              >
+                <tbody>
+                  <tr>
+                    <td style="border-right: 1px solid #ccc; padding: 8px">
+                      <p style="text-align: left; font-weight: 700">
+                        Vehicle No.
+                      </p>
+                    </td>
+                    <td style="border-right: 1px solid #ccc; padding: 8px">
+                      <p style="text-align: left; font-weight: 700">
+                        Container No.
+                      </p>
+                    </td>
+
+                    <td style="border-right: 1px solid #ccc; padding: 8px">
+                      <p style="text-align: left; font-weight: 700">
+                        Container size
+                      </p>
+                    </td>
+
+                    <td style="border-right: 1px solid #ccc; padding: 8px">
+                      <p style="text-align: left; font-weight: 700">
+                        Shipping Line seal No
+                      </p>
+                    </td>
+                    <td style="border-right: 1px solid #ccc; padding: 8px">
+                      <p style="text-align: left; font-weight: 700">
+                        RFID Seal No.
+                      </p>
+                    </td>
+                    <td style="border-right: 1px solid #ccc; padding: 8px">
+                      <p style="text-align: left; font-weight: 700">
+                        Qty / Packages
+                      </p>
+                    </td>
+                  </tr>
+                  <tr *ngFor="let item of data?.containers">
+                    <td
+                      style="
+                        border-right: 1px solid #ccc;
+                        border-top: 1px solid #ccc;
+                        padding: 8px;
+                      "
+                    >
+                      <p style="text-align: left">
+                        {{ item?.transport_vehicle_number }}
+                      </p>
+                    </td>
+                    <td
+                      style="
+                        border-right: 1px solid #ccc;
+                        border-top: 1px solid #ccc;
+                        padding: 8px;
+                      "
+                    >
+                      <p style="text-align: left">
+                        {{ item?.container_number }}
+                      </p>
+                    </td>
+
+                    <td
+                      style="
+                        border-right: 1px solid #ccc;
+                        border-top: 1px solid #ccc;
+                        padding: 8px;
+                      "
+                    >
+                      <p style="text-align: left">
+                        {{ item?.type_of_container }}
+                      </p>
+                    </td>
+
+                    <td
+                      style="
+                        padding: 8px;
+                        border-top: 1px solid #ccc;
+                        border-right: 1px solid #ccc;
+                      "
+                    >
+                      <p style="text-align: left">
+                        {{ item?.carrier_seal_number }}
+                      </p>
+                    </td>
+                    <td
+                      style="
+                        border-right: 1px solid #ccc;
+                        border-top: 1px solid #ccc;
+                        padding: 8px;
+                      "
+                    >
+                      <p style="text-align: left">
+                        {{ item?.rfid_number }}
+                      </p>
+                    </td>
+
+                    <td
+                      style="
+                        border-right: 1px solid #ccc;
+                        border-top: 1px solid #ccc;
+                        padding: 8px;
+                        white-space: normal;
+                      "
+                    >
+                      <p
+                        style="text-align: left; word-break: break-all"
+                        *ngIf="!isEditing"
+                      >
+                        {{ item?.quantity }}
+                      </p>
+                      <mat-form-field
+                        style="position: relative; right: 5px; width: 100%"
+                        class="custom-input mat-input-custom-spacing mt-0 ml-1"
+                        floatLabel="never"
+                        *ngIf="isEditing"
+                      >
+                        <input
+                          type="text"
+                          matInput
+                          style="margin-top: 2px"
+                          (change)="valueupdate(quantity, item, $event)"
+                          [(ngModel)]="item.quantity"
+                          placeholder="Qty/Pacakages"
+                          class="price-value"
+                        />
+                      </mat-form-field>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td
+                      colspan="5"
+                      style="
+                        border-right: 1px solid #ccc;
+                        border-top: 1px solid #ccc;
+                        padding: 8px;
+                      "
+                    >
+                      <p style="text-align: right; word-break: break-all">
+                        <b>TOTAL PALLETS</b>
+                      </p>
+                    </td>
+                    <td
+                      style="
+                        padding: 8px;
+                        border-top: 1px solid #ccc;
+                        white-space: normal;
+                      "
+                    >
+                      <p *ngIf="!isEditing">
+                        {{ data?.pallets }}
+                      </p>
+                      <mat-form-field
+                        style="position: relative; right: 5px; width: 100%"
+                        class="custom-input mat-input-custom-spacing mt-0 ml-1"
+                        floatLabel="never"
+                        *ngIf="isEditing"
+                      >
+                        <input
+                          type="text"
+                          matInput
+                          style="margin-top: 2px"
+                          [(ngModel)]="data.pallets"
+                          placeholder="Total Pallets"
+                          class="price-value"
+                        />
+                      </mat-form-field>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="2">
+              <p style="text-align: left">
+                This Container is stuffed as per SSP NO.
+                <span
+                  style="border-bottom: 1px dotted #565656"
+                  class="w-120"
+                  *ngIf="!isEditing"
+                >
+                  {{ data?.sspno }}
+                </span>
+                <mat-form-field
+                  style="position: relative; top: 12px"
+                  class="custom-input pdf-feild"
+                  floatLabel="never"
+                  *ngIf="isEditing"
+                >
+                  <input
+                    matInput
+                    type="text"
+                    maxlength="20"
+                    placeholder="SSP NO."
+                    class="price-value"
+                    [(ngModel)]="data.sspno"
+                  />
+                </mat-form-field>
+
+                DATED
+                <span
+                  style="border-bottom: 1px dotted #565656"
+                  class="w-120"
+                  *ngIf="!isEditing"
+                  >{{ data?.dated }}</span
+                >
+                <mat-form-field
+                  style="position: relative; top: 12px"
+                  class="custom-input"
+                  floatLabel="never"
+                  *ngIf="isEditing"
+                >
+                  <input
+                    type="text"
+                    matInput
+                    style="margin-top: 2px"
+                    [(ngModel)]="data.dated"
+                    placeholder="Dated"
+                    class="price-value"
+                  />
+                </mat-form-field>
+                , Self sealing No.:
+                <span style="border-bottom: 1px dotted #565656" class="w-120">
+                </span>
+                DIN :
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="2">
+              <p
+                *ngIf="!isEditing"
+                class="shipper-head-address"
+                [innerHTML]="description"
+                style="text-align: left; line-height: 20px; margin-top: 20px"
+              ></p>
+              <mat-form-field
+                *ngIf="isEditing"
+                class="custom-input block-ele grid-full"
+                floatLabel="never"
+                style="
+                  margin-top: 0px;
+                  position: relative;
+                  left: -5px;
+                  top: 7px;
+                "
+              >
+                <textarea
+                  [(ngModel)]="data.description"
+                  matInput
+                  placeholder="Enter Text Here"
+                  autofocus="on"
+                  style="
+                    height: 126px;
+                    line-height: 1.4;
+                    padding: 4px 10px;
+                    border-width: 2px;
+                  "
+                  rows="3"
+                >
+                </textarea>
+              </mat-form-field>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="2">
+              <p style="text-align: left; margin-top: 20px">
+                One cover with samples of items stuffed in container forward for
+                Custom purpose.
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="2" *ngFor="let invoice of orders.invoice">
+              <p style="text-align: left; margin-top: 20px">
+                Our Tax Invoice No.
+                {{ invoice.Inovice.inv_nbr }} DTD:
+                {{ invoice.Inovice.date_added }}
+              </p>
+              <p
+                style="
+                  text-align: left;
+
+                  margin-top: 20px;
+                "
+              >
+                SEALING / STUFFING DATE :
+              </p>
+              <p style="text-align: left; margin-top: 24px">
+                <b>Date : {{ currentDate | date : "dd-MM-yyyy" }}</b>
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="2">
+              <p style="font-weight: 700; text-align: right">
+                For, AAPL SOLUTIONS PVT. LTD
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="2" style="padding-top: 40px">
+              <p style="font-weight: 700; text-align: right">
+                Authorized Signatory
+              </p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div
+      *ngIf="isEditing"
+      class="footer-bottom fxflex"
+      style="padding: 14px"
+      fxLayout="row"
+      fxLayoutAlign="end center"
+    >
+      <span fxFlex></span>
+      <section class="section-right">
+        <button (click)="onEdit()" type="button" mat-button>Cancel</button>
+
+        <button (click)="onEdited()" type="submit" mat-raised-button>
+          Save
+        </button>
+      </section>
+      <div class="cb"></div>
+    </div>
+  </div>
+</div>

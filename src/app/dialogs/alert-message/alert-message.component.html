@@ -10,7 +10,7 @@
 </mat-dialog-content>
 <mat-dialog-actions>
   <span fxFlex></span>
-  <button *ngIf="!success" mat-button mat-dialog-close>{{language.defaults.cancel}}</button>
+  <button *ngIf="!success"  class="back-btn-ui" mat-dialog-close>{{language.defaults.cancel}}</button>
   <button *ngIf="!success" mat-raised-button mat-dialog-close color="warn" (click)="confirm()">{{language.defaults.yes}} {{data.title}}</button> <!-- [mat-dialog-close]="success" -->
 
 </mat-dialog-actions>

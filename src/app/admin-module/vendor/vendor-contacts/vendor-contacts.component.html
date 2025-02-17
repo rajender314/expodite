@@ -1,294 +1,433 @@
-<p *ngIf="0">sdsdsds</p>
-<div class="details clients-details-container hh" >
-    <p *ngIf="0">111</p>
-    <mat-toolbar class="mat-small-toolbar app-small-toolbar">
-        <section class="section-left">
-            <span class="client-detail" *ngIf="Contacts && Contacts.name" title="{{Contacts.name}}" [innerHtml]="Contacts.name"></span>
-        </section>
-        <span fxFlex></span>
-    </mat-toolbar>
+<section class="expansion-panel-ui">
+  <div class="menu-title" style="display: flex; justify-content: space-between">
+    <h1
+      *ngIf="Contacts && Contacts.company_name"
+      title="{{ Contacts.company_name }}"
+      [innerHtml]="Contacts.company_name"
+    ></h1>
+    <div *ngIf="viewActivityLogIcon && !emptyAddressData">
+      <button
+        mat-icon-button
+        class="action-orderbtn"
+        (click)="openActivityModal('add_vendors')"
+      >
+        <img [src]="images.activity_log_icon" title="User Activity Tracker" />
+      </button>
+    </div>
+  </div>
+  <div class="expansion-panel-scroll">
+    <mat-tab-group
+      (selectedTabChange)="tabChanged($event)"
+      *ngIf="!removeTabs && !loading"
+      [selectedIndex]="selectedTabIndex"
+    >
+      <!--////Details///-->
+      <mat-tab label="Details" class="details-tab" *ngIf="adminService.rolePermissions.view_vendors == 1">
+        <perfect-scrollbar *ngIf="!emptyAddressData">
+          <mat-card class="client-documents-card">
+            <form class="organisation-details form-ui">
+              <mat-list fxLayout="row" style="padding-top: 0">
+                <app-form-builder
+                  [module]="'add_vendors'"
+                  (trigger)="formEmitEvent($event)"
+                  (emitUploadInfo)="emitUploadInfo($event)"
+                  [editUpload]="true"
+                  [Contacts]="Contacts"
+                  [undoOnCancel]="undoOnCancel"
+                  [PermissionKey]="'edit_vendor'"
+                ></app-form-builder>
+              </mat-list>
+              <div class="cb"></div>
+              <div
+                class="footer animated slideInUp"
+                fxLayout="row"
+                fxLayoutAlign="end center"
+                *ngIf="detailsForm?.dirty"
+              >
+                <button
+                  type="button"
+                  class="icon-btn-ui"
+                  class="back-btn-ui"
+                  (click)="cancel(detailsForm)"
+                >
+                  {{ language.defaults.cancel }}
+                </button>
+                <button
+                  type="submit"
+                  class="icon-btn-ui"
+                  style="margin-left: 15px"
+                  [disabled]="isFormSaved"
+                  mat-raised-button
+                  (click)="updateOrganization(detailsForm)"
+                >
+                  {{ language.defaults.save }}
+                </button>
+              </div>
+            </form>
+          </mat-card>
+          <div class="page-sub-header" *ngIf="adminService.rolePermissions.view_vendor_address_details == 1">
+            <div class="d-flex justify-content-between align-items-center">
+              <h2>
+                Address Details
+                <span *ngIf="organizationDetails.length != 0"
+                  >({{ organizationDetails.length }})</span
+                >
+              </h2>
+            </div>
+          </div>
 
-    <mat-tab-group (selectedTabChange)="tabChanged($event)" [selectedIndex]="selectedTabIndex"  *ngIf="!removeTabs && !loading">
-        <!--////Details///-->
-        <mat-tab label="Details" class="details-tab" *ngIf="!factoryProfile ">
-            <div *ngIf="!emptyAddressData">
-                <mat-card class="client-documents-card">
-                    <form [formGroup]="detailsForm" class="organisation-details">
-                        <!--<button class="add-address-link" mat-button (click)="updateAddress()">
-                        <mat-icon class="material-icons">add</mat-icon> {{language.defaults.addAddress}}
-                    </button>-->
+          <div class="contacts-billable"  *ngIf="adminService.rolePermissions.view_vendor_address_details == 1">
+            <div class="row w-100">
+              <div
+                class="col-sm-6 col-lg-4 adress-card"
+                *ngFor="let org of organizationDetails; let i = index"
+              >
+                <mat-card class="card">
+                  <mat-card-title class="address-title">
+                    Address {{ i + 1 }}
+                    <span class="icon-btn-holder">
+                      <button
+                        class="btn btn-icon btn-flat-success"
+                        title="Edit"
+                        (click)="updateAddress(org, i)"
+                        *ngIf="adminService.rolePermissions.edit_vendor_address_details == 1"
+                      >
+                        <mat-icon class="contact-add">edit</mat-icon>
+                      </button>
+                      <!-- <button
+                        class="btn btn-icon btn-flat-success"
+                        title="Delete"
+                        (click)="
+                          deleteVendorAddress(
+                            org,
+                            'add_vendor_address',
+                            'Address'
+                          )
+                        "
+                      > 
+                        <mat-icon
+                          class="btn btn-icon btn-flat-success"
+                          class="contact-add"
+                          >delete</mat-icon
+                        >
+                      </button>-->
+                    </span>
+                  </mat-card-title>
+                  <div class="contact-details">
+                    <h3 class="contact-name">
+                      {{ org.address_type }}
+                    </h3>
+                    <p class="contact-address" title="{{ org.company_name }}">
+                      {{ org.company_name }}
+                    </p>
+                    <p class="contact-address" title="{{ org.address1 }}">
+                      {{ org.address1 }},
+                    </p>
+                    <p
+                      class="contact-address"
+                      *ngIf="org.address2"
+                      title="{{ org.address2 }}"
+                    >
+                      {{ org.address2 }},
+                    </p>
+                    <p
+                      class="contact-address"
+                      *ngIf="org.address3"
+                      title="{{ org.address3 }}"
+                    >
+                      {{ org.address3 }},
+                    </p>
+                    <p
+                      class="contact-address"
+                      *ngIf="org.address4"
+                      title="{{ org.address4 }}"
+                    >
+                      {{ org.address4 }},
+                    </p>
+                    <p
+                      class="contact-address"
+                      title="{{ org.country_name }}, {{ org.state }}"
+                    >
+                      {{ org.country_name }}, {{ org.state }},
+                    </p>
+                    <p
+                      class="contact-address"
+                      *ngIf="org.city"
+                      title="{{ org.city }},  {{ org.postal_code }}"
+                    >
+                      {{ org.city }}, {{ org.postal_code }} .
+                    </p>
+                  </div>
 
-                        <mat-list fxLayout="row">
-                            <div fxLayout="column" class="image-upload org-upload" [class.not-allowed]="pointerEvent">
-                                <div ng2FileDrop [ngClass]="{'file-over': hasDropZoneOver}" (fileOver)="fileOverBase($event)" (onFileDrop)="fileDrop($event)" [uploader]="uploader" class="file-drop-zone">
-                                    <input id="edit-org-logo" type="file" ng2FileSelect [uploader]="uploader" (change)="fileSelected($event)" [hidden]="true" multiple/>
-                                    <label for="edit-org-logo" class="browse-file" *ngIf="!uploads.length">
-                                        <a>Upload Logo</a>
-                                    </label>
-                                    <!-- <label for="edit-org-logo" class="change-file" *ngIf="uploads.length">
-                                        <a>{{language.defaults.changeFile}}</a>
-                                    </label> -->
-                                    <label for="edit-org-logo" class="image-edit-delete" *ngIf="uploads.length">
-                                        <a class="upload-open">{{language.defaults.changeFile}}</a>
-                                        <!-- <mat-icon>mode_edit</mat-icon> -->
-                                    </label>
-                                </div>
-                                <div class="change-user-file">
-                                    <span *ngIf="uploadError" class="error-msg error-strip">*You have selected an invalid file type. Only jpg, jpeg, png files are allowed.</span>
-                                </div>
-                                <div class="change-user-file">
-                                    <span *ngIf="sizeError" class="error-msg error-strip">*File more than 5MB is not allowed.</span>
-                                </div>
-                                <div class="images">
-                                    <ul *ngIf="uploads.length">
-                                        <li *ngFor="let file of uploads; let i = index">
-                                            <img [src]="file.source_path" alt="file.filename">
-                                            <div class="overlay"></div>
-                                            <mat-icon class="delete" (click)="deleteItem(i)">delete</mat-icon>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div fxLayout="column" style="width:100%;margin-left:20px;">
-                                <mat-form-field class="custom-input" floatLabel="never">
-                                    <label class="custom-label">{{language.defaults.organisationName}}</label>
-                                    <input matInput placeholder={{language.defaults.organisationName}} maxlength=150 (keyup)="selectDetail()" formControlName="company_name">
-                                    <mat-error *ngIf="detailsForm.controls.company_name.hasError('required') || detailsForm.controls.company_name.hasError('whitespace')">{{language.validations.organisationName}}</mat-error>
-                                </mat-form-field>
-
-                                <mat-form-field class="custom-input" floatLabel="never">
-                                    <label class="custom-label">{{language.defaults.website}}</label>
-                                    <input matInput placeholder={{language.defaults.website}} (keyup)="selectDetail()" maxlength=150 formControlName="website">
-                                    <mat-error *ngIf="detailsForm.controls.website.hasError('required')">{{language.validations.website}}</mat-error>
-                                    <mat-error *ngIf="!detailsForm.controls.website.hasError('required') && detailsForm.controls.website.hasError('pattern')">{{language.validations.validURl}}</mat-error>
-                                </mat-form-field>
-                                <mat-form-field class="custom-input" floatLabel="never" *ngIf="adminUser">
-                                    <label class="custom-label">{{language.defaults.currency}}</label>
-                                    <mat-select placeholder="Select Currency" (click)="selectDetail()" formControlName="currency_id">
-                                        <mat-option *ngFor="let cur of currencyX" [value]="cur.id">{{cur.type}}</mat-option>
-                                    </mat-select>
-                                </mat-form-field>
-                                <mat-form-field class="custom-input" floatLabel="never" *ngIf="adminUser">
-                                    <label class="custom-label">{{language.defaults.status}}</label>
-                                    <mat-select placeholder="Select Status" formControlName="status" (click)="onStatusChange($event)">
-                                        <mat-option [value]="stat.param"  *ngFor="let stat of status" [innerHtml]="stat.value"></mat-option>
-                                    </mat-select>
-                                    <mat-error *ngIf="detailsForm.controls.status.hasError('required')">{{language.validations.status}}</mat-error>
-                                </mat-form-field>
-
-                                <mat-form-field class="custom-input" floatLabel="never">
-                                    <label class="custom-label">{{language.defaults.selectCountry}}</label>
-                                    <mat-select placeholder={{language.defaults.selectCountry}} (click)="onCountryChange($event)" formControlName="country_id">
-                                        <mat-option [value]="Addcontry">Add Country</mat-option>
-                                        <mat-option *ngFor="let country of countries" [value]="country.id">{{country.name}}</mat-option>
-                                    </mat-select>
-                                    <mat-error *ngIf="!detailsForm.controls.country_id.pristine && detailsForm.controls.country_id.hasError('required')">Please Select Country</mat-error>
-
-                                </mat-form-field>
-                                <div class="add-new-address" *ngIf="submitCountry">
-                                    <mat-form-field fxFlex="80" class="custom-input mandatory" floatLabel="never">
-                                        <label class="custom-label">Add Country</label>
-                                        <input matInput placeholder="Add Country" maxlength=10 placeholder="Add Country" formControlName="addCountry">
-                                    </mat-form-field>
-                                    <span class="add-new" *ngIf="submitCountry" (click)="addCountry(detailsForm)">Add Country</span>
-                                </div>
-                                <div class="cb"></div>
-                                <div class="footer animated slideInUp" fxLayout="row" fxLayoutAlign="end center" *ngIf="activestate">
-                                    <button type="button" mat-button (click)="cancel(detailsForm)">{{language.defaults.cancel}}</button>
-                                    <button type="submit" mat-raised-button (click)="updateOrganization(detailsForm)" [disabled]="detailsForm.invalid">{{language.defaults.save}}</button>
-                                </div>
-
-
-                            </div>
-                        </mat-list>
-                        <div class="cb"></div>
-                    </form>
+                  <div class="cb"></div>
                 </mat-card>
-                <mat-toolbar class="detail-toolbar">
-                    <span class="title">Address Details</span>
-                </mat-toolbar>
-                <div class="contacts-billable">
-                    <mat-card class="contacts-card add-address" (click)="updateAddress()">
-                        <mat-card-content>
-                            <mat-icon class="contact-add">add</mat-icon>
-                            <h3 class="contact-text">{{language.defaults.addAddress}}</h3>
-                        </mat-card-content>
-                    </mat-card>
-                    <mat-card class="contacts-card title-card" *ngFor="let org of organizationDetails; let i = index">
-                        <mat-card-title class="address-title">Address {{i+1}}</mat-card-title>
-                        <div class="contact-details">
-                            <!-- <h3 class="contact-name">
-                                {{org.address_type}}
-                            </h3> -->
-                            <p class="contact-address" title="{{org.company_name}}">{{org.company_name}}</p>
-                            <p class="contact-address" title="{{org.address1}}">{{org.address1}}</p>
-                            <p class="contact-address" *ngIf="org.address2" title="{{org.address2}}">{{org.address2}}</p>
-                            <p class="contact-address" *ngIf="org.city" title="{{org.city}}">{{org.city}}</p>
-                            <p class="contact-address" title="{{org.state}}">{{org.state}}</p>
-                            <p class="contact-address" title="{{org.country_name}}">{{org.country_name}}</p>
-                            <p class="contact-address" title="{{org.country_name}}">{{org.postal_code}}</p>
+              </div>
+            </div>
+            <div class="no-results" *ngIf="organizationDetails.length == 0">
+              <div class="empty-img-holder">
+                <span class="material-icons"> business </span>
+              </div>
+              <p class="no-result-text">No Address Found</p>
+              <button
+                type="submit"
+                style="display: block; margin: 0 auto; margin-top: 14px"
+                mat-raised-button
+                (click)="updateAddress()"
+              >
+                {{ language.defaults.addAddress }}
+              </button>
+            </div>
+          </div>
 
-                        </div>
-                        <div class="contact-editDelete">
-                            <div class="contact-edit" (click)="updateAddress(org, i)">
-                                <span>edit</span>
-                                <span class="divider-one"></span>
-                            </div>
-                            <div class="contact-delete" (click)="deleteOrganizationAddress(org, i)">
-                                <span>delete</span>
-                            </div>
-                        </div>
-                        <div class="cb"></div>
-                    </mat-card>
-                </div>
-                <!-- <div *ngIf="!myProfile">
-                    <mat-toolbar class="detail-toolbar">
-                        <span class="title">My Version of {{companyDetails.companyName}}</span>
-                    </mat-toolbar>
-                    <div class="version-products">
-                        <mat-card class="client-documents-card product-card" *ngIf="!noProducts">
+          <div *ngIf="!myProfile" style="display: none">
+            <mat-toolbar class="detail-toolbar">
+              <span class="title"
+                >My Version of {{ companyDetails.companyName }}</span
+              >
+            </mat-toolbar>
+            <div class="version-products">
+              <mat-card
+                class="client-documents-card product-card"
+                *ngIf="!noProducts"
+              >
+                <mat-list class="product">
+                  <mat-list-item class="products-list product-divider">
+                    <h4 mat-header class="product-header">
+                      {{ language.defaults.productName }}
+                    </h4>
+                  </mat-list-item>
+                  <mat-accordion class="product-accordion">
+                    <mat-expansion-panel *ngFor="let product of productsList">
+                      <mat-expansion-panel-header [expandedHeight]="'48px'">
+                        <mat-panel-title>
+                          <span class="prod-name">{{ product.name }}</span>
+                        </mat-panel-title>
+                      </mat-expansion-panel-header>
+                      <ng-template matExpansionPanelContent>
+                        <div>
+                          <mat-card class="client-documents-card product-card">
                             <mat-list class="product">
-                                <mat-list-item class="products-list product-divider">
-                                    <h4 mat-header class="product-header">{{language.defaults.productName}}</h4>
-                                </mat-list-item>
-                                <mat-accordion class="product-accordion">
-                                    <mat-expansion-panel *ngFor="let product of productsList">
-                                        <mat-expansion-panel-header [expandedHeight]="'48px'">
-                                            <mat-panel-title>
-                                                <span class="prod-name">{{product.name}}</span>
-                                            </mat-panel-title>
-                                        </mat-expansion-panel-header>
-                                        <ng-template matExpansionPanelContent>
-                                            <div>
-                                                <mat-card class="client-documents-card product-card">
-                                                    <mat-list class="product">
-                                                        <mat-list-item class="products-list product-divider">
-                                                            <h4 mat-header class="product-header">Price Range</h4>
-                                                            <h4 mat-header class="price-header">Default Price ({{clientCurrency}})</h4>
-                                                        </mat-list-item>
-                                                        <mat-list-item class="products-list" *ngFor="let range of product.priceRange">
-                                                            <span mat-header class="prod-name">{{range.range_name}}</span>
-                                                            <span>{{range.range_price}}</span>
-                                                        </mat-list-item>
-                                                    </mat-list>
-                                                </mat-card>
-                                            </div>
-                                        </ng-template>
-                                    </mat-expansion-panel>
-                                </mat-accordion>
+                              <mat-list-item
+                                class="products-list product-divider"
+                              >
+                                <h4 mat-header class="product-header">
+                                  Price Range
+                                </h4>
+                                <h4 mat-header class="price-header">
+                                  Default Price ({{ clientCurrency }})
+                                </h4>
+                              </mat-list-item>
+                              <mat-list-item
+                                class="products-list"
+                                *ngFor="let range of product.priceRange"
+                              >
+                                <span mat-header class="prod-name">{{
+                                  range.range_name
+                                }}</span>
+                                <span>{{ range.range_price }}</span>
+                              </mat-list-item>
                             </mat-list>
-                        </mat-card>
-                    </div>
-                </div> -->
+                          </mat-card>
+                        </div>
+                      </ng-template>
+                    </mat-expansion-panel>
+                  </mat-accordion>
+                </mat-list>
+              </mat-card>
             </div>
-            
-        </mat-tab>
-        <!--////Details//-->
+          </div>
+        </perfect-scrollbar>
+      </mat-tab>
+      <!--////Details//-->
 
-        <!--//Contacts//-->
-        <mat-tab label="Contacts" class="contacts-tab" *ngIf="!factoryProfile ">
-            <div class="contacts-billable" *ngIf="!emptyContactsData">
-                <mat-card class="contacts-card add-contact" (click)="updateOrganizationContacts()">
-                    <mat-card-content>
-                        <mat-icon class="contact-add">add</mat-icon>
-                        <h3 class="contact-text">{{language.defaults.contact}}</h3>
-                    </mat-card-content>
-                </mat-card>
-                <mat-card class="contacts-card address-card" *ngFor="let contact of contactsList; let i = index;">
-                    <div class="contact-details">
-                        <h3 class="contact-name" title="{{contact.contact.first_name}} {{contact.contact.last_name}}">
-                            {{contact.contact.first_name}} {{contact.contact.last_name}}
-                        </h3>
-                        <p class="contact-address" title="{{contact.contact.primary_emai}}">{{contact.contact.primary_email}}</p>
-                        <p class="contact-address" title="{{contact.contact.primary_phone}}">{{contact.contact.primary_phone}}</p>
-                        <p class="contact-address" title="{{contact.contact.designation_name}}">{{contact.contact.designation_name}}</p>
-
-                    </div>
-                    <div class="contact-editDelete">
-                        <div class="contact-edit" (click)="updateOrganizationContacts(contact)" title="Edit">
-                            <span>edit</span>
-                            <span class="divider-one"></span>
-                        </div>
-                        <div class="contact-delete" (click)="deleteOrganizationsContact(contact.contact, i)" title="Delete">
-                            <span>delete</span>
-                            <!-- <span class="divider-one"></span> -->
-                        </div>
-                    </div>
-                    <div class="cb"></div>
-                </mat-card>
-
-
-
+      <!--//Contacts//-->
+      <mat-tab label="Contacts" class="contacts-tab" *ngIf="adminService.rolePermissions.view_vendor_contact == 1">
+        <div class="page-sub-header" *ngIf="contactsList.length != 0">
+          <div class="d-flex justify-content-between align-items-center">
+            <h2>
+              Contacts <span>({{ contactsList.length }})</span>
+            </h2>
+            <div>
+              <button
+                (click)="updateOrganizationContacts()"
+                style="margin-left: 15px"
+                mat-raised-button
+                *ngIf="adminService.rolePermissions.add_vendor_contact == 1"
+              >
+                {{ language.defaults.contact }}
+              </button>
             </div>
-            <div class="no-record no-clients" *ngIf="!fetchingData && emptyContactsData">No Contacts Found</div>
-        </mat-tab>
-        <!--///Contacts//-->
-
-        <!--//Documents//-->
-        <!-- <mat-tab label="Documents" class="documents-tab" >
-            <app-vendor-documents  [Organization]="Contacts" fxFlex="100%"></app-vendor-documents>
-        </mat-tab> -->
-        <!--//Documents//-->
-
-        <!--///Products//-->
-        <mat-tab label="Products" class="products-tab"  *ngIf="!fetchingData && !factoryProfile">
-            <app-vendor-products *ngIf="Contacts" (updateProducts)="updateProducts($event)" [Organization]="Contacts" fxFlex="100%"></app-vendor-products>
-        </mat-tab>
-
-        <!--//Products//-->
-
-        <!--///Settings///-->
-        <mat-tab label="User Access" class="settings-tab" *ngIf="!factoryProfile">
-            <app-vendorclient-settings [Organization]="Contacts" fxFlex="100%"></app-vendorclient-settings>
-
-            <!--//Settings//-->
-
-        </mat-tab>
-        <!-- certifictions tab -->
-        <mat-tab label="Certifications For Products" class="Certifications-tab" *ngIf="!factoryProfile && saveProduct">
-            <app-vendor-certifications *ngIf="Contacts" [Organization]="Contacts" fxFlex="100%"></app-vendor-certifications>
-        </mat-tab>
-        <!-- <mat-tab label="My Products" class="Certifications-tab" *ngIf="!factoryProfile">
-            <app-vendorclient-products *ngIf="Contacts" [class.client-footer]="!myProfile" [Organization]="Contacts" fxFlex="100%"></app-vendorclient-products>
-        </mat-tab> -->
-        <!-- certifictions tab -->
-        <mat-tab label="Special Instructions" class="Certifications-tab"  *ngIf="!fetchingData && !factoryProfile">
-            <div class="contacts-billable">
-                <mat-card class="contacts-card user-contact" (click)="addInstruction('')">
-                    <mat-card-content>
-                        <mat-icon class="contact-add">add</mat-icon>
-                        <h3 class="contact-text">Add</h3>
-                    </mat-card-content>
-                </mat-card>
-                <mat-card class="contacts-card useraccess-card" *ngFor="let instruction of specialInstruction;">
-                    <div class="instruction-details">
-                        <p class="instruction-data">{{instruction.name}}
-                        </p>
-                    </div>
-                    <div class="contact-editView">
-                        <div class="contact-view" (click)="viewIns(instruction)">View</div>
-                    </div>
-                    <div class="contact-editDelete spcl-ins">
-                        <div class="contact-edit" *ngIf="!factoryProfile" title="Edit" (click)="addInstruction(instruction)">
-                            <span>edit</span>
-                            <span class="divider-one"></span>
+          </div>
+        </div>
+        <div class="content-wrapper">
+          <div class="content-body">
+            <div class="c-row">
+              <div
+                class="w-33 contact-card-ui"
+                *ngFor="let contact of contactsList; let i = index"
+              >
+                <div class="card">
+                  <div class="card-body">
+                    <div
+                      class="d-flex justify-content-between flex-column w-100"
+                    >
+                      <div class="d-flex justify-content-start">
+                        <div class="c-avatar">
+                          {{ contact.first_name | firstWord
+                          }}{{ contact.last_name | firstWord }}
                         </div>
-                        <div class="contact-delete" *ngIf="!factoryProfile" (click)="deleteIns(instruction)">
-                            <span>delete</span>
-                            <span class="divider-two"></span>
+                        <div class="contact-info">
+                          <h3
+                            class="ellipsis"
+                            title="{{ contact.first_name }} {{
+                              contact.last_name
+                            }}"
+                          >
+                            {{ contact.first_name }}
+                            {{ contact.last_name }}
+                            <mat-icon
+                              *ngIf="contact.contact_user_access"
+                              title="Can login as User"
+                              >info</mat-icon
+                            >
+                          </h3>
+                          <p>{{ contact.primary_email }}</p>
+                          <p
+                            class="contact-address"
+                            title="{{ contact.primary_phone }}"
+                          >
+                            {{ contact.primary_phone }}
+                          </p>
+                          <p
+                            class="contact-address"
+                            title="{{ contact.designation_name }}"
+                          >
+                            {{ contact.designation_name }}
+                          </p>
                         </div>
-                        <div class="divider"></div>
+                      </div>
                     </div>
-
-                    <div class="cb"></div>
-                </mat-card>
+                  </div>
+                  <div class="d-flex flex-wrap card-action">
+                    <a
+                      (click)="
+                        deleteVendorAddress(
+                          contact,
+                          'add_vendor_contact',
+                          'Contact'
+                        )
+                      "
+                      class="text-btn-danger"
+                      *ngIf="adminService.rolePermissions.delete_vendor_contact == 1"
+                    >
+                      Delete
+                    </a>
+                    <a
+                      class="text-btn-brand"
+                      (click)="updateOrganizationContacts(contact)"
+                      *ngIf="adminService.rolePermissions.edit_vendor_contact == 1"
+                    >
+                      Edit
+                    </a>
+                    <a
+                      class="text-btn-brand"
+                      style="margin-left: 15px"
+                      (click)="openDialog('reset', contact.primary_email)"
+                      *ngIf="contact.contact_user_access && adminService.rolePermissions.edit_vendor_contact == 1"
+                    >
+                      Reset Password
+                    </a>
+                  </div>
+                </div>
+              </div>
             </div>
-        </mat-tab>
+            <div class="no-results" *ngIf="contactsList.length == 0">
+              <div class="empty-img-holder">
+                <span class="material-icons"> contact_page </span>
+              </div>
+              <p class="no-result-text">No Contacts Found</p>
+              <button
+                (click)="updateOrganizationContacts()"
+                style="display: block; margin: 0 auto; margin-top: 15px"
+                mat-raised-button
+                *ngIf="adminService.rolePermissions.add_vendor_contact == 1"
+              >
+                {{ language.defaults.contact }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </mat-tab>
+
+      <mat-tab
+        label="Special Instructions"
+        class="Certifications-tab"
+        *ngIf="myProfile && factoryProfile"
+      >
+        <div class="contacts-billable">
+          <mat-card
+            class="contacts-card user-contact"
+            (click)="addInstruction('')"
+          >
+            <mat-card-content>
+              <mat-icon class="contact-add">add</mat-icon>
+              <h3 class="contact-text">Add</h3>
+            </mat-card-content>
+          </mat-card>
+          <mat-card
+            class="contacts-card useraccess-card"
+            *ngFor="let instruction of specialInstruction"
+          >
+            <div class="instruction-details">
+              <p class="instruction-data">{{ instruction.name }}</p>
+            </div>
+            <div class="contact-editView">
+              <div class="contact-view" (click)="viewIns(instruction)">
+                View
+              </div>
+            </div>
+            <div class="contact-editDelete spcl-ins">
+              <div
+                class="contact-edit"
+                *ngIf="!factoryProfile"
+                title="Edit"
+                (click)="addInstruction(instruction)"
+              >
+                <span>edit</span>
+                <span class="divider-one"></span>
+              </div>
+              <div
+                class="contact-delete"
+                *ngIf="!factoryProfile"
+                (click)="deleteIns(instruction)"
+              >
+                <span>delete</span>
+                <span class="divider-two"></span>
+              </div>
+              <div class="divider"></div>
+            </div>
+
+            <div class="cb"></div>
+          </mat-card>
+        </div>
+      </mat-tab>
     </mat-tab-group>
-    <div class="clients-loader" *ngIf="loading">
-        <mat-spinner class="medium-spinner"></mat-spinner>
+
+    <div
+      class="container-ui new-center-empty-ui"
+      *ngIf="!fetchingData && emptyAddressData && !loading"
+    >
+      <mat-card class="no-results">
+        <div class="empty-img-holder">
+          <span class="material-icons">info</span>
+        </div>
+
+        <p class="no-result-text">{{ language.defaults.noVendorFound }}</p>
+      </mat-card>
     </div>
-    <div class="no-record no-clients" *ngIf="!fetchingData && emptyAddressData">
-        <p>No Vendors Found</p>
+
+    <div class="container-ui new-center-empty-ui" *ngIf="loading">
+      <mat-spinner class="medium-spinner"></mat-spinner>
     </div>
-</div>
+  </div>
+</section>

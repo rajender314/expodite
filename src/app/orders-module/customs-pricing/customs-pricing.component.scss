@@ -1,0 +1,184 @@
+// .layout {
+//   & > div {
+//     max-height: 100vh;
+//     overflow: visible;
+//     transition: all 0.3s ease;
+//   }
+//   &.minimize-div {
+//     & > div {
+//       padding: 0;
+//       max-height: 0;
+//       overflow: hidden;
+//     }
+//   }
+// }
+
+.expand-icon {
+  transition: all 0.5s ease;
+  &.close {
+    transform: rotate(-180deg);
+  }
+}
+
+.numaricEdit {
+  border: none;
+  background-color: transparent;
+  outline: none;
+
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  letter-spacing: 0;
+  font-size: 14px;
+
+  text-align: center;
+  color: #323232;
+
+  &.charges {
+    font-weight: 400;
+    text-align: right;
+    padding: 5px;
+    color: #565656;
+  }
+}
+.editfreight-orders-commercial:hover .mat-icon {
+  display: inline;
+  // opacity: 1;
+  cursor: pointer;
+}
+.mat-icon.editfreight-orders-commercial {
+  cursor: pointer;
+  // display: none;
+  // opacity: 0;
+  font-size: 14px;
+  color: #747474;
+}
+.close-circle-icons-order {
+  font-size: 18px;
+}
+.editfreight-orders-price:hover .mat-icon {
+  // display: contents;
+  // visibility: visible;
+  display: block;
+  cursor: pointer;
+}
+.mat-icon.editfreight-orders-price {
+  cursor: pointer;
+  // display: none;
+  // visibility: hidden;
+  display: none;
+  font-size: 14px;
+  color: #747474;
+  padding-top: 4px;
+}
+.save-icons {
+  display: flex;
+  mat-icon {
+    font-size: 24px;
+  }
+}
+
+.w-250 {
+  // Description
+  width: 250px;
+}
+.w-200 {
+  // Product Name
+  width: 200px;
+}
+.w-40 {
+  // SL No
+  width: 40px;
+}
+.w-150 {
+  // Quantity
+  width: 150px;
+}
+.w-50 {
+  // UOM
+  width: 50px;
+}
+.w-60 {
+  // UOM
+  width: 50px;
+}
+.W-100 {
+  // Description
+  width: 100px;
+}
+.w-110 {
+  // Description
+  width: 100px;
+}
+.ellipsis {
+  display: -webkit-box;
+  // max-width: 200px;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.d-flex {
+  display: flex;
+}
+.justify-end {
+  justify-content: flex-end;
+}
+
+.edit-new-style {
+  padding: 0 !important;
+  width: 0 !important;
+  &.table-style {
+    border: 1px solid #dfdfdf;
+    border-right: 0;
+  }
+  mat-icon {
+    display: flex !important;
+    justify-content: center;
+    align-items: center;
+    width: 20px !important;
+  }
+}
+
+.pd-25 {
+  padding: 9px 25px !important;
+}
+
+.pr-0 {
+  padding-right: 8px !important;
+}
+.gst-details {
+  padding: 0px 20px;
+  font-size: 14px;
+  color: #565656;
+  font-weight: 500;
+}
+
+.custom-input-class {
+  // border: none !important;
+  text-align: center;
+  input {
+    text-align: center;
+  }
+}
+// .edit-delete {
+//   display: flex;
+//   gap: 6px;
+//   align-items: center;
+//   cursor: pointer;
+//   .edit_icon {
+//     padding: 3px 7px;
+//     background: aliceblue;
+//     height: 30px;
+//     border-radius: 4px;
+//     width: 30px;
+//   }
+//   .delete_icon {
+//     padding: 4px 6px;
+//     background: aliceblue;
+//     height: 30px;
+//     border-radius: 4px;
+//     width: 30px;
+//   }
+// }
+.label {
+  font-weight: 500;
+  color: #333;
+}

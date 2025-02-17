@@ -1,0 +1,85 @@
+.order-main-container {
+  width: 100%;
+  background-color: white;
+  height: 100%;
+  overflow: hidden;
+}
+
+.page-inner-container {
+  width: 100%;
+  max-width: 1040px;
+}
+.create-order-title-wrapper {
+  font-size: 25px;
+  display: flex;
+  gap: 6px;
+  position: sticky;
+  top: 0;
+}
+.order-main-title {
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  font-size: 24px;
+  line-height: 29px;
+  letter-spacing: 0em;
+  text-align: left;
+}
+.cofirmOrderActionsBlock {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  align-items: center;
+  justify-content: end;
+  width: 100%;
+  background: #fff;
+  box-sizing: border-box;
+}
+.field-custom {
+  width: 100%;
+  .mat-form-field {
+    width: 100%;
+  }
+  .mat-form-field.custom-input {
+    margin-top: 0 !important;
+  }
+  textarea {
+    height: 130px;
+  }
+}
+.table-container {
+  padding: 10px 0;
+}
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td,
+th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+.align-right {
+  text-align: right;
+}
+.product-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.fields-list {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  margin-top: 10px;
+  .w-50 {
+    width: calc(50% - 8px);
+  }
+  .w-100 {
+    width: calc(100% - 8px);
+  }
+  textarea {
+    height: 120px;
+  }
+}

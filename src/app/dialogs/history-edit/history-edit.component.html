@@ -1,0 +1,28 @@
+<mat-toolbar>
+	<h2 mat-dialog-title></h2>
+	<span fxFlex> History Edit</span>
+</mat-toolbar>
+<mat-dialog-content>
+	<form  [formGroup]="instructionForm"  class="useraccess-form recieve-form">
+		
+		<div>
+			<mat-form-field  class="custom-input w_100" floatLabel="never">
+				<input matInput  #myInput placeholder="Received Amount" type="number"
+				(keypress)="changeProductPrice($event)"
+				(keyup)="onKeyDown($event)" formControlName="recieved_amount"> 
+			</mat-form-field>
+			<mat-error *ngIf="instructionForm.controls.recieved_amount.hasError('required')" style="position: relative;bottom: 10px;"
+			>Please Enter Received Amount</mat-error>
+			<p class="edit-err" *ngIf="!instructionForm.controls.recieved_amount.hasError('required') && quantError" style="position: relative;bottom: 10px;"
+			>  "Please enter the Amount upto  {{ReciveLimit}}" </p>
+			<mat-error *ngIf="!instructionForm.controls.recieved_amount.hasError('required') && 
+			instructionForm.controls.recieved_amount.hasError('min')"
+			style="position: relative;bottom: 10px;">Please Enter value greater than zero</mat-error>
+		</div>
+	</form>
+</mat-dialog-content>
+<mat-dialog-actions>
+	<span fxFlex></span>
+	<button mat-button mat-dialog-close>Cancel</button>
+	<button mat-raised-button (click)="updateAmounts(instructionForm)">Save</button>
+</mat-dialog-actions>

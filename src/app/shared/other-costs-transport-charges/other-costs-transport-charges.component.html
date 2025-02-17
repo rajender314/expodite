@@ -1,0 +1,44 @@
+<div [formGroup]="othertransportForm" class="shippingForm">
+    <div formArrayName="othercostArray" *ngFor="
+                                let item of othertransportForm.get(
+                                  'othercostArray'
+                                ).controls;
+                                let i = index
+                              ">
+        <div [formGroupName]="i" class="shipping-sec" style="display: flex; align-items: center">
+            <mat-form-field class="custom-input" floatLabel="never">
+                <label class="custom-label">{{addButtonTxt}} Charges
+                </label>
+                <input matInput maxlength="100" placeholder="{{addButtonTxt}} Charges"
+                    formControlName="transport_charge" />
+                <mat-error *ngIf="
+                                      othertransportForm
+                                        .get('othercostArray')
+                                        .controls[
+                                          i
+                                        ].controls.transport_charge.hasError(
+                                          'pattern'
+                                        )
+                                    ">Please Enter Valid {{addButtonTxt}} Charges</mat-error>
+            </mat-form-field>
+            <mat-form-field class="custom-input" floatLabel="never">
+                <label class="custom-label mandatory">Reference Number</label>
+                <input matInput maxlength="100" placeholder="Reference Number"
+                    formControlName="transport_refrence" />
+                <mat-error *ngIf="
+                                      othertransportForm
+                                        .get('othercostArray')
+                                        .controls[
+                                          i
+                                        ].controls.transport_refrence.hasError(
+                                          'pattern'
+                                        )
+                                    ">Please Enter Valid {{addButtonTxt}} Charges</mat-error>
+            </mat-form-field>
+
+            <mat-icon title="Delete" (click)="deleteRowOther(i)" style="cursor: pointer" mat-button>delete</mat-icon>
+        </div>
+    </div>
+    <button (click)="addRowsotherCost()" mat-raised-button>
+        Add {{addButtonTxt}} Charges
+    </button>

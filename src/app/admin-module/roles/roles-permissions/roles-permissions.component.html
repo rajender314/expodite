@@ -1,13 +1,13 @@
 
-<div fxFlex class="permission_wrapper" >
+<div fxFlex class="permission_wrapper test" >
 
 	
-	<div fxLayout="row" [class.user-header]="permission.level==1">
+	<div fxLayout="row" [class.user-header]="permission.level==1" style="justify-content: space-between;">
 		<div fxFlex="70">			
-			<h3 style="padding-left: 8px; font-weight: 400; font-size: 16px;"  *ngIf="permission.level == 1">{{permission.name}}</h3>
+			<h3 style="padding-left: 8px; font-weight: 500; font-size: 16px;"  *ngIf="permission.level == 1" >{{permission.name}}</h3>
 			<div class="permission-name" *ngIf="permission.level != 1" [ngClass]="{'child-level':permission.level == 3 }">{{permission.name}}</div>
 		</div>
-		<div flex="20" fxLayoutAlign="top right">
+		<div flex="20" fxLayoutAlign="top right" style="margin-right: 16px;">
 		<!--<h4 *ngIf="permission.type == 'label'" class="">Permissions</h4>-->
 			<div *ngIf="permission.type != 'label'" [ngClass]="{'child-check-level':permission.level == 3}">
 				<mat-form-field class="custom-input permission" *ngIf="permission.type === 'select'" floatLabel="never">
@@ -17,8 +17,10 @@
 						</mat-option>
 					</mat-select>
 				</mat-form-field>
-				<mat-radio-group class="example-radio-group" *ngIf="permission.type === 'radio'" [(ngModel)]="permission.selectedValue">
-					<mat-radio-button (click)="check(permission, permission.selectedValue)" class="permission" *ngFor="let option of permission.options"
+				<mat-radio-group class="example-radio-group roles-radio" *ngIf="permission.type === 'radio' && !permission.children" [(ngModel)]="permission.selectedValue"
+				[disabled]="adminService.rolePermissions.edit_roles == 1 ? false : true"
+				>
+					<mat-radio-button (change)="check(permission, permission.selectedValue, $event)" class="permission" *ngFor="let option of permission.options"
 					[value]="option.id">
 					{{option.name}}
 					</mat-radio-button>
@@ -29,12 +31,16 @@
 					</div>
 				</div>
 			</div>
+			<div *ngIf="permission.level==1" (click)="toggleAccordion(permission)" style="cursor: pointer;" class="accordian-click">
+				<mat-icon *ngIf="permission.isExpanded">arrow_drop_up</mat-icon> 
+				<mat-icon *ngIf="!permission.isExpanded">arrow_drop_down</mat-icon>
+			</div>
 		</div>
 	</div>
-	<div *ngIf="permission.children" class="permission-block">
-	<div [hidden]="(permission.type == 'check' && !permission.checked) || ((permission.type == 'select' || permission.type == 'radio') && permission.selectedValue != 1)">
+	<div *ngIf="permission.children" class="permission-block" [@expandCollapse]="permission.isExpanded ? 'expanded' : 'collapsed'">
+	<!-- <div *ngIf="permission.isExpanded"> -->
 	<app-roles-permissions *ngFor="let child of permission.children; let i = index" [permission]="child" [class.child-permission-border]="permission.level > 2"
 	class="child-permission"></app-roles-permissions>
-	</div>
+	<!-- </div> -->
 	</div>
 </div>

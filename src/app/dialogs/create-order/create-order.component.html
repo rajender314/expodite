@@ -2,15 +2,16 @@
     <mat-toolbar>
         <h2 mat-dialog-title></h2>
         <span fxFlex class="modal-title" *ngIf="(App.user_details.log_type!='2')">
-            <mat-icon *ngIf="(stepper._selectedIndex!='0')" (click)="goToPrev(stepper)" class="back-to-orders material-icons">arrow_back</mat-icon> 
-            <span *ngIf="(stepper._selectedIndex =='0')">Create Order</span>
+            <mat-icon *ngIf="(stepper._selectedIndex!='0')" (click)="goToPrev(stepper)" class="back-to-orders material-icons">arrow_back</mat-icon>
+            <span *ngIf="(stepper._selectedIndex =='0')&& (!newClient)">Create Order</span>
+            <span *ngIf="(stepper._selectedIndex =='0')&& (newClient)">Add Client </span>
             <span *ngIf="(stepper._selectedIndex =='1')">Order Details</span>
             <span *ngIf="(stepper._selectedIndex =='2')">Select Address</span>
             <span *ngIf="(stepper._selectedIndex =='3')">Add New Address</span>
             <span *ngIf="(stepper._selectedIndex =='4')">Order Confirmation</span>
         </span>
         <span fxFlex class="modal-title" *ngIf="(App.user_details.log_type=='2')">
-            <mat-icon *ngIf="(stepper._selectedIndex!='0')" (click)="goToPrev(stepper)" class="back-to-orders material-icons">arrow_back</mat-icon> 
+            <mat-icon *ngIf="(stepper._selectedIndex!='0')" (click)="goToPrev(stepper)" class="back-to-orders material-icons">arrow_back</mat-icon>
             <!-- <span *ngIf="(stepper._selectedIndex =='0')">Create Order</span> -->
             <span *ngIf="(stepper._selectedIndex =='0')">Order Details</span>
             <span *ngIf="(stepper._selectedIndex =='1')">Select Address</span>
@@ -18,44 +19,81 @@
             <span *ngIf="(stepper._selectedIndex =='3')">Order Confirmation</span>
         </span>
     </mat-toolbar>
-  
+
     <mat-spinner class="medium-spinner" *ngIf="confirOrderLoad"></mat-spinner>
     <mat-horizontal-stepper class="step" @stepTransition #stepper [class]="'step_'+stepper._selectedIndex">
-       
+
         <mat-step *ngIf="(App.user_details.log_type!='2')">
             <mat-dialog-content class="client-step-content" cdk-focus-initial>
-                <form [formGroup]="clientsForm">
+
+                <form [formGroup]="clientsForm"   >
                     <mat-list class="pad_0">
-                        <mat-form-field class="custom-input mandatory" style="margin-top: 40px" floatLabel="never">
-                            <input placeholder="Select Client" matInput [matAutocomplete]="auto" [value]="modelData.name" formControlName="client" (keyup)="selectedClients($event)">
+                        <div style="display:flex">
+                            <mat-checkbox
+                            *ngIf="!newClient"  class="product-name sample_ord_chkbox"  formControlName="is_sample_order"
+                             title="Sample Order">
+                             <div class="zero-val">
+                                <div>Sample Order </div>
+                                <small class="op-6">This would create a zero-value Invoice</small>
+                            </div>
+                            </mat-checkbox>
+
+
+
+                         </div>
+
+
+                        <mat-form-field  class="custom-input mandatory"  floatLabel="never">
+                            <input placeholder="Select Client" matInput [matAutocomplete]="auto"
+                            [value]="modelData.name" formControlName="client" (keyup)="selectedClients($event)">
+
                             <button type="button" mat-button matSuffix mat-icon-button aria-label="Clear" (click)="clear()">
                                 <mat-icon>keyboard_arrow_down</mat-icon>
                             </button>
                             <div>
                                 <mat-autocomplete  #auto="matAutocomplete" auto>
-                                    <mat-option (onSelectionChange)="selectionChange(client)" *ngFor="let client of order.organizations" [value]="client.id">
+                                    <mat-option (onSelectionChange)="selectionChange(client)"
+                                     *ngFor="let client of order.organizations" [value]="client.name">
                                         <span>{{ client.name }}</span>
                                     </mat-option>
                                 </mat-autocomplete>
-                            </div>    
+                            </div>
                             <!-- <label class="custom-label">Select Client</label>
                             <mat-select placeholder="Select Client" formControlName="client">
                                 <mat-option *ngFor="let client of order.organizations" [value]="client.id">
                                     {{ client.name }}
                                 </mat-option>
                             </mat-select> -->
-                            <mat-error *ngIf="clientsForm.controls.client.hasError('required')" >
+                            <mat-error *ngIf="clientsForm.controls.client.hasError('required') && !showError" >
                                 Please Select Client
                             </mat-error>
+                            <p class="edit-err" *ngIf="showError &&!newClientadded">{{errormessage}}</p>
                         </mat-form-field>
-                        <mat-error *ngIf="showError">{{errormessage}}</mat-error>
+
+                        <div  *ngIf="!newClientadded" style="width: 25%;">
+                            <span class="add-link"    *ngIf=" addNew" (click)="createClient()">
+                                <mat-icon class="mat-icon material-icons">add</mat-icon>Add New Client
+                            </span>
+                        </div>
+
+
+
+                        <!-- <div class="inline-err" *ngIf="!newClient">
+                            <span class="add-link"    *ngIf="!(order.organizations?.length) || addNew" (click)="goToCreateClient()">
+                                <mat-icon class="mat-icon material-icons">add</mat-icon>Add New Client
+                            </span>
+                        </div> -->
+
+
                     </mat-list>
                 </form>
+
             </mat-dialog-content>
             <mat-dialog-actions>
                 <span fxFlex></span>
                 <button tyep="button" mat-button mat-dialog-close>Close</button>
-                <button type="button" mat-raised-button color="primary"  [disabled]="!this.modelData.id || !inClient"   (click)="goToProducts(stepper)">Select Product</button>
+                <button type="button" mat-raised-button color="primary"     (click)="goToProducts(stepper)">Select Product</button>
+
             </mat-dialog-actions>
         </mat-step>
 
@@ -63,7 +101,7 @@
             <mat-dialog-content>
                 <!-- <div class="notification">clientsForm
                     <div class="banner-content">clientsForm
-                        
+
                     </div>
                 </div> -->
 
@@ -71,6 +109,21 @@
                     <div class="product-label">Select Product</div>
                 <span *ngIf="productSubmit && order.selectedProductsError" class="error-msg">Please Select Product</span>
                 </div> -->
+                <div class="app-search-container search-small p-b-16">
+                    <mat-form-field class="search" floatLabel="never">
+                        <input matInput placeholder="Search Categories, Products" #search
+                            (keyup)="searchOrders(search.value, $event)"
+                            
+                            (blur)="!search.value.length ? open = false : open = true"
+                            >
+                        <mat-icon matPrefix class="org-search">search</mat-icon>
+                        <mat-icon matSuffix *ngIf=" searching" class="spinner">
+                            <mat-spinner class="small-spinner"></mat-spinner>
+                        </mat-icon>
+                        <mat-icon matSuffix *ngIf="!searching && search.value.length"
+                            (click)="search.value = '';searchOrders(search.value,'','close')">close</mat-icon>
+                    </mat-form-field>
+                </div>
                 <p class="custome-label-ui">Select Product <span class="required-ui">*</span></p>
                 <div  class="product-list-ui-header">
                     <h3 class="product-name"   fxFlex="50" >PRODUCT</h3>
@@ -81,29 +134,39 @@
                 </div>
                 <!-- <div class="no-product" *ngIf="!order.products">No Products for this client.</div> -->
                 <div class="orders-products-data">
-               
-                <mat-list class="products-list">
-                    <ng-container *ngFor="let product of checkedArr; let i = index" >                    
-                    <mat-list-item  [fxHide]="!product.checked_status">
-                        <mat-checkbox (click)="changeCheckbox(product)" fxFlex="50" class="product-name" title="{{product.name}}">{{product.name}}</mat-checkbox>
-                        <!-- <span fxFlex></span> -->
-                        <div fxFlex="25" class="d-flex align-items-center">
-                            <input type="number" style="min-width: 70px !important"  #myInput matInput class="inputBox"  fxFlex="25" min="0" max="999999999" oninput="validity.valid||(value='')" (keyup)="selectedProductRange(product, $event)" (input)="changeProductPrice(product)" [class.bdr-error]="product.error" maxValue="99999.00" [(ngModel)]="product.quantity" placeholder="0">
-                            <h6 class="weight-label">{{product.uom_name}}</h6>
-                        </div>
-                        <div fxFlex="25">
-                            <span class="price-label">{{order.currency+' '+ (product.price || 0)}}</span>
 
+                <mat-list class="products-list" infinite-scroll [scrollWindow]="false" [infiniteScrollDistance]="1" [infiniteScrollThrottle]="50"
+                (scrolled)="onScrollDown()"  >
+                    <ng-container *ngFor=" let item of checkedArr | keyvalue " >
+                        <h3 class="category" >{{item.key}}</h3>
+                        <div *ngFor="let product of item.value ; let i = index">
+                            <!-- <mat-list-item  [fxHide]="!product.checked_status"> -->
+                                <mat-list-item>
+                                <mat-checkbox (click)="changeCheckbox(product)" [(ngModel)]="product.selected"   fxFlex="50" class="product-name" title="{{product.name}}">{{product.name}}</mat-checkbox>
+                                <!-- <span fxFlex></span> -->
+                                <div fxFlex="25" class="d-flex align-items-center">
+                                    <input type="number" style="min-width: 70px !important"  #myInput matInput class="inputBox"
+                                     fxFlex="25"  min="0" max=""  oninput="validity.valid||(value='')" (keyup)="selectedProductRange(product, $event)" (input)="changeProductPrice(product,$event)"
+                                     [class.bdr-error]="product.error" [(ngModel)]="product.quantity" placeholder="0">
+                                    <h6 class="weight-label">{{product.uom_name}}</h6>
+                                </div>
+                                <!-- <md-error>Please enter a value between 0 and 100</md-error> -->
+                                <!-- <p  *ngIf="quantError"> enter 1 to 10</p> -->
+                                <div fxFlex="25">
+                                    <span class="price-label">{{order.currency+' '+ (product.price || 0)}}</span>
+        
+                                </div>
+        
+        
+        
+                            </mat-list-item>
                         </div>
-                       
-                        
+                    
 
-                    </mat-list-item>
-                   
                 </ng-container>
                 <p style="padding: 15px;
                 text-align: center;" class="custom-label" *ngIf="showNoProdFound">No Products Found</p>
-                   
+
                 </mat-list>
             </div>
 
@@ -133,7 +196,7 @@
                                    <small>supports: pdf, jpeg, png and jpg, File Size:Upto 5MB</small>
                                 </label>
                             </div>
-                           
+
                             <div class="images">
                                 <ul *ngIf="uploads.length">
                                     <li *ngFor="let file of uploads; let i = index">
@@ -146,13 +209,13 @@
                         </div>
                         <p class="error-msg m_3" *ngIf="uploadImage">*You have selected an invalid file type. Only jpg, jpeg, png files are allowed.</p>
                         <p class="error-msg m_3" *ngIf="sizeError">*File Size Exceeds Max Limit 5mb</p>
-                       
+
                         <div class="d-flex d-row customized-row-for-fields">
                             <aside class="col-6">
-                            <mat-form-field class="custom-input mandatory" floatLabel="never">
-                                <label class="custom-label mandatory">PO NO</label>
+                            <mat-form-field [ngClass] = "is_sso ? 'custom-input mandatory' : 'custom-input'" floatLabel="never">
+                                <label [ngClass] = "is_sso ? 'custom-label mandatory' : 'custom-label'">PO NO</label>
                                 <input matInput   formControlName="po_no" placeholder="PO No">
-                                <mat-error class="error-msg" *ngIf="productSubmit || !productsForm.controls.po_no.pristine && productsForm.controls.po_no.hasError('required')" >
+                                <mat-error class="error-msg" *ngIf="is_sso && productSubmit || !productsForm.controls.po_no.pristine && productsForm.controls.po_no.hasError('required')" >
                                     Please enter PO NO
                                 </mat-error>
                             </mat-form-field>
@@ -174,14 +237,15 @@
                                     <div class="multi-select mandatory">
                                         <!-- <mat-label class="label-attention mandatory">Attention</mat-label> -->
                                         <label class="custom-label mandatory">Attention</label>
-                                    <ng-select 
+                                    <ng-select
                                                 [items]="contactsList"
                                                 bindLabel="name"
                                                 bindValue="name"
                                                 addTagText = "Add Attention"
                                                 [addTag]="true"
                                                 [clearable]= "false"
-                                                (change)="changeUser()"
+                                            
+                                                (change)="changeUser($event)"
                                                 [multiple]="false"
                                                 placeholder="Select User"
                                                 formControlName="kindAttn">
@@ -190,7 +254,7 @@
                                         Please Select User
                                     </mat-error>
                                     </div>
-                                </div> 
+                                </div>
                             </aside>
                             <aside class="col-6">
                                 <div class="ext-section customized-row-for-fields ">
@@ -220,7 +284,7 @@
                             </aside>
                         </div>
 
-                            
+
                         <div class="d-flex d-row customized-row-for-fields">
                             <aside class="col-6">
                                 <mat-form-field class="custom-input mandatory" floatLabel="never">
@@ -235,23 +299,38 @@
                                 </mat-form-field>
                             </aside>
                             <aside class="col-6">
-                                <mat-form-field class="custom-deliveryDate mandatory" floatLabel="never">
-                                    <label class="custom-labeldate">Expected Delivery</label>
-                                    <input matInput class="datepicker" [min]="now" (focus)="openCalendar(picker1)" (click)="openCalendar(picker1)"  formControlName="delivery_date" [(ngModel)]="deliveryDate"
-                                    [matDatepicker]="picker1" placeholder="Expected Delivery">
-                                    <mat-error class="error-msg" *ngIf="productSubmit || !productsForm.controls.delivery_date.pristine && productsForm.controls.delivery_date.hasError('required')" >
-                                        Please Select Expected Delivery Date 
-                                    </mat-error>
+                                <mat-form-field class="custom-deliveryDate " floatLabel="never">
+                                    <label class="custom-labeldate ddate"> Dispatch Date</label>
+                                    <input matInput class="datepicker" [min]="now" [max]="deliveryDate" (focus)="openCalendar(picker1)"
+                                     (click)="openCalendar(picker1)"  formControlName="dispatch_date" [(ngModel)]="dispatchDate"
+                                    [matDatepicker]="picker1" placeholder="Dispatch Date">
+                                    <!-- <mat-error class="error-msg" *ngIf="productSubmit || !productsForm.controls.dispatch_date.pristine && productsForm.controls.dispatch_date.hasError('required')" >
+                                        Please Select Dispatch Date
+                                    </mat-error> -->
                                 <mat-datepicker-toggle class="mat-picker" matSuffix [for]="picker1"></mat-datepicker-toggle>
                                 <mat-datepicker #picker1 startView="year"></mat-datepicker>
                                 </mat-form-field>
                             </aside>
 
                             </div>
-                       
-                        
-                    
-                        
+                            <div class="d-flex d-row customized-row-for-fields">
+                                <aside class="col-6">
+                                    <mat-form-field class="custom-deliveryDate mandatory" floatLabel="never">
+                                        <label class="custom-labeldate">Expected Delivery</label>
+                                        <input matInput class="datepicker" [min]="dispatchDate" (focus)="openCalendar1(picker3)" (click)="openCalendar1(picker3)"  formControlName="delivery_date" [(ngModel)]="deliveryDate"
+                                        [matDatepicker]="picker3" placeholder="Expected Delivery">
+                                        <mat-error class="error-msg" *ngIf="productSubmit || !productsForm.controls.delivery_date.pristine && productsForm.controls.delivery_date.hasError('required')" >
+                                            Please Select Expected Delivery Date
+                                        </mat-error>
+                                    <mat-datepicker-toggle class="mat-picker" matSuffix [for]="picker3"></mat-datepicker-toggle>
+                                    <mat-datepicker #picker3 startView="year"></mat-datepicker>
+                                    </mat-form-field>
+                                </aside>
+
+                            </div>
+
+
+
                         <mat-form-field class="custom-input m-t-20" floatLabel="never" >
                             <label class="custom-label" style="    color: #6c757d;
                             margin-bottom: 8px;
@@ -260,9 +339,9 @@
                             <textarea matInput formControlName="special_instructions" maxlength="255" placeholder="Special Instructions"></textarea>
                         </mat-form-field>
                     </form>
-                        
-                     
-                    
+
+
+
                 </mat-list>
             </mat-dialog-content>
             <mat-dialog-actions>
@@ -284,9 +363,10 @@
                 <mat-selection-list class="address-selection">
                         <p class="address-error" *ngIf="addressSubmit && order.selectedShippingError">Please Select Shipping Address</p>
 
-                    <mat-list-option selected="{{address.selected}}" 
-                                    (click)="selectAddress(address, order.clientAddress, 1)" 
-                                    class="orders-list" 
+
+                    <mat-list-option selected="{{address.selected}}"
+                                    (click)="selectAddress(address, order.clientAddress, 1)"
+                                    class="orders-list"
                                     *ngFor="let address of order.clientAddress">
                                     <p>{{address?.company_name}}</p>
                                     <p>{{address.address1}}</p>
@@ -306,6 +386,9 @@
                 <mat-selection-list class="address-selection">
                     <p class="address-error" *ngIf="addressSubmit && order.selectedBillingError">Please Select Billing Address</p>
                     <!-- <span fxFlex></span> -->
+
+
+                    <!-- <mat-checkbox    class="product-name" (click)="getAddressSame(clientAddress)"  title="Sample Order"></mat-checkbox> -->
                         <mat-list-option selected="{{address.selected}}" (click)="selectAddress(address, order.companyAddress, 2)" class="orders-list" *ngFor="let address of order.companyAddress">
                                 <p>{{address?.company_name}}</p>
                                 <p>{{address.address1}}</p>
@@ -335,7 +418,7 @@
                                         <p>{{address.country_name}}</p>
                                 </mat-list-option>
                             </mat-selection-list>
-                    </div>    
+                    </div>
 
             </mat-dialog-content>
             <mat-dialog-actions>
@@ -347,6 +430,10 @@
         </mat-step>
         <mat-step>
             <mat-dialog-content>
+                <div *ngIf="(clientAddressSame?.length || clientAddressSame1?.length)&& sameChkShow" class="same-chk">
+                    <mat-checkbox (change)="getAddressSame($event)" [(ngModel)]="uncheck" value="selected"> Same  as Shipping Address</mat-checkbox>
+
+                </div>
                 <div class="modal-label">Create Address</div>
                 <mat-list>
                     <form [formGroup]="createAddressForm">
@@ -375,7 +462,7 @@
                                 Please Enter Postal Code
                             </mat-error>
                         </mat-form-field>
-                       
+
                         <mat-form-field class="custom-input mandatory" floatLabel="never">
                             <label class="custom-label mandatory">Country</label>
                             <mat-select placeholder={{language.defaults.selectCountry}} (selectionChange)="onCountryChange($event)" formControlName="country">
@@ -431,7 +518,7 @@
                         <span class="modal-label">Expected Date:</span>
                         <span class="product-detail">{{orderData.delivery_date | date: 'MMM dd, yyyy'}}</span>
                     </p> -->
-                    
+
                     <table class="shippers-table-one">
                         <!-- <tr>
                             <th>
@@ -441,36 +528,36 @@
                         <tr>
                             <td>Product Name:</td>
                             <td>{{product.name}}</td>
-                            
+
                         </tr>
                         <tr>
                             <td>Quantity:</td>
                             <td>{{product.quantity}}</td>
-                            
+
                         </tr>
                         <tr>
                             <td>Price per {{product.uom_name}}:</td>
                             <td>{{product.price_format}}</td>
-                            
+
                         </tr>
                         <tr>
                             <td>Expected Date of Delivery:</td>
                             <td>{{orderData.delivery_date | date: 'MMM dd, yyyy'}}</td>
-                            
+
                         </tr>
                         <tr *ngIf="productsForm.value.special_instructions.length > 0">
                                 <td>Special Instructions:</td>
                                 <td>{{productsForm.value.special_instructions}}</td>
-                                
+
                             </tr>
-                      
+
                     </table>
 
-                      
-                 
+
+
                 </div>
                 <p *ngIf="orderFaildedMsg != ''" class="errormsg-class" style="color: #f44336; font-size: 12px; padding-bottom: 14px;">{{orderFaildedMsg}}</p>
-                
+
         </mat-dialog-content>
         <mat-dialog-actions>
                 <button mat-button (click)="goToPrev(stepper)" class="back-btn">Back</button>

@@ -1,6 +1,6 @@
 <div class="center-section-scroll vh-100 d-flex body-white" fxFlex>
 	<div  class="flex-fixed-header menu-title">
-    <h2 style="font-weight: 400;" *ngIf="selectedContainer" title="{{selectedContainer.name?'Package':'Add Package'}}" [innerHtml]="selectedContainer.name?'Primary Package':'Add Primary Package'"></h2>
+    <h2 class="admin-heading" *ngIf="selectedContainer" title="{{selectedContainer.name?'Package':'Add Package'}}" [innerHtml]="selectedContainer.name?'Primary Package':'Add Primary Package'"></h2>
 </div>
 <perfect-scrollbar class="padding-16">
   <form [formGroup]="detailsForm" (ngSubmit)="createContainer(detailsForm)">
@@ -14,7 +14,7 @@
             <mat-error *ngIf="submitContainers || !detailsForm.controls.name.pristine && detailsForm.controls.name.hasError('required')">{{language.validations.containerName}}</mat-error>
           </mat-form-field>
         </div> -->
-<div class="ex-row">
+<div class="ex-row" style="padding: 0;">
   <mat-form-field   class="custom-input mandatory grid-six" floatLabel="never">
     <label class="custom-label mandatory">{{language.defaults.containerName}}</label>
     <mat-select placeholder="Packaging Type"  #myInput formControlName="container_id">
@@ -32,7 +32,7 @@
     <mat-error *ngIf="submitContainers || !detailsForm.controls.type_name.pristine && detailsForm.controls.type_name.hasError('required')">{{language.validations.containerSize}}</mat-error>
   </mat-form-field>
 </div> 
-<div class="ex-row">
+<div class="ex-row" style="padding: 0;">
   <mat-form-field   class="custom-input mandatory grid-six" floatLabel="never">
     <label class="custom-label mandatory" style="text-transform: unset">Unit of Measurement</label>
     <mat-select placeholder="Unit of Measurement" formControlName="uom_id"  (selectionChange)="selectType($event)">
@@ -64,10 +64,10 @@
 
 
   <mat-form-field   class="custom-input mandatory grid-six" floatLabel="never">
-    <label class="custom-label mandatory text-transform-none">Margin Length&nbsp;({{selectUnits}})</label>
-    <input matInput type="number" min="0" max="99999999999" oninput="validity.valid||(value='')" placeholder="Margin Length" formControlName="margin_length"
+    <label class="custom-label mandatory text-transform-none">Margin Depth&nbsp;({{selectUnits}})</label>
+    <input matInput type="number" min="0" max="99999999999" oninput="validity.valid||(value='')" placeholder="Margin Depth" formControlName="margin_length"
       id="containerHeight" />
-    <mat-error *ngIf="submitContainers || !detailsForm.controls.margin_length.pristine && detailsForm.controls.margin_length.hasError('required')">Please Enter Margin Length</mat-error>
+    <mat-error *ngIf="submitContainers || !detailsForm.controls.margin_length.pristine && detailsForm.controls.margin_length.hasError('required')">Please Enter Margin Depth</mat-error>
   </mat-form-field>
   <mat-form-field   class="custom-input mandatory grid-six" floatLabel="never">
     <label class="custom-label mandatory text-transform-none">Margin Width&nbsp;({{selectUnits}})</label>
@@ -76,10 +76,10 @@
     <mat-error *ngIf="submitContainers || !detailsForm.controls.margin_width.pristine && detailsForm.controls.margin_width.hasError('required')">Please Enter Margin Width</mat-error>
   </mat-form-field>
   <mat-form-field   class="custom-input mandatory grid-six" floatLabel="never">
-    <label class="custom-label mandatory text-transform-none">Margin Depth&nbsp;({{selectUnits}})</label>
-    <input matInput type="number" min="0" max="99999999999" oninput="validity.valid||(value='')" placeholder="Margin Depth" formControlName="margin_depth"
+    <label class="custom-label mandatory text-transform-none">Margin Height&nbsp;({{selectUnits}})</label>
+    <input matInput type="number" min="0" max="99999999999" oninput="validity.valid||(value='')" placeholder="Margin Height" formControlName="margin_depth"
       id="containerDimensions" />
-    <mat-error *ngIf="submitContainers || !detailsForm.controls.margin_depth.pristine && detailsForm.controls.margin_depth.hasError('required')">Please Enter Margin Depth</mat-error>
+    <mat-error *ngIf="submitContainers || !detailsForm.controls.margin_depth.pristine && detailsForm.controls.margin_depth.hasError('required')">Please Enter Margin Height</mat-error>
   </mat-form-field>
   <mat-form-field   class="custom-input mandatory grid-six" floatLabel="never">
     <label class="custom-label mandatory">Tare weight (kgs)</label>

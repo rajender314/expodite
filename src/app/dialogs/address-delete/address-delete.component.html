@@ -10,7 +10,7 @@
 </mat-dialog-content>
 <mat-dialog-actions>
   <span fxFlex></span>
-  <button mat-button mat-dialog-close *ngIf="data.type != 1">{{language.defaults.cancel}}</button>
+  <button  class="back-btn-ui" mat-dialog-close *ngIf="data.type != 1">{{language.defaults.cancel}}</button>
   <button mat-raised-button  (click)="deleteAddress()" *ngIf="data.type != 1">{{language.defaults.deleteAddress}}</button>
   <button mat-raised-button mat-dialog-close  *ngIf="data.type == 1">OK</button>
 

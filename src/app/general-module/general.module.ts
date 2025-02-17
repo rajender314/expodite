@@ -60,6 +60,13 @@ import { PERFECT_SCROLLBAR_CONFIG, PerfectScrollbarConfigInterface, PerfectScrol
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 import { SharedModule } from '../shared/shared.module';
 import { InvetoryReportsComponent } from './reports/invetory-reports/invetory-reports.component';
+import { ExportRegisterComponent } from './reports/export-register/export-register.component';
+import { FircReportsComponent } from './reports/firc-reports/firc-reports.component';
+import { InsuranceReportComponent } from './reports/insurance-report/insurance-report.component';
+import { ForexReportComponent } from './reports/forex-report/forex-report.component';
+import { ThreeMonthsForexComponent } from './reports/three-months-forex/three-months-forex.component';
+import { RodtepreportComponent } from './reports/rodtepreport/rodtepreport.component';
+import { DutydrawbackReportComponent } from './reports/dutydrawback-report/dutydrawback-report.component';
 
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
       suppressScrollX: true
@@ -83,6 +90,13 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
     AccessDeniedComponent,
     SaveViewComponent,
     DeleteViewComponent,
+    ExportRegisterComponent,
+    FircReportsComponent,
+    InsuranceReportComponent,
+    ForexReportComponent,
+    ThreeMonthsForexComponent,
+    RodtepreportComponent,
+    DutydrawbackReportComponent,
     
   ],
   imports: [

@@ -84,7 +84,7 @@
                     		<mat-datepicker #picker4></mat-datepicker>
 						</mat-form-field>
 						<div fxLayout="row" fxLayoutAlign="end center">
-							<button  mat-button (click)="resetInventory(editForm)">{{language.defaults.cancel}}</button>
+							<button   class="back-btn-ui" (click)="resetInventory(editForm)">{{language.defaults.cancel}}</button>
 							<button  mat-raised-button (click)="update(editForm)">{{language.defaults.save}}</button>
 						</div>
 					</form>

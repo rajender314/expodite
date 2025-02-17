@@ -2,8 +2,14 @@
 	<div class="center-section-scroll vh-100 d-flex media-list-data holy-grail body-white" style="">
 		<div class="flex-fixed-header menu-title ">
 			<h2 style="font-weight: 400;">Users ({{totalUsers}})</h2>
-			<span class="add-link" (click)="selectUser(0)">
+			<!-- <span class="add-link" (click)="selectUser(0)">
 				<mat-icon>add</mat-icon>Add
+			  </span> -->
+			  <span class="add-link custom-tooltip import-img"
+			 *ngIf="adminService.rolePermissions.add_users == 1" 
+			  (click)="selectUser(0)" >
+				<img [src]='images.add'>
+				 <span class="tooltiptext">Add</span>
 			  </span>
 
 		</div>
@@ -25,7 +31,9 @@
 			   <mat-spinner class="medium-spinner" *ngIf="fetchingData"></mat-spinner>
    
 			   <mat-list class="media-list" @usersAnimate *ngIf="!fetchingData" style="padding-top: 0px">
-				   <mat-list-item class="font-family" style="height: 56px;" *ngFor="let user of usersList" (click)="selectUser(user.id)" [class.active]="selectedId === user.id">
+				   <mat-list-item class="font-family" style="height: 56px !important;" *ngFor="let user of usersList" (click)="selectUser(user.id)" [class.active]="selectedId === user.id"
+				   class="admin-internal-menu-list"  
+				   >
 					   <div class="media d-flex align-items-center">
 						<div class="media-aside align-self-center ">
 							<span class="b-avatar badge-light-primary rounded-circle badge-light-info " style="width: 32px; height: 32px;">
@@ -36,7 +44,7 @@
 									
 						  </span></div>
 							<div class="media-body ">
-								<h1 class="font-weight-bold d-block text-nowrap "> {{user.name}}</h1>
+								<h1 class="font-weight-bold d-block text-nowrap " style="font-weight: 500;"> {{user.name}}</h1>
 								<small>{{user.email}}</small>
 							 </div> 
 							 </div>
@@ -55,7 +63,10 @@
 
 
 
-	<app-user-details [userId]="selectedId" (UpdateUser)="updateData($event)" class="w-100"></app-user-details>
+	<app-user-details [userId]="selectedId" (UpdateUser)="updateData($event)"
+	[isEditPerm]="perms.isEditPerm"
+	[isAddPerm]="perms.isAddPerm "
+	class="w-100"></app-user-details>
 	<router-outlet></router-outlet>
 
 </div>

@@ -1,0 +1,126 @@
+<mat-toolbar>
+	<h2 mat-dialog-title></h2>
+	<span fxFlex> {{isEditScreen ? 'Edit' : 'Create'}} Credit Note</span>
+</mat-toolbar>
+<mat-dialog-content>
+    <form [formGroup]="detailsForm" class="" >
+	<div class="row-div">
+        
+        <mat-form-field class="custom-input block-ele mandatory w-100" floatLabel="never">
+           <label class="custom-label mandatory">CN Date</label>
+           <div class="date-picker-field"
+              >
+              <input matInput class="datepicker"formControlName="credit_note_date"
+                 placeholder="Select CN Date"
+                  [min]="minDate"
+                 (click)="openCalendar(picker)" 
+                 [matDatepicker]="picker" >
+              <mat-datepicker-toggle matSuffix [for]="picker">
+              </mat-datepicker-toggle>
+              <mat-datepicker #picker></mat-datepicker>
+           </div>
+           <mat-error *ngIf="detailsForm.controls.credit_note_date.hasError('required')" >
+            Please Select CN Date
+        </mat-error>
+        </mat-form-field>
+     </div>
+     
+     
+     <mat-form-field   class="w-100 custom-input mandatory" floatLabel="never">      
+        <label class="custom-label mandatory" maxlength="150"> Client </label>
+
+ 
+            <input placeholder="Search and Select Client" matInput [matAutocomplete]="auto" [ngClass]="{'disableClass': clientRead}" (keypress)="onKeyUp($event)" [value]="modelData.name" [readonly]="clientRead"  formControlName="organization_id"  (keyup)="selectedClients($event)">
+
+        <div>
+     <mat-autocomplete  #auto="matAutocomplete" auto>
+         <mat-option (onSelectionChange)="selectionChange(client)" *ngFor="let client of clientList" [value]="client.client_name">
+             <span>{{ client.client_name }}</span>
+         </mat-option>
+     </mat-autocomplete>
+ </div>    
+ <mat-error *ngIf="detailsForm.controls.organization_id.hasError('required') && !showError" >
+    Please Select Client
+</mat-error>
+<p class="edit-err" *ngIf="showError ">{{errormessage}}</p>
+
+    </mat-form-field> 
+    <!-- <div class="w-100">
+        <mat-form-field  class="w-100 custom-input mandatory" floatLabel="never" style="margin-top: 18px;">
+            <label class="custom-label mandatory" maxlength="150"> CN Amount( {{curName}})</label>
+            <input  matInput placeholder="Enter CN Amount"   autofocus="off" autocomplete="off" formControlName="amount">
+
+            <mat-error *ngIf="detailsForm.controls.amount.hasError('required')">Please Enter CN Amount</mat-error>
+        </mat-form-field>
+    </div> -->
+     <div  class="w-100" style="display: flex;"> 
+        <div class="wdth-amount">
+            <mat-form-field  class="w-100 custom-input mandatory" floatLabel="never" style="margin-top: 18px;">
+                <label class="custom-label mandatory" maxlength="150"> CN Amount</label>
+                <input  matInput type="number" placeholder="Enter CN Amount" (keydown)="onKeyDown($event)"   (keypress)="onKeyUp($event)"  formControlName="amount">
+    
+                <mat-error *ngIf="detailsForm.controls.amount.hasError('required')">Please Enter CN Amount</mat-error>
+            </mat-form-field>
+        </div>
+        <div class="">
+            <mat-form-field class="custom-input block-ele mandatory" floatLabel="never" style="margin-top: 18px;" >
+                <input  matInput placeholder="Currency"   [readonly]="true" autofocus="off" autocomplete="off" formControlName="currency">
+
+               
+                <!-- <mat-error *ngIf="detailsForm.controls.currency.hasError('required')">
+                    Please Select Currency
+                </mat-error> -->
+            </mat-form-field>
+        </div>
+        
+    </div> 
+    
+     <mat-form-field   class="w-100 custom-input " floatLabel="never">      
+               <label class="custom-label " maxlength="150"> ORIGINAL INVOICE (OI)#</label>
+
+        
+        <input placeholder="Search and Select Invoice" matInput [matAutocomplete]="autotest" [value]="modelData1.name" formControlName="orig_inv_id" (keyup)="selectedInvoices($event)">
+       
+        <div>
+            <mat-autocomplete  #autotest="matAutocomplete" autotest >
+                <mat-option (onSelectionChange)="selectionChange1(invoice)" *ngFor="let invoice of invoiceList" [value]="invoice.inv_nbr">
+                    <span>{{ invoice.inv_nbr }}</span>
+                </mat-option>
+            </mat-autocomplete>
+        </div>    
+        
+        <p class="edit-err" *ngIf="showErrorinv">No invoice Data Found</p>
+    </mat-form-field>  
+    
+
+    <mat-form-field   class="w-100 custom-input " floatLabel="never">      
+        <label class="custom-label " maxlength="150"> REFERENCE INVOICE (RI)#</label>
+
+ 
+ <input placeholder="Search and Select Invoice" matInput [matAutocomplete]="autotest1" [value]="modelData2.name" formControlName="ref_inv_id" (keyup)="selectedRef($event)">
+
+ <div>
+     <mat-autocomplete  #autotest1="matAutocomplete" autotest1>
+         <mat-option (onSelectionChange)="selectionChange2(invoice)" *ngFor="let invoice of invoiceList" [value]="invoice.inv_nbr">
+             <span>{{ invoice.inv_nbr }}</span>
+         </mat-option>
+     </mat-autocomplete>
+ </div>    
+ <p class="edit-err" *ngIf="clientRead && showErrorref ">No invoice Data Found</p>
+
+</mat-form-field>  
+
+
+    <mat-form-field class="custom-input block-ele  w-100" floatLabel="never">
+        <label class="custom-label ">NARRATION</label>
+        <textarea maxlength="250" matInput placeholder="Enter Narration"  formControlName="narration"></textarea>
+
+       
+    </mat-form-field>          
+</form>
+</mat-dialog-content>
+<mat-dialog-actions>
+	<span fxFlex></span>
+	<button mat-button mat-dialog-close>Cancel</button>
+	<button mat-raised-button [disabled] = "disabledSave" (click)="saveCredit(detailsForm)">Save</button>
+</mat-dialog-actions>

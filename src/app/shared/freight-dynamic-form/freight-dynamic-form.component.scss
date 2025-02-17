@@ -1,0 +1,35 @@
+.fields-list {
+    display: flex;
+    // gap: 16px;
+    // flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    .w-50{
+        width: calc(50% - 8px);
+    }
+    .wid-25{
+        width: calc(25% - 8px);
+    }
+    .w-100{
+        width: calc(100% - 8px);
+        &.mb-8 {
+            margin-bottom: 8px;
+        }
+    }
+}
+
+.display-none {
+    display: none;
+}
+.textarea-styles {
+    min-height: 65px;
+}
+.rich-text {
+    .custom-label {
+        font-size: 14px;
+        color: #565656;
+    }
+    .quill-container {
+        padding-top: 10px;
+    }
+}

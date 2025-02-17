@@ -2,10 +2,15 @@
 
   <div class="flex-fixed-header menu-title  ">
     <h2 style="font-weight: 400;">Categories ({{totalCount}})</h2>
-    <span class="add-link" (click)="getCategory()">
-      <mat-icon>add</mat-icon>Add
+    <span class="add-link custom-tooltip import-img" (click)="getCategory()" *ngIf="isAddPerm">
+      <img [src]='images.add'>
+       <span class="tooltiptext">Add</span>
     </span>
-
+    <span class="add-link custom-tooltip import-img" (click)="importCatergory()" *ngIf="isAddPerm">
+      <img [src]='images.import'>
+        <span class="tooltiptext">Import</span>
+     </span>
+    
   </div>
   <div class="app-search-container search-small ">
     <mat-form-field class="search" floatLabel="never">
@@ -25,7 +30,7 @@
       <mat-spinner class="medium-spinner" *ngIf="fetchingData"></mat-spinner>
       <mat-list *ngIf="!fetchingData" class="media-list">
         <mat-list-item @AdminListAnimate *ngFor="let list of categoryType" (click)="getCategory(list)"
-          [class.active]="list.id === selectedCategory.id">
+          [class.active]="list.id === selectedCategory.id" class="admin-internal-menu-list">
 
           <div class="media d-flex align-items-center">
             <div class="media-body" style="padding-left: 2px;">

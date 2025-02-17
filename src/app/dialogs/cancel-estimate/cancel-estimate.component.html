@@ -1,0 +1,23 @@
+<mat-toolbar color="primary">
+  <h2 mat-dialog-title>Cancel {{ estimateslanguage }}</h2>
+  <span fxFlex></span>
+</mat-toolbar>
+<mat-dialog-content class="delete-body">
+  <p>Are you sure you want to cancel this {{ estimateslanguage }}?</p>
+</mat-dialog-content>
+<mat-spinner class="medium-spinner" *ngIf="showSpinner"></mat-spinner>
+
+<mat-dialog-actions>
+  <span fxFlex></span>
+  <button class="back-btn-ui" mat-dialog-close *ngIf="!disabledSave">No</button>
+  <button mat-raised-button (click)="deleteOrder()" [disabled]="disabledSave" style="margin-left: 10px;">
+    Yes
+    <span *ngIf="disabledSave">
+      <mat-icon style="height: 16px; width: 16px"
+        ><mat-spinner
+          class="white-spinner"
+          diameter="20"
+        ></mat-spinner></mat-icon
+    ></span>
+  </button>
+</mat-dialog-actions>

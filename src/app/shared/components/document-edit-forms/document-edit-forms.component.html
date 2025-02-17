@@ -1,0 +1,33 @@
+<div class="order-main-container">
+  <mat-toolbar>
+    <div class="create-order-title-wrapper">
+      <h2 class="order-main-title">{{ data.title }}</h2>
+    </div>
+  </mat-toolbar>
+  <mat-dialog-content>
+    <form>
+      <app-form-builder
+        *ngIf="data?.tableName !== 'assign_container'"
+        [module]="data.tableName"
+        (trigger)="formEmitEvent($event)"
+        [Contacts]="data.related_to_id ? data.related_to_id : ''"
+        [editTypeForRestrict]="true"
+        [dropDownRelatedId]="data.related_to_id ? data.related_to_id : ''"
+      ></app-form-builder>
+    </form>
+  </mat-dialog-content>
+  <mat-dialog-actions>
+    <span fxFlex></span>
+    <section class="section-right" *ngIf="!disabledSave">
+      <button mat-button mat-dialog-close>Cancel</button>
+      <button mat-raised-button (click)="editDocument()">Save</button>
+    </section>
+    <section class="section-right" *ngIf="disabledSave">
+      <button mat-raised-button disabled="true">
+        <mat-icon>
+          <mat-spinner class="white-spinner" diameter="20"></mat-spinner
+        ></mat-icon>
+      </button>
+    </section>
+  </mat-dialog-actions>
+</div>

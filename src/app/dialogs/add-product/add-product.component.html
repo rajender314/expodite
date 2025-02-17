@@ -1,0 +1,193 @@
+<mat-toolbar>
+  <h2 mat-dialog-title></h2>
+  <span fxFlex>Add Product</span>
+</mat-toolbar>
+<mat-dialog-content>
+  <form action="">
+    <div class="ex-row" [formGroup]="productForm">
+      <div class="" fxlayout="row">
+        <aside class="col-6">
+          <mat-form-field class="custom-input mandatory" floatLabel="never">
+            <label class="custom-label mandatory">Name</label>
+            <input matInput formControlName="name" placeholder="Name" />
+            <mat-error
+              class="error-msg"
+              *ngIf="
+                !productForm.controls.name.pristine &&
+                productForm.controls.name.hasError('required')
+              "
+            >
+              Please enter Product Name
+            </mat-error>
+          </mat-form-field>
+        </aside>
+        <aside class="col-6">
+          <mat-form-field class="custom-input mandatory" floatLabel="never">
+            <label class="custom-label mandatory">H.S Code</label>
+            <input matInput formControlName="hs_code" placeholder="H.S Code" />
+            <mat-error
+              class="error-msg"
+              *ngIf="
+                !productForm.controls.hs_code.pristine &&
+                productForm.controls.hs_code.hasError('required')
+              "
+            >
+              Please enter H.S Code
+            </mat-error>
+          </mat-form-field>
+        </aside>
+      </div>
+      <div class="" fxlayout="row">
+        <aside class="col-6">
+          <mat-form-field class="custom-input mandatory" floatLabel="never">
+            <label class="custom-label mandatory">Category</label>
+            <mat-select placeholder="Category" formControlName="category_id">
+              <mat-option *ngFor="let cat of categoryDt" [value]="cat.id">{{
+                cat.name
+              }}</mat-option>
+            </mat-select>
+            <mat-error
+              *ngIf="
+                submitProduct ||
+                (!productForm.controls.category_id.pristine &&
+                  productForm.controls.category_id.hasError('required'))
+              "
+              >Please Select Category</mat-error
+            >
+          </mat-form-field>
+        </aside>
+        <aside class="col-6">
+          <mat-form-field class="custom-input" floatLabel="never">
+            <label class="custom-label">Default Price (USD)</label>
+            <input
+              matInput
+              type="text"
+              maxlength="10"
+              oninput="javascript: if (!/^(\d{1,4}(\.\d{0,3})?)?$/.test(this.value)) this.value = this.value.slice(0, -1);"
+              placeholder="Default Price (USD)"
+              formControlName="price"
+              id="price"
+            />
+            <mat-error
+              *ngIf="productForm.controls.price.hasError('required')"
+              >{{ language.validations.price }}</mat-error
+            >
+            <mat-error
+              *ngIf="
+                !productForm.controls.price.hasError('required') &&
+                productForm.controls.price.hasError('min')
+              "
+              >Please Enter value greater than zero</mat-error
+            >
+            <mat-error
+              *ngIf="
+                !productForm.controls.price.hasError('min') &&
+                productForm.controls.price.hasError('pattern')
+              "
+              >Please Enter Valid Default Price</mat-error
+            >
+          </mat-form-field>
+        </aside>
+      </div>
+      <div class="" fxlayout="row">
+        <aside class="col-6">
+          <mat-form-field class="custom-input mandatory" floatLabel="never">
+            <label class="custom-label mandatory" style="text-transform: unset"
+              >Unit of Measurement</label
+            >
+            <mat-select
+              placeholder="Unit of Measurement"
+              formControlName="uom_id"
+              (selectionChange)="selectType($event)"
+            >
+              <mat-option
+                [value]="stat.id"
+                *ngFor="let stat of uomList"
+                [innerHtml]="stat.name"
+              ></mat-option>
+            </mat-select>
+            <mat-error
+              *ngIf="
+                submitProduct &&
+                productForm.controls.uom_id.hasError('required')
+              "
+              >Please Select Unit of Measurement</mat-error
+            >
+          </mat-form-field>
+        </aside>
+        <aside class="col-6">
+          <mat-form-field
+            class="custom-input mandatory"
+            floatLabel="never"
+            *ngIf="showUnitWeight"
+          >
+            <label class="custom-label mandatory">Unit Weight (in Kgs)</label>
+            <input
+              matInput
+              type="text"
+              maxlength="5"
+              placeholder="Unit Weight"
+              formControlName="unit_weight"
+            />
+            <mat-error
+              *ngIf="productForm.controls.unit_weight.hasError('required')"
+              >Please Enter Unit Weight</mat-error
+            >
+            <mat-error
+              *ngIf="
+                !productForm.controls.unit_weight.hasError('required') &&
+                productForm.controls.unit_weight.hasError('min')
+              "
+              >Please Enter value greater than zero</mat-error
+            >
+            <mat-error
+              *ngIf="
+                !productForm.controls.unit_weight.hasError('min') &&
+                productForm.controls.unit_weight.hasError('pattern')
+              "
+              >Please Enter Valid Unit Weight</mat-error
+            >
+
+            <!-- <mat-error *ngIf="submitProduct && productForm.controls.price.hasError('min')">Please Enter value greater than or equal to 1</mat-error> -->
+          </mat-form-field>
+        </aside>
+      </div>
+      <div class="" fxlayout="row">
+        <aside class="col-6">
+          <mat-form-field class="custom-input mandatory" floatLabel="never">
+            <label class="custom-label">Tax (%)</label>
+            <input
+              matInput
+              type="number"
+              [min]="0"
+              placeholder="Tax"
+              formControlName="tax"
+              oninput="javascript:  if (!/^(\d+(\.\d{0,2})?)?$/.test(this.value)) this.value = this.value.slice(0, -1);"
+            />
+            <mat-error *ngIf="productForm.controls.tax.hasError('required')"
+              >Please Enter Tax</mat-error
+            >
+            <mat-error *ngIf="!productForm.controls.tax.hasError('required')"
+              >Please Enter value greater than zero</mat-error
+            >
+            <mat-error *ngIf="productForm.controls.tax.hasError('pattern')"
+              >Please Enter Up To 2 Characters With 2 Decimals Max</mat-error
+            >
+          </mat-form-field>
+        </aside>
+      </div>
+    </div>
+  </form>
+</mat-dialog-content>
+<mat-spinner class="medium-spinner" *ngIf="showSpinner"></mat-spinner>
+<mat-dialog-actions>
+  <span fxFlex></span>
+  <button  class="back-btn-ui" mat-dialog-close>{{ language.defaults.cancel }}</button>
+  <button
+    mat-raised-button
+    (click)="createProductType(productForm)"
+    [disabled]="disabledSave || productForm.invalid"
+  >
+    Add Product
+  </button>
+</mat-dialog-actions>

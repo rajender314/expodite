@@ -1,0 +1,20 @@
+.mat-expansion-panel:not(.mat-expanded)
+  .mat-expansion-panel-header:hover:not([aria-disabled="true"]) {
+  background: #d5d7d9 !important;
+}
+
+.mat-expansion-panel-header.mat-expanded:focus,
+.mat-expansion-panel-header.mat-expanded:hover {
+  background: #d5d7d9 !important;
+}
+.mat-list-base .mat-list-item {
+  height: 32px !important;
+  margin-top: 4px;
+}
+
+.font-600 {
+  font-weight: 600 !important;
+}
+.mat-expansion-panel-header:not([aria-disabled="true"]) {
+  padding-bottom: 6px;
+}

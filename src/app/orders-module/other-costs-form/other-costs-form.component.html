@@ -1,0 +1,58 @@
+<div
+  class="shipping-container"
+  [class.collapse]="!showotherCosts"
+  *ngIf="order_Permissions.other_costs"
+>
+  <!-- order.selectedOrder.orders_types_id == '14' ||
+  order.selectedOrder.orders_types_id == '4' ||
+  order.selectedOrder.orders_types_id == '6' -->
+  <mat-toolbar class="package-toolbar">
+    <img class="othercost-image" [src]="images.other_cost_icon" />
+    <span> Other Costs</span>
+    <span fxFlex></span>
+    <div *ngIf="viewActivityLogIcon">
+      <button
+        mat-icon-button
+        class="action-orderbtn"
+        (click)="openActivityModal('other_order_details')"
+      >
+        <img [src]="images.activity_log_icon" title="Activity Log" />
+      </button>
+    </div>
+    <button mat-icon-button (click)="toggleotherCosts()">
+      <img [src]="images.grey_arrow" mat-icon-button *ngIf="showotherCosts" />
+      <mat-icon class="toggle-arrow" *ngIf="!showotherCosts"
+        >keyboard_arrow_down
+      </mat-icon>
+    </button>
+  </mat-toolbar>
+  <div class="shipping-sec" style="padding: 16px" *ngIf="showotherCosts">
+    <app-form-builder
+      [related_to_id]="order.selectedOrder.id"
+      module="other_costs"
+      (trigger)="formEmitEvent($event)"
+      [undoOnCancel]="undoOnCancel"
+    ></app-form-builder>
+    <mat-list
+      class="footer-bottom fxflex"
+      *ngIf="otherCosts?.dirty || othertransportForm?.dirty"
+      fxLayout="row"
+      fxLayoutAlign="end center"
+    >
+      <span fxFlex></span>
+      <section class="section-right">
+        <button type="button"  class="back-btn-ui" (click)="cancelOthers()">
+          Cancel
+        </button>
+        <button
+          type="submit"
+          mat-raised-button
+          (click)="submmitOtherForm(otherCosts, $event)"
+        >
+          Save
+        </button>
+      </section>
+      <div class="cb"></div>
+    </mat-list>
+  </div>
+</div>

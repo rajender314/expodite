@@ -6,6 +6,9 @@ import * as _ from 'lodash';
 import { Param } from '../../../custom-format/param';
 import { AdminService } from '../../../services/admin.service';
 import { trigger, style, transition, animate, keyframes, query, stagger } from '@angular/animations';
+import { LeadsService } from '../../../leads/leads.service';
+import { UtilsService } from '../../../services/utils.service';
+import { Images } from '../../../images/images.module';
 
 @Component({
   selector: 'app-shipment-list',
@@ -22,7 +25,7 @@ import { trigger, style, transition, animate, keyframes, query, stagger } from '
   ]
 })
 export class ShipmentListComponent implements OnInit {
-
+  public images = Images;
   public language = language;
   public open = false;
   totalCount: number = 0;
@@ -39,21 +42,31 @@ export class ShipmentListComponent implements OnInit {
   private listActive = true;
   @Input() update;
   @Output() trigger = new EventEmitter<object>();
+  @Input() isAddPerm;
 
-  private param: Param = {
+  private param: any = {
     page: 1,
     perPage: 12,
     sort: 'ASC',
     search: ''
   }
-  constructor(private adminService: AdminService) { }
+  constructor(private adminService: AdminService,  private leadService: LeadsService,
+    private utilsService: UtilsService) { }
 
   backToList() {
     this.listActive = false;
   }
-
+  public modulesList = []
   ngOnInit() {
-    this.getShipments(this.param);
+    
+    this.utilsService.getModuleList().then((response) => {
+      this.modulesList = response.result.data.modulesDt;
+      const indx = _.findIndex(this.modulesList, {slug: "add_carriers"})
+      if(indx > -1) {
+        this.param.form_id = this.modulesList[indx].id
+        this.getShipments(this.param);
+      }
+    })
   }
 
   ngOnChanges(changes: { [propKey: string]: SimpleChange }) {
@@ -101,15 +114,15 @@ export class ShipmentListComponent implements OnInit {
   getShipments(param: object, flag?: string, cb?): void {
     if (flag == 'pagination') this.paginationScroll = true;
     else this.fetchingData = true;
-    this.adminService
-      .getShipmentsList(param)
+    this.leadService
+    .getModuleSavedList(param)
       .then(response => {
         this.paginationScroll = false;
         this.fetchingData = false;
         this.searching = false;
         if (response.result.success) {
-          this.totalCount = response.result.data.count;
-          this.shipmentType = response.result.data.modeTransportDt;
+          this.totalCount = response.result.data.total;
+          this.shipmentType = response.result.data.list;
           this.totalPages = Math.ceil(Number(this.totalCount) / this.param.perPage);
           if (this.totalCount == 0) this.noRecords();
           else this.getShipment(this.shipmentType[0])

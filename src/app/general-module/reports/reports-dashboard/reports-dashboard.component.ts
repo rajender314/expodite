@@ -8,6 +8,7 @@ import * as _ from 'lodash';
 declare var App: any;
 import { ReportsService } from '../../../services/reports.service';
 import { Pipe, PipeTransform } from '@angular/core';
+import { AdminService } from '../../../services/admin.service';
 
 @Pipe({
   name: 'myfilter',
@@ -35,18 +36,33 @@ export class ReportsDashboardComponent implements OnInit {
   private images = Images;
   public search="";
 
-  constructor(public ReportsService: ReportsService) { }
+  constructor(public ReportsService: ReportsService,    public adminService:  AdminService
+    ) { }
   sideListReports: Array<any> = [
-    { id: 1, name: 'Orders', route: 'ordersByStatusReport', icon: this.images.roles, selected: true, code: "orders_by_status_report" },
-    { id: 2, name: 'Invoices', route: 'ordersDueByClientsReport', icon: this.images.roles, selected: true, code: "orders_due_to_clients_report" },  
-    { id: 5, name: 'Payments Due', route: 'paymentDueReport', icon: this.images.contactAddress, selected: true, code: "payment_due_report" },
-    { id: 3, name: 'Payments Received', route: 'salesYearToDateReport', icon: this.images.containers, selected: true, code: "sales_year_to_date_report" },
-    { id: 4, name: 'Product Sales', route: 'salesMonthToDateReport', icon: this.images.containers, selected: true, code: "sales_month_to_date_report" },
-    { id: 7, name: 'Inventory', route: 'inventoryReport', icon: this.images.products , selected: true, code: "couriers_report"},
-    { id: 6, name: 'Shipments', route: 'shipmentsReport', icon: this.images.products,  selected: true, code: "couriers_report"},
+    { id: 1, name: 'Orders', route: 'ordersReport', icon: this.images.roles, selected: true, code: "ordersReport" },
+    { id: 2, name: 'Invoices', route: 'invoicesReport', icon: this.images.roles, selected: true, code: "invoicesReport" },
+    { id: 5, name: 'Payments Due', route: 'paymentsDueReport', icon: this.images.contactAddress, selected: true, code: "paymentsDueReport" },
+    { id: 3, name: 'Payments Received', route: 'paymentsRecievedReport', icon: this.images.containers, selected: true, code: "paymentsRecievedReport" },
+    { id: 4, name: 'Product Sales', route: 'productSalesReport', icon: this.images.containers, selected: true, code: "productSalesReport" },
+    { id: 7, name: 'Inventory', route: 'inventoryReport', icon: this.images.products , selected: true, code: "inventoryReport"},
+    { id: 6, name: 'Shipments', route: 'shipmentsReport', icon: this.images.products,  selected: true, code: "shipmentsReport"},
+    { id: 8, name: 'Export Register', route: 'exportRegisterReport', icon: this.images.products , selected: true, code: "exportRegisterReport"},
+    { id: 8, name: 'F.I.R.C Report', route: 'fircReport', icon: this.images.products , selected: true, code: "fircReport"},
+    { id: 9, name: 'Insurance Report', route: 'insuranceReport', icon: this.images.products , selected: true, code: "insuranceReport"},
+    { id: 9, name: 'Forex Gain/Loss Report', route: 'forexReport', icon: this.images.products , selected: true, code: "forexReport"},
+    { id: 10, name: 'Forex Gain/Loss Report(Grouped)', route: 'forexreportGrouped', icon: this.images.products , selected: true, code: "forexreportGrouped"},
+    { id: 11, name: 'Duty Drawback Report', route: 'duty_drawback_report', icon: this.images.products , selected: true, code: "duty_drawback_report"},
+    { id: 12, name: 'RoDTEP Report', route: 'rodtep_report', icon: this.images.products , selected: true, code: "rodtep_report"},
+
   ];
   ngOnInit() {
-    this.searchReports();
+    // this.searchReports();
+    this.adminService.getPermissions().subscribe(res => {
+      this.adminService.rolePermissions = res.role_details.roles_permissions;
+    })
+    this.updatePermissions();
+
+  
   }
   searchReports(): void {
 
@@ -55,11 +71,10 @@ export class ReportsDashboardComponent implements OnInit {
 
      this.updatePermissions();
 
-    this.sideListReports = this.sideListReports.filter(obj => {
-      return obj.selected == true;
-    })
-    // console.log(this.sideListReports)
     
+    
+    // console.log(this.sideListReports)
+
   }
   public noDataMsg = false;
   onKeyUp() {
@@ -69,40 +84,18 @@ export class ReportsDashboardComponent implements OnInit {
       this.noDataMsg = false;
 
     }
-    console.log(this.ReportsService.searchArray.length)
   }
   clearSearch() {
     this.search = '';
       this.noDataMsg = false;
-    
+
 
   }
   updatePermissions() {
-    // console.log('sdsdsd')
-    for(let i = 0; i < App.user_roles_permissions.length; i++) {
-      // console.log('sdsdsd')
-      if(!App.user_roles_permissions[i].selected) {
-        // console.log('sdsdsd')
-      for(let j = 0; j < this.sideListReports.length; j++) {
-        // console.log('sdsdsd')
-        if(App.user_roles_permissions[i].code.trim() == this.sideListReports[j].code.trim()) {
-          // console.log('sdsdsd')
-          this.sideListReports[j].selected = App.user_roles_permissions[i].selected;
-        }
-      }
-     }
-    }
-   
-
-    // setTimeout(() => {
-    //   this.sideListReports.filter(obj => {
-    //     return obj.selected;
-    //   })
-    //   console.log(this.sideListReports)
-    //  }, 1000);
-    //  console.log(this.sideListReports)
-
+    this.sideListReports = this.sideListReports.filter((obj: any) => {
+      return this.adminService.rolePermissions[obj.code] === 1;
+    });
   }
 
- 
+
 }

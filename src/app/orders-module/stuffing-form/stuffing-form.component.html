@@ -1,0 +1,128 @@
+<!-- *ngIf="
+  is_automech
+    ? (order.selectedOrder.status_id >= 17 ||
+        order.selectedOrder.status_slug == 'processed' ||
+        order.selectedOrder.status_slug == 'delivered' ||
+        order.selectedOrder.status_slug == 'in_transit') &&
+      !(order.selectedOrder.status_slug == 'cancelled')
+    : (order.selectedOrder.status_id >= 17 ||
+        order.selectedOrder.status_slug == 'processed' ||
+        order.selectedOrder.status_slug == 'delivered' ||
+        order.selectedOrder.status_slug == 'in_transit') &&
+      !(order.selectedOrder.status_slug == 'cancelled')
+" -->
+<div #stuffing *ngIf="factoryPermission">
+  <div class="shipping-container" [class.collapse]="!showStuffing">
+    <!--&& (order.packageStatus == 1 || order.packageStatus == 2) -->
+    <mat-toolbar class="package-toolbar">
+      <img class="shipping-image" [src]="images.rocket" />
+      <span>Stuffing</span>
+      <span fxFlex></span>
+      <div *ngIf="viewActivityLogIcon">
+        <button
+          mat-icon-button
+          class="action-orderbtn"
+          (click)="openActivityModal('other_order_details')"
+        >
+          <img [src]="images.activity_log_icon" title="Activity Log" />
+        </button>
+      </div>
+      <button mat-icon-button (click)="togglefreightlogistics()">
+        <img [src]="images.grey_arrow" mat-icon-button *ngIf="showStuffing" />
+        <mat-icon class="toggle-arrow" *ngIf="!showStuffing"
+          >keyboard_arrow_down
+        </mat-icon>
+      </button>
+    </mat-toolbar>
+    <div class="shipping-sec" style="padding: 16px" *ngIf="showStuffing">
+      <app-form-builder
+        [getInputValidationTypes]="getInputValidationTypes"
+        [related_to_id]="order.selectedOrder.id"
+        module="stuffing"
+        (trigger)="formEmitEvent($event)"
+        [undoOnCancel]="undoOnCancel"
+      ></app-form-builder>
+      <!-- <div class="container-title-div">
+          <p class="heading">Containers</p>
+          <button class="add-row-btn" (click)="addNewLine()" mat-raised-button>
+            Add Containers
+          </button>
+        </div> -->
+
+      <!-- <div >
+         
+          <div>
+          <app-ag-grid-view
+          [tableName]="'freight_container_details'"
+          [newColumnAdded]="newColumnAdded"
+        ></app-ag-grid-view>
+      </div>
+        </div> -->
+
+      <!-- <app-freight-dynamic-form 
+        module="add_container"
+        (trigger)="containerFormEmitEvent($event)"
+        [Contacts]="editID"
+        >
+        </app-freight-dynamic-form> -->
+      <!-- <div style="padding-top: 10px;">
+          <mat-error
+            class="error-msg"
+            *ngIf="
+              saveBtnClicked &&
+              (!freightContainerForm ||
+              !freightContainerForm.value.freighContainerAtrray.length
+              )
+            "
+          >
+            Please Include One Container
+          </mat-error>
+        </div> -->
+
+      <mat-list
+        class="footer-bottom fxflex"
+        *ngIf="stuffingForm?.dirty || freightContainerForm?.dirty"
+        fxLayout="row"
+        fxLayoutAlign="end center"
+      >
+        <span fxFlex></span>
+        <section class="section-right">
+          <button type="button" mat-button (click)="cancelFreight()">
+            Cancel
+          </button>
+          <button
+            type="submit"
+            mat-raised-button
+            (click)="submmitFreightcost(stuffingForm)"
+            [disabled]="stuffingForm?.invalid || saveSubmmitFreight"
+          >
+            Save
+          </button>
+        </section>
+        <div class="cb"></div>
+      </mat-list>
+    </div>
+    <!-- <div
+        class="container-title-div"
+        style="margin: 0 30px"
+        *ngIf="showAddContainerBtn"
+      >
+        <p class="heading">Containers</p>
+        <button class="add-row-btn" (click)="addNewLine()" mat-raised-button>
+          Add Containers
+        </button>
+      </div>
+      <div
+        class="shipping-container"
+        style="margin-top: 0"
+        *ngIf="showAddContainerBtn"
+      >
+        <div class="shipping-sec" style="margin-bottom: 0">
+          <app-ag-grid-view
+            [tableName]="'freight_container_details'"
+            [newColumnAdded]="newColumnAdded"
+          ></app-ag-grid-view>
+        </div>
+      </div> -->
+  </div>
+</div>

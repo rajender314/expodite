@@ -1,0 +1,100 @@
+<div
+  #shipping
+  *ngIf="factoryPermission"
+  [class]="shipping.print ? 'print' : 'no-print'"
+>
+  <div
+    class="shipping-container"
+    [class.collapse]="!showShipping"
+    *ngIf="order_Permissions.enable_shipping_details"
+  >
+    <mat-toolbar class="package-toolbar">
+      <img
+        class="othercost-image"
+        [src]="images.Shipping_Details_Icon"
+        style="width: 24px; height: 24px"
+      />
+      <span>Shipping Details</span>
+      <span fxFlex></span>
+      <div *ngIf="viewActivityLogIcon">
+        <button
+          mat-icon-button
+          class="action-orderbtn"
+          (click)="openActivityModal('shipping_details')"
+        >
+          <img [src]="images.activity_log_icon" title="User Activity Tracker" />
+        </button>
+      </div>
+      <button mat-icon-button (click)="toggleShipping()">
+        <img [src]="images.grey_arrow" mat-icon-button *ngIf="showShipping" />
+        <mat-icon class="toggle-arrow" *ngIf="!showShipping"
+          >keyboard_arrow_down
+        </mat-icon>
+      </button>
+    </mat-toolbar>
+    <div class="shipping-sec" style="padding: 16px" *ngIf="showShipping">
+      <app-form-builder
+        [related_to_id]="order.selectedOrder.id"
+        [module]="'shipping_details'"
+        [editUpload]="true"
+        (trigger)="formEmitEvent($event)"
+        [undoOnCancel]="undoOnCancel"
+        [order]="order"
+        [saveFreightFlag]="saveFreightFlag"
+        [selectedOrderStatus]="selectedOrderStatus"
+        [shipping_id]="shipping_id"
+        (emitUploadInfo)="emitUploadInfo($event)"
+        [PermissionKey]="'edit_shipment'"
+      ></app-form-builder>
+
+      <!-- <div style="position: relative;top: 10px;">
+        <mat-error class="error-msg" *ngIf="saveBtnClicked && shipmentId != '1' && !shippingContainer">
+          Please Include One Container
+        </mat-error>
+      </div> -->
+      <mat-list
+        class="footer-bottom fxflex"
+        *ngIf="shippingForm?.dirty || shippingContainer?.dirty"
+        fxLayout="row"
+        fxLayoutAlign="end center"
+      >
+        <span fxFlex></span>
+        <section class="section-right">
+          <button
+            type="button"
+            *ngIf="!saveBtnClicked"
+            (click)="cancelShip()"
+            class="back-btn-ui"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            (click)="saveShippingAddress(shippingForm)"
+            [disabled]="
+              shippingForm?.invalid || disableSaveShipping || saveBtnClicked
+            "
+            mat-raised-button
+          >
+            Save
+            <span *ngIf="saveBtnClicked">
+              <mat-icon style="height: 16px; width: 16px"
+                ><mat-spinner
+                  class="white-spinner"
+                  diameter="20"
+                ></mat-spinner></mat-icon
+            ></span>
+          </button>
+        </section>
+        <!-- <section class="section-right" *ngIf="saveBtnClicked">
+          <button mat-raised-button disabled="true">
+            <mat-icon>
+              <mat-spinner class="white-spinner" diameter="20"></mat-spinner
+            ></mat-icon>
+          </button>
+        </section> -->
+        <div class="cb"></div>
+      </mat-list>
+    </div>
+  </div>
+</div>

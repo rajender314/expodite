@@ -1,0 +1,17 @@
+<div fxLayout="row">
+  <app-document-template-list
+    class="tabs-list"
+    [update]="updatedDocumentDetails"
+    (trigger)="getSelectedDocument($event)"
+    [typeOfDocument]="typeOfDocument"
+    [isAddPerm]="adminService.rolePermissions.add_document_template == 1 ? true : false"
+  ></app-document-template-list>
+  <app-document-template-details
+    [documentData]="selectedDocument"
+    style="width: 100%"
+    (trigger)="updateDocumentDetails($event)"
+    (injectDocumentTemplates)="getDocumentTemplateTypes($event)"
+    class="inner-content"
+    style="width: 100%"
+  ></app-document-template-details>
+</div>

@@ -1,7 +1,7 @@
 <!--Success alert-->
-<div *ngIf="data?.status=='success'">
+<div *ngIf="data?.status=='success'" style="display: flex; align-items: center;">
   <mat-icon class="success-alert">check_circle</mat-icon>
-  <span>{{data.msg}}</span>
+  <span class="success-msg">{{data.msg}}</span>
   <div class="clearfix"></div>
 </div>
 <!--Error alert-->

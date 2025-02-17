@@ -1,0 +1,157 @@
+.payment {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
+
+.content {
+  padding: 16px 24px;
+}
+
+.table-container {
+  min-height: 100px;
+  height: auto;
+  overflow-y: auto;
+  max-height: 300px;
+  padding: 0px !important;
+}
+
+.table-container .mat-table .mat-row .mat-cell {
+  display: table-cell;
+  padding: 10px;
+}
+
+.no-payment {
+  padding: 16px 10px;
+  color: #565656;
+}
+
+th.mat-header-cell {
+  padding: 10px;
+}
+.add-package-button {
+  display: flex;
+  padding: 15px;
+  gap: 8px;
+  background: #e4e5e9;
+  cursor: pointer;
+  align-items: center;
+  border-radius: 5px;
+  font-size: 15px;
+  color: #ff5722;
+  border: 0;
+}
+.package-container {
+  padding: 16px;
+}
+.add-import {
+  display: flex;
+  gap: 10px;
+}
+.import-items {
+  background: transparent;
+  border: 0px;
+  cursor: pointer;
+  font-size: 15px;
+  display: flex;
+  color: #323232;
+  align-items: center;
+  gap: 4px;
+  &:hover {
+    text-decoration: underline;
+  }
+}
+tr.mat-header-row {
+  height: 40px;
+  line-height: 12px !important;
+}
+table {
+  border-collapse: collapse; /* Ensures there are no gaps between borders */
+  width: 100%; /* Optional, ensures the table takes full width */
+}
+
+td,
+th {
+  border: 1px solid #cecece; /* Division lines between table cells */
+  padding: 8px; /* Adds padding to the cells */
+}
+.table-container {
+  .mat-table {
+    .mat-header-row {
+      background: none !important;
+    }
+  }
+}
+
+.info-line {
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+}
+
+.add-package-button-aapl {
+  display: flex;
+  padding: 15px;
+  gap: 8px;
+  background: #e4e5e9;
+  cursor: pointer;
+  align-items: center;
+  border-radius: 5px;
+  font-size: 15px;
+  color: #ff5722;
+  border: 0;
+}
+.info-line {
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  text-align: left;
+  margin-top: 6px;
+}
+
+.info-line .label {
+  font-weight: bold;
+  color: #333;
+}
+
+.info-line .value {
+  color: #555;
+}
+
+.info-line .divider {
+  margin: 0 5px;
+  color: #999;
+}
+table.package-tables {
+  tr.package-total {
+    font-family: "Roboto", "Helvetica Neue", sans-serif;
+    font-size: 18px;
+    color: #323232;
+    letter-spacing: 0;
+    font-weight: 500;
+    background: #f6f7f8;
+    td {
+      vertical-align: top;
+      word-break: break-word;
+    }
+  }
+}
+.noData {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+}
+.upoad-packing {
+  color: blue;
+  padding-left: 6px;
+  cursor: pointer;
+  &:hover {
+    text-decoration: underline;
+  }
+}
+.edit_icon {
+  padding: 2px 6px;
+  background: aliceblue;
+  height: 30px;
+  border-radius: 4px;
+  width: 30px;
+  cursor: pointer;
+}

@@ -1,0 +1,15 @@
+.header-black {
+  background-color: black;
+  color: white;
+}
+
+.my-parent-header-class {
+  background-color: red;
+}
+[role="columnheader"] {
+  background-color: red !important;
+}
+
+.my-parent-header-class1 {
+  text-align: center;
+}

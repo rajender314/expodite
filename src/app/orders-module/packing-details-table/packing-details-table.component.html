@@ -1,0 +1,233 @@
+<!-- <div class="table-container" *ngIf="packageTable?.packages?.length">
+  <table
+    style="margin-bottom: 4px"
+    class="package-details-table"
+    *ngFor="let package of packageTable.packages; index as productIndex"
+  >
+    <tbody>
+      <tr class="product-details">
+        <td colspan="4" class="package-head" style="padding: 0px">
+          <mat-toolbar
+            class="package-head"
+            style="
+              display: flex;
+              justify-content: space-between;
+              background-color: #9db5d92e;
+            "
+          >
+            <div>
+              <div class="info-line">
+                {{ productIndex + 1 }} .
+                <span class="label"
+                  >{{ package?.packing_meta_data?.name }} :
+                </span>
+                <strong>{{ package?.packing_meta_data?.quantity }}</strong>
+                <span class="divider">|</span>
+                <span class="label">Dimensions : </span>
+                <span class="value"
+                  >{{ package?.packing_meta_data?.height }}x{{
+                    package?.packing_meta_data?.width
+                  }}x{{ package?.packing_meta_data?.depth }} ({{
+                    package?.packing_meta_data?.unit_of_measurement
+                  }})
+                </span>
+                <span class="divider">|</span>
+                <span class="label">Tare Wt : </span>
+                <strong>
+                  {{ package?.packing_meta_data?.total_tare_weight }}
+                  Kgs</strong
+                >
+                <span class="divider">|</span>
+                <span class="label">Net Wt : </span>
+                <strong>
+                  {{ package?.packing_meta_data?.total_net_weight }}
+                  Kgs</strong
+                >
+                <span class="divider">|</span>
+                <span class="label">Gross Wt : </span>
+                <strong
+                  >{{
+                    package?.packing_meta_data?.total_gross_weight
+                  }}
+                  Kgs</strong
+                >
+              </div>
+            </div>
+          </mat-toolbar>
+        </td>
+      </tr>
+      <table
+        style="width: 100%"
+        mat-table
+        [dataSource]="package.row_data"
+        class="mat-elevation-z10"
+      >
+        <ng-container
+          *ngFor="let column of package.column_data"
+          [matColumnDef]="column.field"
+        >
+          <th mat-header-cell *matHeaderCellDef>
+            {{ column.headerName }}
+          </th>
+          <td mat-cell *matCellDef="let element">
+            <ng-container
+              *ngIf="column.field === 'date_of_payment'; else defaultCell"
+            >
+              {{ element[column.field] | date : "medium" }}
+            </ng-container>
+            <ng-template #defaultCell>
+              {{ element[column.field] }}
+            </ng-template>
+          </td>
+        </ng-container>
+
+        <tr
+          mat-header-row
+          *matHeaderRowDef="displayedColumns(package.column_data)"
+        ></tr>
+        <tr
+          mat-row
+          *matRowDef="let row; columns: displayedColumns(package.column_data)"
+        ></tr>
+      </table>
+      <table class="package-tables footer">
+        <tBody>
+          <tr class="package-total">
+            <td colspan="4">
+              <div class="info-line">
+                <span class="label">Package Label : </span>
+                <span class="divider">|</span>
+                <span class="label"> {{ package?.cal_label }} : </span>
+              </div>
+            </td>
+            <td class="table-right" style="font-size: 15px">
+              Total per {{ package?.packing_meta_data?.name }}
+            </td>
+            <td class="table-right" style="font-size: 15px"></td>
+
+            <td class="table-right gross-details" style="font-size: 15px">
+              {{ package?.packing_meta_data?.net_weight_per_package }}
+            </td>
+            <td class="table-right gross-details" style="font-size: 15px">
+              {{ package?.packing_meta_data?.gross_weight_per_package }}
+            </td>
+          </tr>
+        </tBody>
+      </table>
+    </tbody>
+  </table>
+</div>
+<div
+  *ngIf="packageTable?.packages?.length"
+  class="footer"
+  style="text-align: right; font-size: 18px"
+>
+  Total Net Weight: {{ packageTable?.totals?.net_weight }} Kgs &nbsp;&nbsp; |
+  &nbsp;&nbsp; Total Tare Weight: {{ packageTable?.totals?.tare_weight }} Kgs
+  &nbsp;&nbsp; | &nbsp;&nbsp; Total Total Gross Weight:
+  {{ packageTable?.totals?.total_gross_weight }}
+</div> -->
+<div
+  [class.noData]="!packageTable.packages.length"
+  style="border-bottom: 1px solid #d7dbe0"
+>
+  <span
+    *ngIf="!packageTable.packages || !packageTable.packages.length"
+    class="no-data-found"
+    >No Packages Found &nbsp;</span
+  ><span
+    class="upoad-packing"
+    *ngIf="(!packageTable.packages || !packageTable.packages.length) && adminService.rolePermissions.add_packing == 1"
+    (click)="uploadPacking()"
+    >Add Open-Format Packaging</span
+  >
+
+  <div class="table-container" style="max-height: 440px; margin: 6px 14px">
+    <div
+      *ngFor="let package of packageTable.packages; index as productIndex"
+      [ngStyle]="{ 'margin-top': productIndex > 0 ? '12px' : '0px' }"
+    >
+      <app-pallet-table
+        *ngIf="package.is_pallet == 'true'"
+        (editPackage)="editPackage($event.id)"
+        [productIndex]="productIndex"
+        [package]="package"
+        [order_Permissions]="order_Permissions"
+      ></app-pallet-table>
+      <app-non-pallet-table
+        *ngIf="package.is_pallet == 'false'"
+        (editPackage)="editPackage($event.id)"
+        [productIndex]="productIndex"
+        [package]="package"
+        [order_Permissions]="order_Permissions"
+      ></app-non-pallet-table>
+    </div>
+    <!-- <div style="padding: 10px">
+      <button class="add-package-button-aapl" (click)="addBatchNumber('')">
+        <span
+          class="add-batch add-Line add-package"
+          title="{{ isMerchantExporter ? 'Add Packaging' : 'Add Packaging' }}"
+          *ngIf="blockContent && factoryPermission && !clientPermission"
+        >
+          <mat-icon>add</mat-icon>
+          <span>{{ "Add Packaging" }}</span>
+        </span>
+      </button>
+    </div> -->
+
+    <!-- <div class="summary-footer">
+      <div class="summary">
+        <h4>Summary :</h4>
+        <p>
+          Total {{ orders.packageOrders.cal_label }}:
+          <span>
+            {{ orders.packageOrders.total_cbm }}
+          </span>
+        </p>
+        <p>
+          Total Net Weight :
+          <span>
+            {{ orders.packageOrders.total_net_weight }}
+          </span>
+        </p>
+  
+        <p>
+          Total Gross Weight :
+          <span>
+            {{ orders.packageOrders.total_gross_weight }}
+            
+          </span>
+        </p>
+      </div>
+    </div> -->
+  </div>
+
+  <!-- <div
+    *ngIf="packageTable?.packages?.length"
+    class="footer summary-footer"
+    style="text-align: right; font-size: 16px"
+  >
+    <div
+      class="summary"
+      style="display: flex; flex-direction: column; gap: 4px"
+    >
+      <h4>Packaging Summary:</h4>
+      <p>
+        <span class="label">Total CBM:</span>
+        <span>{{ packageTable?.summary?.total_cbm }}</span>
+      </p>
+      <p>
+        <span class="label">Total Net Weight:</span>
+        <span>{{ packageTable?.summary?.total_net_wt }}</span>
+      </p>
+      <p>
+        <span class="label"> Total Gross Weight:</span>
+        <span> {{ packageTable?.summary?.total_gross_wt }}</span>
+      </p>
+    </div> -->
+  <!-- Total CBM: {{ packageTable?.summary?.total_cbm }} Kgs &nbsp;&nbsp; |
+    &nbsp;&nbsp; Total Net Weight: {{ packageTable?.summary?.total_net_wt }} Kgs
+    &nbsp;&nbsp; | &nbsp;&nbsp; Total Gross Weight:
+    {{ packageTable?.summary?.total_gross_wt }} Kgs -->
+  <!-- </div> -->
+</div>

@@ -1,0 +1,44 @@
+<mat-toolbar color="primary">
+  <h2 mat-dialog-title>Select a Master Sales Order</h2>
+  <span fxFlex></span>
+</mat-toolbar>
+<mat-dialog-content>
+  <p class="heading">
+  When you merge two salesorders, the child sales order 
+  discarded after it's Details are merged with the sales order.
+  </p>
+  <mat-selection-list class="address-selection" *ngFor="let list of OrdersList">
+
+    <mat-list-option  disableRipple="true" class="orders-list merge-order-list"  (click)="selectOrder(list.id, list)" [selected]="list.selected">
+    <div class="main">
+      <div class="orders-1">
+        <p>{{list.client_name}}</p>
+        <p><span class="merge-order-number">{{list.order_no}}</span> | <span> {{list.date_added |  date: 'MMM dd, yyyy'}}</span></p> 
+      </div>
+     <div class="orders-1">
+      <p>Amount : <span>{{list.total_amount}}</span></p>
+      <p>Total Quantity : <span>{{list.total_quantity}}</span></p>
+     </div>
+    </div>
+    <div class="client-status merge-order"  [ngClass]="{'accepted':list.status == 'Accepted','received':list.status == 'Received'}" >
+      {{list.status}}
+    </div>
+      <!-- <p>{{list.address1}}</p>
+      <p>{{list.address2}}</p>
+      <p>{{list.city}}</p>
+      <p>{{list.state}}</p>
+      <p>{{list.country_name}}</p>
+      <p>{{list.postal_code}}</p> -->
+
+    </mat-list-option>
+  </mat-selection-list>
+  <p class="merge-conform">
+    Once you merge them <span>you'll not be able to undo it.</span> Do You want to Continue
+  </p>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <span fxFlex></span>
+  <button  class="back-btn-ui" mat-dialog-close>Cancel</button>
+  <button mat-raised-button (click)="MergeOrder()" >Continue</button>
+  <!--<button *ngIf="!success" [disabled] = "disabledSave"   mat-raised-button mat-dialog-close color="warn" (click)="confirm()"></button>-->
+</mat-dialog-actions>

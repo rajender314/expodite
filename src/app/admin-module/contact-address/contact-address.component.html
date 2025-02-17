@@ -1,4 +1,17 @@
-<div fxLayout="row">
-  <app-contact-address-list [update]="updatedContactDetails" (trigger)="getSelectedContactAddress($event)"></app-contact-address-list>
-  <app-contact-address-details [globalData]="globalData" [contacts]="selectedContact" style="width:100%;" (trigger)="updateContactDetails($event)"></app-contact-address-details>
-</div>
+<!-- <div fxLayout="row">
+  <app-contact-address-list
+    [update]="updatedContactDetails"
+    (trigger)="getSelectedContactAddress($event)"
+  ></app-contact-address-list>
+  <app-contact-address-details
+    [globalData]="globalData"
+    [contacts]="selectedContact"
+    style="width: 100%"
+    (trigger)="updateContactDetails($event)"
+  ></app-contact-address-details>
+</div> -->
+<app-form-builder-list-view
+  [form_module_name]="'contact_addresses'"
+  [noDataImage]="images.no_contacts"
+  [namingConvention]="'Contact Addresses'"
+></app-form-builder-list-view>

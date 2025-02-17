@@ -1,43 +1,87 @@
 <div class="list admin-inner-list lead-att-list">
-    <mat-toolbar class="mat-small-toolbar list-toolbar">
-     <!-- <p>Custom Attributes </p> -->
-      <mat-select class="slect-head" type="text" [(ngModel)]="modeselect" name="selected_value">      
-        <mat-option (click)="add(1)" value="option1">Custom Attributes</mat-option>
-        <mat-option (click)="add(2)" value="option2">Default Attributes</mat-option>
+  <mat-toolbar class="mat-small-toolbar list-toolbar" style="height: 68px">
+    <!-- <p>Custom Attributes </p> -->
+    <div style="width: 100%; display: flex; flex-direction: column">
+      <mat-select
+        class="slect-head"
+        type="text"
+        [(ngModel)]="moduleSelect"
+        name="selected_value"
+      >
+        <!-- <mat-option (click)="changeModule('create_order')" value="create_order">Create Order</mat-option>
+        <mat-option (click)="changeModule('orders')" value="orders">Orders</mat-option>
+        <mat-option (click)="changeModule('invoices')" value="invoices">Invoices</mat-option> -->
+        <mat-option
+          (click)="changeModule(module.id)"
+          *ngFor="let module of modulesList"
+          [value]="module.id"
+          >{{ module.name }}</mat-option
+        >
       </mat-select>
-      <!-- <mat-select class="slect-head" type="text" [(ngModel)]="modeselect" name="selected_value">      
-        <mat-option (click)="add(1)" value="option1">Custom Attributes</mat-option>
-        <mat-option (click)="add(2)" value="option2">Default Attributes</mat-option>
-      </mat-select> -->
-
-      <span fxFlex></span>
-      <span class="add-link"   *ngIf="showAdd" (click)="addAttributes()">
-                <mat-icon>add</mat-icon>Add
-            </span>
-      
-    </mat-toolbar>
-    <div class="app-search-container search-small search-role">
+      <mat-select
+        class="slect-head"
+        type="text"
+        [(ngModel)]="modeselect"
+        name="selected_value"
+      >
+        <mat-option (click)="add(1)" value="option1"
+          >Custom Attributes</mat-option
+        >
+        <mat-option (click)="add(2)" value="option2"
+          >Default Attributes</mat-option
+        >
+      </mat-select>
+    </div>
+    <span fxFlex></span>
+    <span class="add-link" *ngIf="showAdd && adminService.rolePermissions.add_form_builder == 1" (click)="addAttributes()">
+      <mat-icon>add</mat-icon>Add
+    </span>
+  </mat-toolbar>
+  <div class="app-search-container search-small search-role">
     <mat-form-field class="search" floatLabel="never">
-      <input matInput placeholder={{language.defaults.search}} #search (keyup)="searchAttributes(search.value, $event)" (blur)="!search.value.length ? open = false : open = true">
+      <input
+        matInput
+        placeholder="{{ language.defaults.search }}"
+        #search
+        (keyup)="searchAttributes(search.value, $event)"
+        (blur)="!search.value.length ? (open = false) : (open = true)"
+      />
       <mat-icon matPrefix class="org-search">search</mat-icon>
       <mat-icon matSuffix *ngIf="searching" class="spinner">
         <mat-spinner class="small-spinner"></mat-spinner>
       </mat-icon>
-      <mat-icon matSuffix *ngIf="!searching && search.value.length" (click)="search.value = '';searchAttributes(search.value)">close</mat-icon>
+      <mat-icon
+        matSuffix
+        *ngIf="!searching && search.value.length"
+        (click)="search.value = ''; searchAttributes(search.value)"
+        >close</mat-icon
+      >
     </mat-form-field>
   </div>
-    <div class="list-items"infiniteScroll [infiniteScrollDistance]="1" [infiniteScrollThrottle]="50" (scrolled)="onScroll()"
-    [scrollWindow]="false" >
-      <!-- <mat-spinner class="medium-spinner" *ngIf="fetchingData"></mat-spinner> -->
-      <mat-list  *ngIf="!noAttributes">
-        <mat-list-item @AdminListAnimate (click)="getRole(list)" *ngFor="let list of attributes" [class.active]="list.id === selectedAttribute.id"   >
-          <h4 mat-line title="{{list.name}}">{{list.label}}</h4>
-        </mat-list-item>
-        <!-- <mat-list-item *ngIf="paginationScroll">{{language.defaults.loading}}</mat-list-item> -->
-       
-      </mat-list>
-      
+  <div
+    class="list-items"
+    infiniteScroll
+    [infiniteScrollDistance]="1"
+    [infiniteScrollThrottle]="50"
+    (scrolled)="onScroll()"
+    [scrollWindow]="false"
+  >
+    <!-- <mat-spinner class="medium-spinner" *ngIf="fetchingData"></mat-spinner> -->
+    <mat-list *ngIf="!noAttributes" class="media-list">
+      <mat-list-item
+        @AdminListAnimate
+        (click)="getRole(list)"
+        *ngFor="let list of attributes"
+        [class.active]="list.id === selectedAttribute.id"
+        class="admin-internal-menu-list"
+      >
+        <h4 mat-line title="{{ list.name }}">{{ list.label }}</h4>
+      </mat-list-item>
+      <!-- <mat-list-item *ngIf="paginationScroll">{{language.defaults.loading}}</mat-list-item> -->
+    </mat-list>
 
-      <div class="search-empty admin-search no-attrbt" *ngIf="noAttributes">No Attributes found</div>
-     </div>
+    <div class="search-empty admin-search no-attrbt" *ngIf="noAttributes">
+      No Attributes found
+    </div>
   </div>
+</div>

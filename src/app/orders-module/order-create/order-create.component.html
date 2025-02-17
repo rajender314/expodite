@@ -1,0 +1,283 @@
+<div class="pfi-main-container">
+  <mat-toolbar style="display: flex; justify-content: space-between">
+    <div style="display: flex; gap: 30px">
+      <div class="create-pfi-title-wrapper">
+        <span class="img-icon">
+          <img [src]="createOrderIcon" alt="Icon" />
+        </span>
+        <h2 class="pfi-main-title">
+          {{ data.title ? data.title : "Create" }} Order
+        </h2>
+      </div>
+
+      <div
+        *ngIf="data.showQuotationDropdown"
+      >
+        <mat-form-field
+          class="custom-input mandatory"
+          floatLabel="never"
+          style="font-size: 14px; width: 220px; margin-top: 0"
+        >
+          <mat-select
+            placeholder="Select Quotation"
+            (selectionChange)="onChangeQuotation($event)"
+          >
+            <mat-option
+              [value]="attribute.quotation_id"
+              *ngFor="let attribute of quotationLists"
+              [innerHtml]="attribute.quotation_no"
+            ></mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div>
+    <mat-icon
+      mat-button
+      mat-dialog-close
+      style="cursor: pointer"
+      aria-hidden="false"
+      aria-label="Example home icon"
+      >close</mat-icon
+    >
+  </mat-toolbar>
+  <mat-dialog-content
+    (scroll)="onWindowScroll($event)"
+    class="create-quote-popup"
+  >
+    <div class="page-inner-container" style="max-width: 100%">
+      <div class="products-container">
+        <div class="test">
+          <mat-tab-group #allTabs (selectedIndexChange)="onTabChange($event)">
+            <mat-tab class="pfi-tab" label="Buyer & Shipping Information">
+              <div class="inner-content">
+                <div class="estimate-error">
+                  <app-form-builder
+                    [getInputValidationTypes]="
+                      data?.getInputValidationTypes
+                        ? data.getInputValidationTypes
+                        : getInputValidationTypes
+                    "
+                    [module]="'create_order'"
+                    (changeAddress)="getSelectedAddress($event)"
+                    (trigger)="formEmitEvent($event)"
+                    (changeclietId)="changeclietId($event)"
+                    [Contacts]="
+                      data.estimate_id
+                        ? data.estimate_id
+                        : data.flag == 'override' && data.orders
+                        ? data.orders[0].id
+                        : ''
+                    "
+                    [isSubmitBtnClicked]="submiteBtnClicked"
+                    [overrideForm]="
+                      data.flag == 'override' || selectedQuotionId
+                        ? true
+                        : false
+                    "
+                    [related_to_id]="
+                      data.flag == 'override' && data.orders[0].id
+                        ? data.orders[0].id
+                        : selectedQuotionId
+                        ? selectedQuotionId
+                        : ''
+                    "
+                    [editTypeForRestrict]="data.type === 'edit' ? true : false"
+                  ></app-form-builder>
+                </div>
+                <div class="select-address-error" *ngIf="estimate_form_id">
+                  <app-select-address
+                    [module]="'pfi_address_form'"
+                    [totalFormFields]="returnedDynmicDropdowns"
+                    [clientSelectedId]="clientSelectedId"
+                    (trigger)="getSelectedAddress($event)"
+                    [Contacts]="
+                      data.estimate_id
+                        ? data.estimate_id
+                        : data.flag == 'override' && data.orders
+                        ? data.orders[0].id
+                        : selectedQuotionId
+                        ? selectedQuotionId
+                        : ''
+                    "
+                  ></app-select-address>
+                </div>
+              </div>
+            </mat-tab>
+            <mat-tab class="pfi-tab" label="{{ language.pageNavbar.products }}">
+              <div class="inner-content">
+                <!-- <app-form-builder
+                    [module]="'add_product_in_create'"
+                    (changeProducts)="emitNewProductsData($event)"
+                    (trigger)="productFormEmit($event)"
+                    (emitProducts)="emitProducts($event)"
+                  ></app-form-builder> -->
+                <div class="product-error">
+                  <app-products-form
+                    [module]="'add_product_in_order'"
+                    [clientSelectedId]="clientSelectedId"
+                    (trigger)="emitNewProductsData($event)"
+                    [Contacts]="
+                      data.estimate_id
+                        ? data.estimate_id
+                        : data.flag == 'override' && data.orders
+                        ? data.orders[0].id
+                        : selectedQuotionId
+                        ? selectedQuotionId
+                        : ''
+                    "
+                    [selected_order_ids]="
+                      data.ordersId
+                        ? [data.ordersId]
+                        : selectedQuotionId
+                        ? [selectedQuotionId]
+                        : ''
+                    "
+                    type="add_product_in_create"
+                    [selectedRowsGrid]="data.rowIds"
+                  >
+                    <!-- [isSubmitBtnClicked]="submiteBtnClicked" -->
+                  </app-products-form>
+                </div>
+                <div class="subtotal-error">
+                  <app-sub-total-form
+                    [getInputValidationTypes]="
+                      data?.getInputValidationTypes
+                        ? data.getInputValidationTypes
+                        : getInputValidationTypes
+                    "
+                    [module]="'subtotal_form'"
+                    [subTotalSum]="subTotalVal"
+                    [selectedCurrency]="selectedCurrency"
+                    (trigger)="subTotalFormEvent($event)"
+                    [Contacts]="
+                      data.estimate_id
+                        ? data.estimate_id
+                        : selectedQuotionId
+                        ? selectedQuotionId
+                        : ''
+                    "
+                    [isSubmitBtnClicked]="submiteBtnClicked"
+                    [disableEdit]="pfiProductsPayload.valid ? false : true"
+                  ></app-sub-total-form>
+                </div>
+              </div>
+            </mat-tab>
+            <mat-tab
+              class="pfi-tab"
+              label="{{ language.pageNavbar.paymentAndDelivery }}"
+            >
+              <div class="inner-content">
+                <app-form-builder
+                  [getInputValidationTypes]="
+                    data?.getInputValidationTypes
+                      ? data.getInputValidationTypes
+                      : getInputValidationTypes
+                  "
+                  [module]="'order_payment_terms'"
+                  (trigger)="paymentformEmitEvent($event)"
+                  [isSubmitBtnClicked]="submiteBtnClicked"
+                  [Contacts]="data.estimate_id ? data.estimate_id : ''"
+                  [overrideForm]="
+                    data.flag == 'override' || selectedQuotionId ? true : false
+                  "
+                  [related_to_id]="
+                    data.flag == 'override' && data.orders[0].id
+                      ? data.orders[0].id
+                      : selectedQuotionId
+                      ? selectedQuotionId
+                      : ''
+                  "
+                ></app-form-builder>
+              </div>
+            </mat-tab>
+
+            <mat-tab class="pfi-tab" label="Regulatory Details">
+              <div class="inner-content">
+                <app-form-builder
+                  [getInputValidationTypes]="
+                    data?.getInputValidationTypes
+                      ? data.getInputValidationTypes
+                      : getInputValidationTypes
+                  "
+                  [module]="'order_other_specifications'"
+                  (trigger)="specificationsformEmitEvent($event)"
+                  [isSubmitBtnClicked]="submiteBtnClicked"
+                  [Contacts]="data.estimate_id ? data.estimate_id : ''"
+                  [overrideForm]="
+                    data.flag == 'override' || selectedQuotionId ? true : false
+                  "
+                  [related_to_id]="
+                    data.flag == 'override' && data.orders[0].id
+                      ? data.orders[0].id
+                      : selectedQuotionId
+                      ? selectedQuotionId
+                      : ''
+                  "
+                ></app-form-builder>
+              </div>
+            </mat-tab>
+            <!-- <mat-tab class="pfi-tab" label="Packing">
+              <div class="inner-content">
+                <p>Packing Contents</p>
+              </div>
+            </mat-tab>
+            <mat-tab class="pfi-tab" label="Documents">
+              <div class="inner-content">
+                <p>Documents</p>
+              </div>
+            </mat-tab> -->
+          </mat-tab-group>
+        </div>
+      </div>
+      <div style="position: fixed; top: 50%; left: 50%;z-index: 99;">
+      <mat-spinner
+        class="medium-spinner page-fixed"
+        *ngIf="fetchingData"
+      ></mat-spinner>
+    </div>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions>
+    <div class="conformPFi">
+      <button
+        class="back-btn-ui"
+        *ngIf="!submiteBtnClicked"
+        (click)="onClose(allTabs, tabIndex)"
+      >
+        {{ closeBtnLabel }}
+      </button>
+      <!-- [disabled]="isDisableBtn" -->
+      <button
+        mat-raised-button
+        color="primary"
+        (click)="savePfi(allTabs, tabIndex)"
+        [disabled]="isDisableBtn || submiteBtnClicked"
+      >
+        {{ btnLabel }}
+        <span *ngIf="submiteBtnClicked">
+          <mat-icon style="height: 16px; width: 16px"
+            ><mat-spinner
+              class="white-spinner"
+              diameter="20"
+            ></mat-spinner></mat-icon
+        ></span>
+      </button>
+      <!-- <button
+        mat-raised-button
+        id="createorder"
+        color="primary"
+        (click)="moveToNextTab(allTabs)"
+      >
+        {{ confirmButtonText }}
+      </button> -->
+    </div>
+    <!-- <div class="conformPFi" *ngIf="submiteBtnClicked">
+      <button mat-raised-button disabled="true">
+        <mat-icon>
+          <mat-spinner class="white-spinner" diameter="20"></mat-spinner
+        ></mat-icon>
+      </button>
+    </div> -->
+  </mat-dialog-actions>
+</div>

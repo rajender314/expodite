@@ -1,0 +1,176 @@
+<div label="Details" class="details-tab" style="border-left: solid 1px #d6d9dc">
+  <div class="center-section-scroll vh-100 d-flex body-white">
+    <div class="page-header-ui">
+      <div class="flex-fixed-header page-title max-container-ui" style="display: flex;justify-content: space-between;">
+        <h1>Conversion Rates</h1>
+        <div style="display: flex;align-items: center;">
+          <div class="last-updated" *ngIf="updated_on">
+            Last updated on: <span class="font-600" style="color:#262626;">{{ updated_on ? updated_on : '--' }}</span>
+          </div>
+          <button
+            mat-raised-button
+            style="height: 34px;margin-left: 12px;"
+            class="mat-button mat-primary-btn filter-btn"
+            (click)="openFilters()"
+          >
+            <div>
+              <mat-icon [matBadge]="filterCount">filter_list</mat-icon>
+              <span>Filters</span>
+            </div>
+            <div
+              (click)="clearFilters($event)"
+              title="Clear Filters"
+              *ngIf="filterCount"
+              style="display: flex;"
+            >
+              <img [src]="images.removeIcon" alt="img" class="removeRedIcon" />
+            </div>
+          </button>
+          <button
+        mat-raised-button
+        class="mat-button mat-primary-btn"
+        (click)="addCurrencyConversion()"
+        style="margin-left: 10px;"
+        *ngIf="adminService.rolePermissions.add_conversion_rates == 1"
+      >
+        Add Currency
+      </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- <div class="report-filters" style="justify-content: space-between">
+      <form [formGroup]="filtersForm" style="margin-left: 11.5%">
+        <mat-form-field appearance="fill" class="date-field">
+          <label>Select Date</label>
+          <input
+            matInput
+            [matDatepicker]="picker1"
+            formControlName="selectedDate"
+            (dateChange)="getIcegateExchRates()"
+            (focus)="openCalendar(picker1)"
+            (click)="openCalendar(picker1)"
+            [max]="today"
+          />
+          <mat-error
+            class="error-msg"
+            *ngIf="
+              !filtersForm.controls.selectedDate.pristine &&
+              filtersForm.controls.selectedDate.hasError('required')
+            "
+          >
+            Please Select Date
+          </mat-error>
+          <mat-datepicker-toggle
+            matSuffix
+            [for]="picker1"
+          ></mat-datepicker-toggle>
+          <mat-datepicker #picker1></mat-datepicker>
+        </mat-form-field>
+      </form>
+      <button
+        mat-raised-button
+        class="mat-button mat-primary-btn"
+        style="margin-bottom: 15px; margin-left: 30px"
+        (click)="addCurrencyConversion()"
+      >
+        Add Currency
+      </button>
+    </div> -->
+
+    <perfect-scrollbar class="padding-16" *ngIf="apiData != 0">
+      <div class="list-view-table p-b-16 customized-table-list">
+        <div
+          fxLayout="column"
+          class="container-ui"
+          style="max-width: 100%;"
+        >
+          <div class="table-view-for-list d-flex">
+            <mat-table
+              #table
+              [dataSource]="exchRates"
+              style="width: 86%"
+              *ngIf="apiData !== 0"
+            >
+              <ng-container matColumnDef="from">
+                <mat-header-cell *matHeaderCellDef fxFlex="25"
+                  >From</mat-header-cell
+                >
+                <mat-cell
+                  class="secound-cell"
+                  *matCellDef="let exch_rate"
+                  [title]="exch_rate.name"
+                  fxFlex="25"
+                  >{{ exch_rate.code }}</mat-cell
+                >
+              </ng-container>
+              <ng-container matColumnDef="value">
+                <mat-header-cell
+                  class="text-right"
+                  style="position: relative; left: 15px !important"
+                  fxFlex="25"
+                  *matHeaderCellDef
+                  >Value</mat-header-cell
+                >
+                <mat-cell
+                  class="text-right"
+                  *matCellDef="let exch_rate"
+                  fxFlex="25"
+                >
+                  {{ exch_rate.final_export_rate }}
+                </mat-cell>
+              </ng-container>
+
+              <ng-container matColumnDef="to">
+                <mat-header-cell *matHeaderCellDef fxFlex="25"
+                  >To</mat-header-cell
+                >
+                <mat-cell
+                  class="secound-cell"
+                  *matCellDef="let exch_rate"
+                  title="Indian Rupee"
+                  fxFlex="25"
+                  >{{ "INR" }}</mat-cell
+                >
+              </ng-container>
+
+              <ng-container matColumnDef="edit" >
+                <mat-header-cell
+                  *matHeaderCellDef
+                  fxFlex="25"
+                ></mat-header-cell>
+                <mat-cell *matCellDef="let exch_rate" fxFlex="25">
+                  <mat-icon
+                    style="font-size: 20px"
+                    (click)="editExchRate(exch_rate.id)"
+                    >edit</mat-icon
+                  >
+                </mat-cell>
+              </ng-container>
+              <mat-header-row
+                class="table-row"
+                *matHeaderRowDef="displayedColumns"
+              ></mat-header-row>
+              <mat-row
+                *matRowDef="let row; columns: displayedColumns"
+                [ngClass]="{ 'edit-row': row.is_edit }"
+              ></mat-row>
+            </mat-table>
+          </div>
+        </div>
+      </div>
+    </perfect-scrollbar>
+    <div
+      class="container-ui new-center-empty-ui"
+      style="height: 100%"
+      *ngIf="apiData === 0"
+    >
+      <mat-card class="no-results">
+        <div class="empty-img-holder">
+          <span class="material-icons"> attach_money </span>
+        </div>
+        <p class="no-result-text">No Conversion Rates Found</p>
+      </mat-card>
+    </div>
+  </div>
+</div>

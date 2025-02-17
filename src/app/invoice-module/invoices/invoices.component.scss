@@ -57,3 +57,41 @@
 //         cursor: not-allowed;
 //     }
 // }
+.igst-fliter-menu1{
+    position: absolute;
+    top: 268px;
+    left: 5px;
+    height: 355px;
+    width: 280px;
+    /* top: 332px; */
+    margin-top: 80px;
+    /* border-top: 1px saddlebrown; */
+    border-top: solid 1px #d6d9dc;
+  }
+  .fsize{
+      font-size: 16px!important;
+  }
+  .container-ui1 {
+    margin: 0 auto;
+    width: 100%;
+    max-width: 95%;}
+    .menu-title-ac {
+        letter-spacing: -0.09px;
+        height: 68px;
+        padding: 8px 16px;
+        display: flex;
+        border-bottom: solid 1px #d6d9dc;
+        align-items: center;
+        // flex: 0 0 175px;
+    }
+    .search-ui-ac{
+        margin-top: 12px;
+    }
+
+    .table-view-for-list .item-container {
+        padding: 0 18px
+    }
+
+    .list-view-table .header-cleint .item-container {
+        padding: 0 18px
+    }

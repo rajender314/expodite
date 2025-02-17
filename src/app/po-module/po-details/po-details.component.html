@@ -1,0 +1,354 @@
+<div class="orders">
+  <div>
+    <mat-horizontal-stepper #stepper>
+      <mat-step-header></mat-step-header>
+
+      <mat-step>
+        <div *ngIf="!fetchingData">
+          <mat-toolbar class="inner-detail-toolbar" id="order-toolbar">
+            <div class="inv-back" (click)="backToOrders(stepper)">
+              <mat-icon class="back-to-orders">arrow_back</mat-icon>
+            </div>
+            <img [src]="images.addPO_stroke" />
+            <span
+              class="title"
+              *ngIf="!clientPermission"
+              style="margin-right: 0"
+              >PO</span
+            >
+            <div class="po-nbr-edit">
+              <!-- <span
+                class="title"
+                *ngIf="!clientPermission"
+                title="{{ po?.selectedPo?.add_po[0].po_nbr }}"
+                >{{ po?.selectedPo?.add_po[0].po_no }}</span
+              > -->
+
+              <div class="nbr-field-container">
+                <!-- [attr.contenteditable]="
+                !(
+                  poDetails?.add_po[0]?.status_slug === 'po_cancelled' ||
+                  poDetails?.add_po[0]?.status_slug === 'po_sent'
+                )
+              " -->
+                <!-- {{ poDetails?.add_po[0]?.discount }} -->
+                <mat-form-field
+                  class="custom-input mandatory"
+                  floatLabel="never"
+                  *ngIf="editPODescountstate"
+                >
+                  <input
+                    style="width: 100%"
+                    matInput
+                    #poInvEditInput
+                    class="po-nmbr"
+                    (keyup)="savechangesPO($event)"
+                    [value]="po?.selectedPo?.add_po[0].po_no"
+                    maxlength="25"
+                  />
+                </mat-form-field>
+                <div *ngIf="!editPODescountstate" style="font-size: 18px;">
+                  {{ po?.selectedPo?.add_po[0].po_no ? po?.selectedPo?.add_po[0].po_no : '--' }}
+                </div>
+
+                <div class="save-icons" style="margin: 0 6px" *ngIf="editPODescountstate">
+                  <mat-icon
+                    *ngIf="editPODescountstate"
+                    (click)="editDiscount($event)"
+                    class="mat-circle-check close-circle-icons-po"
+                    style="font-size: 24px"
+                    >check_circle_outline</mat-icon
+                  >
+                  <mat-icon
+                    *ngIf="editPODescountstate"
+                    class="close-conversion close-circle-icons-po"
+                    (click)="closeEdit()"
+                    style="font-size: 24px"
+                    >highlight_off</mat-icon
+                  >
+                </div>
+              </div>
+              <div
+                style="display: flex; cursor: pointer"
+                class="po-nbr-edit-icon"
+              >
+                <mat-icon
+                *ngIf="!editPODescountstate && adminService.rolePermissions.edit_po == 1"
+                  class="edit-icon"
+                  title="Edit"
+                  mat-icon-button
+                  (click)="editpoQPD()"
+                >
+                  mode_edit
+                </mat-icon>
+              </div>
+            </div>
+            <!-- <span
+              class="title"
+              *ngIf="clientPermission"
+              title="{{ po?.selectedPo?.add_po[0].po_no }}"
+              >{{ po?.selectedPo?.add_po[0].po_no }}</span
+            > -->
+            <div
+              class="order-detail-status client-status"
+              [ngClass]="{
+                accepted: po?.selectedPo?.add_po[0].status == 'Accepted',
+                created: po?.selectedPo?.add_po[0].status == 'PO Created',
+                'in-transit': po?.selectedPo?.add_po[0].status == 'In-transit',
+                delivered: po?.selectedPo?.add_po[0].status == 'Delivered',
+                cancelled: po?.selectedPo?.add_po[0].status == 'Cancelled',
+                received: po?.selectedPo?.add_po[0].status == 'Received',
+                processing: po?.selectedPo?.add_po[0].status == 'Processing',
+                placed: po?.selectedPo?.add_po[0].status == 'Placed',
+                draft: po?.selectedPo?.add_po[0].status == 'Draft',
+                passed: po?.selectedPo?.add_po[0].status == 'Passed',
+                shipped: po?.selectedPo?.add_po[0].status == 'Shipped',
+                fulfilment: po?.selectedPo?.add_po[0].status == 'Fulfilment',
+                pending: po?.selectedPo?.add_po[0].status == 'Pending',
+                order_confirmed:
+                  po?.selectedPo?.add_po[0].status == 'Order Confirmed',
+                po_sent: po?.selectedPo?.add_po[0].status == 'PO Sent',
+                po_approved: po?.selectedPo?.add_po[0].status == 'PO Approved',
+                po_accepted: po?.selectedPo?.add_po[0].status == 'PO Accepted',
+                po_cancelled: po?.selectedPo?.add_po[0].status == 'PO Cancelled'
+              }"
+            >
+              {{ po?.selectedPo?.add_po[0].status }}
+            </div>
+            <span fxFlex></span>
+            <span class="order-date"
+              >Vendor Name:
+              <b>{{ po?.selectedPo?.add_po[0].vendor_name }}</b>
+            </span>
+            <span class="vertical-divider"></span>
+            <span class="order-date"
+              >PO Date :
+              <b>{{ po?.selectedPo?.add_po[0].date_added }}</b>
+            </span>
+            <span
+              class="vertical-divider"
+              *ngIf="
+                blockContent &&
+                !disablecreateorder &&
+                factoryPermission &&
+                !(po?.selectedPo?.add_po[0].status_slug == 'po_cancelled') &&
+                !(po?.selectedPo?.add_po[0].status_slug == 'po_sent')
+              "
+            ></span>
+
+            <!--changing estimates to aapl proforma invoice-->
+            <button
+              mat-button
+              class="cancel-order-button"
+              [disableRipple]="true"
+              *ngIf="
+                blockContent &&
+                !disablecreateorder &&
+                factoryPermission &&
+                !(po?.selectedPo?.add_po[0].status_slug == 'po_cancelled') &&
+                !(po?.selectedPo?.add_po[0].status_slug == 'po_sent') &&
+                adminService.rolePermissions.cancel_po == 1
+              "
+              (click)="cancelAllPO()"
+            >
+              Cancel this PO
+            </button>
+            <!-- <button
+              mat-button
+              class="cancel-order-button"
+              [disableRipple]="true"
+              *ngIf="
+                disableCancel &&
+                blockContent &&
+                factoryPermission &&
+                !(orders.selectedOrder.orders_types_id == '4')
+              "
+              (click)="deliverOrder()"
+            >
+              Mark as Delivered
+            </button> -->
+            <!-- <button
+              mat-button
+              class="cancel-order-button"
+              *ngIf="
+                factoryPermission &&
+                !clientPermission &&
+                orders.selectedOrder.orders_types_id == '2'
+              "
+              [disabled]="
+                sendDocumentMails == false || selectedOrderStatus == 'Cancelled'
+              "
+              [disableRipple]="true"
+              (click)="sendMails()"
+            >
+              Email Documents
+            </button>
+            <span class="vertical-divider"></span>
+            <button
+              mat-button
+              class="order-download"
+              *ngIf="
+                factoryPermission &&
+                !clientPermission &&
+                orders.selectedOrder.status_id >= 2
+              "
+              (click)="downloadDocuments()"
+            >
+              <img [src]="images.download_order" title="order download" />
+
+              <span class="download-order-text">Download All Documents</span>
+            </button> -->
+          </mat-toolbar>
+          <div
+            class="inner-detail-container"
+            id="innerDetailContent"
+            fxLayout="row"
+          >
+            <div class="side-nav po-grid">
+              <mat-list class="inner-detail-list">
+                <mat-list-item
+                  class="inactive-tab"
+                  title="Activity"
+                  (click)="moveToActivity()"
+                  [class.active]="activeTab == 'activity'"
+                >
+                  <mat-icon
+                    mat-list-icon
+                    class="icon-menu"
+                    style="background: #ef5350"
+                  >
+                    <img [src]="images.activity_small" title="Activity" />
+                  </mat-icon>
+                  <h4 mat-line>Activity</h4>
+                </mat-list-item>
+                <mat-list-item
+                  class="inactive-tab"
+                  title="Proforma Invoice"
+                  (click)="moveToProfomaInvoice()"
+                  *ngIf="factoryPermission && !clientPermission"
+                  [ngClass]="{
+                    active: activeTab == 'pfiinvoice',
+                    'no-details': !enableProforma,
+                    pointer_none: !enableProforma
+                  }"
+                >
+                  <mat-icon mat-list-icon class="post_ship_icon icon-menu">
+                    <img
+                      [src]="images.addPO_fill"
+                      style="position: relative; top: 1px"
+                      title="Proforma Invoice"
+                    />
+                  </mat-icon>
+                  <h4 mat-line>Purchase Order</h4>
+                </mat-list-item>
+                <!--comention proforma inovice for aapl comention to -->
+              </mat-list>
+
+              <div *ngIf="dynamicDocLoader">
+                <mat-divider class="divider"></mat-divider>
+
+                <app-order-documents
+                  [orderDocMap]="poDocuments"
+                  [removeDocHighlight]="removeDocHighlight"
+                  (documentEventId)="handleDocumentEventId($event)"
+                  [typeId]="typeId"
+                  *ngFor="let typeId of poDocumentsArr"
+                >
+                </app-order-documents>
+                <mat-divider class="divider"></mat-divider>
+              </div>
+            </div>
+            <div
+              fxFlex
+              class="inner-detail-content order-detail-content"
+              id="printAll"
+              #scrollContainer
+              (scroll)="scrollOrdersContainer($event)"
+            >
+              <div class="app-container order-form-view">
+                <div class="activity-container" #activity>
+                  <div>
+                    <mat-toolbar class="package-toolbar">
+                      <mat-icon
+                        mat-list-icon
+                        class="icon-menu detail_view_right_icons"
+                        style="background: #ef5350"
+                      >
+                        <img
+                          class="logo-img"
+                          [src]="images.activity_small"
+                          title="Activity"
+                        />
+                      </mat-icon>
+                      <span>Activity Log</span>
+                      <span fxFlex></span>
+                    </mat-toolbar>
+                    <div class="address-container activity-status">
+                      <mat-list *ngFor="let activity of po.activityDetails">
+                        <mat-list-item class="activity-list">
+                          <div class="activity-progress today-activity"></div>
+                          <div class="activity-details">
+                            <span class="activity-name">
+                              {{ activity.name }}
+                            </span>
+                            <span>({{ activity.date_added }})</span>
+                          </div>
+                        </mat-list-item>
+                      </mat-list>
+                    </div>
+                  </div>
+                </div>
+                <!--  Proforma Invoice data in estimateProforma Generic proforma -->
+
+                <div #pfiinvoice *ngIf="po.selectedPo">
+                  <app-po-invoice
+                    [poDetails]="po.selectedPo"
+                    [isSampleDocs]="isSampleDocs"
+                    [factoryPermission]="factoryPermission"
+                    [clientPermission]="clientPermission"
+                    [salesDocuments]="salesDocuments"
+                    [data]="data"
+                    [adminUser]="adminUser"
+                    (updateParentData)="onUpdateParentData()"
+                    [editClosed]="editClosed"
+                    (generatePo)="generatePo($event.type, $event.id)"
+                    [viewActivityLogIcon]="viewActivityLogIcon"
+                  >
+                  </app-po-invoice>
+                </div>
+
+                <ng-container
+                  #prePostDocuments
+                  *ngFor="let item of dymanicdocumentdata; let i = index"
+                >
+                  <app-dynamic-documents
+                    (getOrderDocuments)="getOrderDocuments()"
+                    [item]="item"
+                    [orderId]="orderId"
+                    type="generatePODocument"
+                  ></app-dynamic-documents>
+                </ng-container>
+
+                <!--/////////-->
+                <!-- Airway ends  -->
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="container-ui new-center-empty-ui" *ngIf="showNoDatFound">
+          <mat-card class="no-results">
+            <div class="empty-img-holder">
+              <!-- <img [src]='images.ordersIcon_o'> -->
+              <span class="material-icons"> info </span>
+            </div>
+            <p class="no-result-text">No Data Found</p>
+          </mat-card>
+        </div>
+      </mat-step>
+    </mat-horizontal-stepper>
+    <div *ngIf="totalSpinner">
+      <mat-spinner class="medium-spinner"></mat-spinner>
+    </div>
+    <!-- <mat-spinner class="medium-spinner" *ngIf="confirOrderLoad"></mat-spinner> -->
+  </div>
+</div>

@@ -9,7 +9,6 @@ import * as _ from 'lodash';
   selector: 'app-primary-package-list',
   templateUrl: './primary-package-list.component.html',
   styleUrls: ['./primary-package-list.component.css'],
-  providers: [AdminService],
   animations: [
     trigger('AdminListAnimate', [
       transition(':enter', [
@@ -36,7 +35,7 @@ export class PrimaryPackageListComponent implements OnInit {
   private listActive = true;
   @Input() update;
   @Output() trigger = new EventEmitter<object>();
-
+  @Input() isAddPermission = true;
   private param = {
     page: 1,
     perPage: 12,
@@ -44,7 +43,7 @@ export class PrimaryPackageListComponent implements OnInit {
     search: '',
     is_primary_packaging: true
   }
-  constructor(private adminService: AdminService) { }
+  constructor(public adminService: AdminService) { }
 
   backToList() {
     this.listActive = false;

@@ -1,0 +1,66 @@
+<mat-toolbar color="primary">
+  <h2 mat-dialog-title>Split Quantity</h2>
+  <span fxFlex></span>
+</mat-toolbar>
+<mat-dialog-content>
+  <div class="main">
+    <div class="w-100">
+      <p class="quantity-text">Total Quantity : {{ totalQuantity }}</p>
+
+      <div *ngFor="let data of addSplit" class="split-input">
+        <mat-form-field class="w-100 custom-input split" floatLabel="never">
+          <input
+            id="quantity"
+            matInput
+            type="number"
+            placeholder="Enter Split Quantity"
+            autofocus="off"
+            autocomplete="off"
+            (input)="changeQuantity($event)"
+            (keyup.backspace)="hideError()"
+            (keydown)="handleKeyDown($event)"
+            [max]="maxQuantity"
+            pattern="[0-9]*[.]?[0-9]*"
+            oninput="javascript:  if (!/^(\d+(\.\d{0,3})?)?$/.test(this.value)) this.value = this.value.slice(0, -1);"
+          />
+        </mat-form-field>
+        <div class="remain-quantity">
+          <div class="seperator"></div>
+          <div class="remain-count">
+            <p class="count">{{ remaningCount | number : "1.3-3" }}</p>
+            <p class="rmng-text">RMNG</p>
+          </div>
+        </div>
+        <p
+          *ngIf="!errorMessage && quantityError"
+          class="error custom-error"
+          style="text-transform: none"
+        >
+          Please Enter a Valid Quantity
+        </p>
+        <p *ngIf="errorMessage" class="error custom-error">
+          {{ errorMessage }}
+        </p>
+        <!-- <p *ngIf="maxquanity" class="error custom-error">Value can not exceed total quantity.</p>
+        <p *ngIf="invalidnumber" class="error custom-error">Pleasen Enter Valid input other than 0</p>
+        <p *ngIf="sameQuantity" class="error custom-error">Same quantity cannot be split </p> -->
+      </div>
+
+      <div class="add-split-button">
+        <!-- <button class="add-split-text"  class="back-btn-ui" (click)="addSplitClicked()" [disabled]="disableaddsplit">+ Add Split</button> -->
+      </div>
+    </div>
+  </div>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <span fxFlex></span>
+  <button  class="back-btn-ui" mat-dialog-close>Close</button>
+  <button
+    mat-raised-button
+    (click)="splitQuantity()"
+    [disabled]="savebutton || saveSplit"
+  >
+    Save
+  </button>
+  <!--<button *ngIf="!success" [disabled] = "disabledSave"   mat-raised-button mat-dialog-close color="warn" (click)="confirm()"></button>-->
+</mat-dialog-actions>

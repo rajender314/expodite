@@ -1,0 +1,68 @@
+<div fxlayout="column">
+  <div
+    class="image-upload"
+    [ngClass]="editUpload ? 'org-upload' : 'address-upload'"
+  >
+    <div
+      ng2FileDrop
+      [ngClass]="{ 'file-over': hasDropZoneOver }"
+      (fileOver)="fileOverBase($event)"
+      (onFileDrop)="fileDrop($event)"
+      [uploader]="uploader"
+      class="file-drop-zone"
+    >
+      <input
+        (click)="onClick($event)"
+        [id]="editUpload ? 'org-upload' : 'address-upload'"
+        type="file"
+        ng2FileSelect
+        [uploader]="uploader"
+        (change)="fileSelected($event)"
+        [hidden]="true"
+        [disabled]="adminService.rolePermissions && adminService.rolePermissions[PermissionKey] == 2 ? true : false"
+      />
+      <label
+        [for]="editUpload ? 'org-upload' : 'address-upload'"
+        [ngClass]="adminService.rolePermissions && adminService.rolePermissions[PermissionKey] == 2 ? 'browse-file disable-upload' : 'browse-file'"
+        *ngIf="!uploads.length"
+      >
+        <a
+          >{{
+            formObject && formObject.label_name
+              ? formObject.label_name
+              : "Upload Logo"
+          }}
+        </a>
+      </label>
+      <label
+        [for]="editUpload ? 'org-upload' : 'address-upload'"
+        class="image-edit-delete"
+        *ngIf="uploads.length && adminService?.rolePermissions && adminService?.rolePermissions[PermissionKey] == 1"
+      >
+        <a class="upload-open"
+        
+        >{{ language.defaults.changeFile }}</a>
+      </label>
+    </div>
+
+    <div class="images">
+      <ul *ngIf="uploads.length">
+        <li *ngFor="let file of uploads; let i = index">
+          <img [src]="file.filepath" [alt]="file.filename"  />
+          <div class="overlay"></div>
+          <mat-icon class="delete"
+          *ngIf="adminService.rolePermissions && adminService.rolePermissions[PermissionKey] == 1"
+          (click)="deleteItem(i)">delete</mat-icon>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="upload-error">
+    <p *ngIf="uploadError">
+     {{uploadErroMsg}}
+    </p>
+  </div>
+  <!-- <div class="change-user-file address-size-error">
+    <p *ngIf="sizeError">*File more than 5MB is not allowed.</p>
+  </div> -->
+</div>

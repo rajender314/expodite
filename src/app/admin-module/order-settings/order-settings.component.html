@@ -1,0 +1,462 @@
+<section section class="expansion-panel-ui">
+  <div class="page-header-ui">
+    <div class="flex-fixed-header page-title">
+      <h2 class="admin-heading">Orders Settings</h2>
+    </div>
+  </div>
+  <div class="expansion-panel-scroll">
+    <mat-tab-group
+      (selectedTabChange)="tabChanged($event)"
+      [selectedIndex]="selectedTabIndex"
+    >
+      <mat-tab label="Numbering Series" class="details-tab">
+        <mat-card class="client-documents-card">
+          <div class="organisation-details form-ui">
+            <perfect-scrollbar class="padding-16">
+              <div class="max-container-ui" style="padding-bottom: 20px">
+                <div class="page-sub-heading" style="margin-top: 16px">
+                  <h3 class="font-600">Numbering Series</h3>
+                </div>
+                <form [formGroup]="seriesForm" class="form-fields">
+                  <mat-radio-group
+                    class="share_section"
+                    style="display: inline-block; padding-top: 12px"
+                    formControlName="generation_type"
+                  >
+                    <mat-radio-button
+                      class="radio-sec"
+                      color="primary"
+                      value="manual"
+                      >Add Number Manually</mat-radio-button
+                    >
+                    <mat-radio-button
+                      class="radio-sec"
+                      color="primary"
+                      value="auto"
+                      >Auto-Generate</mat-radio-button
+                    >
+                  </mat-radio-group>
+                  <div
+                    *ngIf="seriesForm.get('generation_type').value === 'auto'"
+                  >
+                    <div class="auto-generate-fields">
+                      <div>
+                        <mat-form-field
+                          class="custom-input mandatory compny-sub-flx grid-six"
+                          floatLabel="never"
+                        >
+                          <label class="custom-label mandatory"
+                            >Number Series</label
+                          >
+                          <input
+                            matInput
+                            formControlName="numbering_value"
+                            type="number"
+                            placeholder="Enter Number Series"
+                          />
+                          <mat-error
+                            *ngIf="
+                              seriesForm.controls.numbering_value.hasError(
+                                'required'
+                              ) &&
+                              !seriesForm.controls.numbering_value.hasError(
+                                'pattern'
+                              )
+                            "
+                            >Please Enter Number Series</mat-error
+                          >
+                          <mat-error
+                            *ngIf="
+                              !seriesForm.controls.numbering_value.hasError(
+                                'required'
+                              ) &&
+                              seriesForm.controls.numbering_value.hasError(
+                                'pattern'
+                              )
+                            "
+                            >Please Enter Valid Number Series</mat-error
+                          >
+                        </mat-form-field>
+                        <mat-form-field
+                          class="custom-input mandatory compny-sub-flx grid-six"
+                          floatLabel="never"
+                        >
+                          <label class="custom-label mandatory"
+                            >Display Order</label
+                          >
+                          <input
+                            matInput
+                            formControlName="numbering_display_order"
+                            type="number"
+                            placeholder="Enter display order"
+                          />
+                          <mat-error
+                            *ngIf="
+                              seriesForm.controls.numbering_display_order.hasError(
+                                'required'
+                              )
+                            "
+                            >Please Enter Display Order</mat-error
+                          >
+                          <mat-error
+                            *ngIf="
+                              !seriesForm.controls.numbering_display_order.hasError(
+                                'required'
+                              ) &&
+                              seriesForm.controls.numbering_display_order.hasError(
+                                'pattern'
+                              )
+                            "
+                            >Please Enter Valid Display Order</mat-error
+                          >
+                        </mat-form-field>
+                      </div>
+                      <!-- Prefix -->
+                      <div>
+                        <mat-checkbox
+                          formControlName="enable_prefix"
+                          color="primary"
+                          (change)="onCheckboxChange('prefix')"
+                        >
+                          Prefix
+                        </mat-checkbox>
+                        <div *ngIf="seriesForm.get('enable_prefix').value">
+                          <mat-form-field
+                            class="custom-input mandatory compny-sub-flx grid-six"
+                            floatLabel="never"
+                          >
+                            <label class="custom-label mandatory"
+                              >Prefix
+                            </label>
+                            <input
+                              matInput
+                              formControlName="prefix"
+                              placeholder="Enter Prefix"
+                            />
+                            <mat-error
+                              *ngIf="
+                                seriesForm.controls.prefix.hasError('required')
+                              "
+                              >Please Enter Prefix</mat-error
+                            >
+                          </mat-form-field>
+
+                          <mat-form-field
+                            class="custom-input mandatory compny-sub-flx grid-six"
+                            floatLabel="never"
+                          >
+                            <label class="custom-label mandatory"
+                              >Display Order</label
+                            >
+                            <input
+                              matInput
+                              formControlName="prefix_display_order"
+                              type="number"
+                              placeholder="Enter Display order"
+                            />
+                            <mat-error
+                              *ngIf="
+                                seriesForm.controls.prefix_display_order.hasError(
+                                  'required'
+                                )
+                              "
+                              >Please Enter Display order</mat-error
+                            >
+                            <mat-error
+                              *ngIf="
+                                !seriesForm.controls.prefix_display_order.hasError(
+                                  'required'
+                                ) &&
+                                seriesForm.controls.prefix_display_order.hasError(
+                                  'pattern'
+                                )
+                              "
+                              >Please Enter Valid Display Order</mat-error
+                            >
+                          </mat-form-field>
+                        </div>
+                      </div>
+
+                      <!-- Number Series -->
+                      <!-- <mat-checkbox
+                formControlName="enableNumberSeries"
+                color="primary"
+                (change)="onCheckboxChange('numberSeries')"
+              >
+                Number Series
+              </mat-checkbox> -->
+
+                      <!-- Suffix -->
+                      <mat-checkbox
+                        formControlName="enable_suffix"
+                        color="primary"
+                        (change)="onCheckboxChange('suffix')"
+                      >
+                        Suffix
+                      </mat-checkbox>
+                      <div *ngIf="seriesForm.get('enable_suffix').value">
+                        <mat-form-field
+                          class="custom-input mandatory compny-sub-flx grid-six"
+                          floatLabel="never"
+                        >
+                          <label class="custom-label mandatory">Suffix</label>
+                          <input
+                            matInput
+                            formControlName="suffix"
+                            placeholder="Enter suffix"
+                          />
+                          <mat-error
+                            *ngIf="
+                              seriesForm.controls.enable_suffix.hasError(
+                                'required'
+                              )
+                            "
+                            >Please Enter Suffix</mat-error
+                          >
+                        </mat-form-field>
+                        <mat-form-field
+                          class="custom-input mandatory compny-sub-flx grid-six"
+                          floatLabel="never"
+                        >
+                          <label class="custom-label mandatory"
+                            >Display Order</label
+                          >
+                          <input
+                            matInput
+                            formControlName="suffix_display_order"
+                            type="number"
+                            placeholder="Enter Display order"
+                          />
+                          <mat-error
+                            *ngIf="
+                              seriesForm.controls.suffix_display_order.hasError(
+                                'required'
+                              )
+                            "
+                            >Please Enter Display Order</mat-error
+                          >
+                          <mat-error
+                            *ngIf="
+                              !seriesForm.controls.suffix_display_order.hasError(
+                                'required'
+                              ) &&
+                              seriesForm.controls.suffix_display_order.hasError(
+                                'pattern'
+                              )
+                            "
+                            >Please Enter Valid Display Order</mat-error
+                          >
+                        </mat-form-field>
+                      </div>
+
+                      <!-- Client Code -->
+                      <mat-checkbox
+                        formControlName="client_code"
+                        color="primary"
+                        client_code
+                        (change)="onCheckboxChange('client_code')"
+                      >
+                        Client Code
+                      </mat-checkbox>
+                      <div *ngIf="seriesForm.get('client_code').value">
+                        <!-- <mat-form-field
+                  class="custom-input mandatory compny-sub-flx grid-six"
+                  floatLabel="never"
+                >
+                  <label class="custom-label mandatory">Client Code</label>
+                  <input
+                    matInput
+                    formControlName="clientCode"
+                    placeholder="Enter client code"
+                  />
+                </mat-form-field> -->
+
+                        <mat-form-field
+                          class="custom-input mandatory compny-sub-flx grid-six"
+                          floatLabel="never"
+                        >
+                          <label class="custom-label mandatory"
+                            >Display Order</label
+                          >
+                          <input
+                            matInput
+                            formControlName="client_code_display_order"
+                            type="number"
+                            placeholder="Enter Display order"
+                          />
+                          <mat-error
+                            *ngIf="
+                              seriesForm.controls.client_code_display_order.hasError(
+                                'required'
+                              )
+                            "
+                            >Please Enter Display Order</mat-error
+                          >
+                          <mat-error
+                            *ngIf="
+                              !seriesForm.controls.client_code_display_order.hasError(
+                                'required'
+                              ) &&
+                              seriesForm.controls.client_code_display_order.hasError(
+                                'pattern'
+                              )
+                            "
+                            >Please Enter Valid Display Order</mat-error
+                          >
+                        </mat-form-field>
+                      </div>
+
+                      <!-- Year -->
+                      <mat-checkbox
+                        formControlName="enable_year_format"
+                        color="primary"
+                        (change)="onCheckboxChange('year')"
+                      >
+                        Year
+                      </mat-checkbox>
+                      <div
+                        *ngIf="seriesForm.get('enable_year_format').value"
+                        style="display: flex; align-items: center"
+                      >
+                        <mat-form-field
+                          class="custom-input mandatory compny-sub-flx grid-six"
+                          floatLabel="never"
+                        >
+                          <label class="custom-label mandatory"
+                            >Year Format</label
+                          >
+                          <mat-select
+                            placeholder="Select Year Format"
+                            formControlName="year_format"
+                            (selectionChange)="onOptionChange($event.value)"
+                          >
+                            <mat-option
+                              *ngFor="let year of yearOptions"
+                              [value]="year.type"
+                            >
+                              {{ year.label }}
+                            </mat-option>
+                          </mat-select>
+                          <mat-error
+                            *ngIf="
+                              seriesForm.controls.year_format.hasError(
+                                'required'
+                              )
+                            "
+                            >Please Enter Year Format</mat-error
+                          >
+                        </mat-form-field>
+
+                        <mat-form-field
+                          class="custom-input mandatory compny-sub-flx grid-six"
+                          floatLabel="never"
+                        >
+                          <label class="custom-label mandatory"
+                            >Display Order</label
+                          >
+                          <input
+                            matInput
+                            formControlName="year_format_display_order"
+                            type="number"
+                            placeholder="Enter Display order"
+                          />
+                          <mat-error
+                            *ngIf="
+                              seriesForm.controls.year_format_display_order.hasError(
+                                'required'
+                              )
+                            "
+                            >Please Enter Display Order</mat-error
+                          >
+                          <mat-error
+                            *ngIf="
+                              !seriesForm.controls.year_format_display_order.hasError(
+                                'required'
+                              ) &&
+                              seriesForm.controls.year_format_display_order.hasError(
+                                'pattern'
+                              )
+                            "
+                            >Please Enter Valid Display Order</mat-error
+                          >
+                        </mat-form-field>
+                      </div>
+                      <div class="seperator-styles">
+                        <mat-checkbox
+                          formControlName="enable_separator"
+                          color="primary"
+                          (change)="onCheckboxChange('separator')"
+                        >
+                          Separator
+                        </mat-checkbox>
+                        <mat-radio-group
+                          style="padding-left: 10px"
+                          *ngIf="seriesForm.get('enable_separator').value"
+                          formControlName="separator"
+                          class="seperator-radio-group"
+                        >
+                          <mat-radio-button
+                            class="radio-sec"
+                            color="primary"
+                            value="/"
+                            >/ (Slash)</mat-radio-button
+                          >
+                          <mat-radio-button
+                            class="radio-sec"
+                            color="primary"
+                            value="-"
+                            >- (Hyphen)</mat-radio-button
+                          >
+                        </mat-radio-group>
+                      </div>
+                      <!-- Separator -->
+                    </div>
+                    <div class="sample-series-format" *ngIf="seriesForm.valid">
+                      <p
+                        class="primary-text-link"
+                        style="cursor: pointer; text-decoration: underline"
+                        (click)="addSeries(seriesForm, 'sample')"
+                      >
+                        Click Here to Show Sample Format
+                      </p>
+                      <strong *ngIf="showSample">{{ sample_series }}</strong>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </perfect-scrollbar>
+            <div
+              class="document-footer"
+              *ngIf="seriesForm.dirty"
+              fxLayout="row"
+              fxLayoutAlign="end center"
+            >
+              <div class="w-100 max-container-ui justify-content-end d-flex">
+                <button
+                  type="button"
+                  class="back-btn-ui"
+                  (click)="cancel(seriesForm)"
+                >
+                  {{ language.defaults.cancel }}
+                </button>
+                <button
+                  type="submit"
+                  mat-raised-button
+                  [disabled]="seriesForm.invalid"
+                  (click)="addSeries(seriesForm, 'save')"
+                >
+                  {{ language.defaults.save }}
+                </button>
+              </div>
+            </div>
+          </div>
+        </mat-card>
+      </mat-tab>
+      <!-- <mat-tab label="test" class="details-tab">456456</mat-tab> -->
+    </mat-tab-group>
+  </div>
+
+  <div *ngIf="totalSpinner">
+    <mat-spinner class="medium-spinner"></mat-spinner>
+  </div>
+</section>

@@ -1,0 +1,15 @@
+
+<div >
+<div class="custom-header" *ngIf="params.column.colDef.field == 'is_order_created' || params.column.colDef.field == 'is_po_created'">
+    <img [src]="icon" alt="Image" class="custom-cell-image"/>
+    <span class="custom-header-label">{{ params.displayName }}</span>
+  </div>
+  <div class="custom-header" *ngIf="params.column.colDef.field == 'select_all'">
+    <!-- <input type="checkbox"  [checked]="params.value" 
+    (change)="onChange($event)" > -->
+
+    <mat-checkbox  type="checkbox"  [checked]="isChecked" 
+    (change)="onChange($event)"></mat-checkbox>
+
+  </div>
+</div>

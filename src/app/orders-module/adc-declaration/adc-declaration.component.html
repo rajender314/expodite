@@ -1,0 +1,145 @@
+<div
+  class="inner-container declaration-section"
+  [class.collapse]="!shownadcdecl"
+>
+  <mat-toolbar class="package-toolbar">
+    <img class="shipping-image" [src]="images.pdf_download" />
+    <span>ADC Declaration</span>
+    <span fxFlex></span>
+    <button (click)="onEdit()" mat-icon-button>
+      <mat-icon class="edit-icon" title="Edit" mat-icon-button
+        >mode_edit
+      </mat-icon>
+    </button>
+    <a
+      *ngIf="!clientPermission"
+      target="_blank"
+      href="generateAdcDeclaration?id={{
+        orders.selectedOrder.id
+      }}&is_printable=1"
+    >
+      <button mat-icon-button>
+        <img [src]="images.printer_icon" title="Print" />
+      </button>
+    </a>
+    <a
+      href="generateAdcDeclaration?id={{
+        orders.selectedOrder.id
+      }}&is_printable=0"
+    >
+      <button mat-icon-button>
+        <img [src]="images.download_arrow" title="Download" />
+      </button>
+    </a>
+    <button mat-icon-button (click)="toggleAdcdecl()">
+      <img [src]="images.grey_arrow" mat-icon-button *ngIf="shownadcdecl" />
+      <mat-icon class="toggle-arrow" *ngIf="!shownadcdecl">
+        keyboard_arrow_down</mat-icon
+      >
+    </button>
+  </mat-toolbar>
+  <div class="non-scomet-decl" *ngIf="shownadcdecl">
+    <h1
+      style="
+        text-align: center;
+        font-size: 18px;
+        font-weight: 700;
+        text-decoration: underline;
+      "
+    >
+      To whomsoever it may concern
+    </h1>
+
+    <p class="mt mb" *ngFor="let invoice of orders.invoice">
+      Invoice Number No: {{ invoice.Inovice.inv_nbr }} DT:
+      {{ invoice.Inovice.date_added }}
+    </p>
+    <p>
+      Shipping Bill no:
+      {{
+        freightData.mode_of_shipment == 1
+          ? orders.shipping_data.shipping_id
+          : freightData.mode_of_shipment == 15 ||
+            freightData.mode_of_shipment == 2 ||
+            freightData.mode_of_shipment == 16
+          ? orders.shipping_data.bol_id
+          : ""
+      }}
+      DT: {{ orders.shipping_data.date_added }}
+    </p>
+    <p *ngFor="let invoice of orders.invoice">
+      We certify that Goods covered under invoice number:
+      {{ invoice.Inovice.inv_nbr }} DT: {{ invoice.Inovice.date_added }}/
+      Shipping Bill No:
+      {{
+        freightData.mode_of_shipment == 1
+          ? orders.shipping_data.shipping_id
+          : freightData.mode_of_shipment == 15 ||
+            freightData.mode_of_shipment == 2 ||
+            freightData.mode_of_shipment == 16
+          ? orders.shipping_data.bol_id
+          : ""
+      }}
+      DT: {{ orders.shipping_data.date_added }} is "
+      <!-- {{ productDetails }} -->
+      <span *ngIf="!isEditing" [innerHTML]="productDetails"></span>
+      <span>
+        <mat-form-field
+          *ngIf="isEditing"
+          class="custom-input block-ele grid-full"
+          floatLabel="never"
+          style="
+            margin-top: 0px;
+            position: relative;
+            left: -5px;
+            top: 7px;
+            max-width: 50%;
+          "
+        >
+          <textarea
+            [(ngModel)]="productDetails"
+            matInput
+            placeholder="Enter To Address"
+            autofocus="on"
+            style="
+              height: 126px;
+              line-height: 1.4;
+              padding: 4px 10px;
+              border-width: 2px;
+            "
+            rows="3"
+          >
+          </textarea>
+        </mat-form-field>
+      </span>
+      "".
+    </p>
+    <p class="mb">
+      We have mentioned the exact same name on invoice and packing list as on
+      Labels as well.
+    </p>
+    <p class="mb">
+      We therefore request you to kindly issue ADC NOC for the same.
+    </p>
+    <p class="mb">Thanking You,</p>
+    <p class="mb">For {{ compnayDetails?.name }}</p>
+    <p class="">Authorized Signatory</p>
+    <div
+      *ngIf="isEditing"
+      class="footer-bottom fxflex"
+      style="padding: 14px; bottom: 0; right: 0"
+      fxLayout="row"
+      fxLayoutAlign="end center"
+    >
+      <span fxFlex></span>
+      <section class="section-right">
+        <button (click)="onEdit()" type="button" mat-button>Cancel</button>
+
+        <button (click)="onEdited()" type="submit" mat-raised-button>
+          Save
+        </button>
+      </section>
+      <div class="cb"></div>
+    </div>
+  </div>
+</div>

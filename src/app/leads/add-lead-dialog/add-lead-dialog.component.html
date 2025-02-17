@@ -609,13 +609,13 @@
                      </div>
                      <div class="row-div">
                      <mat-form-field class="custom-input block-ele mandatory w-100" floatLabel="never">
-                        <label class="custom-label mandatory">Postal Code</label>
-                        <input matInput  maxlength="6" placeholder=" Enter Postal Code" (keydown)="allowOnlyNum($event,i,postal_code)" [errorStateMatcher]="matcher"  formControlName="postal_code">
+                        <label class="custom-label mandatory">Postal/Zip Code</label>
+                        <input matInput  maxlength="6" placeholder=" Enter Postal/Zip Code" (keydown)="allowOnlyNum($event,i,postal_code)" [errorStateMatcher]="matcher"  formControlName="postal_code">
                         <mat-error *ngIf="(submittedStoresAttributeForm) 
                         && (storesAttributeForm.get('billAddress')['controls'][i]?.get('postal_code')?.hasError('required')
                         || storesAttributeForm.get('billAddress')['controls'][i]?.get('postal_code')?.invalid)">
                                        Please Enter
-                                       <span class="capitalize">Postal Code</span>
+                                       <span class="capitalize">Postal/Zip Code</span>
                          </mat-error>
                          
                          
@@ -692,8 +692,8 @@
                      </div>
                      <div class="row-div">
                      <mat-form-field class="custom-input block-ele  w-100" floatLabel="never">
-                        <label class="custom-label">Postal Code</label>
-                        <input matInput maxlength="6"(keydown)="allowOnlyNum($event,i,postal_code)" placeholder="Enter Postal Code" formControlName="postal_code">
+                        <label class="custom-label">Postal/Zip Code</label>
+                        <input matInput maxlength="6"(keydown)="allowOnlyNum($event,i,postal_code)" placeholder="Enter Postal/Zip Code" formControlName="postal_code">
                         <!-- <mat-error *ngIf="addressForm.controls.postal_code.hasError('required') || addressForm.controls.postal_code.hasError('whitespace') ">Please enter postal code</mat-error> -->
                     </mat-form-field>
                     </div>

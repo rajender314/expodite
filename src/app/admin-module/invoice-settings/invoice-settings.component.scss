@@ -1,0 +1,25 @@
+.auto-generate-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  .sample-series-format {
+    padding-top: 16px;
+    display: flex;
+    align-items: center;
+    gap: 30px;
+  }
+  .seperator-styles {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    .seperator-radio-group {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      .mat-radio-label-content {
+        font-weight: 500 !important;
+      }
+    }
+  }

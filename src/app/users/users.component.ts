@@ -10,6 +10,8 @@ import { UsersService } from '../services/users.service';
 import { trigger, style, transition, animate, keyframes, query, stagger } from '@angular/animations';
 //import { AppComponent } from '../app.component';
 import * as _ from 'lodash';
+import { Images } from '../images/images.module';
+import { AdminService } from '../services/admin.service';
 
 declare var App: any;
 
@@ -28,7 +30,7 @@ declare var App: any;
   ]
 })
 export class UsersComponent implements OnInit {
-
+  public images = Images;
   //user_roles_permissions: Object;
   usersList: Array<any> = [];
   totalUsers: number = 0;
@@ -57,11 +59,15 @@ export class UsersComponent implements OnInit {
     private titleService: Title,
     private router: Router,
     public contactsViewService: ContactsViewService,
+    public adminService: AdminService,
     private userService: UsersService/*,
   private appComponent: AppComponent*/) { }
 
   ngOnInit() {
     this.titleService.setTitle(App['company_data'].usersTitle);
+    this.adminService.getPermissions().subscribe((res) => {
+      this.adminService.rolePermissions = res.role_details.roles_permissions;
+    });
     this.getUsers(this.params);
     this.calculateCount = true;
 
@@ -119,10 +125,15 @@ export class UsersComponent implements OnInit {
     this.totalUsers = 0;
     this.selectUser(-1);
   }
-
+  public perms: any = {
+    isEditPerm: "",
+	isAddPerm : ""
+  }
   selectUser(id?: number): void {
     this.selectedId = id;
     this.noUsers = false;
+    this.perms.isAddPerm = this.adminService.rolePermissions.add_users == 1 ? true : false;
+    this.perms.isEditPerm = this.adminService.rolePermissions.edit_users == 1 ? true : false
   }
   updateData(data: any) {
     // console.log(data)

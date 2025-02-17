@@ -1,0 +1,100 @@
+<!-- *ngIf="contactsList.length != 0" -->
+<div class="page-sub-header">
+  <div
+    *ngIf="contactsList.length != 0"
+    class="d-flex justify-content-between align-items-center"
+  >
+    <h2>
+      Account Manager
+      <span>({{ contactsList.length }})</span>
+    </h2>
+    <div>
+      <button
+      *ngIf="adminService.rolePermissions.add_client_account_manager == 1"
+        style="margin-left: 15px"
+        (click)="updateOrganizationContacts()"
+        mat-raised-button
+      >
+        Add Account Manager
+      </button>
+    </div>
+  </div>
+</div>
+<div class="content-wrapper">
+  <div class="content-body">
+    <div class="c-row">
+      <div
+        class="w-33 contact-card-ui"
+        *ngFor="let contact of contactsList; let i = index"
+      >
+        <div class="card">
+          <div class="card-body">
+            <div class="d-flex justify-content-between flex-column w-100">
+              <div class="d-flex justify-content-start">
+                <div class="c-avatar">
+                  {{ contact.app_user.label | firstWord }}
+                  <!-- {{ contact.last_name | secondWord }} -->
+                </div>
+                <div class="contact-info">
+                  <h3
+                    class="ellipsis"
+                    title="{{ contact.first_name }} {{ contact.last_name }}"
+                  >
+                    {{ contact.app_user.label }}
+                    <!-- {{ contact.last_name }} -->
+                    <!-- <mat-icon
+                      *ngIf="contact.give_user_access"
+                      title="Can login as User"
+                      >info</mat-icon
+                    > -->
+                  </h3>
+                  <!-- <p>{{ contact.primary_email }}</p> -->
+                  <!-- <p
+                    class="contact-address"
+                    title="{{ contact.primary_phone }}"
+                  >
+                    {{ contact.primary_phone }}
+                  </p> -->
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="d-flex flex-wrap card-action"
+          >
+            <a
+              (click)="
+                handelDeleteManager(contact, 'account_manager', 'Manager')
+              "
+              class="text-btn-danger"
+              *ngIf="adminService.rolePermissions.delete_client_account_manager == 1"
+            >
+              <!-- *ngIf="!contact.give_user_access" -->
+              Delete
+            </a>
+            <a
+              class="text-btn-brand"
+              (click)="updateOrganizationContacts(contact)"
+              *ngIf="adminService.rolePermissions.edit_client_account_manager == 1"
+            >
+              Edit
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="no-results" *ngIf="contactsList.length == 0">
+      <div class="empty-img-holder">
+        <span class="material-icons"> contact_page </span>
+      </div>
+      <p class="no-result-text">No Account Mangers Found</p>
+
+      <button
+        (click)="updateOrganizationContacts()"
+        style="display: block; margin: 0 auto; margin-top: 15px"
+        mat-raised-button
+      >
+        Add Account Manager
+      </button>
+    </div>
+  </div>
+</div>

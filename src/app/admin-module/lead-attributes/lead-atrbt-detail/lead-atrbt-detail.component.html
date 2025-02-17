@@ -1,357 +1,797 @@
 <div class="details" fxFlex>
-	<mat-toolbar class="mat-small-toolbar padLR_24" >
-	  <span class="admin-toolbar"  *ngIf="selectedAttribute" >  {{selectedAttribute.label}}</span> 
-	</mat-toolbar>
-  
-	<form class="roles-form" [formGroup]="detailsForm" (ngSubmit)="createRole(detailsForm)">
-	  <mat-spinner class="medium-spinner" *ngIf="fetchingData"></mat-spinner>
-	  <div class="box"  *ngIf="!noRoles " [class.user-footer]="detailsForm.dirty">
-		<div class="form-fields">
-		  <!-- <h4>{{language.defaults.roleProfile}}</h4> -->
-		  <div>
-			
-				<mat-form-field class="custom-input mandatory" floatLabel="never">
-					<label class="custom-label">Label</label>
-			  <input class="field-captl" matInput #myInput maxlength=100 placeholder="label" formControlName="label" id="role" />
-			  <mat-error *ngIf="detailsSubmit || !detailsForm.controls.label.pristine && detailsForm.controls.label.hasError('required') && detailsForm.controls.label.hasError('whitespace')">{{language.validations.roleName}}</mat-error>
-			</mat-form-field>
-		  </div>
-		  <div class="structure-select strut-type">
+  <mat-toolbar
+    class="mat-small-toolbar padLR_24"
+    style="height: 68px; display: flex; justify-content: space-between"
+  >
+    <span class="admin-toolbar admin-heading" *ngIf="selectedAttribute">
+      {{ selectedAttribute.label }}</span
+    >
+    <div *ngIf="selectedAttribute && adminService.rolePermissions.add_form_builder == 1">
+      <button mat-raised-button (click)="addNewForm()">Add New Form</button>
+    </div>
+  </mat-toolbar>
 
-			<mat-form-field class="custom-input mandatory" floatLabel="never">
-				<label class="custom-label">Type</label>
-				<mat-select placeholder="Select" formControlName="ui_element_id" [disabled]="true">
-					<mat-option *ngFor="let uiElement of dropdowns.uiElements"  [value]="uiElement.id">{{uiElement.label}}</mat-option>
-				</mat-select>
-				
-			</mat-form-field>
-          </div>
-		 
-		  <!-- <div>
+  <form
+    class="roles-form"
+    [formGroup]="detailsForm"
+    (ngSubmit)="createRole(detailsForm)"
+  >
+    <mat-spinner class="medium-spinner" *ngIf="fetchingData"></mat-spinner>
+    <div class="box" *ngIf="!noRoles" [class.user-footer]="detailsForm.dirty">
+      <div class="form-fields">
+        <!-- <h4>{{language.defaults.roleProfile}}</h4> -->
+        <div>
+          <mat-form-field class="custom-input mandatory" floatLabel="never">
+            <label class="custom-label" [class.mandatory]="true">Label</label>
+            <input
+              class="field-captl"
+              matInput
+              #myInput
+              maxlength="100"
+              placeholder="label"
+              formControlName="label"
+              id="role"
+            />
+            <mat-error
+              *ngIf="
+                detailsSubmit ||
+                (!detailsForm.controls.label.pristine &&
+                  detailsForm.controls.label.hasError('required') &&
+                  detailsForm.controls.label.hasError('whitespace'))
+              "
+              >Please Enter Label</mat-error
+            >
+          </mat-form-field>
+        </div>
+        <div class="structure-select strut-type">
+          <mat-form-field class="custom-input mandatory" floatLabel="never">
+            <label class="custom-label">Types</label>
+            <mat-select
+              placeholder="Select"
+              formControlName="form_element_id"
+              [disabled]="true"
+            >
+              <mat-option
+                *ngFor="let uiElement of dropdowns.uiElements"
+                [value]="uiElement.id"
+                >{{ uiElement.label }}</mat-option
+              >
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div
+          *ngIf="
+            selectedAttribute &&
+            (selectedAttribute.slug == 'upload' ||
+              selectedAttribute.slug == 'upload_documents')
+          "
+        >
+          <mat-form-field
+            class="custom-input custom-client mandatory"
+            floatLabel="never"
+            style="width: 100%; margin-top: 30px"
+          >
+            <label class="custom-label font-600" [class.mandatory]="true"
+              >Allowed Formats</label
+            >
+            <mat-select
+              panelClass="myPanelClass"
+              class="chips-select"
+              [placeholder]="
+                detailsForm && detailsForm.value?.accepted_formats?.length
+                  ? ''
+                  : 'Select Allowed Formats'
+              "
+              formControlName="accepted_formats"
+              multiple
+            >
+              <mat-select-trigger>
+                <mat-chip-list
+                  *ngIf="
+                    detailsForm && detailsForm.value?.accepted_formats?.length
+                  "
+                >
+                  <mat-chip
+                    *ngFor="let prodId of detailsForm.value.accepted_formats"
+                    [removable]="true"
+                    (removed)="
+                      removeClient(prodId, detailsForm.value.accepted_formats)
+                    "
+                  >
+                    {{ getClientName(prodId, formatList) }}
+                    <mat-icon matChipRemove *ngIf="adminService.rolePermissions.add_form_builder == 1">cancel</mat-icon>
+                  </mat-chip>
+                </mat-chip-list>
+              </mat-select-trigger>
+              <mat-option
+                [value]="status.slug"
+                class="orders-list"
+                *ngFor="let status of formatList"
+              >
+                {{ status.label }}</mat-option
+              >
+            </mat-select>
+            <mat-error
+              *ngIf="
+                detailsSubmit ||
+                detailsForm.controls.accepted_formats.hasError('required')
+              "
+              >Please Select Allowed Formats</mat-error
+            >
+          </mat-form-field>
+        </div>
+        <div
+          *ngIf="
+            selectedAttribute &&
+            (selectedAttribute.slug == 'upload' ||
+              selectedAttribute.slug == 'upload_documents')
+          "
+        >
+          <mat-form-field class="custom-input mandatory" floatLabel="never">
+            <label class="custom-label" [class.mandatory]="true"
+              >Max File Size (in MB)</label
+            >
+
+            <input
+              class="field-captl"
+              matInput
+              #myInput
+              maxlength="100"
+              placeholder="Max File Size"
+              formControlName="max_file_size"
+              type="number"
+              id="role"
+            />
+            <mat-error
+              *ngIf="
+                detailsSubmit ||
+                detailsForm.controls.max_file_size.hasError('required')
+              "
+              >Please Enter File Size</mat-error
+            >
+          </mat-form-field>
+        </div>
+        <div
+          *ngIf="
+            selectedAttribute &&
+            (selectedAttribute.slug == 'single_line_text' ||
+              selectedAttribute.slug == 'paragraph_text')
+          "
+        >
+          <mat-form-field class="custom-input mandatory" floatLabel="never">
+            <label class="custom-label">Min Length</label>
+
+            <input
+              class="field-captl"
+              matInput
+              #myInput
+              maxlength="100"
+              placeholder="Min Length"
+              formControlName="min_length"
+              type="number"
+              id="role"
+              (keyup)="onMinChange($event)"
+            />
+          </mat-form-field>
+          <mat-error *ngIf="detailsForm.controls.min_length.hasError('max')"
+            >Min Length should be less than max length</mat-error
+          >
+        </div>
+        <div
+          *ngIf="
+            selectedAttribute &&
+            (selectedAttribute.slug == 'single_line_text' ||
+              selectedAttribute.slug == 'paragraph_text' ||
+              selectedAttribute.slug == 'number')
+          "
+        >
+          <mat-form-field class="custom-input mandatory" floatLabel="never">
+            <label class="custom-label">Max Length</label>
+
+            <input
+              class="field-captl"
+              matInput
+              #myInput
+              maxlength="100"
+              placeholder="Max Length"
+              formControlName="max_length"
+              (keyup)="onMaxChange($event)"
+              type="number"
+              id="role"
+            />
+          </mat-form-field>
+          <mat-error *ngIf="detailsForm.controls.max_length.hasError('min')"
+            >Max Length should be more than min length</mat-error
+          >
+        </div>
+        <div
+          class="structure-select strut-type"
+          *ngIf="
+            selectedAttribute &&
+            (selectedAttribute.slug == 'single_line_text' ||
+              selectedAttribute.slug == 'paragraph_text' ||
+              selectedAttribute.slug == 'number')
+          "
+        >
+          <mat-form-field class="custom-input mandatory" floatLabel="never">
+            <label class="custom-label">Validation Type</label>
+            <mat-select
+              placeholder="Select"
+              formControlName="validation_type_id"
+            >
+              <mat-option
+                *ngFor="let valid of inputValidations"
+                [value]="valid.key || valid.id"
+                (click)="onValidationTypeChange(valid)"
+                >{{ valid.label }}</mat-option
+              >
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div
+          *ngIf="
+            selectedAttribute &&
+            (selectedAttribute.validation_type_slug == 'non_zero_float' ||
+              selectedAttribute.validation_type_slug == 'float')
+          "
+        >
+          <mat-form-field class="custom-input mandatory" floatLabel="never">
+            <label class="custom-label">No. of Decimals</label>
+
+            <input
+              class="field-captl"
+              matInput
+              #myInput
+              maxlength="100"
+              placeholder="No. of Decimals"
+              formControlName="decimals_accepted"
+              type="number"
+              id="role"
+            />
+          </mat-form-field>
+        </div>
+
+        <div
+          class="structure-select strut-type"
+          *ngIf="
+            selectedAttribute &&
+            (selectedAttribute.slug == 'custom_component' ||
+              selectedAttribute.slug == 'upload')
+          "
+        >
+          <mat-form-field class="custom-input mandatory" floatLabel="never">
+            <label class="custom-label">Selected Type</label>
+            <mat-select
+              placeholder="Select"
+              formControlName="dependent_on_form_id"
+            >
+              <mat-option
+                *ngFor="let uiElement of modulesList"
+                [value]="uiElement.id"
+                >{{ uiElement.name }}</mat-option
+              >
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <!-- <div>
 			  <mat-form-field class="custom-input" floatLabel="never">
 				  <label class="custom-label">{{language.defaults.description}}</label>
 			  <textarea matInput placeholder={{language.defaults.description}} formControlName="description" id="desc" rows="5"></textarea>
 			  
 			</mat-form-field>
 		  </div> -->
-		  <div>
-					  <mat-form-field class="custom-input mandatory" floatLabel="never">
-						<label class="custom-label">Status</label>
-						<mat-select placeholder="Status" formControlName="status">
-						  <mat-option [value]="stat.param" *ngFor="let stat of status" [innerHtml]="stat.value"></mat-option>
-						</mat-select>
-						<mat-error *ngIf="detailsSubmit || !detailsForm.controls.status.pristine && detailsForm.controls.status.hasError('required')">{{language.validations.status}}</mat-error>
-					  </mat-form-field>
-					</div>
-					
-		</div>
-		
-		<div *ngIf="uiElement" [ngSwitch]="uiElement.template_id" style="margin-bottom:20px;" class="type-fields">
+        <div>
+          <mat-form-field class="custom-input mandatory" floatLabel="never">
+            <label class="custom-label">Status</label>
+            <mat-select placeholder="Status" formControlName="status">
+              <mat-option
+                [value]="stat.param"
+                *ngFor="let stat of status"
+                [innerHtml]="stat.value"
+              ></mat-option>
+            </mat-select>
+            <mat-error
+              *ngIf="
+                detailsSubmit ||
+                (!detailsForm.controls.status.pristine &&
+                  detailsForm.controls.status.hasError('required'))
+              "
+              >{{ language.validations.status }}</mat-error
+            >
+          </mat-form-field>
+        </div>
+        <div>
+          <mat-form-field
+            class="custom-input block-ele mandatory w-100 pointer-none"
+            floatLabel="never"
+          >
+            <label class="custom-label">Form control Name</label>
+            <!-- <mat-icon
+              class="i-icon-d"
+              title="Smaller numbers prioritize display at the top"
+              >info</mat-icon
+            > -->
+            <!-- class="field-captl" -->
+            <input
+              matInput
+              #myInput
+              placeholder="Form control Name"
+              readonly="true"
+              style="cursor: not-allowed"
+              formControlName="form_control_name"
+            />
+            <!-- [(ngModel)]="selectedAttribute.form_control_name" -->
+          </mat-form-field>
+        </div>
+        <div>
+          <mat-form-field
+            class="custom-input mandatory block-ele w-100"
+            floatLabel="never"
+          >
+            <label class="custom-label">Document Field Name</label>
+            <!-- <mat-icon
+              class="i-icon-d"
+              title="Smaller numbers prioritize display at the top"
+              >info</mat-icon
+            > -->
+            <!-- class="field-captl" -->
+            <!-- [readonly]="selectedAttribute?.document_mapping ? true : false" -->
+            <!-- [ngStyle]="{
+              cursor: selectedAttribute?.document_mapping
+                ? 'not-allowed'
+                : 'text'
+            }" -->
+            <input
+              matInput
+              #myInput
+              placeholder="Document Field Name"
+              formControlName="document_mapping"
+            />
+            <!-- [(ngModel)]="selectedAttribute.document_mapping" -->
+          </mat-form-field>
+        </div>
 
-            <div *ngSwitchCase="'1'" class="choice-table sp-form-elements">
+        <div>
+          <mat-form-field class="custom-input mandatory" floatLabel="never">
+            <label class="custom-label">Display Order</label>
+            <mat-icon
+              class="i-icon-d"
+              title="Smaller numbers prioritize display at the top"
+              >info</mat-icon
+            >
+            <input
+              class="field-captl"
+              matInput
+              #myInput
+              maxlength="100"
+              placeholder="Display Order"
+              formControlName="display_order"
+              type="number"
+              id="role"
+            />
+            <mat-error
+              *ngIf="
+                detailsSubmit ||
+                (!detailsForm.controls.display_order.pristine &&
+                  detailsForm.controls.display_order.hasError('pattern'))
+              "
+              >{{ language.validations.inValidDisplayOrder }}</mat-error
+            >
+          </mat-form-field>
+        </div>
+        <div>
+          <mat-form-field class="custom-input mandatory" floatLabel="never">
+            <label class="custom-label">Dependent Field</label>
+            <mat-select
+              placeholder="Dependent Field"
+              formControlName="dependent_on_field_id"
+            >
+              <mat-option
+                [value]="attribute.id"
+                *ngFor="let attribute of dependentFieldList"
+                [innerHtml]="attribute.label"
+              ></mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <!-- <div>
+          <label class="custom-label">Attribute Display Dependents</label>
+          <div class="display-fields-list">
+          <div class="fields">
+            <mat-form-field class="custom-input mandatory" floatLabel="never">
+              <mat-select
+                placeholder="Select Attribute"
+                formControlName="display_dependent_field_id"
+                (change)="onDependencyFieldChange($event.value)"
+              >
+                <mat-option
+                  [value]="attribute.id"
+                  *ngFor="let attribute of attributes"
+                  [innerHtml]="attribute.label"
+                ></mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="fields">
+            <mat-form-field class="custom-input mandatory" floatLabel="never">
+              <mat-select
+                placeholder="Select Value"
+                formControlName="display_dependent_field_value"
+              >
+                <mat-option
+                  [value]="attribute.id"
+                  *ngFor="let attribute of dependentFieldList"
+                  [innerHtml]="attribute.label"
+                ></mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </div>
+        </div> -->
+      </div>
 
+      <div
+        class="radio-container"
+        *ngIf="
+          selectedAttribute &&
+          (selectedAttribute.slug == 'auto_suggest' ||
+            selectedAttribute.slug == 'dropdown')
+        "
+      >
+        <label class="custom-label font-600">Select Option</label>
 
-              <!-- <ag-grid-angular #agGrid style="width: 500px; height: 200px;" class="ag-theme-balham" [rowData]="rowData"
+        <mat-radio-group
+          aria-label="Select an option"
+          [(ngModel)]="selectedOption"
+          [ngModelOptions]="{ standalone: true }"
+          (change)="onSelectionChange($event.value)"
+          [disabled]="adminService.rolePermissions.add_form_builder == 1 ? false : true"
+        >
+          <mat-radio-button value="own_options"
+            >Define own options</mat-radio-button
+          >
+          <mat-radio-button value="from_modules"
+            >Get from Modules</mat-radio-button
+          >
+          <mat-radio-button value="from_api">Get from Api</mat-radio-button>
+        </mat-radio-group>
+      </div>
+      <div style="padding: 6px 24px" *ngIf="selectedOption == 'from_api'">
+        <mat-form-field class="custom-input mandatory" floatLabel="never">
+          <label for="name" class="custom-label mandatory">API Name</label>
+          <input
+            matInput
+            class="field-captl"
+            formControlName="method_name"
+            placeholder="API Name"
+          />
+          <mat-error
+            *ngIf="
+              detailsSubmit &&
+              detailsForm.controls.method_name.hasError('required')
+            "
+            >Please Enter API Name</mat-error
+          >
+        </mat-form-field>
+      </div>
+
+      <div
+        class="structure-select strut-type lead-dropdown form-fields"
+        style="display: flex; gap: 14px; padding: 8px 6px; padding-bottom: 14px"
+        *ngIf="
+          selectedAttribute &&
+          (selectedAttribute.slug == 'auto_suggest' ||
+            selectedAttribute.slug == 'dropdown') &&
+          selectedOption == 'from_modules'
+        "
+      >
+        <div class="module-level-dropdown">
+          <mat-form-field class="custom-input mandatory" floatLabel="never">
+            <label class="custom-label mandatory">Module List</label>
+            <mat-select
+              placeholder="Select"
+              formControlName="dropdown_from_form_id"
+              (selectionChange)="moduleSelect($event)"
+            >
+              <mat-option
+                *ngFor="let uiElement of modulesList"
+                [value]="uiElement.id"
+                >{{ uiElement.name }}</mat-option
+              >
+            </mat-select>
+          </mat-form-field>
+          <mat-error
+            *ngIf="
+              detailsSubmit &&
+              detailsForm.controls.dropdown_from_form_id.hasError('required')
+            "
+            >Please Select Module</mat-error
+          >
+        </div>
+        <div class="module-level-dropdown">
+          <mat-form-field class="custom-input mandatory" floatLabel="never">
+            <label class="custom-label mandatory">Attribute List</label>
+            <mat-select
+              placeholder="Select"
+              formControlName="form_dropdown_field_id"
+            >
+              <mat-option
+                *ngFor="let uiElement of attributes"
+                [value]="uiElement.id"
+                >{{ uiElement.label }}</mat-option
+              >
+            </mat-select>
+          </mat-form-field>
+          <mat-error
+            *ngIf="
+              detailsSubmit &&
+              detailsForm.controls.form_dropdown_field_id.hasError('required')
+            "
+            >Please Select Attribute</mat-error
+          >
+        </div>
+      </div>
+      <div
+        class="type-fields"
+        *ngIf="
+          selectedAttribute &&
+          (selectedAttribute.slug == 'auto_suggest' ||
+            selectedAttribute.slug == 'dropdown')
+        "
+      >
+        <div
+          class="choice-table sp-form-elements"
+          style="padding-top: 14px"
+          *ngIf="selectedOption == 'own_options'"
+        >
+          <!-- <ag-grid-angular #agGrid style="width: 500px; height: 200px;" class="ag-theme-balham" [rowData]="rowData"
                 rowHeight="50" [rowClass]="rowClass" [animateRows]="true" [rowSelection]="single" [resizable]="true"
                 [sortable]="true" [filter]="true" [columnDefs]="columnDefs" [defaultColDef]="defaultColDef"
                 (gridReady)="onGridReady($event)">
               </ag-grid-angular> -->
+          <!-- <div
+            *ngIf="selectedAttribute.dynamic_dropdown === true"
+            class="note-text"
+          >
+            Note:
+            <span
+              >Options are getting dynamically from
+              <b>{{ selectedAttribute.data_source }}</b> API</span
+            >
+          </div> -->
+          <div *ngIf="selectedOption == 'own_options'">
+            <span class="form-label font-600">Choices</span>
+            <div class="choices" *ngIf="options.controls.length">
+              <div class="header">
+                <span class="radio def-btn">Default</span>
+                <span class="text def-btn value-btn">Value</span>
+                <span class="toggle def-btn">Status</span>
+              </div>
 
+              <div class="body" formArrayName="option">
+                <div
+                  *ngFor="let choice of options.controls; let i = index"
+                  class="choice-box"
+                  [formGroupName]="i"
+                >
+                  <div class="radio ak-field-group">
+                    <mat-radio-group
+                      formControlName="id"
+                      class="choices-wrapper"
+                      (change)="onSelect(i)"
+                      [disabled]="adminService.rolePermissions.add_form_builder == 1 ? false : true"
+                    >
+                      <mat-radio-button
+                        disableRipple="true"
+                        [checked]="options.controls[i].get('id').value"
+                      >
+                      </mat-radio-button>
+                    </mat-radio-group>
 
-              <mat-radio-group formControlName="predefined_value" class="choices-wrapper">
-                <span class="form-label">Choices</span>
-                <div class="choices"  *ngIf="options.controls.length"  >
-                  <div class="header">
-                    <span class="radio def-btn">Default</span>
-                    <span class="text def-btn value-btn">Value</span>
-                    <span class="toggle def-btn">Status</span>
+                    <!-- <input 
+                      type="radio" 
+                      formControlName="id" 
+                      (change)="onSelect(i)" 
+                      [checked]="options.controls[i].get('id').value"
+                    /> -->
                   </div>
-
-                  <div class="body" formArrayName="option">
-                    <div *ngFor="let choice of options.controls;let i = index" class="choice-box"
-                      [formGroupName]="i">
-                      <div class="radio ak-field-group">
-                        <mat-radio-button disableRipple="true" [value]="options.controls[i].get('id').value">
-                        </mat-radio-button>
+                  <!-- <mat-form-field class="custom-input mandatory" floatLabel="never"> -->
+                  <div class="text value-btn">
+                    <div class="ak-field-group">
+                      <input
+                        type="text"
+                        class="ak-field-text field-captl"
+                        id="value"
+                        name="value"
+                        formControlName="value"
+                        maxlength="100"
+                        matInput
+                      />
+                      <div
+                        class="pi-error"
+                        *ngIf="
+                          (options.controls[i]
+                            .get('value')
+                            .hasError('whitespace') ||
+                            options.controls[i]
+                              .get('value')
+                              .hasError('required')) &&
+                          detailsSubmit
+                        "
+                      >
+                        Please enter the value to save.
                       </div>
-
-                      <div class="text value-btn">
-                        <div class="ak-field-group ">
-                          <input type="text" class="ak-field-text field-captl" id="value" name="value" formControlName="value"
-                            maxlength="100">
-                          <div class="pi-error"
-                            *ngIf="options.controls[i].get('value').hasError('whitespace') && detailsForm.dirty">
-                            Please
-                            enter the value to save. </div>
-                          <div class="pi-error"
-                            *ngIf="options.controls[i].get('value').hasError('duplicateOption') && detailsForm.dirty">
-                            A
-                            Value with this name already exists.</div>
-                        </div>
-                      </div>
-
-                      <div class="toggle">
-                        <mat-slide-toggle color="primary" class="toggle" formControlName="status"></mat-slide-toggle>
-                      </div>
-                      <!-- <div class="actions" [class.add_only]="i == availableOptions - 1 && availableOptions &&  !attributeEdit"> -->
-                      <div class="actions" [class.add_only]="i == availableOptions - 1 && availableOptions">
-                        <span (click)="addControl()" *ngIf="i >= availableOptions - 1"
-                          [class.disable]="options.controls.length == maxAliases" class="btn-action add">
-                          <mat-icon>add</mat-icon>
-                        </span>
-                        <span (click)="removeControl(i)" *ngIf="availableOptions <= i"
-                          [class.disable]="options.controls.length == 1" class="btn-action remove">
-                          <mat-icon>remove</mat-icon>
-                        </span>
-                      </div>
-                    </div>
-
-                  </div>
-                </div>
-              </mat-radio-group>
-
-            </div>
-
-            <div *ngSwitchCase="'2'">
-              <div class="structure-select ">
-				<mat-form-field class="custom-input mandatory" floatLabel="never">
-                <label for="size"class="custom-label">Size</label>
-                <mat-select type="text" class="" id="size" name="size" 
-                  formControlName="selected_value" (selectionChange)="changeLength($event.value)">
-                  <mat-option [value]="size.key" *ngFor="let size of dropdowns.sizes">
-                    {{size.label}}
-                  </mat-option>
-				</mat-select>
-				</mat-form-field>
-              </div>
-              <div class="structure-select">
-				<mat-form-field class="custom-input mandatory" floatLabel="never">
-                <label class="custom-label" for="size" >Data Type</label>
-                <mat-select type="text" class="" id="datatype" name="datatype"
-                  formControlName="label_element_data_type">
-                  <mat-option [value]="dataType.key" *ngFor="let dataType of dropdowns.dataTypes">
-                    {{dataType.label}}
-                  </mat-option>
-				</mat-select>
-			</mat-form-field> 
-              </div>
-              <div class="structure-select ">
-				
-				  <mat-form-field class="custom-input" floatLabel="never">
-					<label class="custom-label">Predefined Value</label>
-				<textarea matInput class="text-bottom field-captl " formControlName="predefined_value" [maxLength]="predefinedValueLength"></textarea>
-				<span class="field-note">Enter text of {{predefinedValueLength}} characters or
-					less.</span>
-			  </mat-form-field>
-              </div>
-            </div>
-
-            <div *ngSwitchCase="'3'" class="mg-btm">
-              <!-- <div class="strStore IDucture-select">
-								<span for="tooltip" class="level-name">Tooltip/Help</span>
-								<textarea class="ak-field-textarea" rows="3" id="tooltip" name="tooltip" formControlName="tooltip" maxlength="1024"></textarea>
-								<span class="field-note">Enter text of 1024 characters or less.</span>
-							</div>-->
-              <!-- <div class="note">Last modified on 09-10-2018 03:27 PM by Recon Dev User</div> -->
-              <span class="auto-suggest-form-label">Values</span>
-              <div class="auto-suggest">
-                <div class="actions">
-                  <!-- <span class="search-sec"> -->
-                   
-                    <div class="app-search-container search-small search-role">
-                      <mat-form-field class="search auto-serch-in" floatLabel="never">
-                        <input  matInput placeholder={{language.defaults.search}} #search (keyup)="DOMSearch( $event)" (blur)="!search.value.length ? open = false : open = true">
-                        <mat-icon matPrefix class="org-search">search</mat-icon>
-                        <mat-icon matSuffix *ngIf="searching" class="spinner">
-                          <mat-spinner class="small-spinner"></mat-spinner>
-                        </mat-icon>
-                        <mat-icon matSuffix *ngIf="!searching && search.value.length" (click)="search.value = '';DOMSearch(search.value)">close</mat-icon>
-                      </mat-form-field>
-                    </div>
-                    <!-- <app-search (onSearch)="DOMSearch($event)"></app-search> -->
-                  <!-- </span> -->
-                  <button class="btn btn-default button-sec" mat-raised-button
-                    (click)="addAutoSuggestValue()">Add</button>
-                </div>
-
-                <div class="list">
-                  <div class="header">
-                    <div class="item sorting">
-                      <!-- <div (click)="DOMSort('value')"><span class="sort-action {{value.sortBy | lowercase}}">Value</span></div>
-											<div (click)="DOMSort('status')"><span class="sort-action {{status.sortBy | lowercase}}">Status</span></div> -->
-                      <div class="value-wdth">
-                        <span class="sort-action">Value</span>
-                      </div>
-                      <div>
-                        <span class="sort-action">Status</span>
+                      <div
+                        class="pi-error"
+                        *ngIf="
+                          options.controls[i]
+                            .get('value')
+                            .hasError('duplicateOption') && detailsForm.dirty
+                        "
+                      >
+                        A Value with this name already exists.
                       </div>
                     </div>
                   </div>
-                  <div class="content" *ngIf="selectedAttribute.option.length">
-                    <div class="item auto-item" *ngFor="let data of selectedAttribute.option">
-                      <div class="auto-value">
-                        <span (click)="focusElement('suggest_value', data);data.showValue = true"
-                          *ngIf="!data.showValue">{{data.value}}</span>
-                        <div *ngIf="data.showValue">
-                          <input #valueInput autocomplete="" name="suggest_value" type="text" class="ak-field-text"
-                            formControlName="suggest_value" (change)="onChangeOption('value', $event, data)"
-                            (blur)="onChangeOption('value', $event, data)" maxlength="100">
-                          <div class="pi-error" *ngIf="af.suggest_value.hasError('required')">
-                            Please Enter Value</div>
-                        </div>
-                      </div>
-                      <div>
-                        <span [innerHTML]="data.status ? 'Active' : 'Inactive'"
-                          (click)="focusElement('suggest_status', data);data.showStatus = true"
-                          *ngIf="!data.showStatus"></span>
-                        <select #mySelect name="suggest_status"  type="text"
-                          *ngIf="data.showStatus" formControlName="suggest_status"
-                          (change)="onChangeOption('status', $event, data)"
-                          (blur)="onChangeOption('status', $event, data)">
-                          <option *ngFor="let status of dropdowns.status" [value]="status.value">{{status.label}}
-                          </option>
-                        </select>
-                      </div>
-                    </div>
+                  <!-- </mat-form-field> -->
+                  <div class="toggle">
+                    <mat-slide-toggle
+                      color="primary"
+                      class="toggle"
+                      formControlName="status"
+                    ></mat-slide-toggle>
                   </div>
-                  <div class="content text-center no-value" *ngIf="!searchValue && !selectedAttribute.option.length">
-                    No Values Yet.
-                  </div>
-                  <div class="content text-center no-value" *ngIf="searchValue && !selectedAttribute.option.length">
-                    No Results Found.
-                  </div>
-                </div>
-
-                <div class="pagination">
-
-                </div>
-              </div>
-            </div>
-
-            <div *ngSwitchCase="'4'" class="size">
-              <div class="field-groups-2">
-                <div class="sp-form-elements">
-                 
-				  <mat-form-field class="custom-input mandatory" floatLabel="never">
-					<label class="custom-label">Decimal Digits</label>
-					<mat-select type="text" id="decimal_digits" name="decimal_digits"
-                    formControlName="selected_value">
-                    <mat-option [value]="digits.key" *ngFor="let digits of dropdowns.decimalDigits">
-                      {{digits.label}}
-                    </mat-option>
-				  </mat-select>
-					
-				  </mat-form-field>
-                </div>
-                <div class="sp-form-elements predefined-val">
-					<mat-form-field class="custom-input mandatory" floatLabel="never">
-                  <label for="name" class="form-label">Predefined Value</label>
-                  <input autocomplete="" [appAllowNumbers]="true" zero="false" matInput
-                    type="number" class="ak-field-text" id="predefined_value" name="predefined_value"
-                    formControlName="predefined_value" maxlength="26">
-                  <mat-error *ngIf="formSubmit && af.predefined_value.hasError('pattern')">Value
-					should be a number.</mat-error>
-				</mat-form-field>
-                </div>
-              </div>
-            </div>
-
-            <div *ngSwitchCase="'5'">
-              <div class="choices-wrapper">
-                <label>Attributes</label>
-                <div class="choices" *ngIf="options.controls.length">
-                  <div class="header">
-                    <span class="text">Spec</span>
-                    <span class="toggle">Delimiter</span>
-                  </div>
-                  <div class="body" formArrayName="option">
-                    <div *ngFor="let choice of options.controls;let i = index" class="choice-box"
-                      [formGroupName]="i">
-                      <div class="ak-field-group">
-                        <select type="text" formControlName="value">
-                          <option *ngFor="let type of attributes" [value]="type.id">
-                            {{type.label}}</option>
-                        </select>
-                        <div class="pi-error"
-                          *ngIf="options.controls[i].get('value').hasError('required') && formSubmit">
-                          Please
-                          Select Attribute</div>
-                      </div>
-                      <div class="ak-field-group field-captl">
-                        <input autocomplete=""  type="text" class="ak-field-text field-captl"
-                          formControlName="delimiter">
-                      </div>
-
-                      <div class="actions">
-                        <span (click)="removeControl(i)" [class.disable]="options.controls.length == 1" class="remove">
-                          <mat-icon>remove</mat-icon>
-                        </span>
-                        <span (click)="addControl()" class="add">
-                          <mat-icon>add</mat-icon>
-                        </span>
-                      </div>
-                    </div>
+                  <!-- <div class="actions" [class.add_only]="i == availableOptions - 1 && availableOptions &&  !attributeEdit"> -->
+                  <div
+                    class="actions"
+                    [class.add_only]="
+                      i == availableOptions - 1 && availableOptions
+                    "
+                    *ngIf="adminService.rolePermissions.add_form_builder == 1"
+                  >
+                    <span
+                      (click)="addControl()"
+                      *ngIf="i >= availableOptions - 1"
+                      [class.disable]="options.controls.length == maxAliases"
+                      class="btn-action add"
+                    >
+                      <mat-icon>add</mat-icon>
+                    </span>
+                    <span
+                      (click)="removeControl(i)"
+                      *ngIf="availableOptions <= i"
+                      [class.disable]="options.controls.length == 1"
+                      class="btn-action remove"
+                    >
+                      <mat-icon>remove</mat-icon>
+                    </span>
                   </div>
                 </div>
               </div>
             </div>
-            <div *ngSwitchCase="'6'">
-              <div class="choices-wrapper">
+          </div>
+        </div>
 
-                <div class="structure-select">
-                  
-				  <mat-form-field class="custom-input mandatory" floatLabel="never">
-					<label class="custom-label">Date Format</label>
-					<mat-select type="text" name="selected_value" 
-                    formControlName="selected_value">
-
-                    <mat-option style="text-transform: none" [value]="dateType.key"
-                      *ngFor="let dateType of dropdowns.dateTypes">
-                      {{dateType.label}}
-                    </mat-option>
-				  </mat-select>
-					
-				  </mat-form-field>
-                </div>
-              </div>
-            </div>
-            <div class="sp-form-elements mandity-fileds">
-              <div>
-                <mat-checkbox [value]="1" color="primary" [disabled]="disableCheck" formControlName="required">
-                  Mandatory Field</mat-checkbox>
-              </div>
-              <di></di>
-              <div>
-                <mat-checkbox [value]="1" color="primary" [disabled]="disableCheck" formControlName="display_in_grid">
-                  Display in
-                  Leads Grid</mat-checkbox>
-              </div>
-            </div>
-
-            <!-- <div class="ak-field-group" *ngIf="uiElement.template_id != 3 && uiElement.template_id != 5">
+        <!-- <div class="ak-field-group" *ngIf="uiElement.template_id != 3 && uiElement.template_id != 5">
 							<label for="tooltip">Tooltip/Help</label>
 							<textarea class="ak-field-textarea" rows="3" id="tooltip" name="tooltip" formControlName="tooltip" maxlength="1024"></textarea>
 							<span class="field-note">Enter text of 1024 characters or less.</span>
 						</div> -->
 
-            <!-- <div *ngSwitchCase="selectedAttribute.key  == 'paragraph_text' || selectedSpecification.key == 'single_line_text' ? selectedSpecification.key : 'NotInCase'"
+        <!-- <div *ngSwitchCase="selectedAttribute.key  == 'paragraph_text' || selectedSpecification.key == 'single_line_text' ? selectedSpecification.key : 'NotInCase'"
 						 class="note">
 							<p>Last modified on 09-10-2018 03:27 PM by Chris Pearce</p>
 							<p>Created on 09-08-2018 03:27 PM by Chris Pearce</p>
 						</div> -->
-
+      </div>
+      <div
+        class="sp-form-elements mandity-fileds form-fields"
+        style="margin-left: 20px"
+      >
+        <div>
+          <mat-checkbox
+            [value]="1"
+            color="primary"
+            [disabled]="disableCheck"
+            formControlName="required"
+          >
+            Mandatory Field</mat-checkbox
+          >
+        </div>
+        <div>
+          <mat-checkbox
+            [value]="1"
+            color="primary"
+            [disabled]="disableCheck"
+            formControlName="is_editable"
+          >
+            Editable</mat-checkbox
+          >
+        </div>
+        <div
+          class="display-fields-list"
+          style="width: 100%; margin-top: 14px"
+          *ngIf="
+            selectedAttribute &&
+            (selectedAttribute.slug == 'single_line_text' ||
+              selectedAttribute.slug == 'paragraph_text' ||
+              selectedAttribute.slug == 'number')
+          "
+        >
+          <div class="fields">
+            <mat-checkbox
+              [value]="1"
+              color="primary"
+              formControlName="is_custom_validation"
+              (change)="onChangeCustValidation($event)"
+            >
+              Custom Validation</mat-checkbox
+            >
           </div>
-		
-	  </div>
-	  <div class="footer" fxLayout="row" fxLayoutAlign="end center"  *ngIf="detailsForm.dirty">
-		<button type="button" mat-button (click)="cancel(detailsForm)">Cancel</button>
-		<button type="submit" mat-raised-button >Update Attribute</button>
-	  </div>
-	  <div *ngIf="noRoles" class="no-record">
-		<img [src]="images.no_category">
-		<p>No Attributes found</p>
-	  </div>
-	</form>
-  </div>
-  
-  
+          <div
+            class="fields"
+            *ngIf="detailsForm.get('is_custom_validation').value"
+          >
+            <mat-form-field class="custom-input mandatory" floatLabel="never">
+              <label class="custom-label" [class.mandatory]="true"
+                >Validation Method</label
+              >
+              <input
+                class="field-captl"
+                matInput
+                #myInput
+                maxlength="100"
+                placeholder="Validation Method"
+                formControlName="validation_method"
+                id="role"
+              />
+              <mat-error
+                *ngIf="
+                  detailsSubmit ||
+                  (!detailsForm.controls.validation_method.pristine &&
+                    detailsForm.controls.validation_method.hasError(
+                      'required'
+                    ) &&
+                    detailsForm.controls.validation_method.hasError(
+                      'whitespace'
+                    ))
+                "
+                >Please Enter Validation Method</mat-error
+              >
+            </mat-form-field>
+          </div>
+        </div>
+        <div
+          *ngIf="selectedAttribute && selectedAttribute.slug == 'date_field'"
+        >
+          <div>
+            <mat-checkbox
+              [value]="1"
+              color="primary"
+              [disabled]="disableCheck"
+              formControlName="is_current_date"
+            >
+              Select Date from Current Date</mat-checkbox
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      class="footer"
+      fxLayout="row"
+      fxLayoutAlign="end center"
+      *ngIf="detailsForm.dirty"
+    >
+      <button type="button" class="back-btn-ui" (click)="cancel(detailsForm)">
+        Cancel
+      </button>
+      <button type="submit" mat-raised-button>Update Attribute</button>
+    </div>
+    <div *ngIf="noRoles" class="no-record">
+      <img [src]="images.no_category" />
+      <p>No Attributes found</p>
+    </div>
+  </form>
+</div>

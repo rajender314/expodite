@@ -1,0 +1,489 @@
+<ng-container class="proforma-top">
+  <div>
+    <div>
+      <div class="inner-container" [class.collapse]="!showProfInvoice">
+        <mat-toolbar class="package-toolbar">
+          <mat-icon mat-list-icon class="icon-menu detail_view_right_icons">
+            <img [src]="images.addPO_fill" style="height: 24px; width: 24px" />
+          </mat-icon>
+
+          <div class="invoice-toolbar">
+            <div class="invoice-number">
+              <span class="details-span">{{
+                poDetails?.add_po[0]?.po_no
+              }}</span>
+              <span
+                class="order-detail-status client-status"
+                [ngClass]="{
+                  accepted: poDetails?.add_po[0]?.status == 'Accepted',
+                  created: poDetails?.add_po[0]?.status == 'PO Created',
+                  'in-transit': poDetails?.add_po[0]?.status == 'In-transit',
+                  delivered: poDetails?.add_po[0]?.status == 'Delivered',
+                  cancelled: poDetails?.add_po[0]?.status == 'Cancelled',
+                  received: poDetails?.add_po[0]?.status == 'Received',
+                  processing: poDetails?.add_po[0]?.status == 'Processing',
+                  placed: poDetails?.add_po[0]?.status == 'Placed',
+                  draft: poDetails?.add_po[0]?.status == 'Draft',
+                  passed: poDetails?.add_po[0]?.status == 'Passed',
+                  shipped: poDetails?.add_po[0]?.status == 'Shipped',
+                  fulfilment: poDetails?.add_po[0]?.status == 'Fulfilment',
+                  pending: poDetails?.add_po[0]?.status == 'Pending',
+                  order_confirmed:
+                    poDetails?.add_po[0]?.status == 'Order Confirmed',
+                  po_sent: poDetails?.add_po[0]?.status == 'PO Sent',
+                  po_approved: poDetails?.add_po[0]?.status == 'PO Approved',
+                  po_accepted: poDetails?.add_po[0]?.status == 'PO Accepted',
+                  po_cancelled: poDetails?.add_po[0]?.status == 'PO Cancelled'
+                }"
+                >{{ poDetails?.add_po[0]?.status }}</span
+              >
+              <span class="pad-lft">Purchase Order</span>
+            </div>
+            <!-- <div class="xyz">
+              <span class="details-date">{{
+                poDetails?.add_po[0]?.date_added
+              }}</span>
+            </div> -->
+          </div>
+          <span fxFlex></span>
+          <div *ngIf="viewActivityLogIcon">
+            <button
+              mat-icon-button
+              class="action-orderbtn"
+              (click)="openActivityModal('add_po')"
+            >
+              <img [src]="images.activity_log_icon" title="Activity Log" />
+            </button>
+          </div>
+          <div class="packages-icons">
+            <button
+              *ngIf="
+                poDetails?.add_po[0]?.status_slug == 'po_accepted' ||
+                poDetails?.add_po[0]?.status_slug == 'po_sent'
+              "
+              mat-icon-button
+              class="action-orderbtn"
+              (click)="SendEmail()"
+            >
+              <img [src]="images.mail_icon" title="Mail" />
+            </button>
+
+            <!-- <a
+              *ngIf="!clientPermission"
+              target="_blank"
+              href="generatePurchaseOrder?id={{ data.id }}&is_printable=1"
+            >
+              <button mat-icon-button>
+                <img [src]="images.printer_icon" title="Print" />
+              </button>
+            </a>
+            <a href="generatePurchaseOrder?id={{ data.id }}&is_printable=0">
+              <button mat-icon-button>
+                <img [src]="images.download_arrow" title="Download" />
+              </button>
+            </a> -->
+            <button mat-icon-button (click)="CreatePO()" *ngIf="adminService.rolePermissions.edit_po == 1">
+              <mat-icon class="edit-icon" title="Edit" mat-icon-button>
+                mode_edit
+              </mat-icon>
+            </button>
+            <button mat-icon-button (click)="toggleProformaInvoice()">
+              <img
+                [src]="images.grey_arrow"
+                mat-icon-button
+                *ngIf="showProfInvoice"
+              />
+              <mat-icon class="toggle-arrow" *ngIf="!showProfInvoice">
+                keyboard_arrow_down</mat-icon
+              >
+            </button>
+          </div>
+        </mat-toolbar>
+        <div *ngIf="showProfInvoice">
+          <div class="address-container" fxLayout="row">
+            <div class="shipper-secction" fxFlex="50">
+              <h4 class="gray-title">Address To</h4>
+              <div class="address-inner-content">
+                <b class="bill-address">{{
+                  poDetails?.add_po[0]?.bill_company_name
+                }}</b>
+                <p class="bill-address">
+                  {{ poDetails?.add_po[0]?.bill_address1 }}
+                </p>
+                <p class="bill-address">
+                  {{ poDetails?.add_po[0]?.bill_address2 }}
+                </p>
+                <p class="bill-address">
+                  {{ poDetails?.add_po[0]?.bill_address3 }}
+                </p>
+                <p class="bill-address">
+                  {{ poDetails?.add_po[0]?.bill_address4 }}
+                </p>
+                <p class="bill-address">
+                  {{ poDetails?.add_po[0]?.bill_city }}
+                </p>
+                <p
+                  class="bill-address"
+                  *ngIf="
+                    poDetails?.add_po[0]?.bill_state ||
+                    poDetails?.add_po[0]?.bill_postal_status_slug
+                  "
+                >
+                  {{ poDetails?.add_po[0]?.bill_state }} -
+                  {{ poDetails?.add_po[0]?.bill_postal_status_slug }}
+                </p>
+                <p class="bill-address">
+                  {{ poDetails?.add_po[0]?.bill_countrty }}
+                </p>
+              </div>
+            </div>
+            <div class="vertical-divider"></div>
+            <div fxFlex="30" class="address-inner-content">
+              <p>Attention : {{ poDetails?.add_po[0]?.attention_name }}</p>
+              <p class="bill-address">
+                Email : {{ poDetails?.add_po[0]?.attention_email }}
+              </p>
+            </div>
+          </div>
+
+          <div fxLayout="row">
+            <div class="orders-table">
+              <app-ag-grid-view
+                [poDetails]="poDetails"
+                (emitGridEvent)="triggerGridEvent($event)"
+                [tableName]="'poInvoice'"
+                [isEditable]="
+                  poDetails?.add_po[0].status_slug === 'po_cancelled' || adminService.rolePermissions.edit_po == 2
+                    ? false
+                    : true
+                "
+                [newColumnAdded]="newColumnAdded"
+              ></app-ag-grid-view>
+              <table class="invoice-table estimate-invoice">
+                <tbody>
+                  <tr class="invoice-row">
+                    <td
+                      class="invoice-tdata gst-data"
+                      colspan="4"
+                      style="padding: 0; width: 60%"
+                    >
+                      <table class="invoice-row-table" style="width: 100%">
+                        <tbody>
+                          <tr *ngIf="is_automech">
+                            <td style="padding: 10px">
+                              <div class="gst-details">
+                                <span class="gst-one"
+                                  >GSTN TYPE:
+                                  {{ compnayDetails?.gstin_type }}</span
+                                >
+                                <span class="gst-two"
+                                  >END USE: {{ compnayDetails?.end_use }}</span
+                                >
+                              </div>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td>
+                              <div
+                                class="gst-details"
+                                style="text-align: left; padding: 10px"
+                              >
+                                <span
+                                  class="invoice-desc"
+                                  [innerHTML]="
+                                    poDetails?.add_po[0]?.term_conditions
+                                  "
+                                ></span>
+                              </div>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </td>
+                    <td
+                      class="invoice-tdata table-invoice invoice-tdata-border proforma-inovice"
+                      colspan="3"
+                      rowspan="2"
+                      style="width: 40%"
+                    >
+                      <table class="invoice-costTable">
+                        <thead>
+                          <tr>
+                            <th class="costTable-head font-normal" colspan="2">
+                              Sub Total
+                            </th>
+                            <th class="costTable-head font-normal">
+                              {{ poDetails?.po_subtotal_form[0]?.subtotal }}
+                            </th>
+                            <th
+                              class="costTable-head font-normal edit-new-style"
+                            ></th>
+                          </tr>
+
+                          <tr
+                            *ngFor="let tax of poDetails.tax; index as colIndex"
+                          >
+                            <td class="costTable-row" colspan="2">
+                              {{ tax.label }}
+                            </td>
+                            <td class="costTable-row">{{ tax.value }}</td>
+                          </tr>
+                          <tr>
+                            <th class="costTable-head font-normal" colspan="2">
+                              Discount
+                              <span>(-) </span>
+                            </th>
+                            <th
+                              class="costTable-head font-normal values1 descountEdit"
+                              [readonly]="
+                                poDetails?.add_po[0]?.status_slug ==
+                                  'po_cancelled' ||
+                                poDetails?.add_po[0]?.status_slug == 'po_sent'
+                              "
+                            >
+                              <div style="display: flex">
+                                <!-- [attr.contenteditable]="
+                                !(
+                                  poDetails?.add_po[0]?.status_slug === 'po_cancelled' ||
+                                  poDetails?.add_po[0]?.status_slug === 'po_sent'
+                                )
+                              " -->
+                                <!-- {{ poDetails?.add_po[0]?.discount }} -->
+                                <input
+                                  style="width: 100%"
+                                  #poInvEditInput
+                                  class="numaricEdit charges"
+                                  (keyup)="savechangesPO($event, 'discount')"
+                                  onpaste="javascript:event.preventDefault();"
+                                  oninput="javascript:if (!/^(\d+(\.\d{0,3})?)?$/.test(this.value)) this.value = this.value.slice(0, -1);"
+                                  [readonly]="
+                                    poDetails?.add_po[0]?.status_slug ==
+                                      'po_cancelled' ||
+                                    poDetails?.add_po[0]?.status_slug ==
+                                      'po_sent' ||
+                                    !editPODescountstate
+                                  "
+                                  [ngStyle]="{
+                                    border: editPODescountstate
+                                      ? '1px solid #075da8'
+                                      : 'none'
+                                  }"
+                                  [(ngModel)]="
+                                    poDetails.po_subtotal_form[0].discount
+                                  "
+                                  (focus)="removeCommas($event)"
+                                  (blur)="onBlur($event, 'discount')"
+                                />
+
+                                <div class="save-icons">
+                                  <mat-icon
+                                    *ngIf="editPODescountstate"
+                                    (mousedown)="editDiscount($event)"
+                                    class="mat-circle-check close-circle-icons-po"
+                                    style="font-size: 24px"
+                                    >check_circle_outline</mat-icon
+                                  >
+                                  <mat-icon
+                                    *ngIf="editPODescountstate"
+                                    class="close-conversion close-circle-icons-po"
+                                    (click)="closeEdit()"
+                                    style="font-size: 24px"
+                                    >highlight_off</mat-icon
+                                  >
+                                </div>
+                              </div>
+                            </th>
+                            <th
+                              class="costTable-head font-normal edit-new-style"
+                            >
+                              <mat-icon
+                                *ngIf="
+                                  ((poDetails?.add_po[0]?.status_slug ==
+                                    'po_accepted' ||
+                                    poDetails?.add_po[0]?.status_slug ==
+                                      'po_created') &&
+                                  !editPODescountstate) &&
+                                  adminService.rolePermissions.edit_po == 1
+                                "
+                                class="descountEdit"
+                                (mousedown)="editpoQPD('discount', '')"
+                                >edit</mat-icon
+                              >
+                            </th>
+                          </tr>
+
+                          <ng-container
+                            *ngFor="
+                              let column of poDetails.add_line_items;
+                              index as colIndex
+                            "
+                          >
+                            <!-- *ngIf="!is_aapl" -->
+                            <tr>
+                              <td class="costTable-row delete">
+                                <mat-icon
+                                  class="delete-icon"
+                                  title="Delete"
+                                  (click)="deleteLineItemopoDetails(column)"
+                                  *ngIf="adminService.rolePermissions.edit_po == 1"
+                                >
+                                  delete</mat-icon
+                                >
+                              </td>
+                              <td
+                                [attr.colspan]="1"
+                                class="costTable-row cost-key"
+                                (input)="
+                                  changeInvoiceExtraKey(colIndex, $event)
+                                "
+                              >
+                                {{ column.line_item }}
+                              </td>
+                              <!-- <td
+                                [attr.colspan]="2"
+                                class="costTable-row"
+                                (keydown)="
+                                  changeInvoiceExtraValue(colIndex, $event)
+                                "
+                              >
+                                {{ column.value }}
+                              </td> -->
+                              <th
+                                style="border-right: 0px"
+                                class="costTable-head font-normal values1 descountEdit"
+                              >
+                                <div
+                                  style="
+                                    display: flex;
+                                    justify-content: flex-end;
+                                  "
+                                >
+                                  <input
+                                    style="width: 100%"
+                                    #poInvEditLineInput
+                                    class="numaricEdit charges"
+                                    (keyup)="
+                                      savechangesPO(
+                                        $event,
+                                        'add_line_items',
+                                        colIndex
+                                      )
+                                    "
+                                    onpaste="javascript:event.preventDefault();"
+                                    oninput="javascript:if (!/^(\d+(\.\d{0,3})?)?$/.test(this.value)) this.value = this.value.slice(0, -1);"
+                                    [readonly]="editaddlineItem != colIndex"
+                                    [ngStyle]="{
+                                      border:
+                                        editaddlineItem == colIndex
+                                          ? '1px solid #075da8'
+                                          : 'none'
+                                    }"
+                                    *ngIf="editaddlineItem == colIndex"
+                                    [(ngModel)]="column.value"
+                                    (focus)="removeCommas($event)"
+                                    (blur)="onBlur($event, 'add_line_items')"
+                                  />
+                                  <span
+                                    style="
+                                      padding-top: 6px;
+                                      word-break: break-all;
+                                    "
+                                    *ngIf="editaddlineItem != colIndex"
+                                    >{{ column.value }}</span
+                                  >
+                                  <div class="save-icons">
+                                    <mat-icon
+                                      *ngIf="editaddlineItem == colIndex"
+                                      (mousedown)="
+                                        saveAddline(column, colIndex)
+                                      "
+                                      class="mat-circle-check close-circle-icons-po"
+                                      style="font-size: 24px"
+                                      >check_circle_outline</mat-icon
+                                    >
+                                    <mat-icon
+                                      *ngIf="editaddlineItem == colIndex"
+                                      class="close-conversion close-circle-icons-po"
+                                      (click)="closeEdit()"
+                                      style="font-size: 24px"
+                                      >highlight_off</mat-icon
+                                    >
+                                  </div>
+                                </div>
+                              </th>
+                              <th
+                                class="costTable-head font-normal edit-new-style"
+                              >
+                                <mat-icon
+                                  *ngIf="
+                                    (poDetails?.add_po[0]?.status_slug ==
+                                      'po_accepted' ||
+                                      poDetails?.add_po[0]?.status_slug ==
+                                        'po_created') &&
+                                    editaddlineItem != colIndex &&
+                                    adminService.rolePermissions.edit_po == 1
+                                  "
+                                  class="descountEdit"
+                                  (mousedown)="
+                                    editpoQPD('add_line_items', colIndex)
+                                  "
+                                  >edit</mat-icon
+                                >
+                              </th>
+                            </tr>
+                          </ng-container>
+                        </thead>
+                      </table>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <div class="footer invoice-footer">
+                <div>
+                  <span
+                    class="add-Line"
+                    (click)="addlineitemspo()"
+                    [class.disableClass]="
+                      poDetails?.add_po[0].status_slug == 'po_cancelled'
+                    "
+                    *ngIf="adminService.rolePermissions.edit_po == 1"
+                  >
+                    <mat-icon>add</mat-icon>
+                    Add Line Item
+                  </span>
+                </div>
+                <span fxFlex></span>
+                <span class="total-text">Total:</span>
+                <span class="total-text">
+                  {{ poDetails?.add_po[0]?.currency_type }}</span
+                >
+                <span>{{ poDetails?.po_subtotal_form[0]?.total }}</span>
+              </div>
+              <div
+                class="packages-footer"
+                fxLayoutAlign="end center"
+                style="padding: 10px"
+                *ngIf="
+                  adminUser && poDetails?.add_po[0]?.status_slug == 'po_created'
+                "
+              >
+                <button type="button" class="back-btn-ui" (click)="CancelPO()">
+                  Decline
+                </button>
+                <button
+                  *ngIf="adminService.rolePermissions.accept_po == 1"
+                  [disabled]="disableAccept"
+                  type="submit"
+                  mat-raised-button
+                  (click)="acceptPo()"
+                >
+                  Accept
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-container>

@@ -1,0 +1,206 @@
+<div
+  class="inner-container declaration-section"
+  [class.collapse]="!showSelfSealCertificate"
+>
+  <mat-toolbar class="package-toolbar">
+    <img class="shipping-image" [src]="images.pdf_download" />
+    <span>Self Sealing Certificate</span>
+    <span fxFlex></span>
+    <button (click)="editSelfSealCertificate()" mat-icon-button>
+      <mat-icon class="edit-icon" title="Edit" mat-icon-button
+        >mode_edit
+      </mat-icon>
+    </button>
+    <a
+      target="_blank"
+      href="generateSelfSealedPdf?id={{ orderId }}&is_printable=1"
+    >
+      <button mat-icon-button>
+        <img [src]="images.printer_icon" title="Print" />
+      </button>
+    </a>
+    <a href="generateSelfSealedPdf?id={{ orderId }}&is_printable=0">
+      <button mat-icon-button>
+        <img [src]="images.download_arrow" title="Download" />
+      </button>
+    </a>
+    <button mat-icon-button (click)="toggleSelfSeal()">
+      <img
+        [src]="images.grey_arrow"
+        mat-icon-button
+        *ngIf="showSelfSealCertificate"
+      />
+      <mat-icon class="toggle-arrow" *ngIf="!showSelfSealCertificate">
+        keyboard_arrow_down</mat-icon
+      >
+    </button>
+  </mat-toolbar>
+  <div class="table-container self-table" *ngIf="showSelfSealCertificate">
+    <div class="shipper_address declaration-one">
+      <p
+        style="
+          margin: 0;
+          margin-bottom: 14px;
+          text-align: center;
+          font-weight: 700;
+          font-size: 16px;
+          text-decoration: underline;
+        "
+      >
+        Self Sealing Certificate
+      </p>
+      <!-- <p class="shipper-head-address" style="text-align:center;font-size:14px;"> <b>Self Sealed Container</b></p> -->
+      <p class="shipper-head-address">
+        Export under self sealing / self certification procedure approved vide
+        F.No.S/6-Gen-
+      </p>
+      <div class="editable-container">
+        <p class="shipper-head-address">
+          Self Sealing Permission No:<span *ngIf="!editModeSelfCertificate">
+            {{ inlineSelfSealData?.sealing_permission_no }}</span
+          >
+        </p>
+
+        <mat-form-field
+          style="position: relative; right: 5px"
+          class="custom-input mat-input-custom-spacing mt-0 ml-1"
+          floatLabel="never"
+          *ngIf="editModeSelfCertificate"
+        >
+          <input
+            [(ngModel)]="inlineSelfSealData.sealing_permission_no"
+            type="text"
+            matInput
+            style="margin-top: 2px"
+            placeholder="Self Sealing No :"
+            class="price-value"
+          />
+        </mat-form-field>
+      </div>
+      <p class="shipper-head-address">
+        Date:{{ freightData.sailing_date | date : "dd-MM-yyyy" }}
+      </p>
+
+      <p class="shipper-head-address" *ngFor="let invoice of invoiceDetails">
+        Invoice No: {{ invoice.Inovice.inv_nbr }}
+      </p>
+      <p class="shipper-head-address" *ngFor="let invoice of invoiceDetails">
+        Date: {{ invoice.Inovice.date_added }}
+      </p>
+      <div class="editable-container">
+        <p class="shipper-head-address">
+          Container No:
+          <span *ngIf="!editModeSelfCertificate">
+            {{ inlineSelfSealData?.container_nbr }}</span
+          >
+        </p>
+
+        <mat-form-field
+          style="position: relative; right: 5px"
+          class="custom-input mat-input-custom-spacing mt-0 ml-1"
+          floatLabel="never"
+          *ngIf="editModeSelfCertificate"
+        >
+          <input
+            [(ngModel)]="inlineSelfSealData.container_nbr"
+            type="text"
+            matInput
+            style="margin-top: 2px"
+            placeholder="Container No"
+            class="price-value"
+          />
+        </mat-form-field>
+      </div>
+      <p class="shipper-head-address">Size: {{ type_size }}</p>
+      <div class="editable-container">
+        <p class="shipper-head-address">
+          AIPL Bottel Seal No:<span *ngIf="!editModeSelfCertificate">
+            {{ inlineSelfSealData?.self_seal_number }}</span
+          >
+        </p>
+
+        <mat-form-field
+          style="position: relative; right: 5px"
+          class="custom-input mat-input-custom-spacing mt-0 ml-1"
+          floatLabel="never"
+          *ngIf="editModeSelfCertificate"
+        >
+          <input
+            [(ngModel)]="inlineSelfSealData.self_seal_number"
+            type="text"
+            matInput
+            style="margin-top: 2px"
+            placeholder="AIPL Bottel Seal No:"
+            class="price-value"
+          />
+        </mat-form-field>
+      </div>
+      <div class="editable-container">
+        <p class="shipper-head-address">
+          Shipping Line Bottle Seal No:<span *ngIf="!editModeSelfCertificate">
+            {{ inlineSelfSealData?.customs_seal_number }}</span
+          >
+        </p>
+
+        <mat-form-field
+          style="position: relative; right: 5px; width: 200px"
+          class="custom-input mat-input-custom-spacing mt-0 ml-1"
+          floatLabel="never"
+          *ngIf="editModeSelfCertificate"
+        >
+          <input
+            [(ngModel)]="inlineSelfSealData.customs_seal_number"
+            type="text"
+            matInput
+            style="margin-top: 2px"
+            placeholder="Shipping Line Bottle Seal No:"
+            class="price-value"
+          />
+        </mat-form-field>
+      </div>
+      <p class="shipper-head-address">
+        Certified that the description and valuve of the goods covered bt this
+        invoice have been checked by me and the goods have been packed and
+        sealed with one time bottel seal under by supervision.
+      </p>
+    </div>
+
+    <div class="authorized-signature">
+      <p
+        class="authorized-head declaration-left"
+        style="font-weight: 400; text-align: right"
+      >
+        For {{ compnayDetails?.name }}
+      </p>
+      <p
+        class="authorized-head declaration-right"
+        style="padding-top: 40px; font-weight: 400; text-align: right"
+      >
+        Authorized Signatory
+      </p>
+    </div>
+    <div
+      *ngIf="editModeSelfCertificate"
+      class="footer-bottom fxflex"
+      style="padding: 14px"
+      fxLayout="row"
+      fxLayoutAlign="end center"
+    >
+      <span fxFlex></span>
+      <section class="section-right">
+        <button (click)="editSelfSealCertificate()" type="button" mat-button>
+          Cancel
+        </button>
+
+        <button
+          (click)="saveSealCertificate('save')"
+          type="submit"
+          mat-raised-button
+        >
+          Save
+        </button>
+      </section>
+      <div class="cb"></div>
+    </div>
+  </div>
+</div>

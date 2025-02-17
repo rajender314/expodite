@@ -1,145 +1,375 @@
+<!-- <div class="center-section-scroll vh-100 d-flex body-white">
+  <div class="page-header-ui" *ngIf="!noContacts">
+    <div class="flex-fixed-header page-title">
+      <div>
+        <h2
+          class="admin-heading"
+          title="{{
+            selectedContacts.address1
+              ? selectedContacts.address1
+              : 'Add Contact Address'
+          }}"
+          *ngIf="selectedContacts"
+          [innerHtml]="
+            selectedContacts.address1
+              ? selectedContacts.address1
+              : 'Add Contact Address'
+          "
+        ></h2>
+      </div>
+    </div>
+  </div>
+  <perfect-scrollbar class="perfect-scroll">
+    <mat-spinner class="medium-spinner" *ngIf="fetchingData"></mat-spinner>
+    <form
+      class="roles-form"
+      [formGroup]="detailsForm"
+      (ngSubmit)="createContactAddress(detailsForm)"
+      *ngIf="!noContacts && !fetchingData"
+    >
+      <div
+        class="box min-container d-flex"
+        fxlayout="column"
+        [class.user-footer]="detailsForm.dirty"
+      >
+        <div class="form-fields">
+          <div class="ex-row">
+            <mat-form-field
+              fxFlex="50"
+              class="custom-input mandatory grid-six"
+              floatLabel="never"
+            >
+              <label class="custom-label mandatory">{{
+                language.defaults.address1
+              }}</label>
+              <input
+                matInput
+                #myInput
+                placeholder="Enter Address 1"
+                maxlength="52"
+                formControlName="address1"
+              />
+              <mat-error
+                *ngIf="
+                  contactSubmit ||
+                  (!detailsForm.controls.address1.pristine &&
+                    detailsForm.controls.address1.hasError('required'))
+                "
+                >{{ language.validations.address1 }}</mat-error
+              >
+            </mat-form-field>
+            <mat-form-field
+              fxFlex="50"
+              class="custom-input mandatory grid-six"
+              floatLabel="never"
+            >
+              <label class="custom-label mandatory">{{
+                language.defaults.address2
+              }}</label>
+              <input
+                matInput
+                placeholder="Enter Address 2"
+                formControlName="address2"
+                maxlength="52"
+                id="address2"
+              />
+              <mat-error
+                *ngIf="
+                  contactSubmit ||
+                  (!detailsForm.controls.address2.pristine &&
+                    detailsForm.controls.address2.hasError('required'))
+                "
+                >{{ language.validations.address2 }}</mat-error
+              >
+            </mat-form-field>
+            <mat-form-field
+              fxFlex="50"
+              class="custom-input mandatory grid-six"
+              floatLabel="never"
+            >
+              <label class="custom-label mandatory">{{
+                language.defaults.postalCode
+              }}</label>
+              <input
+                matInput
+                maxlength="12"
+                placeholder="Enter Postal Code"
+                formControlName="postal_code"
+                id="postal_code"
+              />
+              <mat-error
+                *ngIf="
+                  contactSubmit ||
+                  (!detailsForm.controls.postal_code.pristine &&
+                    detailsForm.controls.postal_code.hasError('required'))
+                "
+                >{{ language.validations.postalCode }}</mat-error
+              >
+            </mat-form-field>
+            <mat-form-field
+              fxFlex="50"
+              class="custom-input mandatory grid-six"
+              floatLabel="never"
+            >
+              <label class="custom-label mandatory">{{
+                language.defaults.city
+              }}</label>
+              <input
+                matInput
+                maxlength="25"
+                placeholder="Enter City"
+                formControlName="city"
+                id="city"
+              />
+              <mat-error
+                *ngIf="
+                  contactSubmit ||
+                  (!detailsForm.controls.city.pristine &&
+                    detailsForm.controls.city.hasError('required'))
+                "
+                >{{ language.validations.city }}</mat-error
+              >
+            </mat-form-field>
+            <mat-form-field
+              fxFlex="50"
+              class="custom-input mandatory grid-six"
+              floatLabel="never"
+              *ngIf="globalData"
+            >
+              <label class="custom-label mandatory">{{
+                language.defaults.selectCountry
+              }}</label>
+              <mat-select
+                placeholder="{{ language.defaults.selectCountry }}"
+                (selectionChange)="onCountryChange($event)"
+                formControlName="country_id"
+                id="country_id"
+              >
+                <mat-option [value]="Addcontry">Add Country</mat-option>
+                <mat-option
+                  *ngFor="let country of globalData.countries"
+                  [value]="country.id"
+                  >{{ country.name }}</mat-option
+                >
+              </mat-select>
+              <mat-error
+                *ngIf="
+                  contactSubmit ||
+                  (!detailsForm.controls.country_id.pristine &&
+                    detailsForm.controls.country_id.hasError('required'))
+                "
+                >Please Select Country</mat-error
+              >
+            </mat-form-field>
+            <mat-form-field
+              fxFlex="50"
+              class="custom-input mandatory grid-six"
+              floatLabel="never"
+            >
+              <label class="custom-label mandatory">{{
+                language.defaults.selectState
+              }}</label>
+              <mat-select
+                placeholder="Select state"
+                (change)="onStateChange($event)"
+                formControlName="state_province_id"
+                id="state_province_id"
+              >
+                <mat-option [value]="">Add State</mat-option>
+                <mat-option *ngFor="let state of states" [value]="state.id">{{
+                  state.name
+                }}</mat-option>
+              </mat-select>
+              <mat-error
+                *ngIf="
+                  contactSubmit ||
+                  (!detailsForm.controls.state_province_id.pristine &&
+                    detailsForm.controls.state_province_id.hasError('required'))
+                "
+                >Please Select State</mat-error
+              >
+            </mat-form-field>
+            <mat-form-field
+              fxFlex="100"
+              class="custom-input grid-full"
+              floatLabel="never"
+            >
+              <label class="custom-label mandatory">Bank Details</label>
+              <textarea
+                matInput
+                placeholder="Enter Bank Details"
+                formControlName="bank_details"
+                id="bank_details"
+              ></textarea>
+            </mat-form-field>
+            <mat-form-field
+              fxFlex="50"
+              class="custom-input mandatory grid-six"
+              floatLabel="never"
+            >
+              <label class="custom-label mandatory">Phone Number</label>
+              <input
+                matInput
+                minlength="6"
+                maxlength="15"
+                placeholder="Enter Phone Number"
+                formControlName="phone"
+                id="phone"
+              />
+              <mat-error
+                *ngIf="
+                  (!detailsForm.controls.phone.pristine &&
+                    detailsForm.controls.phone.hasError('required')) ||
+                  detailsForm.controls.phone.hasError('pattern')
+                "
+                >Please Enter valid Phone Number</mat-error
+              >
+              <mat-error
+                *ngIf="
+                  !(
+                    detailsForm.controls.phone.hasError('required') ||
+                    detailsForm.controls.phone.hasError('pattern')
+                  ) && detailsForm.controls.phone.hasError('minlength')
+                "
+                >Please Enter Minimum 6 Characters</mat-error
+              >
+            </mat-form-field>
+            <mat-form-field
+              fxFlex="50"
+              class="custom-input mandatory grid-six"
+              floatLabel="never"
+            >
+              <label class="custom-label mandatory">{{
+                language.defaults.status
+              }}</label>
+              <mat-select
+                placeholder="Select Status"
+                formControlName="status"
+                (selectionChange)="onStatusChange($event)"
+              >
+                <mat-option
+                  [value]="stat.param"
+                  *ngFor="let stat of status"
+                  [innerHtml]="stat.value"
+                ></mat-option>
+              </mat-select>
+              <mat-error
+                *ngIf="
+                  contactSubmit ||
+                  (!detailsForm.controls.status.pristine &&
+                    detailsForm.controls.status.hasError('required'))
+                "
+                >{{ language.validations.status }}</mat-error
+              >
+            </mat-form-field>
+          
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="document-footer"
+        fxLayout="row"
+        fxLayoutAlign="start center"
+        *ngIf="detailsForm.dirty"
+      >
+        <div class="min-container d-flex justify-content-end">
+          <button
+            type="button"
+            class="back-btn-ui"
+            (click)="cancel(detailsForm)"
+          >
+            {{ language.defaults.cancel }}
+          </button>
+          <button
+            type="submit"
+            mat-raised-button
+            [disabled]="detailsForm.invalid"
+          >
+            {{ addContacts }}
+          </button>
+        </div>
+      </div>
+    </form>
+    <div *ngIf="noContacts" class="no-results full">
+      <div class="empty-img-holder">
+        <img [src]="images.no_contacts" />
+      </div>
+      <p class="no-result-text">{{ language.defaults.noContactsFound }}</p>
+    </div>
+  </perfect-scrollbar>
+</div> -->
+
 <div class="center-section-scroll vh-100 d-flex body-white">
-	<div class="page-header-ui " *ngIf="!noContacts">
-		<div class="flex-fixed-header page-title ">
-			<div><h2 style="font-weight: 400;" title="{{selectedContacts.address1?selectedContacts.address1: 'Add Contact Address'}}" *ngIf="selectedContacts" [innerHtml]="selectedContacts.address1?selectedContacts.address1: 'Add Contact Address'"></h2>	
-			</div>
-			<!-- <div>002</div> -->
-
-		</div>
-	</div>
-	<perfect-scrollbar class="padding-16" >
-		<form class="roles-form" [formGroup]="detailsForm" (ngSubmit)="createContactAddress(detailsForm)"  >
-			<mat-spinner class="medium-spinner" *ngIf="fetchingData"></mat-spinner>
-			<div class="box min-container d-flex" fxlayout="column" *ngIf="!noContacts && !fetchingData" [class.user-footer]="detailsForm.dirty">
-				<div class="form-fields">
-					<div class="ex-row">
-						<mat-form-field fxFlex="50" class="custom-input mandatory grid-six" floatLabel="never">
-							<label class="custom-label mandatory">{{language.defaults.address1}}</label>
-							<input matInput #myInput placeholder="Enter Address 1"  maxlength=100 formControlName="address1"  />
-							<mat-error *ngIf="contactSubmit || !detailsForm.controls.address1.pristine && detailsForm.controls.address1.hasError('required')">{{language.validations.address1}}</mat-error>
-						</mat-form-field>
-						<mat-form-field fxFlex="50" class="custom-input mandatory grid-six"  floatLabel="never">
-							<label class="custom-label mandatory">{{language.defaults.address2}}</label>
-							<input matInput placeholder="Enter Address 2" formControlName="address2" maxlength=100 id="address2" />
-							<mat-error *ngIf="contactSubmit || !detailsForm.controls.address2.pristine && detailsForm.controls.address2.hasError('required')">{{language.validations.address2}}</mat-error>
-						</mat-form-field>
-						<mat-form-field fxFlex="50" class="custom-input mandatory grid-six" floatLabel="never">
-							<label class="custom-label mandatory">{{language.defaults.postalCode}}</label>
-							<input matInput placeholder="Enter Postal Code" formControlName="postal_code" id="postal_code" />
-							<mat-error *ngIf="contactSubmit || !detailsForm.controls.postal_code.pristine && detailsForm.controls.postal_code.hasError('required')">{{language.validations.postalCode}}</mat-error>
-						</mat-form-field>
-						<mat-form-field fxFlex="50" class="custom-input mandatory grid-six" floatLabel="never">
-							<label class="custom-label mandatory">{{language.defaults.city}}</label>
-							<input matInput maxlength=100 placeholder="Enter City" formControlName="city" id="city" />
-							<mat-error *ngIf="contactSubmit || !detailsForm.controls.city.pristine && detailsForm.controls.city.hasError('required')">{{language.validations.city}}</mat-error>
-						</mat-form-field>
-						<mat-form-field fxFlex="50" class="custom-input mandatory grid-six" floatLabel="never" *ngIf="globalData">
-							<label class="custom-label mandatory">{{language.defaults.selectCountry}}</label>
-							<mat-select placeholder={{language.defaults.selectCountry}} (selectionChange)="onCountryChange($event)" formControlName="country_id"
-							id="country_id">
-								<mat-option [value]="Addcontry" >Add Country</mat-option>
-								<mat-option *ngFor="let country of globalData.countries" [value]="country.id">{{country.name}}</mat-option>
-							</mat-select>
-							<mat-error *ngIf="contactSubmit || !detailsForm.controls.country_id.pristine && detailsForm.controls.country_id.hasError('required')">Please Select Country</mat-error>
-						</mat-form-field>
-						<div class="add-new-address  grid-six" *ngIf="submitCountry">
-							<div class="ex-row">
-							<mat-form-field   class="custom-input mandatory grid-six" floatLabel="never">
-								<label class="custom-label mandatory">Add Country</label>
-								<input matInput placeholder="Enter Add Country" maxlength=100 placeholder="Add Country" formControlName="addCountry">
-								<mat-error *ngIf="contactSubmit || !detailsForm.controls.city.pristine && detailsForm.controls.city.hasError('required')">{{language.validations.city}}</mat-error>
-							</mat-form-field>
-							<div class="grid-six">
-								<span class="add-new primary-text-link " style="cursor: pointer; position: relative;  top: 32px; display: inline-flex; padding: 11px; height: 40px;" (click)="addCountry(detailsForm) ">Add Country</span>
-
-							</div>
-						</div>
-					</div>
-						<mat-form-field fxFlex="50" class="custom-input mandatory grid-six" floatLabel="never">
-							<label class="custom-label mandatory">{{language.defaults.selectState}}</label>
-							<mat-select placeholder="Select state" (change)="onStateChange($event)" formControlName="state_province_id" id="state_province_id">
-									<mat-option [value]="">No State</mat-option>
-								<mat-option *ngFor="let state of states" [value]="state.id">{{state.name}}</mat-option>
-							</mat-select>
-							<mat-error *ngIf="contactSubmit || !detailsForm.controls.state_province_id.pristine && detailsForm.controls.state_province_id.hasError('required')">Please Select State</mat-error>
-						</mat-form-field> 
-						<div class="add-new-address grid-six" *ngIf="!detailsForm.get('state_province_id').value">
-							<div class="ex-row">
-							<mat-form-field   class="custom-input mandatory grid-six" floatLabel="never">
-								<label class="custom-label">Add State</label>
-								<input matInput maxlength=100 placeholder="Enter Add State" formControlName="addState">
-							</mat-form-field>
-							<div class="grid-six">
-								<span  class="add-new primary-text-link" style="cursor: pointer; position: relative;  top: 32px; display: inline-flex; padding: 11px; height: 40px;" (click)="addState(detailsForm)">Add State</span>
-
-							</div>
-						</div>
-						</div>
-						<mat-form-field fxFlex="100" class="custom-input grid-full" floatLabel="never">
-							<label class="custom-label mandatory">Bank Details</label>
-							<textarea matInput placeholder="Enter Bank Details" formControlName="bank_details" id="bank_details"></textarea>
-							<!-- <mat-error *ngIf="contactSubmit || !detailsForm.controls.bank_details.pristine && detailsForm.controls.bank_details.hasError('required')">Please Enter Bank Details</mat-error> -->
-						</mat-form-field>
-						<mat-form-field fxFlex="50" class="custom-input mandatory grid-six"  floatLabel="never">
-							<label class="custom-label mandatory">Phone Number</label>
-							<input matInput  minlength=10 maxlength=50 placeholder="Enter Phone Number" type="number" formControlName="phone" id="phone" />
-							<mat-error *ngIf="contactSubmit || !detailsForm.controls.phone.pristine &&  detailsForm.controls.phone.hasError('required')">Please Enter valid Phone Number</mat-error>
-						</mat-form-field>
-						<mat-form-field fxFlex="50" class="custom-input mandatory  grid-six" floatLabel="never">
-							<label class="custom-label mandatory">{{language.defaults.status}}</label>
-							<mat-select placeholder="Select Status" formControlName="status" (selectionChange)="onStatusChange($event)">
-								<mat-option [value]="stat.param" *ngFor="let stat of status" [innerHtml]="stat.value"></mat-option>
-							</mat-select>
-							<mat-error *ngIf="contactSubmit || !detailsForm.controls.status.pristine && detailsForm.controls.status.hasError('required')">{{language.validations.status}}</mat-error>
-						</mat-form-field>
-						<mat-form-field fxFlex="50" class="custom-input  grid-six " floatLabel="never">
-							<label class="custom-label">Drug License Number</label>
-							<input matInput #myInput placeholder="Enter Drug License No" formControlName="drug_license_no" id="drug_license_no" />
-							<mat-error *ngIf="contactSubmit || !detailsForm.controls.drug_license_no.pristine && detailsForm.controls.drug_license_no.hasError('required')">Please Enter Drug License No</mat-error>
-						</mat-form-field>
-						<mat-form-field fxFlex="50" class="custom-input  grid-six" floatLabel="never">
-							<label class="custom-label">FDA Registration Number</label>
-							<input matInput #myInput placeholder="Enter FDA Registration No" formControlName="fda_registration_no" id="fda_registration_no" />
-							<mat-error *ngIf="contactSubmit || !detailsForm.controls.fda_registration_no.pristine && detailsForm.controls.fda_registration_no.hasError('required')">Please Enter FDA Registration No</mat-error>
-						</mat-form-field>
-						<mat-form-field fxFlex="50" class="custom-input  grid-six" floatLabel="never">
-							<label class="custom-label">GSTIN Number</label>
-							<input matInput #myInput placeholder="Enter GSTIN No" formControlName="gstin_no" id="gstin_no" />
-							<mat-error *ngIf="contactSubmit || !detailsForm.controls.gstin_no.pristine && detailsForm.controls.gstin_no.hasError('required')">Please Enter GSTIN No</mat-error>
-						</mat-form-field>
-					</div> 
-	
-				</div>
-			</div>
-		
-			<!-- <div *ngIf="noContacts" class="no-record">
-				<img [src]="images.no_contacts">
-				<p>{{language.defaults.noContactsFound}}</p>
-			</div> -->
-		
-			<!-- <div class="document-footer  " fxLayout="row" fxLayoutAlign="end center" *ngIf="detailsForm.dirty">
-				<button type="button" mat-button (click)="cancel(detailsForm)">{{language.defaults.cancel}}</button>
-				<button type="submit" mat-raised-button>{{addContacts}}</button>
-			</div> -->
-			<div class="document-footer  " fxLayout="row" fxLayoutAlign="start center" *ngIf="detailsForm.dirty">
-					<div class=" min-container d-flex justify-content-end">
-					<button type="button" mat-button (click)="cancel(detailsForm)">{{language.defaults.cancel}}</button>
-					<button type="submit" mat-raised-button>{{addContacts}}</button>
-				</div>
-				</div>
-		</form>
-		<div *ngIf="noContacts"  class="no-results full">
-			<div class="empty-img-holder">
-			<img [src]="images.no_contacts">
-		</div>
-			<p class="no-result-text">{{language.defaults.noContactsFound}}</p>
-
-		
-	</div>
-
-	</perfect-scrollbar> 
-
-
-
-
+  <!-- *ngIf="!noProducts" -->
+  <div class="page-header-ui">
+    <div class="flex-fixed-header page-title container-ui">
+      <!-- <h2
+      class="admin-heading"
+      *ngIf="selectedProducts"
+        title="{{
+          selectedProducts.name ? selectedProducts.name : 'Add Product'
+        }}"
+        [innerHtml]="
+          selectedProducts.name ? selectedProducts.name : 'Add Product'
+        "
+        
+      ></h2> -->
+      <!-- <div *ngIf="viewActivityLogIcon">
+        <button (click)="openActivityModal('add_products')" mat-icon-button class="action-orderbtn">
+          
+          <img [src]="images.activity_log_icon" title="User Activity Tracker" />
+        </button>
+      </div> -->
+    </div>
+  </div>
+  <perfect-scrollbar class="padding-16">
+    <div style="display: flex; gap: 10%">
+      <div class="min-container">
+        <!-- <mat-spinner class="medium-spinner" *ngIf="fetchingData"></mat-spinner> -->
+        <!-- *ngIf="!noProducts && !fetchingData" -->
+        <div class="box">
+          <app-form-builder
+            [module]="'contact_addresses'"
+            (trigger)="createForm($event)"
+            [Contacts]="contacts"
+          ></app-form-builder>
+          <!-- (trigger)="formEmitEvent($event)"
+            (emitUploadInfo)="emitUploadInfo($event)"
+            [undoOnCancel]="undoOnCancel" -->
+        </div>
+        <div class="footer" fxLayout="row" fxLayoutAlign="start center">
+          <!-- *ngIf="detailsForm?.dirty" -->
+          <div class="min-container d-flex justify-content-end">
+            <!--  (click)="cancel(detailsForm)" -->
+            <button type="button" class="back-btn-ui">
+              <!-- {{ language.defaults.cancel }} -->
+            </button>
+            <!-- [disabled]="detailsForm.invalid"
+             -->
+            <button
+              (click)="createContactAddress(detailsForm)"
+              type="submit"
+              mat-raised-button
+            >
+              <!-- {{ addProducts }} -->
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- *ngIf="noProducts" -->
+    <!-- <div  class="no-results full">
+      <div class="empty-img-holder">
+        <img [src]="images.no_products" />
+      </div>
+      <p class="no-result-text">
+        {{ language.defaults.noProductTypeFound }}
+      </p>
+    </div> -->
+    <!-- <div *ngIf="totalSpinner">
+      <mat-spinner class="medium-spinner"></mat-spinner>
+    </div>
+    <mat-spinner class="medium-spinner" *ngIf="conformsubmit"></mat-spinner> -->
+  </perfect-scrollbar>
 </div>

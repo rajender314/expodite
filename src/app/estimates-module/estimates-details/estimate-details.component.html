@@ -1,0 +1,2979 @@
+<div class="orders">
+  <div>
+    <mat-horizontal-stepper #stepper>
+      <mat-step-header></mat-step-header>
+
+      <mat-step>
+        <div *ngIf="!fetchingData">
+          <mat-toolbar class="inner-detail-toolbar" id="order-toolbar">
+            <div class="inv-back" (click)="backToOrders(stepper)">
+              <mat-icon class="back-to-orders">arrow_back</mat-icon>
+            </div>
+            <img [src]="images.estimatesIcon" />
+            <span
+              class="title"
+              *ngIf="!clientPermission"
+              style="margin-right: 0"
+            >
+              Quotation</span
+            >
+            <!-- <span
+              class="title"
+              *ngIf="!clientPermission"
+              title="{{ orders.selectedOrder.pfi_number }}"
+              >{{ orders.selectedOrder.pfi_number }}</span
+            >
+            <span
+              class="title"
+              *ngIf="clientPermission"
+              title="{{ orders.selectedOrder.po_nbr }}"
+              >{{ orders.selectedOrder.po_nbr }}</span
+            > -->
+            <div class="po-nbr-edit">
+              <!-- <span
+                class="title"
+                *ngIf="!clientPermission"
+                title="{{ po?.selectedPo?.add_po[0].po_nbr }}"
+                >{{ po?.selectedPo?.add_po[0].po_no }}</span
+              > -->
+
+              <div class="nbr-field-container">
+                <!-- [attr.contenteditable]="
+                !(
+                  poDetails?.add_po[0]?.status_slug === 'po_cancelled' ||
+                  poDetails?.add_po[0]?.status_slug === 'po_sent'
+                )
+              " -->
+                <!-- {{ poDetails?.add_po[0]?.discount }} -->
+                <mat-form-field
+                  class="custom-input mandatory"
+                  floatLabel="never"
+                  *ngIf="editQuoteNoState"
+                >
+                  <input
+                    style="width: 100%"
+                    matInput
+                    #poInvEditInput
+                    class="po-nmbr"
+                    (keyup)="savechangesPO($event)"
+                    [value]="orders.selectedOrder.pfi_number"
+                    maxlength="25"
+                  />
+                </mat-form-field>
+                <div *ngIf="!editQuoteNoState" style="font-size: 18px">
+                  {{
+                    orders.selectedOrder.pfi_number
+                      ? orders.selectedOrder.pfi_number
+                      : "--"
+                  }}
+                </div>
+
+                <div
+                  class="save-icons"
+                  style="margin: 0 6px"
+                  *ngIf="editQuoteNoState"
+                >
+                  <mat-icon
+                    *ngIf="editQuoteNoState"
+                    (click)="editQuoteNo($event)"
+                    class="mat-circle-check close-circle-icons-po"
+                    style="font-size: 24px"
+                    >check_circle_outline</mat-icon
+                  >
+                  <mat-icon
+                    *ngIf="editQuoteNoState"
+                    class="close-conversion close-circle-icons-po"
+                    (click)="closeEdit()"
+                    style="font-size: 24px"
+                    >highlight_off</mat-icon
+                  >
+                </div>
+              </div>
+              <div
+                style="display: flex; cursor: pointer"
+                class="po-nbr-edit-icon"
+              >
+                <mat-icon
+                  *ngIf="
+                    !editQuoteNoState &&
+                    adminService.rolePermissions.edit_quotation == 1
+                  "
+                  class="edit-icon"
+                  title="Edit"
+                  mat-icon-button
+                  (click)="editpoQPD()"
+                >
+                  mode_edit
+                </mat-icon>
+              </div>
+            </div>
+            <div
+              class="order-detail-status client-status"
+              [ngClass]="{
+                accepted: orders.selectedOrder.status == 'Accepted',
+                created: orders.selectedOrder.status == 'Created',
+                'in-transit': orders.selectedOrder.status == 'In-transit',
+                delivered: orders.selectedOrder.status == 'Delivered',
+                cancelled: orders.selectedOrder.status == 'Cancelled',
+                received: orders.selectedOrder.status == 'Received',
+                processing: orders.selectedOrder.status == 'Processing',
+                placed: orders.selectedOrder.status == 'Placed',
+                draft: orders.selectedOrder.status == 'Draft',
+                passed: orders.selectedOrder.status == 'Passed',
+                shipped: orders.selectedOrder.status == 'Shipped',
+                fulfilment: orders.selectedOrder.status == 'Fulfilment',
+                pending: orders.selectedOrder.status == 'Pending'
+              }"
+            >
+              {{ orders.selectedOrder.status }}
+            </div>
+            <span fxFlex></span>
+            <span class="order-date"
+              >Client Name:
+              <b>{{ orders.selectedOrder.client_name }}</b>
+            </span>
+            <span class="vertical-divider"></span>
+            <span class="order-date"
+              >{{ estimateslanguage }} Date :
+              <b>{{
+                orders.selectedOrder.invoice_date | date : "dd-MM-yyyy"
+              }}</b>
+            </span>
+            <span
+              style="margin-right: 0px"
+              class="vertical-divider"
+              *ngIf="orders.selectedOrder.status_id != '4'"
+            ></span>
+            <button
+              style="
+                padding-bottom: 5px;
+                background-color: unset !important;
+                margin-left: 6px;
+              "
+              mat-button
+              [matMenuTriggerFor]="belowMenu"
+              *ngIf="
+                (order_Permissions.enable_cancel_quotation &&
+                  adminService.rolePermissions.cancel_quotation == 1) ||
+                adminService.rolePermissions.duplicate_quotation == 1 ||
+                order_Permissions.enable_download_all_docs
+              "
+            >
+              <img
+                [src]="images.admin_settings"
+                alt="Actions"
+                title="Actions"
+              />
+            </button>
+
+            <mat-menu
+              #belowMenu="matMenu"
+              yPosition="below"
+              class="mat-menu-custom"
+            >
+              <button
+                mat-button
+                class="cancel-order-button"
+                [disableRipple]="true"
+                (click)="cancelAllOrder()"
+                *ngIf="
+                  order_Permissions.enable_cancel_quotation &&
+                  adminService.rolePermissions.cancel_quotation == 1
+                "
+              >
+                Cancel this {{ estimateslanguage }}
+              </button>
+              <button
+                mat-button
+                class="cancel-order-button"
+                [disableRipple]="true"
+                (click)="duplicateQuotation()"
+                *ngIf="adminService.rolePermissions.duplicate_quotation == 1"
+              >
+                Duplicate {{ estimateslanguage }}
+              </button>
+              <button
+                mat-button
+                class="order-download"
+                *ngIf="order_Permissions.enable_download_all_docs"
+                (click)="downloadDocuments()"
+              >
+                <span class="download-order-text">Download All Documents</span>
+              </button>
+            </mat-menu>
+            <button
+              mat-button
+              class="cancel-order-button"
+              [disableRipple]="true"
+              *ngIf="
+                disableCancel &&
+                blockContent &&
+                factoryPermission &&
+                adminService.rolePermissions.edit_quotation == 1 &&
+                !(orders.selectedOrder.orders_types_id == '4')
+              "
+              (click)="deliverOrder()"
+            >
+              Mark as Delivered
+            </button>
+            <button
+              mat-button
+              class="cancel-order-button"
+              [disableRipple]="true"
+              *ngIf="
+                selectedOrderStatus == 'Delivered' ||
+                selectedOrderStatus == 'Mail Sent'
+              "
+              (click)="deliverOrder()"
+            >
+              Delivery Info
+            </button>
+            <button
+              mat-button
+              class="cancel-order-button"
+              *ngIf="
+                factoryPermission &&
+                !clientPermission &&
+                orders.selectedOrder.orders_types_id == '2'
+              "
+              [disabled]="
+                sendDocumentMails == false || selectedOrderStatus == 'Cancelled'
+              "
+              [disableRipple]="true"
+              (click)="sendMails()"
+            >
+              Email Documents
+            </button>
+            <!-- <span class="vertical-divider"></span> -->
+          </mat-toolbar>
+          <div
+            class="inner-detail-container"
+            id="innerDetailContent"
+            fxLayout="row"
+          >
+            <div class="side-nav">
+              <mat-list class="inner-detail-list">
+                <mat-list-item
+                  class="inactive-tab"
+                  title="Activity"
+                  (click)="moveToActivity()"
+                  [class.active]="activeTab == 'activity'"
+                >
+                  <mat-icon
+                    mat-list-icon
+                    class="icon-menu"
+                    style="background: #ef5350"
+                  >
+                    <img [src]="images.activity_small" title="Activity" />
+                  </mat-icon>
+                  <h4 mat-line>Activity</h4>
+                </mat-list-item>
+                <mat-list-item
+                  class="inactive-tab"
+                  title="Buyer & Shipping Information "
+                  (click)="moveToQuotationDetails('quoteDetails')"
+                  *ngIf="factoryPermission && !clientPermission"
+                  [ngClass]="{
+                    active: activeTab == 'quoteDetails',
+                    'no-details': !enableProforma,
+                    pointer_none: !enableProforma
+                  }"
+                >
+                  <mat-icon
+                    mat-list-icon
+                    class="post_ship_icon icon-menu"
+                    style="background-color: #f07e0a"
+                  >
+                    <img
+                      [src]="images.orders_small"
+                      style="position: relative; top: 1px"
+                      title="Buyer & Shipping Information "
+                    />
+                  </mat-icon>
+                  <h4 mat-line>Buyer & Shipping Information</h4>
+                </mat-list-item>
+
+                <mat-list-item
+                  class="inactive-tab"
+                  title="Products"
+                  (click)="moveToQuotationDetails('prod_items')"
+                  *ngIf="factoryPermission && !clientPermission"
+                  [ngClass]="{
+                    active: activeTab == 'prod_items',
+                    'no-details': !enableProforma,
+                    pointer_none: !enableProforma
+                  }"
+                >
+                  <mat-icon
+                    mat-list-icon
+                    class="post_ship_icon icon-menu"
+                    style="background-color: #8b5729"
+                  >
+                    <img
+                      [src]="images.pkgDetails_small"
+                      style="position: relative; top: 1px"
+                      title="Products"
+                    />
+                  </mat-icon>
+                  <h4 mat-line>{{ language.pageNavbar.products }}</h4>
+                </mat-list-item>
+                <mat-list-item
+                  class="inactive-tab"
+                  title="{{ language.pageNavbar.paymentAndDelivery }}"
+                  (click)="moveToPayments()"
+                  *ngIf="factoryPermission && !clientPermission"
+                  [ngClass]="{
+                    active: activeTab == 'payments',
+                    'no-details': !enableProforma,
+                    pointer_none: !enableProforma
+                  }"
+                >
+                  <mat-icon mat-list-icon class="post_ship_icon icon-menu">
+                    <img
+                      [src]="images.newPaymentIcon"
+                      style="position: relative; top: 1px"
+                      title="{{ language.pageNavbar.paymentAndDelivery }}"
+                    />
+                  </mat-icon>
+                  <h4 mat-line>{{ language.pageNavbar.paymentAndDelivery }}</h4>
+                </mat-list-item>
+                <mat-list-item
+                  class="inactive-tab"
+                  title="Regulatory Details"
+                  (click)="moveToQuotationDetails('specification')"
+                  *ngIf="factoryPermission && !clientPermission"
+                  [ngClass]="{
+                    active: activeTab == 'specification',
+                    'no-details': !enableProforma,
+                    pointer_none: !enableProforma
+                  }"
+                >
+                  <mat-icon
+                    mat-list-icon
+                    class="post_ship_icon icon-menu"
+                    style="background-color: #679136"
+                  >
+                    <img
+                      [src]="images.Regulatory_Details_Icon"
+                      style="position: relative; top: 1px"
+                      title="Regulatory Details"
+                    />
+                  </mat-icon>
+                  <h4 mat-line>Regulatory Details</h4>
+                </mat-list-item>
+                <mat-list-item
+                  class="inactive-tab"
+                  title="Regulatory Details"
+                  (click)="moveToQuotationDetails('acceptQuotation')"
+                  *ngIf="adminService.rolePermissions.accept_quotation == 1"
+                  [ngClass]="{
+                    active: activeTab == 'acceptQuotation'
+                  }"
+                >
+                  <mat-icon
+                    mat-list-icon
+                    class="post_ship_icon icon-menu"
+                    style="background-color: #679136; padding: 4px 2px"
+                  >
+                    <img
+                      [src]="images.Accept_Quotation_Icon"
+                      style="
+                        position: relative;
+                        top: 1px;
+                        width: 18px;
+                        height: 18px;
+                      "
+                      title="Accept {{ estimateslanguage }}"
+                    />
+                  </mat-icon>
+                  <h4 mat-line>Accept {{ estimateslanguage }}</h4>
+                </mat-list-item>
+                <mat-list-item
+                  class="inactive-tab"
+                  title="Orders"
+                  (click)="moveToQuotationDetails('order')"
+                  *ngIf="
+                    order_Permissions.enable_accept_quotation &&
+                    order_Permissions.enable_create_order
+                  "
+                  [ngClass]="{
+                    active: activeTab == 'order'
+                  }"
+                >
+                  <mat-icon
+                    mat-list-icon
+                    class="post_ship_icon icon-menu"
+                    style="background-color: #f07e0a"
+                  >
+                    <img
+                      [src]="images.orders_small"
+                      style="position: relative; top: 1px"
+                      title="Orders"
+                    />
+                  </mat-icon>
+                  <h4 mat-line>Orders</h4>
+                </mat-list-item>
+                <mat-divider class="divider"></mat-divider>
+                <div
+                  *ngIf="
+                    dynamicDocLoader &&
+                    order_Permissions.enable_accept_quotation
+                  "
+                >
+                  <app-order-documents
+                    [docName]="activeTab"
+                    [orderDocMap]="orderDocuments"
+                    [removeDocHighlight]="removeDocHighlight"
+                    (documentEventId)="handleDocumentEventId($event)"
+                    [typeId]="typeId"
+                    *ngFor="let typeId of orderDocumentsArr"
+                  >
+                  </app-order-documents>
+                </div>
+              </mat-list>
+            </div>
+            <div
+              fxFlex
+              class="inner-detail-content order-detail-content scroll-container"
+              id="printAll"
+              #scrollContainer
+              (scroll)="scrollOrdersContainer($event)"
+              style="padding: 26px 0"
+            >
+              <div class="app-container order-form-view">
+                <!-- formBuilder Activity log -->
+                <div class="activity-container" #activity>
+                  <div>
+                    <mat-toolbar class="package-toolbar">
+                      <mat-icon
+                        mat-list-icon
+                        class="icon-menu detail_view_right_icons"
+                        style="background: #ef5350"
+                      >
+                        <img
+                          class="logo-img"
+                          [src]="images.activity_small"
+                          title="Activity"
+                        />
+                      </mat-icon>
+                      <span>Activity Log</span>
+                      <span fxFlex></span>
+                    </mat-toolbar>
+                    <div class="address-container activity-status">
+                      <mat-list *ngFor="let activity of orders.activityDetails">
+                        <mat-list-item class="activity-list">
+                          <div class="activity-progress today-activity"></div>
+                          <div class="activity-details">
+                            <span class="activity-name"
+                              >{{ estimateslanguage }} {{ activity.name }}
+                            </span>
+                            <span>{{ activity.date_added }}</span>
+                          </div>
+                        </mat-list-item>
+                      </mat-list>
+                    </div>
+                  </div>
+                </div>
+
+                <!--  Proforma Invoice data in estimateProforma Generic proforma originallllllllllllll -->
+
+                <div
+                  *ngIf="inv_placement == '1'"
+                  class="proforma-top"
+                  #quoteDetails
+                >
+                  <div *ngIf="!is_pvm_proforma">
+                    <div>
+                      <div
+                        class="inner-container"
+                        [class.collapse]="!showProfInvoice"
+                      >
+                        <mat-toolbar class="package-toolbar">
+                          <mat-icon
+                            mat-list-icon
+                            class="post_ship_icon icon-menu d-flexicon"
+                            style="background-color: #f07e0a"
+                          >
+                            <img [src]="images.orders_small" />
+                          </mat-icon>
+                          <div class="invoice-toolbar">
+                            <div class="invoice-number">
+                              <span class="details-span">{{
+                                orders.selectedOrder.pfi_number
+                              }}</span>
+                              <span
+                                class="order-detail-status client-status"
+                                [ngClass]="{
+                                  accepted:
+                                    proformaInvData[0].create_estimate[0]
+                                      .status == 'Accepted',
+                                  created:
+                                    proformaInvData[0].create_estimate[0]
+                                      .status == 'Created',
+                                  'in-transit':
+                                    proformaInvData[0].create_estimate[0]
+                                      .status == 'In-transit',
+                                  delivered:
+                                    proformaInvData[0].create_estimate[0]
+                                      .status == 'Delivered',
+                                  cancelled:
+                                    proformaInvData[0].create_estimate[0]
+                                      .status == 'Cancelled',
+                                  received:
+                                    proformaInvData[0].create_estimate[0]
+                                      .status == 'Received',
+                                  processing:
+                                    proformaInvData[0].create_estimate[0]
+                                      .status == 'Processing',
+                                  placed:
+                                    proformaInvData[0].create_estimate[0]
+                                      .status == 'Placed',
+                                  draft:
+                                    proformaInvData[0].create_estimate[0]
+                                      .status == 'Draft',
+                                  passed:
+                                    proformaInvData[0].create_estimate[0]
+                                      .status == 'Passed',
+                                  shipped:
+                                    proformaInvData[0].create_estimate[0]
+                                      .status == 'Shipped',
+                                  fulfilment:
+                                    proformaInvData[0].create_estimate[0]
+                                      .status == 'Fulfilment',
+                                  pending:
+                                    proformaInvData[0].create_estimate[0]
+                                      .status == 'Pending',
+                                  expired:
+                                    proformaInvData[0].create_estimate[0]
+                                      .status == 'Expired'
+                                }"
+                                >{{
+                                  proformaInvData[0].create_estimate[0].status
+                                }}</span
+                              >
+                              <span class="pad-lft"
+                                >Buyer & Shipping Information
+                              </span>
+                            </div>
+                            <!-- <div class="xyz">
+                              <span class="details-date">{{
+                                proformaInvData[0].create_estimate[0]
+                                  .invoice_date
+                              }}</span>
+                            </div> -->
+                          </div>
+                          <span fxFlex></span>
+                          <button
+                            *ngIf="viewActivityLogIcon"
+                            mat-icon-button
+                            class="action-orderbtn"
+                            (click)="openActivityModal('create_estimate')"
+                          >
+                            <img
+                              [src]="images.activity_log_icon"
+                              title="Activity Log"
+                            />
+                          </button>
+                          <div
+                            *ngIf="
+                              order_Permissions.enable_edit_quotation &&
+                              adminService.rolePermissions.edit_quotation == 1
+                            "
+                            class="packages-icons"
+                          >
+                            <button
+                              mat-icon-button
+                              (click)="editEstimate()"
+                              [disabled]="editEstimateBtn"
+                            >
+                              <mat-icon
+                                class="edit-icon"
+                                title="Edit"
+                                mat-icon-button
+                                >mode_edit
+                              </mat-icon>
+                            </button>
+                          </div>
+                          <div class="packages-icons">
+                            <!-- <a
+                              *ngIf="
+                                !clientPermission &&
+                                orders.selectedOrder.status_id >= 2
+                              "
+                              target="_blank"
+                              href="generateProfInvPdf?estimate_id={{
+                                orders.selectedOrder.id
+                              }}&is_printable=1"
+                            >
+                              <button mat-icon-button>
+                                <img
+                                  [src]="images.printer_icon"
+                                  title="Print {{ estimateslanguage }}"
+                                />
+                              </button>
+                            </a>
+                            <a
+                              *ngIf="orders.selectedOrder.status_id >= 2"
+                              href="generateProfInvPdf?estimate_id={{
+                                orders.selectedOrder.id
+                              }}&is_printable=0"
+                            >
+                              <button mat-icon-button>
+                                <img
+                                  [src]="images.download_arrow"
+                                  title="Download {{ estimateslanguage }}"
+                                />
+                              </button>
+                            </a> -->
+                            <button
+                              mat-icon-button
+                              (click)="toggleProformaInvoice()"
+                            >
+                              <img
+                                [src]="images.grey_arrow"
+                                mat-icon-button
+                                *ngIf="showProfInvoice"
+                              />
+                              <mat-icon
+                                class="toggle-arrow"
+                                *ngIf="!showProfInvoice"
+                              >
+                                keyboard_arrow_down</mat-icon
+                              >
+                            </button>
+                          </div>
+                        </mat-toolbar>
+                        <div *ngIf="showProfInvoice">
+                          <div class="address-container" fxLayout="row">
+                            <div class="shipper-secction" fxFlex="30">
+                              <h4 class="gray-title">BILL TO PARTY</h4>
+                              <div class="address-inner-content">
+                                <b class="bill-address">{{
+                                  proformaInvData[0].add_billing_address[0]
+                                    .billing_company
+                                }}</b>
+                                <p class="bill-address">
+                                  {{
+                                    proformaInvData[0].add_billing_address[0]
+                                      .billing_address1
+                                  }}
+                                </p>
+                                <p class="bill-address">
+                                  {{
+                                    proformaInvData[0].add_billing_address[0]
+                                      ?.billing_address2
+                                  }}
+                                </p>
+                                <p class="bill-address">
+                                  {{
+                                    proformaInvData[0].add_billing_address[0]
+                                      ?.billing_address3
+                                  }}
+                                </p>
+                                <p class="bill-address">
+                                  {{
+                                    proformaInvData[0].add_billing_address[0]
+                                      ?.billing_address4
+                                  }}
+                                </p>
+                                <p class="bill-address">
+                                  {{
+                                    proformaInvData[0].add_billing_address[0]
+                                      .billing_city
+                                  }}
+                                </p>
+                                <!-- *ngIf="
+                                invoice.add_billing_address[0].state_province_id ||
+                                    invoice.add_billing_address[0]
+                                      .billing_postal_code
+                                  "
+                                -->
+                                <p class="bill-address">
+                                  {{
+                                    proformaInvData[0].add_billing_address[0]
+                                      .billing_state
+                                  }}
+                                  -
+                                  {{
+                                    proformaInvData[0].add_billing_address[0]
+                                      .billing_postal_code
+                                  }}
+                                </p>
+                                <p class="bill-address">
+                                  {{
+                                    proformaInvData[0].add_billing_address[0]
+                                      .billing_country
+                                  }}
+                                </p>
+                              </div>
+                              <div class="shipper-secction mt_16">
+                                <div class="address-inner-content">
+                                  <p class="invoice-contact">
+                                    <span
+                                      ><span style="font-weight: bold"
+                                        >Country : </span
+                                      ><span>{{
+                                        proformaInvData[0]
+                                          .add_billing_address[0]
+                                          .billing_country
+                                      }}</span></span
+                                    >
+                                  </p>
+                                </div>
+                              </div>
+                              <div
+                                class="notify-address"
+                                *ngIf="showNotifyAddress"
+                              >
+                                <div class="shipper-secction">
+                                  <h4 class="gray-title">NOTIFY TO PARTY</h4>
+                                  <div class="address-inner-content">
+                                    <b class="bill-address">{{
+                                      proformaInvData[0].add_notify_address[0]
+                                        .notify_company
+                                    }}</b>
+                                    <p class="bill-address">
+                                      {{
+                                        proformaInvData[0].add_notify_address[0]
+                                          .notify_address1
+                                      }}
+                                    </p>
+                                    <p class="bill-address">
+                                      {{
+                                        proformaInvData[0].add_notify_address[0]
+                                          .notify_address2
+                                      }}
+                                    </p>
+                                    <p class="bill-address">
+                                      {{
+                                        proformaInvData[0].add_notify_address[0]
+                                          ?.notify_address3
+                                      }}
+                                    </p>
+                                    <p class="bill-address">
+                                      {{
+                                        proformaInvData[0].add_notify_address[0]
+                                          ?.notify_address4
+                                      }}
+                                    </p>
+                                    <p class="bill-address">
+                                      {{
+                                        proformaInvData[0].add_notify_address[0]
+                                          .notify_city
+                                      }}
+                                    </p>
+                                    <p
+                                      class="bill-address"
+                                      *ngIf="
+                                        proformaInvData[0].add_notify_address[0]
+                                          .notify_state ||
+                                        proformaInvData[0].add_notify_address[0]
+                                          .notify_postal_code
+                                      "
+                                    >
+                                      {{
+                                        proformaInvData[0].add_notify_address[0]
+                                          .notify_state
+                                      }}
+                                      -
+                                      {{
+                                        proformaInvData[0].add_notify_address[0]
+                                          .notify_postal_code
+                                      }}
+                                    </p>
+                                    <p class="bill-address">
+                                      {{
+                                        proformaInvData[0].add_notify_address[0]
+                                          .notify_country
+                                      }}
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="vertical-divider"></div>
+                            <div fxFlex="30">
+                              <div class="shipper-secction">
+                                <h4 class="gray-title">SHIP TO PARTY</h4>
+                                <div class="address-inner-content">
+                                  <b class="bill-address">{{
+                                    proformaInvData[0].add_address[0]
+                                      .shipping_company
+                                  }}</b>
+                                  <p class="bill-address">
+                                    {{
+                                      proformaInvData[0].add_address[0]
+                                        .shipping_address1
+                                    }}
+                                  </p>
+                                  <p class="bill-address">
+                                    {{
+                                      proformaInvData[0].add_address[0]
+                                        .shipping_address2
+                                    }}
+                                  </p>
+                                  <p class="bill-address">
+                                    {{
+                                      proformaInvData[0].add_address[0]
+                                        ?.shipping_address3
+                                    }}
+                                  </p>
+                                  <p class="bill-address">
+                                    {{
+                                      proformaInvData[0].add_address[0]
+                                        ?.shipping_address4
+                                    }}
+                                  </p>
+                                  <p class="bill-address">
+                                    {{
+                                      proformaInvData[0].add_address[0]
+                                        .shipping_city
+                                    }}
+                                  </p>
+                                  <p class="bill-address">
+                                    {{
+                                      proformaInvData[0].add_address[0]
+                                        .shipping_state
+                                    }}
+                                    -
+                                    {{
+                                      proformaInvData[0].add_address[0]
+                                        .shipping_postal_code
+                                    }}
+                                  </p>
+                                  <p class="bill-address">
+                                    {{
+                                      proformaInvData[0].add_address[0]
+                                        .shipping_country
+                                    }}
+                                  </p>
+                                </div>
+                              </div>
+                              <div class="shipper-secction mt_16">
+                                <div class="address-inner-content">
+                                  <p class="invoice-contact">
+                                    <span
+                                      >Phone:
+                                      {{
+                                        proformaInvData[0].create_estimate[0]
+                                          .primary_phone
+                                      }}</span
+                                    >
+                                    <span style="margin-left: 4px"
+                                      >Ext:
+                                      {{
+                                        proformaInvData[0].create_estimate[0]
+                                          .ext
+                                      }}</span
+                                    >
+                                  </p>
+                                  <!-- <p class="invoice-contact"> </p> -->
+                                  <p class="invoice-contact">
+                                    Attention:
+                                    {{
+                                      proformaInvData[0].create_estimate[0]
+                                        .kindAttn
+                                    }}
+                                  </p>
+                                  <p class="invoice-contact">
+                                    Email:
+                                    {{
+                                      proformaInvData[0].create_estimate[0]
+                                        .primary_email
+                                    }}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="vertical-divider"></div>
+                            <div fxFlex="30">
+                              <div class="shipper-secction">
+                                <h4 class="gray-title">INVOICE DETAILS</h4>
+                                <div class="address-inner-content">
+                                  <p class="bill-address">
+                                    Invoice No :&nbsp;&nbsp;
+                                    <!-- orders.selectedOrder.estimate_no -->
+                                    <span style="font-weight: bold">{{
+                                      proformaInvData[0].create_estimate[0]
+                                        .pfi_number
+                                    }}</span>
+                                  </p>
+                                  <!-- | date : "dd-MM-yyyy" -->
+                                  <p class="bill-address">
+                                    Invoice Date :&nbsp;&nbsp;
+                                    {{
+                                      proformaInvData[0].create_estimate[0]
+                                        .invoice_date
+                                    }}
+                                  </p>
+                                </div>
+                              </div>
+
+                              <div
+                                class="shipper-secction"
+                                style="padding-top: 30px"
+                              >
+                                <h4 class="gray-title">MODE OF SHIPPING</h4>
+                                <p class="bill-address">
+                                  {{
+                                    proformaInvData[0].create_estimate[0]
+                                      .mode_of_shipping
+                                  }}
+                                </p>
+                              </div>
+                            </div>
+                            <div class="vertical-divider"></div>
+                            <div fxFlex="30">
+                              <div fxFlex class="">
+                                <div>
+                                  <div class="address-inner-content">
+                                    <p class="bill-address">
+                                      <strong>PO No :</strong>&nbsp;&nbsp;
+                                      {{ po_nbr }}
+                                    </p>
+                                    <p class="bill-address">
+                                      <strong>PO Date :</strong>&nbsp;&nbsp;
+                                      {{ po_date2 }}
+                                    </p>
+
+                                    <p
+                                      *ngIf="
+                                        proformaInvData[0].create_estimate[0]
+                                          ?.pi_nbr
+                                      "
+                                      class="bill-address"
+                                    >
+                                      <strong>PI No :</strong>&nbsp;&nbsp;
+                                      {{
+                                        proformaInvData[0].create_estimate[0]
+                                          .pi_nbr
+                                      }}
+                                    </p>
+                                    <p
+                                      *ngIf="
+                                        proformaInvData[0].create_estimate[0]
+                                          ?.pi_date
+                                      "
+                                      class="bill-address"
+                                    >
+                                      <strong>PI Date :</strong>&nbsp;&nbsp;
+                                      {{
+                                        proformaInvData[0].create_estimate[0]
+                                          .pi_date
+                                      }}
+                                    </p>
+
+                                    <!-- <mat-form-field
+                                      class="custom-input w-100"
+                                      floatLabel="never"
+                                    >
+                                      <label class="custom-label mandatory"
+                                        >PO No</label
+                                      >
+                                      <input
+                                        matInput
+                                        placeholder="PO No"
+                                        maxlength="15"
+                                        [readonly]="
+                                          orders.selectedOrder.status_id == 4
+                                        "
+                                        [class.disableClass]="
+                                          orders.selectedOrder.status_id == 4
+                                        "
+                                        [(ngModel)]="po_nbr"
+                                        (keydown)="
+                                          editInLineitems(
+                                            $event.target.value,
+                                            'po_nbr',
+                                            proformaInvData[0]
+                                              .create_estimate[0].id,
+                                            'PO Number'
+                                          )
+                                        "
+                                        #poInput
+                                      />
+                                    </mat-form-field> -->
+                                    <!-- <p >
+                                      <span>PO No - </span>
+                                      <span class="editable-cell po-values"  contenteditable="true"
+                                      *ngIf="orders.selectedOrder.status_id !=4"
+                                       >
+                                        {{orders.selectedOrder.po_nbr}}</span>
+                                      <span>{{errormes}}</span>
+                                      <span contenteditable="false"
+                                      *ngIf="orders.selectedOrder.status_id ==4"
+                                        >{{orders.selectedOrder.po_nbr}}</span>
+                                    </p> -->
+                                  </div>
+                                  <div class="" style="margin-top: 60px">
+                                    <!-- <mat-form-field
+                                      class="custom-deliveryDate custom-deliveryDatePo"
+                                      floatLabel="never"
+                                      style="position: relative; bottom: 72px"
+                                    >
+                                      <label class="custom-labeldate po-date"
+                                        >PO Date</label
+                                      >
+                                      <input
+                                        matInput
+                                        class="datepicker"
+                                        (focus)="openCalendar(picker2)"
+                                        (click)="openCalendar(picker2)"
+                                        [disabled]="
+                                          orders.selectedOrder.status_id == 4
+                                        "
+                                        [(ngModel)]="po_date2"
+                                        [matDatepicker]="picker2"
+                                        placeholder="PO Date"
+                                        readonly
+                                        (dateChange)="
+                                          editInLineitems(
+                                            po_date2,
+                                            'po_date',
+                                            proformaInvData[0]
+                                              .create_estimate[0].id,
+                                            'PO Date'
+                                          )
+                                        "
+                                      />
+                                      <mat-datepicker-toggle
+                                        class="mat-picker"
+                                        matSuffix
+                                        [for]="picker2"
+                                      >
+                                      </mat-datepicker-toggle>
+                                      <mat-datepicker
+                                        #picker2
+                                        startView="year"
+                                      ></mat-datepicker>
+                                    </mat-form-field> -->
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!--  Proforma Invoice data in estimateProforma -->
+                  <div #proinvoicetab *ngIf="is_pvm_proforma">
+                    <div [class]="taxinvoicetab.print ? 'print' : 'no-print'">
+                      <div
+                        class="inner-container"
+                        [class.collapse]="!showProfInvoice"
+                        *ngFor="let invoice of proformaInvData"
+                      >
+                        <mat-toolbar class="package-toolbar">
+                          <img [src]="images.invoice_green" />
+                          <div class="invoice-toolbar">
+                            <div class="invoice-number">
+                              <span class="details-span">{{
+                                invoice.profInv.inv_nbr
+                              }}</span>
+                              <span
+                                class="order-detail-status"
+                                [ngClass]="{
+                                  due: invoice.profInv.status == 'Due',
+                                  overdue: invoice.profInv.status == 'Overdue',
+                                  open: invoice.profInv.status == 'Open',
+                                  paid: invoice.profInv.status == 'Paid'
+                                }"
+                                >{{ invoice.profInv.status }}</span
+                              >
+                              <span class="pad-lft">{{
+                                invoice.profInv.title
+                              }}</span>
+                            </div>
+                            <div class="xyz">
+                              <span class="details-date">{{
+                                invoice.profInv.invoice_date_added
+                              }}</span>
+                            </div>
+                          </div>
+                          <span fxFlex></span>
+                          <div class="packages-icons">
+                            <!-- <a
+                              *ngIf="!clientPermission"
+                              target="_blank"
+                              href="generateProfInvPdf?estimate_id={{
+                                orders.selectedOrder.id
+                              }}&is_printable=1"
+                            >
+                              <button mat-icon-button>
+                                <img
+                                  [src]="images.printer_icon"
+                                  title="Print"
+                                />
+                              </button>
+                            </a>
+                            <a
+                              href="generateProfInvPdf?estimate_id={{
+                                orders.selectedOrder.id
+                              }}&is_printable=0"
+                            >
+                              <button mat-icon-button>
+                                <img
+                                  [src]="images.download_arrow"
+                                  title="Download"
+                                />
+                              </button>
+                            </a> -->
+                            <button
+                              mat-icon-button
+                              (click)="toggleProformaInvoice()"
+                            >
+                              <img
+                                [src]="images.grey_arrow"
+                                mat-icon-button
+                                *ngIf="showProfInvoice"
+                              />
+                              <mat-icon
+                                class="toggle-arrow"
+                                *ngIf="!showProfInvoice"
+                              >
+                                keyboard_arrow_down</mat-icon
+                              >
+                            </button>
+                          </div>
+                        </mat-toolbar>
+                        <div *ngIf="showProfInvoice">
+                          <div class="address-container" fxLayout="row">
+                            <div class="shipper-secction" fxFlex="30">
+                              <h4 class="gray-title">CONSIGNEE</h4>
+                              <div class="address-inner-content">
+                                <b class="bill-address">{{
+                                  invoice.billingAddr.company_name
+                                }}</b>
+                                <p class="bill-address">
+                                  {{ invoice.billingAddr.bill_address1 }}
+                                </p>
+                                <p class="bill-address">
+                                  {{ invoice.billingAddr.bill_address2 }}
+                                </p>
+                                <p class="bill-address">
+                                  {{ invoice.billingAddr.bill_city }}
+                                </p>
+                                <p
+                                  class="bill-address"
+                                  *ngIf="
+                                    invoice.billingAddr.bill_state ||
+                                    invoice.billingAddr.bill_postal_code
+                                  "
+                                >
+                                  {{ invoice.billingAddr.bill_state }} -
+                                  {{ invoice.billingAddr.bill_postal_code }}
+                                </p>
+                                <p class="bill-address">
+                                  {{ invoice.billingAddr.bill_countrty }}
+                                </p>
+                              </div>
+                              <!-- <div class="notify-address" *ngIf="showNotifyAddress">
+                                <div class="shipper-secction">
+                                  <h4 class="gray-title">NOTIFY TO PARTY</h4>
+                                  <div class="address-inner-content">
+                                    <b class="bill-address">{{invoice.notifyingAddr.company_name}}</b>
+                                    <p class="bill-address">
+                                      {{invoice.notifyingAddr.notify_address1}}</p>
+                                    <p class="bill-address">
+                                      {{invoice.notifyingAddr.notify_address2}}</p>
+                                    <p class="bill-address">
+                                      {{invoice.notifyingAddr.notify_city}}</p>
+                                    <p class="bill-address"
+                                      *ngIf="invoice.notifyingAddr.notify_state || invoice.notifyingAddr.notify_postal_code">
+                                      {{invoice.notifyingAddr.notify_state}} -
+                                      {{invoice.notifyingAddr.notify_postal_code}}</p>
+                                    <p class="bill-address">
+                                      {{invoice.notifyingAddr.notify_country}}</p>
+                                  </div>
+                                </div>
+                              </div> -->
+                            </div>
+                            <div class="vertical-divider"></div>
+                            <div fxFlex="30">
+                              <div class="shipper-secction">
+                                <h4 class="gray-title">
+                                  BUYER OTHER THAN CONSIGNEE
+                                </h4>
+                                <div class="address-inner-content">
+                                  <b class="bill-address">{{
+                                    invoice.shippingAddr.company_name
+                                  }}</b>
+                                  <p class="bill-address">
+                                    {{ invoice.shippingAddr.ship_address1 }}
+                                  </p>
+                                  <p class="bill-address">
+                                    {{ invoice.shippingAddr.ship_address2 }}
+                                  </p>
+                                  <p class="bill-address">
+                                    {{ invoice.shippingAddr.ship_city }}
+                                  </p>
+                                  <p class="bill-address">
+                                    {{ invoice.shippingAddr.ship_state }} -
+                                    {{ invoice.shippingAddr.ship_postal_code }}
+                                  </p>
+                                  <p class="bill-address">
+                                    {{ invoice.shippingAddr.ship_countrty }}
+                                  </p>
+                                </div>
+                              </div>
+                              <div class="shipper-secction mt_16">
+                                <div class="address-inner-content">
+                                  <p class="invoice-contact">
+                                    <span
+                                      >Phone: {{ invoice.profInv.phone }}</span
+                                    >
+                                    <span style="margin-left: 4px"
+                                      >Ext: {{ invoice.profInv.ext }}</span
+                                    >
+                                  </p>
+                                  <!-- <p class="invoice-contact"> </p> -->
+                                  <p class="invoice-contact">
+                                    Attention: {{ invoice.profInv.kindName }}
+                                  </p>
+                                  <p class="invoice-contact">
+                                    Email: {{ invoice.profInv.email }}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="vertical-divider"></div>
+                            <div fxFlex="30">
+                              <div class="shipper-secction">
+                                <h4 class="gray-title">INVOICE DETAILS</h4>
+                                <div class="address-inner-content">
+                                  <p class="bill-address">
+                                    Invoice No :&nbsp;&nbsp;
+                                    <span style="font-weight: bold">{{
+                                      invoice.profInv.inv_nbr
+                                    }}</span>
+                                  </p>
+                                  <p class="bill-address">
+                                    Invoice Date :&nbsp;&nbsp;
+                                    {{ invoice.profInv.invoice_date_added }}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div fxLayout="row">
+                            <div class="orders-table" style="overflow-x: auto">
+                              <table class="invoice-table-pfi">
+                                <thead *ngIf="!is_sso">
+                                  <th class="invoice-head">SL No.</th>
+                                  <th class="invoice-head">H.S Code</th>
+                                  <th class="invoice-head">
+                                    Description of Goods
+                                  </th>
+                                  <!--proforma-->
+                                  <!-- <th class="invoice-head">Batch No.</th> -->
+                                  <th class="invoice-head">
+                                    Qty in Bag/s (Cartons)
+                                  </th>
+                                  <th class="invoice-head">
+                                    RATE/MT IN {{ invoice.profInv.currency }}
+                                  </th>
+                                  <th class="invoice-head">
+                                    RATE/ CARTON IN
+                                    {{ invoice.profInv.currency }}
+                                  </th>
+                                  <th class="invoice-head">
+                                    Amount {{ invoice.profInv.currency }}
+                                  </th>
+                                </thead>
+                                <thead *ngIf="is_sso">
+                                  <th class="invoice-head">SL No.</th>
+                                  <th class="invoice-head">Description</th>
+                                  <!-- <th class="invoice-head">Batch No.</th> -->
+                                  <th class="invoice-head">Mfg. Date</th>
+                                  <th class="invoice-head">Exp. Date</th>
+                                  <th class="invoice-head">Quantity</th>
+                                  <th class="invoice-head">UOM</th>
+                                  <th class="invoice-head">
+                                    Rate per UOM ({{
+                                      invoice.Inovice.currency
+                                    }})
+                                  </th>
+                                  <th class="invoice-head">
+                                    Amount ({{ invoice.Inovice.currency }})
+                                  </th>
+                                </thead>
+                                <tbody>
+                                  <tr
+                                    class="invoice-row"
+                                    *ngFor="
+                                      let product of invoice.productsData;
+                                      index as productIndex
+                                    "
+                                  >
+                                    <td class="invoice-tdata">
+                                      {{ productIndex + 1 }}
+                                    </td>
+                                    <td *ngIf="!is_sso" class="invoice-tdata">
+                                      {{ product?.hs_code }}
+                                    </td>
+                                    <td class="invoice-tdata">
+                                      {{ product.product_name }}
+                                    </td>
+                                    <!-- <td class="invoice-tdata">
+                                      <span *ngIf="product.batch_nbr">
+                                        <p class="invoice-batch">{{product.batch_nbr}}</p>
+                                      </span>
+                                      <span class="add-batch add-Line" title="Add Batch Quantity"
+                                        *ngIf="!product.batch_nbr && blockContent && factoryPermission && !clientPermission && !batchshow"
+                                        (click)="addBatchNumber(product,'proforma')">
+                                        <mat-icon>add</mat-icon>
+                                        <span>Add Batch Quantity</span>
+                                      </span>
+                                      <span class="add-batch add-Line m_t_10" title="Edit Batch Quantity"
+                                        *ngIf="(orders.selectedOrder.status != 'In-transit' && orders.selectedOrder.status != 'Cancelled' && orders.selectedOrder.status != 'Delivered') && product.batch_nbr && factoryPermission && !clientPermission"
+                                        (click)="addBatchNumber(product,orders.selectedOrder.id)">
+                                        <mat-icon>edit</mat-icon>
+                                        <span class="edit-batch" title="Edit Batch Quantity">Edit Batch Quantity</span>
+                                      </span>
+                                    </td> -->
+                                    <td class="invoice-tdata" *ngIf="is_sso">
+                                      <span *ngIf="product.batch_nbr">
+                                        <p class="invoice-batch">
+                                          {{ product.mfd_date }}
+                                        </p>
+                                      </span>
+                                    </td>
+                                    <td class="invoice-tdata" *ngIf="is_sso">
+                                      <span *ngIf="product.batch_nbr">
+                                        <p class="invoice-batch">
+                                          {{ product.exp_date }}
+                                        </p>
+                                      </span>
+                                    </td>
+                                    <td class="invoice-tdata">
+                                      {{ product.product_quantity }}
+                                    </td>
+                                    <td class="invoice-tdata">
+                                      {{ product.uom_name }}
+                                    </td>
+                                    <td class="invoice-tdata">
+                                      {{ product.product_price }}
+                                    </td>
+                                    <td class="invoice-tdata">
+                                      {{ product.product_price_total }}
+                                    </td>
+                                  </tr>
+
+                                  <tr class="invoice-row">
+                                    <td
+                                      class="invoice-tdata gst-data"
+                                      colspan="5"
+                                      style="padding: 0"
+                                    >
+                                      <table class="invoice-row-table">
+                                        <tbody>
+                                          <tr>
+                                            <td>
+                                              <div class="gst-details">
+                                                <!-- <span class="gst-one"
+                                                  >GSTN TYPE:
+                                                  {{
+                                                    compnayDetails?.gstin_type
+                                                  }}</span
+                                                >
+                                                <span class="gst-two"
+                                                  >END USE:
+                                                  {{
+                                                    compnayDetails?.end_use
+                                                  }}</span
+                                                > -->
+                                              </div>
+                                            </td>
+                                          </tr>
+                                          <tr>
+                                            <td>
+                                              <div class="gst-details">
+                                                <span class="invoice-desc">
+                                                  Declaration: We declare that
+                                                  this invoice shows the actual
+                                                  price of goods described and
+                                                  that all particulars are true
+                                                  and correct
+                                                </span>
+                                              </div>
+                                            </td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                    </td>
+                                    <td
+                                      class="invoice-tdata table-invoice invoice-tdata-border"
+                                      colspan="4"
+                                      rowspan="2"
+                                    >
+                                      <table class="invoice-costTable">
+                                        <thead>
+                                          <tr>
+                                            <th
+                                              class="costTable-head font-normal"
+                                              colspan="2"
+                                            >
+                                              Sub Total
+                                            </th>
+                                            <th
+                                              class="costTable-head font-normal"
+                                            >
+                                              {{ invoice.profInv.sub_total }}
+                                            </th>
+                                          </tr>
+                                          <tr>
+                                            <th
+                                              class="costTable-head font-normal"
+                                              colspan="2"
+                                            >
+                                              Package Charge
+                                            </th>
+                                            <th
+                                              class="costTable-head font-normal"
+                                            >
+                                              {{ invoice.profInv.pack_charge }}
+                                            </th>
+                                          </tr>
+                                        </thead>
+                                        <tbody>
+                                          <tr
+                                            *ngFor="
+                                              let column of invoice.profInv
+                                                .invTaxAmounts;
+                                              index as colIndex
+                                            "
+                                          >
+                                            <td
+                                              class="costTable-row"
+                                              colspan="2"
+                                            >
+                                              {{ column.key }}
+                                            </td>
+                                            <td class="costTable-row">
+                                              {{ column.value }}
+                                            </td>
+                                          </tr>
+
+                                          <tr
+                                            *ngFor="
+                                              let column of invoice.profInv
+                                                .extra_col;
+                                              index as colIndex
+                                            "
+                                          >
+                                            <td class="costTable-row delete">
+                                              <mat-icon
+                                                class="delete-icon"
+                                                title="Delete"
+                                                [class.disableClass]="
+                                                  selectedOrderStatus ==
+                                                    'Delivered' ||
+                                                  selectedOrderStatus ==
+                                                    'Cancelled' ||
+                                                  selectedOrderStatus ==
+                                                    'In-transit'
+                                                "
+                                                [class.events-none]="
+                                                  selectedOrderStatus ==
+                                                    'Delivered' ||
+                                                  selectedOrderStatus ==
+                                                    'Cancelled' ||
+                                                  selectedOrderStatus ==
+                                                    'In-transit'
+                                                "
+                                                (click)="
+                                                  deleteLineItem(colIndex)
+                                                "
+                                              >
+                                                delete</mat-icon
+                                              >
+                                            </td>
+                                            <td
+                                              class="costTable-row cost-key"
+                                              (input)="
+                                                changeInvoiceExtraKey(
+                                                  colIndex,
+                                                  $event
+                                                )
+                                              "
+                                              contenteditable="!((orders.selectedOrder.orders_types_id=='4') || (orders.selectedOrder.orders_types_id=='3') || (orders.selectedOrder.orders_types_id=='5'))"
+                                            >
+                                              {{ column.key }}
+                                            </td>
+                                            <td
+                                              class="costTable-row"
+                                              (keydown)="
+                                                changeInvoiceExtraValue(
+                                                  colIndex,
+                                                  $event
+                                                )
+                                              "
+                                              contenteditable="!((orders.selectedOrder.orders_types_id=='4') || (orders.selectedOrder.orders_types_id=='3')  || (orders.selectedOrder.orders_types_id=='5'))"
+                                            >
+                                              {{ column.value }}
+                                            </td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                    </td>
+                                  </tr>
+                                </tbody>
+                              </table>
+                              <div class="footer invoice-footer">
+                                <span fxFlex></span>
+                                <span class="total-text">Total:</span>
+                                <span class="total-text">
+                                  {{ invoice.profInv.currency }}</span
+                                >
+                                <span>{{ invoice.profInv.total }}</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div *ngIf="inv_placement == '1'" #prod_items>
+                  <div>
+                    <div>
+                      <div
+                        class="inner-container"
+                        [class.collapse]="!showProducts"
+                      >
+                        <mat-toolbar class="package-toolbar">
+                          <mat-icon
+                            mat-list-icon
+                            class="post_ship_icon icon-menu d-flexicon"
+                            style="background-color: #8b5729"
+                          >
+                            <img [src]="images.pkgDetails_small" />
+                          </mat-icon>
+                          <div class="invoice-toolbar">
+                            <div class="invoice-number">
+                              <span class="pad-lft" style="padding-left: 8px">{{
+                                language.pageNavbar.products
+                              }}</span>
+                            </div>
+                          </div>
+                          <span fxFlex></span>
+                          <div class="packages-icons">
+                            <button
+                              *ngIf="
+                                proformaInvData[0].create_estimate[0]
+                                  .status_slug == 'pfi_confirmed' &&
+                                proformaInvData[0].create_estimate[0]
+                                  .status_slug != 'cancelled'
+                              "
+                              mat-icon-button
+                              (click)="openCreatMenu()"
+                            >
+                              <img
+                                [src]="images.addPO"
+                                [matMenuTriggerFor]="menu"
+                                title="Create PO , Order"
+                              />
+                            </button>
+                            <mat-menu #menu="matMenu">
+                              <div class="upload-drop">
+                                <span
+                                  *ngIf="viewCreatePoButton"
+                                  [style.opacity]="!removePo ? '0.5' : '1'"
+                                >
+                                  <a
+                                    class="click"
+                                    title="Create PO"
+                                    (click)="createPOButton()"
+                                  >
+                                    <span
+                                      [style.cursor]="
+                                        !removePo ? 'not-allowed' : 'pointer'
+                                      "
+                                      class="pointer create-po"
+                                    >
+                                      Create PO
+                                    </span>
+                                  </a>
+                                </span>
+                                <!-- <span
+                                  *ngIf="viewCreateOrderButton"
+                                  [style.opacity]="
+                                    !removeCreateOrder ? '0.5' : '1'
+                                  "
+                                >
+                                  <a
+                                    class="click"
+                                    title="Create Order"
+                                    (click)="createorderButton()"
+                                  >
+                                    <span
+                                      class="pointer create-po"
+                                      [style.cursor]="
+                                        !removeCreateOrder
+                                          ? 'not-allowed'
+                                          : 'pointer'
+                                      "
+                                    >
+                                      Create Order
+                                    </span>
+                                  </a>
+                                </span> -->
+                              </div>
+                            </mat-menu>
+                            <!-- <a
+                              *ngIf="
+                                !clientPermission &&
+                                orders.selectedOrder.status_id >= 2
+                              "
+                              target="_blank"
+                              href="generateProfInvPdf?estimate_id={{
+                                orders.selectedOrder.id
+                              }}&is_printable=1"
+                            >
+                              <button mat-icon-button>
+                                <img
+                                  [src]="images.printer_icon"
+                                  title="Print {{ estimateslanguage }}"
+                                />
+                              </button>
+                            </a>
+                            <a
+                              *ngIf="orders.selectedOrder.status_id >= 2"
+                              href="generateProfInvPdf?estimate_id={{
+                                orders.selectedOrder.id
+                              }}&is_printable=0"
+                            >
+                              <button mat-icon-button>
+                                <img
+                                  [src]="images.download_arrow"
+                                  title="Download {{ estimateslanguage }}"
+                                />
+                              </button>
+                            </a> -->
+                            <button
+                              *ngIf="viewActivityLogIcon"
+                              mat-icon-button
+                              class="action-orderbtn"
+                              (click)="
+                                openActivityModal('add_product_in_create')
+                              "
+                            >
+                              <img
+                                [src]="images.activity_log_icon"
+                                title="Activity Log"
+                              />
+                            </button>
+                            <button mat-icon-button (click)="toggleProdItems()">
+                              <img
+                                [src]="images.grey_arrow"
+                                mat-icon-button
+                                *ngIf="showProducts"
+                              />
+                              <mat-icon
+                                class="toggle-arrow"
+                                *ngIf="!showProducts"
+                              >
+                                keyboard_arrow_down</mat-icon
+                              >
+                            </button>
+                          </div>
+                        </mat-toolbar>
+                        <div
+                          fxLayout="row"
+                          #createpo
+                          [ngClass]="!showProducts ? 'visible-hidden' : ''"
+                        >
+                          <div class="orders-table" *ngIf="!refreshGrid">
+                            <app-ag-grid-view
+                              [orders]="orders"
+                              [selectOrder]="selectOrder"
+                              [originFileAttachments]="originFileAttachments"
+                              [selectPO]="selectPO"
+                              (emitGridEvent)="triggerGridEvent($event)"
+                              (emitRowData)="triggerRowDataEvent($event)"
+                              [enableSplit]="enableSplit"
+                              [selectdRows]="selectdRows"
+                              [tableName]="'estimate-table'"
+                              [newColumnAdded]="newColumnAdded"
+                              [isEditable]="
+                                order_Permissions.enable_edit_quotation &&
+                                adminService.rolePermissions.edit_quotation == 1
+                              "
+                            ></app-ag-grid-view>
+                            <table class="invoice-table-pfi estimate-invoice">
+                              <tbody>
+                                <tr class="invoice-row">
+                                  <td
+                                    class="invoice-tdata gst-data"
+                                    colspan="5"
+                                    style="padding: 0; width: 50%"
+                                  >
+                                    <table
+                                      class="invoice-row-table"
+                                      style="width: 100%"
+                                    >
+                                      <tbody>
+                                        <tr *ngIf="is_automech">
+                                          <td style="padding: 10px">
+                                            <div class="gst-details">
+                                              <!-- <span class="gst-one"
+                                                >GSTN TYPE:
+                                                {{
+                                                  "compnayDetails?.gstin_type"
+                                                }}</span
+                                              >
+                                              <span class="gst-two"
+                                                >END USE:
+                                                {{
+                                                  "compnayDetails?.end_use"
+                                                }}</span
+                                              > -->
+                                            </div>
+                                          </td>
+                                        </tr>
+                                        <tr>
+                                          <td>
+                                            <div
+                                              class="gst-details"
+                                              style="padding: 0"
+                                            >
+                                              <!-- <span class="invoice-desc" >{{invoice.profInv.terms_cond_des}}
+                                              </span> -->
+                                              <span
+                                                class="invoice-desc"
+                                                [innerHTML]="
+                                                  proformaInvData[0]
+                                                    .create_estimate[0]
+                                                    .terms_conditions
+                                                "
+                                              ></span>
+                                            </div>
+                                          </td>
+                                        </tr>
+                                      </tbody>
+                                    </table>
+                                  </td>
+                                  <td
+                                    class="invoice-tdata table-invoice invoice-tdata-border proforma-inovice"
+                                    colspan="5"
+                                    rowspan="2"
+                                  >
+                                    <table class="invoice-costTable">
+                                      <thead>
+                                        <tr>
+                                          <th
+                                            class="costTable-head font-normal"
+                                            colspan="2"
+                                          >
+                                            {{
+                                              proformaInvData[0]
+                                                .subtotal_form[0].totals
+                                                ?.subtotal.label
+                                            }}
+                                          </th>
+                                          <th
+                                            class="costTable-head font-normal"
+                                          >
+                                            {{
+                                              proformaInvData[0]
+                                                .subtotal_form[0].totals
+                                                ?.subtotal.value
+                                            }}
+                                          </th>
+                                        </tr>
+                                        <tr>
+                                          <th
+                                            class="costTable-head font-normal"
+                                            colspan="2"
+                                          >
+                                            {{
+                                              proformaInvData[0]
+                                                .subtotal_form[0].totals
+                                                ?.insurance.label
+                                            }}
+                                          </th>
+
+                                          <th
+                                            class="costTable-head font-normal values1 editfreight"
+                                            [readonly]="
+                                              !order_Permissions.enable_edit_quotation
+                                            "
+                                          >
+                                            <div
+                                              style="
+                                                display: flex;
+                                                justify-content: flex-end;
+                                              "
+                                            >
+                                              <input
+                                                #inlineEditInsurance
+                                                *ngIf="editinsurancevalue"
+                                                class="numaricEdit charges"
+                                                [ngStyle]="{
+                                                  border: editinsurancevalue
+                                                    ? '1px solid #075da8'
+                                                    : 'none'
+                                                }"
+                                                (keyup)="
+                                                  savefreighdescount(
+                                                    $event,
+                                                    'insurance'
+                                                  )
+                                                "
+                                                onpaste="javascript:event.preventDefault();"
+                                                oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/^(\d+(\.\d{0,3})?).*/, '$1');"
+                                                [readonly]="
+                                                  !order_Permissions.enable_edit_quotation ||
+                                                  !editinsurancevalue
+                                                "
+                                                [(ngModel)]="
+                                                  proformaInvData[0]
+                                                    .subtotal_form[0].totals
+                                                    ?.insurance.value
+                                                "
+                                                (focus)="removeCommas($event)"
+                                                (blur)="
+                                                  onBlur($event, 'insurance')
+                                                "
+                                              />
+                                              <span
+                                                style="
+                                                  padding-top: 6px;
+                                                  word-break: break-all;
+                                                "
+                                                *ngIf="!editinsurancevalue"
+                                                >{{
+                                                  proformaInvData[0]
+                                                    .subtotal_form[0].totals
+                                                    ?.insurance.value
+                                                }}</span
+                                              >
+
+                                              <div style="display: flex">
+                                                <mat-icon
+                                                  *ngIf="editinsurancevalue"
+                                                  (mousedown)="
+                                                    editInsurance(
+                                                      colIndex,
+                                                      $event,
+                                                      1
+                                                    )
+                                                  "
+                                                  class="mat-circle-check close-circle-icons"
+                                                  style="font-size: 24px"
+                                                  >check_circle_outline</mat-icon
+                                                >
+                                                <mat-icon
+                                                  *ngIf="editinsurancevalue"
+                                                  class="close-conversion close-circle-icons"
+                                                  (click)="closeConverionRate()"
+                                                  style="font-size: 24px"
+                                                  >highlight_off</mat-icon
+                                                >
+                                              </div>
+                                            </div>
+                                            <!-- {{ invoice.profInv.insurance }} -->
+                                          </th>
+                                          <th
+                                            class="costTable-head font-normal edit-new-style"
+                                          >
+                                            <mat-icon
+                                              *ngIf="
+                                                order_Permissions.enable_edit_quotation &&
+                                                !editinsurancevalue &&
+                                                !selectOrder &&
+                                                !selectPO &&
+                                                adminService.rolePermissions
+                                                  .edit_quotation == 1
+                                              "
+                                              (mousedown)="
+                                                editInsurancefre('insurance')
+                                              "
+                                              class="editfreight"
+                                              >edit</mat-icon
+                                            >
+                                          </th>
+                                        </tr>
+                                        <tr>
+                                          <th
+                                            class="costTable-head font-normal"
+                                            colspan="2"
+                                          >
+                                            {{
+                                              proformaInvData[0]
+                                                .subtotal_form[0].totals
+                                                ?.freight.label
+                                            }}
+                                          </th>
+                                          <!--   [attr.contenteditable]="
+                                              canEditFreight()
+                                                ? 'true'
+                                                : 'false'
+                                            "
+                                            (input)="onTdInput($event)"
+                                            (keydown)="
+                                              editFreight(colIndex, $event, 0)
+                                            " -->
+                                          <th
+                                            class="costTable-head font-normal values1 editfreight"
+                                            [readonly]="
+                                              !order_Permissions.enable_edit_quotation
+                                            "
+                                          >
+                                            <div
+                                              style="
+                                                display: flex;
+                                                justify-content: flex-end;
+                                              "
+                                            >
+                                              <input
+                                                #inlineEditFright
+                                                class="numaricEdit charges hi"
+                                                [ngStyle]="{
+                                                  border: editfreight
+                                                    ? '1px solid #075da8'
+                                                    : 'none'
+                                                }"
+                                                (keyup)="
+                                                  savefreighdescount(
+                                                    $event,
+                                                    'freight'
+                                                  )
+                                                "
+                                                oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/^(\d+(\.\d{0,3})?).*/, '$1');"
+                                                [readonly]="
+                                                  !order_Permissions.enable_edit_quotation ||
+                                                  !editfreight
+                                                "
+                                                *ngIf="editfreight"
+                                                onpaste="javascript:event.preventDefault();"
+                                                [(ngModel)]="
+                                                  proformaInvData[0]
+                                                    .subtotal_form[0].totals
+                                                    ?.freight.value
+                                                "
+                                                (focus)="removeCommas($event)"
+                                                (blur)="
+                                                  onBlur($event, 'freight')
+                                                "
+                                              />
+                                              <span
+                                                style="
+                                                  padding-top: 6px;
+                                                  word-break: break-all;
+                                                "
+                                                *ngIf="!editfreight"
+                                                >{{
+                                                  proformaInvData[0]
+                                                    .subtotal_form[0].totals
+                                                    ?.freight.value
+                                                }}</span
+                                              >
+
+                                              <div style="display: flex">
+                                                <mat-icon
+                                                  *ngIf="editfreight"
+                                                  (mousedown)="
+                                                    editFreight(
+                                                      colIndex,
+                                                      $event,
+                                                      0
+                                                    )
+                                                  "
+                                                  class="mat-circle-check close-circle-icons"
+                                                  style="font-size: 24px"
+                                                  >check_circle_outline</mat-icon
+                                                >
+                                                <mat-icon
+                                                  *ngIf="editfreight"
+                                                  class="close-conversion close-circle-icons"
+                                                  (click)="closeConverionRate()"
+                                                  style="font-size: 24px"
+                                                  >highlight_off</mat-icon
+                                                >
+                                              </div>
+                                            </div>
+                                            <!-- {{ invoice.profInv.freight }} -->
+                                          </th>
+                                          <th
+                                            class="costTable-head font-normal edit-new-style"
+                                          >
+                                            <mat-icon
+                                              *ngIf="
+                                                order_Permissions.enable_edit_quotation &&
+                                                !editfreight &&
+                                                !selectOrder &&
+                                                !selectPO &&
+                                                adminService.rolePermissions
+                                                  .edit_quotation == 1
+                                              "
+                                              (mousedown)="
+                                                editInsurancefre('freight')
+                                              "
+                                              class="editfreight"
+                                              >edit</mat-icon
+                                            >
+                                          </th>
+                                        </tr>
+                                        <tr>
+                                          <th
+                                            class="costTable-head font-normal"
+                                            colspan="2"
+                                          >
+                                            {{
+                                              proformaInvData[0]
+                                                .subtotal_form[0].totals
+                                                ?.discount.label
+                                            }}
+                                            <!-- <span
+                                              *ngIf="
+                                                proformaInvData[0]
+                                                  .subtotal_form[0].discount !==
+                                                '0.00'
+                                              "
+                                              >(-)
+                                            </span> -->
+                                          </th>
+
+                                          <th
+                                            class="costTable-head font-normal values1 editfreight"
+                                          >
+                                            <div
+                                              style="
+                                                display: flex;
+                                                justify-content: flex-end;
+                                              "
+                                            >
+                                              <input
+                                                #inlineEditDiscount
+                                                class="numaricEdit charges"
+                                                [ngStyle]="{
+                                                  border: editDescountstate
+                                                    ? '1px solid #075da8'
+                                                    : 'none'
+                                                }"
+                                                (keyup)="
+                                                  savefreighdescount(
+                                                    $event,
+                                                    'discount'
+                                                  )
+                                                "
+                                                oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/^(\d+(\.\d{0,3})?).*/, '$1');"
+                                                [readonly]="
+                                                  !order_Permissions.enable_edit_quotation ||
+                                                  !editDescountstate
+                                                "
+                                                *ngIf="editDescountstate"
+                                                onpaste="javascript:event.preventDefault();"
+                                                [(ngModel)]="
+                                                  proformaInvData[0]
+                                                    .subtotal_form[0].totals
+                                                    ?.discount.value
+                                                "
+                                                (focus)="removeCommas($event)"
+                                                (blur)="
+                                                  onBlur($event, 'discount')
+                                                "
+                                              />
+                                              <span
+                                                style="
+                                                  padding-top: 6px;
+                                                  word-break: break-all;
+                                                "
+                                                *ngIf="!editDescountstate"
+                                                >{{
+                                                  proformaInvData[0]
+                                                    .subtotal_form[0].totals
+                                                    ?.discount.value || 0
+                                                }}</span
+                                              >
+
+                                              <div style="display: flex">
+                                                <mat-icon
+                                                  *ngIf="editDescountstate"
+                                                  (mousedown)="
+                                                    editDiscount($event)
+                                                  "
+                                                  class="mat-circle-check close-circle-icons"
+                                                  style="font-size: 24px"
+                                                  >check_circle_outline</mat-icon
+                                                >
+                                                <mat-icon
+                                                  *ngIf="editDescountstate"
+                                                  class="close-conversion close-circle-icons"
+                                                  (click)="closeConverionRate()"
+                                                  style="font-size: 24px"
+                                                  >highlight_off</mat-icon
+                                                >
+                                              </div>
+                                            </div>
+                                            <!-- {{
+                                              invoice.profInv.discount_value
+                                            }} -->
+                                          </th>
+                                          <th
+                                            class="costTable-head font-normal edit-new-style"
+                                          >
+                                            <mat-icon
+                                              *ngIf="
+                                                order_Permissions.enable_edit_quotation &&
+                                                !editDescountstate &&
+                                                !selectOrder &&
+                                                !selectPO &&
+                                                adminService.rolePermissions
+                                                  .edit_quotation == 1
+                                              "
+                                              (mousedown)="
+                                                editInsurancefre('discount')
+                                              "
+                                              class="editfreight"
+                                              >edit</mat-icon
+                                            >
+                                          </th>
+                                          <!-- <th class="costTable-head font-normal " *ngIf="invoice.profInv.discount_value == '0' ">
+                                            {{invoice.profInv.discount_value }}
+                                          </th> -->
+                                        </tr>
+
+                                        <!-- <tr>
+                                          <th class="costTable-head font-normal" colspan="2">Package Charges</th>
+                                          <th class="costTable-head font-normal">
+                                            {{invoice.profInv.pack_charge | number}}
+                                          </th>
+                                        </tr> -->
+                                      </thead>
+                                      <tbody>
+                                        <tr
+                                          *ngFor="
+                                            let column of proformaInvData[0]
+                                              .add_line_items;
+                                            index as colIndex
+                                          "
+                                        >
+                                          <td
+                                            *ngIf="
+                                              order_Permissions.enable_edit_quotation &&
+                                              adminService.rolePermissions
+                                                .edit_quotation == 1
+                                            "
+                                            class="costTable-row delete"
+                                          >
+                                            <mat-icon
+                                              class="delete-icon"
+                                              title="Delete"
+                                              (click)="
+                                                deleteLineItemorderDetails(
+                                                  column
+                                                )
+                                              "
+                                            >
+                                              delete</mat-icon
+                                            >
+                                          </td>
+                                          <td
+                                            [attr.colspan]="
+                                              order_Permissions.enable_edit_quotation &&
+                                              adminService.rolePermissions
+                                                .edit_quotation == 1
+                                                ? 1
+                                                : 2
+                                            "
+                                            class="costTable-row cost-key"
+                                            (input)="
+                                              changeInvoiceExtraKey(
+                                                colIndex,
+                                                $event
+                                              )
+                                            "
+                                          >
+                                            {{ column.line_item }}
+                                          </td>
+
+                                          <th
+                                            style="border-right: 0px"
+                                            class="costTable-head font-normal values1 editfreight"
+                                          >
+                                            <div
+                                              style="
+                                                display: flex;
+                                                justify-content: flex-end;
+                                              "
+                                            >
+                                              <input
+                                                #inlineEditLineItem
+                                                class="numaricEdit charges"
+                                                [ngStyle]="{
+                                                  border:
+                                                    editaddlineItem == colIndex
+                                                      ? '1px solid #075da8'
+                                                      : 'none'
+                                                }"
+                                                (keyup)="
+                                                  editAddline(
+                                                    $event,
+                                                    'extra_col',
+                                                    colIndex
+                                                  )
+                                                "
+                                                oninput="this.value = this.value.match(/^(-?\d*(\.\d{0,3})?)?/)?.[0] || '';"
+                                                [readonly]="
+                                                  !order_Permissions.enable_edit_quotation ||
+                                                  editaddlineItem !== colIndex
+                                                "
+                                                *ngIf="
+                                                  editaddlineItem == colIndex
+                                                "
+                                                onpaste="javascript:event.preventDefault();"
+                                                [(ngModel)]="column.value"
+                                                (focus)="removeCommas($event)"
+                                                (blur)="
+                                                  onBlur($event, 'discount')
+                                                "
+                                              />
+                                              <span
+                                                style="
+                                                  padding-top: 6px;
+                                                  word-break: break-all;
+                                                "
+                                                *ngIf="
+                                                  editaddlineItem != colIndex
+                                                "
+                                                >{{ column.value }}</span
+                                              >
+
+                                              <div style="display: flex">
+                                                <mat-icon
+                                                  *ngIf="
+                                                    editaddlineItem == colIndex
+                                                  "
+                                                  (mousedown)="
+                                                    saveAddline(
+                                                      column,
+                                                      colIndex
+                                                    )
+                                                  "
+                                                  class="mat-circle-check close-circle-icons"
+                                                  style="font-size: 24px"
+                                                  >check_circle_outline</mat-icon
+                                                >
+                                                <mat-icon
+                                                  *ngIf="
+                                                    editaddlineItem == colIndex
+                                                  "
+                                                  class="close-conversion close-circle-icons"
+                                                  (click)="closeConverionRate()"
+                                                  style="font-size: 24px"
+                                                  >highlight_off</mat-icon
+                                                >
+                                              </div>
+                                            </div>
+                                            <!-- {{
+                                              invoice.profInv.discount_value
+                                            }} -->
+                                          </th>
+                                          <th
+                                            class="costTable-head font-normal edit-new-style"
+                                            style="border-bottom: 0"
+                                          >
+                                            <mat-icon
+                                              *ngIf="
+                                                order_Permissions.enable_edit_quotation &&
+                                                editaddlineItem != colIndex &&
+                                                !selectOrder &&
+                                                !selectPO &&
+                                                adminService.rolePermissions
+                                                  .edit_quotation == 1
+                                              "
+                                              (mousedown)="
+                                                editInsurancefre(
+                                                  'add_line',
+                                                  colIndex
+                                                )
+                                              "
+                                              class="editfreight"
+                                              >edit</mat-icon
+                                            >
+                                          </th>
+                                        </tr>
+
+                                        <tr
+                                          *ngFor="
+                                            let column of proformaInvData[0]
+                                              .create_estimate[0].extra_col;
+                                            index as colIndex
+                                          "
+                                          class="extra-col"
+                                        >
+                                          <td
+                                            class="costTable-row delete"
+                                            *ngIf="!is_aapl"
+                                          >
+                                            <mat-icon
+                                              class="delete-icon"
+                                              title="Delete"
+                                              [class.disableClass]="
+                                                selectedOrderStatus ==
+                                                'Cancelled'
+                                              "
+                                              [class.events-none]="
+                                                selectedOrderStatus ==
+                                                'Cancelled'
+                                              "
+                                              (click)="
+                                                deleteLineItemorderDetails(
+                                                  colIndex
+                                                )
+                                              "
+                                            >
+                                              delete</mat-icon
+                                            >
+                                          </td>
+                                          <td
+                                            class="costTable-row cost-key"
+                                            (input)="
+                                              changeInvoiceExtraKey(
+                                                colIndex,
+                                                $event
+                                              )
+                                            "
+                                          >
+                                            {{ column.key }}
+                                          </td>
+                                          <td
+                                            colspan="2"
+                                            class="costTable-row"
+                                            style="border-right: 0px"
+                                            (keydown)="
+                                              changeInvoiceExtraValue(
+                                                colIndex,
+                                                $event
+                                              )
+                                            "
+                                          >
+                                            {{ column.value }}
+                                          </td>
+                                        </tr>
+                                      </tbody>
+                                    </table>
+                                  </td>
+                                </tr>
+                              </tbody>
+                            </table>
+                            <div class="footer invoice-footer">
+                              <div
+                                *ngIf="
+                                  blockContent &&
+                                  factoryPermission &&
+                                  !clientPermission &&
+                                  order_Permissions.enable_edit_quotation &&
+                                  !selectOrder &&
+                                  !selectPO &&
+                                  adminService.rolePermissions.edit_quotation ==
+                                    1
+                                "
+                              >
+                                <span
+                                  class="add-Line"
+                                  (click)="addlineitemspfi($event)"
+                                  [class.disableClass]="
+                                    selectedOrderStatus == 'Cancelled'
+                                  "
+                                >
+                                  <!-- ||!removeAdd -->
+                                  <mat-icon>add</mat-icon>
+                                  Add Line Item
+                                </span>
+                              </div>
+                              <span fxFlex></span>
+                              <span class="total-text"
+                                >{{
+                                  proformaInvData[0].subtotal_form[0].totals
+                                    ?.total.label
+                                }}
+                                :</span
+                              >
+                              <span class="total-text">
+                                {{
+                                  proformaInvData[0].create_estimate[0]
+                                    .currency_type
+                                }}</span
+                              >
+                              <span>{{
+                                proformaInvData[0].subtotal_form[0].totals
+                                  ?.total.value
+                              }}</span>
+                            </div>
+                            <div>
+                              <div
+                                class="packages-footer"
+                                fxLayoutAlign="end center"
+                              >
+                                <button
+                                  mat-raised-button
+                                  color="warn"
+                                  *ngIf="selectOrder || selectPO"
+                                  class="create-order-btn"
+                                  (click)="cancelOrderPo()"
+                                >
+                                  Cancel
+                                </button>
+                                <!--aapl proforma change add new button -->
+                                <button
+                                  mat-raised-button
+                                  color="warn"
+                                  (click)="createOrderInovice()"
+                                  *ngIf="selectOrder"
+                                  class="create-order-btn"
+                                  [disabled]="disablecreateorder"
+                                >
+                                  Create Order
+                                </button>
+                                <button
+                                  mat-raised-button
+                                  color="warn"
+                                  (click)="CreatePO()"
+                                  *ngIf="selectPO"
+                                  class="create-order-btn"
+                                  [disabled]="disablecreateorder"
+                                >
+                                  Create PO
+                                </button>
+                              </div>
+                            </div>
+                            <!-- <div
+                              class="packages-footer"
+                              fxLayoutAlign="end center"
+                              style="padding: 10px"
+                              *ngIf="
+                                adminUser &&
+                                orders.selectedOrder.status_id == '1' &&
+                                orders.selectedOrder.status_id != 4
+                              "
+                            >
+                              <button
+                                type="button"
+                                mat-button
+                                (click)="CancelEstimate()"
+                              >
+                                Decline
+                              </button>
+                              <button
+                                [disabled]="disableAccept"
+                                type="submit"
+                                mat-raised-button
+                                (click)="acceptPfi()"
+                              >
+                                Accept
+                              </button>
+                            </div> -->
+
+                            <!-- <div class="add-paid">
+                            <span fxFlex></span>
+                            <button mat-raised-button
+                              *ngIf="invoice.Inovice.invoice_status_id < '3' && !added
+                                                                                                                      && blockContent && factoryPermission && hidePaidBtn &&
+                                                                                                                      invoice.Inovice.payment_type !='Advance'"
+                              (click)="paidInvoice()">Mark as paid</button>
+                          </div> -->
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div #payments *ngIf="editDone">
+                  <app-estimate-payments
+                    [getInputValidationTypes]="getInputValidationTypes"
+                    [module]="'add_payment_terms'"
+                    [factoryPermission]="factoryPermission"
+                    [viewActivityLogIcon]="viewActivityLogIcon"
+                    [minimizeAll]="minimizeAll"
+                    [id]="data.estimate_id"
+                    (updatedGetViewDetails)="
+                      getViewDetails(data.estimate_id, 'pfi_details', true)
+                    "
+                    [disableEdit]="
+                      order_Permissions?.disable_quotation_payment_terms &&
+                      adminService.rolePermissions.edit_quotation == 2
+                        ? order_Permissions.disable_quotation_payment_terms
+                        : false
+                    "
+                    [isEditPermission]="
+                      adminService.rolePermissions.edit_quotation == 1
+                        ? true
+                        : false
+                    "
+                  ></app-estimate-payments>
+                </div>
+                <div class="proforma-top" #specification *ngIf="editDone">
+                  <div>
+                    <app-estimate-specification
+                      [getInputValidationTypes]="getInputValidationTypes"
+                      [module]="'pfi_other_specifications'"
+                      [factoryPermission]="factoryPermission"
+                      [viewActivityLogIcon]="viewActivityLogIcon"
+                      [minimizeAll]="minimizeAll"
+                      [id]="data.estimate_id"
+                      [disableEdit]="
+                        order_Permissions?.disable_regulatory_details
+                          ? order_Permissions.disable_regulatory_details
+                          : false
+                      "
+                      [isEditPermission]="
+                        adminService.rolePermissions.edit_quotation == 1
+                          ? true
+                          : false
+                      "
+                    ></app-estimate-specification>
+                  </div>
+                </div>
+
+                <!-- *ngIf="
+                    adminUser &&
+                    orders.selectedOrder.status_id == '1' &&
+                    orders.selectedOrder.status_id != 4
+                  " -->
+                <div #acceptQuotation class="inner-container invoice-container">
+                  <div
+                    *ngIf="
+                      !order_Permissions.enable_accept_quotation &&
+                      adminService.rolePermissions.accept_quotation == 1
+                    "
+                  >
+                    <p style="padding-bottom: 12px" class="plane_text">
+                      Click below to accept the {{ estimateslanguage }}.
+                    </p>
+                    <!-- *ngIf="!disableAccept" -->
+                    <button
+                      mat-raised-button
+                      (click)="updateEstimateSatus()"
+                      [disabled]="disableAccept"
+                    >
+                      Accept {{ estimateslanguage }}
+                      <span *ngIf="disableAccept">
+                        <mat-icon style="height: 16px; width: 16px"
+                          ><mat-spinner
+                            class="white-spinner"
+                            diameter="20"
+                          ></mat-spinner></mat-icon
+                      ></span>
+                    </button>
+                    <!-- <section class="section-right" *ngIf="disableAccept">
+                      <button mat-raised-button disabled="true">
+                        <mat-icon>
+                          <mat-spinner
+                            class="white-spinner"
+                            diameter="20"
+                          ></mat-spinner
+                        ></mat-icon>
+                      </button>
+                    </section> -->
+                  </div>
+                  <div *ngIf="order_Permissions.enable_accept_quotation">
+                    <p style="padding-bottom: 12px" class="plane_text">
+                      The quotation was accepted by the
+                      {{ this.orders.selectedOrder.status_modified_by }} on
+                      {{ this.orders.selectedOrder.status_modified_date }}
+                    </p>
+                  </div>
+                </div>
+
+                <div
+                  *ngIf="
+                    order_Permissions.enable_accept_quotation &&
+                    order_Permissions.enable_create_order
+                  "
+                  #order
+                >
+                  <div class="inner-container" [class.collapse]="!showProducts">
+                    <mat-toolbar class="package-toolbar">
+                      <mat-icon
+                        mat-list-icon
+                        class="post_ship_icon icon-menu d-flexicon"
+                        style="background-color: #f07e0a"
+                      >
+                        <img [src]="images.orders_small" />
+                      </mat-icon>
+                      <div class="invoice-toolbar">
+                        <div class="invoice-number">
+                          <span class="pad-lft" style="padding-left: 8px"
+                            >Orders</span
+                          >
+                        </div>
+                      </div>
+                      <span fxFlex></span>
+                      <div class="packages-icons" style="display: flex">
+                        <!-- <div *ngIf="viewActivityLogIcon">
+                          <button
+                            mat-icon-button
+                            class="action-orderbtn"
+                            (click)="openActivityModal('create_order')"
+                          >
+                            <img
+                              [src]="images.activity_log_icon"
+                              title="Activity Log"
+                            />
+                          </button>
+                        </div> -->
+                        <!-- <button
+                          *ngIf="order_Permissions.enable_create_order"
+                          mat-raised-button
+                          color="warn"
+                          (click)="createOrderInovice()"
+                          class="create-order-btn"
+                        >
+                          Create Order
+                        </button> -->
+
+                        <div class="edit-delete">
+                          <div
+                            class="edit_icon"
+                            title="Create Order"
+                            (click)="createOrderInovice()"
+                            style="padding: 3px 3px"
+                            *ngIf="
+                              adminService.rolePermissions.create_order == 1
+                            "
+                            [matMenuTriggerFor]="CreateMenu"
+                          >
+                            <img
+                              [src]="images.add"
+                              alt="add"
+                              style="width: 100%; height: 100%"
+                            />
+                          </div>
+                        </div>
+
+                        <mat-menu
+                          #CreateMenu="matMenu"
+                          yPosition="below"
+                          class="mat-menu-custom create-event"
+                        >
+                          <div *ngIf="order_Permissions.show_numbering_error">
+                            <div class="error-text">Please enter quotation number to create order</div>
+                          </div>
+                        </mat-menu>
+
+                        <!-- <button mat-icon-button (click)="toggleProdItems()">
+                          <img
+                            [src]="images.grey_arrow"
+                            mat-icon-button
+                            *ngIf="showProducts"
+                          />
+                          <mat-icon class="toggle-arrow" *ngIf="!showProducts">
+                            keyboard_arrow_down</mat-icon
+                          >
+                        </button> -->
+                      </div>
+                    </mat-toolbar>
+                    <perfect-scrollbar>
+                      <div
+                        class="list-view-table detail-table"
+                        style="padding: 16px 16px; padding-top: 0"
+                      >
+                        <div
+                          class="table-header-ui top-sticky z-index-8"
+                          style="top: 16px"
+                        >
+                          <div class="container-ui">
+                            <mat-list-item
+                              class="order-list-row mat-list-item header-cleint"
+                            >
+                              <div
+                                class="item-container justify-start p-l-16"
+                                fxFlex="16"
+                              >
+                                Order number
+                              </div>
+                              <div
+                                class="item-container justify-left"
+                                style="padding-left: 20px"
+                                fxFlex="18"
+                              >
+                                Attention
+                              </div>
+                              <div
+                                class="item-container justify-start pl-12"
+                                fxFlex="16"
+                              >
+                                Country
+                              </div>
+                              <div
+                                class="item-container justify-start pl-12"
+                                fxFlex="16"
+                              >
+                                Account Manager
+                              </div>
+                              <div
+                                class="item-container justify-right"
+                                fxFlex="14"
+                                style="justify-content: end"
+                              >
+                                Amount
+                              </div>
+                              <div
+                                class="item-container status-align p-r-16 status-padding"
+                                style="justify-content: center"
+                                fxFlex="20"
+                              >
+                                Status
+                              </div>
+                            </mat-list-item>
+                          </div>
+                        </div>
+                        <div
+                          class="container-ui new-center-empty-ui"
+                          *ngIf="fetchingOrders"
+                        >
+                          <mat-spinner
+                            class="medium-spinner"
+                            *ngIf="fetchingOrders"
+                          ></mat-spinner>
+                        </div>
+
+                        <div
+                          *ngIf="!fetchingOrders"
+                          class="global_list_view container-ui"
+                          infiniteScroll
+                          [infiniteScrollDistance]="1"
+                          [infiniteScrollThrottle]="50"
+                          (scrolled)="onScroll()"
+                          [scrollWindow]="false"
+                        >
+                          <div fxLayout="column" fxFlex="100">
+                            <div *ngIf="ordersList.length">
+                              <div
+                                class="list-item-card"
+                                (click)="orderDetails(stepper, order)"
+                                *ngFor="let order of ordersList"
+                              >
+                                <mat-list-item class="order-list-row">
+                                  <div class="item-container" fxFlex="16">
+                                    <div
+                                      class="d-flex align-items-center avatar-cell o-hidden"
+                                    >
+                                      <div class="icon-sec">
+                                        <img
+                                          [src]="images.estimatesIcon"
+                                          title="Estimates"
+                                        />
+                                      </div>
+                                      <div
+                                        class="content-sec o-hidden ellipsis-text"
+                                      >
+                                        <h1
+                                          title="{{ order.order_no }}"
+                                          class="ellipsis-text"
+                                        >
+                                          {{ order.order_no }}
+                                          <mat-icon
+                                            *ngIf="order.special_instructions"
+                                            class="flag-orders"
+                                            title="{{
+                                              order.special_instructions
+                                            }}"
+                                          >
+                                            flag</mat-icon
+                                          >
+                                        </h1>
+                                        <small
+                                          title="{{ order.product_names }}"
+                                          class="ellipsis-text"
+                                        >
+                                          {{ order.product_names }}</small
+                                        >
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  <div class="item-container" fxFlex="18">
+                                    <div
+                                      class="d-flex align-items-center avatar-cell o-hidden"
+                                    >
+                                      <mat-icon
+                                        mat-list-icon
+                                        class="avatar-list"
+                                        *ngIf="order.client_image"
+                                      >
+                                        <div
+                                          class="mat-order-avatar"
+                                          [ngStyle]="{
+                                            'background-image':
+                                              'url(' + order.client_image + ')'
+                                          }"
+                                        ></div>
+                                      </mat-icon>
+                                      <div
+                                        mat-list-icon
+                                        class="no-order-image"
+                                        *ngIf="!order.client_image"
+                                      >
+                                        <span class="mat-avatar">{{
+                                          order.client_name
+                                            | contactImageName : 2
+                                        }}</span>
+                                      </div>
+                                      <div
+                                        class="content-sec o-hidden ellipsis-text"
+                                      >
+                                        <h1
+                                          class="normal ellipsis-text"
+                                          title="{{ order.client_name }}"
+                                        >
+                                          {{ order.client_name }}
+                                        </h1>
+                                        <small
+                                          class="client-name ellipsis-text"
+                                          title="{{ order.name }}"
+                                        >
+                                          {{ order.name }}</small
+                                        >
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div
+                                    class="item-container country po_no"
+                                    fxFlex="16"
+                                  >
+                                    <p mat-line title="{{ order.country }}">
+                                      {{ order.country }}
+                                    </p>
+                                  </div>
+                                  <div
+                                    class="item-container country account_manager"
+                                    fxFlex="16"
+                                  >
+                                    <p
+                                      mat-line
+                                      title="{{ order.account_manager }}"
+                                    >
+                                      {{ order.account_manager }}
+                                    </p>
+                                  </div>
+                                  <div
+                                    class="item-container amount_container text-right country"
+                                    fxFlex="14"
+                                    style="justify-content: end"
+                                  >
+                                    <p
+                                      mat-line
+                                      title="{{ order.total_amount }}"
+                                    >
+                                      {{ order.currency }}
+                                      {{ order.total_amount }}
+                                    </p>
+                                  </div>
+                                  <div
+                                    class="item-container status-cell status-tag-container status-padding"
+                                    style="
+                                      display: flex;
+                                      justify-content: flex-end;
+                                      width: 100%;
+                                    "
+                                    fxFlex="20"
+                                  >
+                                    <div
+                                      class="client-status"
+                                      [ngClass]="{
+                                        accepted: order.status == 'Accepted',
+                                        created: order.status == 'Created',
+                                        'in-transit':
+                                          order.status == 'In-transit',
+                                        delivered: order.status == 'Delivered',
+                                        cancelled: order.status == 'Cancelled',
+                                        received: order.status == 'Received',
+                                        processing:
+                                          order.status == 'Processing',
+                                        placed: order.status == 'Placed',
+                                        draft: order.status == 'Draft',
+                                        passed: order.status == 'Passed',
+                                        shipped: order.status == 'Shipped',
+                                        fulfilment:
+                                          order.status == 'Fulfilment',
+                                        pending: order.status == 'Pending',
+                                        expired: order.status == 'Expired'
+                                      }"
+                                    >
+                                      {{ order.status }}
+                                    </div>
+                                    <span style="width: 50px"></span>
+                                    <mat-icon class="go-to-details"
+                                      >keyboard_arrow_right</mat-icon
+                                    >
+
+                                    <!-- <p class="client-status"
+                                                            title="{{order.orders.status}}"
+                                                            [ngClass]="{'accepted':order.orders.status == 'Accepted' , 'in-transit':order.orders.status == 'In-transit', 'delivered':order.orders.status == 'Delivered', 'cancelled':order.orders.status == 'Cancelled','received':order.orders.status == 'Received','processing':order.orders.status == 'Processing'}">
+                                                            {{order.orders.status}} </p> -->
+                                  </div>
+                                </mat-list-item>
+                              </div>
+                            </div>
+
+                            <!-- <div
+                              class="container-ui new-center-empty-ui"
+                              > -->
+                            <mat-card
+                              class="no-results"
+                              *ngIf="!ordersList.length"
+                              style="margin-top: 0"
+                            >
+                              <div class="empty-img-holder">
+                                <!-- <img [src]='images.ordersIcon_o'> -->
+                                <span class="material-icons"> info </span>
+                              </div>
+                              <p class="no-result-text">No Data Found</p>
+                            </mat-card>
+                            <!-- </div> -->
+
+                            <!-- <div
+                              class="container-ui new-center-empty-ui"
+                              *ngIf="fetchingData"
+                            >
+                              <mat-spinner
+                                class="medium-spinner"
+                                *ngIf="fetchingData"
+                              ></mat-spinner>
+                            </div> -->
+                          </div>
+                        </div>
+                      </div>
+                    </perfect-scrollbar>
+                  </div>
+                </div>
+                <div *ngIf="order_Permissions.enable_accept_quotation">
+                  <ng-container
+                    *ngFor="let item of dymanicdocumentdata; let i = index"
+                  >
+                    <app-dynamic-documents
+                      [item]="item"
+                      [orderId]="orderId"
+                      type="generateQuotationDocument"
+                    ></app-dynamic-documents>
+                  </ng-container>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="container-ui new-center-empty-ui" *ngIf="showNoDatFound">
+          <mat-card class="no-results">
+            <div class="empty-img-holder">
+              <!-- <img [src]='images.ordersIcon_o'> -->
+              <span class="material-icons"> info </span>
+            </div>
+            <p class="no-result-text">No Data Found</p>
+          </mat-card>
+        </div>
+      </mat-step>
+    </mat-horizontal-stepper>
+    <div *ngIf="totalSpinner">
+      <mat-spinner class="medium-spinner"></mat-spinner>
+    </div>
+    <mat-spinner class="medium-spinner" *ngIf="confirOrderLoad"></mat-spinner>
+  </div>
+</div>

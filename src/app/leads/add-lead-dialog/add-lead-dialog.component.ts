@@ -407,11 +407,12 @@ export class AddLeadDialogComponent implements OnInit {
   allowOnlyNum(evt, i, value): boolean {
     const charCode = (evt.which) ? evt.which : evt.keyCode;
     //allowing backspace
+    // console.log(charCode)
     if (charCode == 8) {
       return true;
     }
 
-    if (this.storesCustomAttributesData[i].selected_value && this.storesCustomAttributesData[i].selected_value.length > 0) {
+    if (this.storesCustomAttributesData[i] && this.storesCustomAttributesData[i].selected_value && this.storesCustomAttributesData[i].selected_value.length > 0) {
       let l = parseInt(this.storesCustomAttributesData[i].selected_value);
       if (evt.srcElement.value && evt.srcElement.value.split(".")[1] && evt.srcElement.value.split(".")[1].length > l - 1) {
         return false;

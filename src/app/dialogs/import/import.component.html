@@ -1,0 +1,128 @@
+<mat-toolbar color="primary">
+  <h2 mat-dialog-title>Upload Files</h2>
+  <span fxFlex></span>
+</mat-toolbar>
+<mat-dialog-content class="import">
+  <form>
+    <div
+      style="height: auto"
+      class="image-uploade"
+      [class.not-allowed]="pointerEvent"
+    >
+      <div
+        ng2FileDrop
+        [ngClass]="{ 'file-over': hasDropZoneOver }"
+        [uploader]="uploader"
+        (fileOver)="fileOverBase($event)"
+        class="file-drop-zone"
+        (onFileDrop)="fileDrop($event)"
+      >
+        <p class="import-file-heading">Upload Import File</p>
+        <input
+          type="file"
+          id="import-category"
+          [uploader]="uploader"
+          ng2FileSelect
+          (change)="fileSelected($event.target.files)"
+          [hidden]="true"
+        />
+        <label for="import-category">
+          <!-- <span class="material-icons" >
+          photo_library 
+          </span> -->
+          <!-- <img [src]='images.dialogs.upload_icon' title="upload"> -->
+          <img src="signatures/assets/images/uploadicon.svg" title="upload" />
+          <p class="drag-drop">
+            Drag & drop files
+            <span style="text-transform: lowercase"
+              >{{ language.defaults.or }}
+            </span>
+            <span
+              class="primary-text-link"
+              style="
+                font-weight: normal;
+                padding: 0;
+                text-decoration: underline;
+              "
+            >
+              {{ language.defaults.browse }}</span
+            >
+          </p>
+          <div *ngIf="selectedFile">
+            <p class="file-name">{{ selectedFile.name }}</p>
+            <p *ngIf="uploadFilestatus" class="upload-success">File Uploaded</p>
+          </div>
+
+          <small class="support-format"
+            >(Maximum file size is 10 MB Supported file formats : XLSX , XLS
+            )</small
+          >
+        </label>
+      </div>
+
+      <p *ngIf="errorMessage" class="error-msg m_3">{{ errorMessage }}</p>
+
+      <div *ngIf="errorTableData && errorTableData.length" class="error-table">
+        <strong>Errors</strong>
+        <table mat-table [dataSource]="errorTableData" class="mat-elevation-z8">
+          <!-- Row Number Column -->
+          <ng-container matColumnDef="rowNumber">
+            <th mat-header-cell *matHeaderCellDef>Row</th>
+            <td style="color: red" mat-cell *matCellDef="let error">
+              {{ error.rowNumber }}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="rowErrors">
+            <th mat-header-cell *matHeaderCellDef style="text-align: center">
+              Errors
+            </th>
+            <td mat-cell *matCellDef="let error" style="padding-left: 8px">
+              <div
+                style="
+                  display: flex;
+                  flex-direction: column;
+                  flex-wrap: nowrap;
+                  align-items: flex-start;
+                  gap: 4px;
+                  color: red;
+                "
+                [innerHTML]="error.rowErrors"
+              ></div>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+
+          <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+        </table>
+      </div>
+
+      <!-- <div *ngIf="errorMessage" class="error-msg m_3">
+        <strong>Errors:</strong>
+        <pre>{{ errorMessage }}</pre>
+      </div> -->
+      <div *ngIf="isSample">
+        <a href="sampleDownload?type={{ type }}" download class="sample-file">
+          Sample File
+          <span>
+            <img
+              class="sample-img"
+              src="signatures/assets/images/sampleupload.svg"
+              title="sample"
+            />
+          </span>
+        </a>
+      </div>
+      <!-- <a [href]="getFileUrl()" download>Download File</a> -->
+    </div>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <span fxFlex></span>
+  <button class="back-btn-ui" mat-dialog-close>Cancel</button>
+  <button mat-raised-button (click)="importFile()" [disabled]="!selectedFile">
+    Import
+  </button>
+  <!--<button *ngIf="!success" [disabled] = "disabledSave"   mat-raised-button mat-dialog-close color="warn" (click)="confirm()"></button>-->
+</mat-dialog-actions>

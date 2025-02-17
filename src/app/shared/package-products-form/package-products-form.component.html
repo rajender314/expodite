@@ -1,0 +1,984 @@
+<div>
+  <div class="products-table formbuilder" style="margin-top: 10px">
+    <div
+      class="divTable"
+      [formGroup]="productsDynamicForm"
+      style="border: 1px solid #e3e3e3"
+    >
+      <!-- <div class="product-table-header">
+        <div
+          class="header-list"
+          *ngFor="let header of productAttributes; let x = index"
+          [ngStyle]="{
+            width:
+              productAttributes &&
+              productAttributes[x].key == 'product_dropdown'
+                ? '40%'
+                : '25%'
+          }"
+        >
+          {{ header.label_name }}
+        </div>
+        <div class="divTableCell" style="text-align: left"></div>
+      </div> -->
+      <div formArrayName="productItem">
+        <div
+          class="divTableBody"
+          *ngFor="
+            let item of productsDynamicForm.get('productItem')['controls'];
+            let i = index
+          "
+          [formGroupName]="i"
+          class="fields-list"
+          [ngClass]="'prod-list-' + i"
+        >
+          <!-- <div class="item-no"><p >Item - {{i + 1}}</p></div> -->
+          <div style="display: flex; width: 100%">
+            <div
+              class="delete-row"
+              style="text-align: center"
+              *ngIf="module === 'add_product_in_shipment'"
+            >
+              <mat-checkbox
+                color="primary"
+                formControlName="is_checked"
+                (change)="checkBoxSelectionChange($event)"
+              >
+              </mat-checkbox>
+            </div>
+            <div class="row-container">
+              <div
+                *ngFor="let attribute of productAttributes; let j = index"
+                [ngSwitch]="productAttributes[j]?.slug"
+                [ngClass]="
+                  productAttributes[j]?.slug === 'custom_component' ||
+                  productAttributes[j]?.slug === 'paragraph_text'
+                    ? 'wid-20 mb-8'
+                    : productAttributes[j]?.slug === 'product_dropdown'
+                    ? 'wid-40'
+                    : 'wid-20'
+                "
+                [ngStyle]="{
+                  display: productAttributes[j].is_hide ? 'none' : 'block'
+                }"
+              >
+                <div class="form-elements">
+                  <div class="stores-attr-data">
+                    <div *ngSwitchCase="'single_line_text'">
+                      <div *ngIf="!productAttributes[j].is_hide">
+                        <mat-form-field
+                          [ngClass]="
+                            !productAttributes[j].is_editable
+                              ? 'custom-input block-ele mandatory w-100 pointer-none'
+                              : 'custom-input block-ele mandatory w-100'
+                          "
+                          floatLabel="never"
+                        >
+                          <label
+                            class="custom-label"
+                            [class.mandatory]="productAttributes[j]?.required"
+                            >{{ productAttributes[j]?.label_name }}
+                            {{
+                              productAttributes[j]?.custom_label &&
+                              productAttributes[j]?.custom_label.has(i)
+                                ? productAttributes[j]?.custom_label.get(i)
+                                : ""
+                            }}
+                            <!-- {{
+                              subPackingLabelMap.has(i)
+                                ? subPackingLabelMap.get(i)
+                                : ""
+                            }} -->
+                          </label>
+                          <input
+                            matInput
+                            placeholder="{{
+                              module === 'add_product_in_package' &&
+                              productAttributes[j]?.form_control_name ===
+                                'quantity' &&
+                              item.value.name.id
+                                ? productAttributes[j]?.label_name +
+                                  ' ' +
+                                  (productAttributes[j]?.custom_label &&
+                                  productAttributes[j]?.custom_label.has(i)
+                                    ? productAttributes[j]?.custom_label.get(i)
+                                    : '') +
+                                  ': ' +
+                                  productRemainQty[item.value.name.id]
+                                    ?.remaining_quantity
+                                : 'Enter ' +
+                                  productAttributes[j]?.label_name +
+                                  (productAttributes[j]?.custom_label &&
+                                  productAttributes[j]?.custom_label.has(i)
+                                    ? ' ' +
+                                      productAttributes[j]?.custom_label.get(i)
+                                    : '')
+                            }}"
+                            [errorStateMatcher]="matcher"
+                            [formControlName]="
+                              productAttributes[j]?.form_control_name
+                            "
+                            [readonly]="!productAttributes[j].is_editable"
+                            [type]="
+                              productAttributes[j].label_element_data_type ===
+                              'numeric'
+                                ? 'number'
+                                : 'text'
+                            "
+                            (input)="
+                              onInputChange(
+                                $event,
+                                productAttributes[j],
+                                productAttributes[j]?.form_control_name,
+                                i,
+                                productAttributes[j]?.id
+                              );
+                              checkRemainingQuantityError(
+                                productAttributes[j],
+                                item,
+                                productsDynamicForm,
+                                i,
+                                j
+                              )
+                            "
+                            [ngStyle]="{
+                              'background-color': productAttributes[j]
+                                .is_editable
+                                ? ''
+                                : '#D0D0D0',
+                              cursor: productAttributes[j].is_editable
+                                ? 'auto'
+                                : 'not-allowed'
+                            }"
+                          />
+                          <!--                           
+                                                      *ngIf="
+                                                        productAttributes[j]?.form_control_name ==
+                                                          'quantity' &&
+                                                        productsDynamicForm.controls.productItem.controls[
+                                                          i
+                                                        ].controls[productAttributes[j].form_control_name]
+                                                          .value *
+                                                          packageQuantity *
+                                                          is_pallet
+                                                          ? productsDynamicForm.controls.productItem
+                                                              .controls[i].controls.number_of_sub_packages
+                                                              : 1 > productRemainQty[item.value.name] "-->
+
+                          <span
+                            class="custom-error"
+                            *ngIf="
+                              isConditionMet(
+                                productAttributes,
+                                j,
+                                productsDynamicForm,
+                                i,
+                                packageQuantity,
+                                is_pallet,
+                                productRemainQty,
+                                item
+                              )
+                            "
+                            >Please Enter Quantity less than or equal to
+                            Remaining Quantity</span
+                          >
+
+                          <mat-error
+                            *ngIf="
+                              submittedStoresAttributeForm &&
+                              (productsDynamicForm.controls.productItem.controls[
+                                i
+                              ].controls[
+                                productAttributes[j].form_control_name
+                              ].hasError('required') ||
+                                productsDynamicForm.controls.productItem.controls[
+                                  i
+                                ].controls[
+                                  productAttributes[j].form_control_name
+                                ].hasError('whitespace'))
+                            "
+                          >
+                            Please Enter
+                            <!-- <span class="capitalize"
+                        >{{ productAttributes[j].label_name }}
+                      </span> -->
+                            <span>{{ productAttributes[j].label_name }} </span>
+                          </mat-error>
+                          <mat-error
+                            *ngIf="
+                              submittedStoresAttributeForm &&
+                              (productsDynamicForm.controls.productItem.controls[
+                                i
+                              ].controls[
+                                productAttributes[j].form_control_name
+                              ].hasError('pattern') ||
+                                (productsDynamicForm.controls.productItem.controls[
+                                  i
+                                ].controls[
+                                  productAttributes[j].form_control_name
+                                ].hasError('pattern') &&
+                                  productsDynamicForm.controls.productItem.controls[
+                                    i
+                                  ].controls[
+                                    productAttributes[j].form_control_name
+                                  ].hasError('maxlength'))) &&
+                              !productsDynamicForm.controls.productItem.controls[
+                                i
+                              ].controls[
+                                productAttributes[j].form_control_name
+                              ].hasError('minlength')
+                            "
+                          >
+                            Please Enter
+                            <!-- <span class="capitalize"
+                        >valid {{ productAttributes[j].label_name }}
+                      </span> -->
+                            <span
+                              >valid {{ productAttributes[j].label_name }}
+                            </span>
+                          </mat-error>
+                          <mat-error
+                            *ngIf="
+                              submittedStoresAttributeForm &&
+                              productsDynamicForm.controls.productItem.controls[
+                                i
+                              ].controls[
+                                productAttributes[j].form_control_name
+                              ].hasError('minlength') &&
+                              !productsDynamicForm.controls.productItem.controls[
+                                i
+                              ].controls[
+                                productAttributes[j].form_control_name
+                              ].hasError('maxlength')
+                            "
+                          >
+                            Please Enter minimum of
+                            <span
+                              >{{
+                                productsDynamicForm.controls.productItem.controls[
+                                  i
+                                ].controls[
+                                  productAttributes[j].form_control_name
+                                ].getError("minlength").requiredLength
+                              }}
+                              characters
+                            </span>
+                          </mat-error>
+                          <mat-error
+                            *ngIf="
+                              submittedStoresAttributeForm &&
+                              !productsDynamicForm.controls.productItem.controls[
+                                i
+                              ].controls[
+                                productAttributes[j].form_control_name
+                              ].hasError('minlength') &&
+                              !productsDynamicForm.controls.productItem.controls[
+                                i
+                              ].controls[
+                                productAttributes[j].form_control_name
+                              ].hasError('pattern') &&
+                              productsDynamicForm.controls.productItem.controls[
+                                i
+                              ].controls[
+                                productAttributes[j].form_control_name
+                              ].hasError('maxlength')
+                            "
+                          >
+                            {{ productAttributes[j].label_name }} Cannot Exceed
+                            <span
+                              >{{
+                                productsDynamicForm.controls.productItem.controls[
+                                  i
+                                ].controls[
+                                  productAttributes[j].form_control_name
+                                ].getError("maxlength").requiredLength
+                              }}
+                              characters
+                            </span>
+                          </mat-error>
+                        </mat-form-field>
+                      </div>
+                    </div>
+
+                    <div *ngSwitchCase="'rich_text_editor'">
+                      <div
+                        *ngIf="!productAttributes[j].is_hide"
+                        class="rich-text"
+                      >
+                        <div
+                          [ngClass]="
+                            !productAttributes[j].is_editable
+                              ? 'custom-input block-ele mandatory w-100 pointer-none'
+                              : 'custom-input block-ele mandatory w-100'
+                          "
+                          floatLabel="never"
+                        >
+                          <div class="quill-container">
+                            <quill-editor
+                              style="min-height: 110px"
+                              placeholder="Enter {{
+                                productAttributes[j]?.label_name
+                              }}"
+                              [formControlName]="
+                                productAttributes[j]?.form_control_name
+                              "
+                            ></quill-editor>
+                          </div>
+                          <div
+                            style="padding: 6px 4px"
+                            *ngIf="
+                              submittedStoresAttributeForm &&
+                              productsDynamicForm.controls.productItem.controls[
+                                i
+                              ].controls[
+                                productAttributes[j].form_control_name
+                              ].hasError('required')
+                            "
+                          >
+                            Please Enter
+                            <span>{{ productAttributes[j].label_name }} </span>
+                          </div>
+                          <mat-error
+                            style="padding: 6px 4px"
+                            *ngIf="
+                              submittedStoresAttributeForm &&
+                              !productsDynamicForm.controls.productItem.controls[
+                                i
+                              ].controls[
+                                productAttributes[j].form_control_name
+                              ].hasError('required') &&
+                              productsDynamicForm.controls.productItem.controls[
+                                i
+                              ].controls[
+                                productAttributes[j].form_control_name
+                              ].hasError('maxlength')
+                            "
+                          >
+                            {{ productAttributes[j].label_name }} Cannot Exceed
+                            <span
+                              >{{
+                                productsDynamicForm.controls.productItem.controls[
+                                  i
+                                ].controls[
+                                  productAttributes[j].form_control_name
+                                ].getError("maxlength").requiredLength
+                              }}
+                              characters
+                            </span>
+                          </mat-error>
+                        </div>
+                      </div>
+                    </div>
+                    <div *ngSwitchCase="'number'">
+                      <mat-form-field
+                        class="custom-input block-ele mandatory w-100"
+                        floatLabel="never"
+                      >
+                        <label
+                          class="custom-label"
+                          [class.mandatory]="productAttributes[j]?.required"
+                          >{{ productAttributes[j]?.label_name }}</label
+                        >
+                        <input
+                          matInput
+                          placeholder="Enter {{
+                            productAttributes[j].label_name
+                          }}"
+                          [errorStateMatcher]="matcher"
+                          [formControlName]="
+                            productAttributes[j]?.form_control_name
+                          "
+                          [maxlength]="
+                            productAttributes[j].label_element_data_length
+                          "
+                          oninput="javascript:  if (!/^(-?\d+(\.\d{0,3})?)?$/.test(this.value)) this.value = this.value.slice(0, -1);"
+                          [readonly]="
+                            productAttributes[j]?.form_control_name == 'amount'
+                              ? true
+                              : false
+                          "
+                          [type]="number"
+                          [ngClass]="
+                            !productAttributes[j].is_editable
+                              ? 'no-opacity'
+                              : ''
+                          "
+                        />
+
+                        <mat-error
+                          *ngIf="
+                            submittedStoresAttributeForm &&
+                            (productsDynamicForm?.controls?.productItem?.controls[
+                              i
+                            ]?.controls[
+                              productAttributes[j].form_control_name
+                            ].hasError('required') ||
+                              productsDynamicForm?.controls?.productItem
+                                ?.controls[j]?.controls[
+                                productAttributes[j].form_control_name
+                              ].invalid)
+                          "
+                        >
+                          Please Enter
+                          <span>{{ productAttributes[j].label_name }}</span>
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+
+                    <div *ngSwitchCase="'paragraph_text'">
+                      <div *ngIf="!productAttributes[j].is_hide">
+                        <mat-form-field
+                          class="custom-input block-ele mandatory w-100"
+                          floatLabel="never"
+                        >
+                          <label
+                            class="custom-label"
+                            [class.mandatory]="productAttributes[j]?.required"
+                            >{{ productAttributes[j]?.label_name }}</label
+                          >
+                          <textarea
+                            matInput
+                            class="textarea-styles"
+                            placeholder="Enter {{
+                              productAttributes[j].label_name
+                            }}"
+                            [errorStateMatcher]="matcher"
+                            [formControlName]="
+                              productAttributes[j].form_control_name
+                            "
+                            [readonly]="!productAttributes[j].is_editable"
+                            (input)="updateWordCount($event.target.value)"
+                          >
+                          </textarea>
+
+                          <mat-error
+                            *ngIf="
+                              submittedStoresAttributeForm &&
+                              productsDynamicForm?.controls?.productItem?.controls[
+                                i
+                              ].controls[
+                                productAttributes[j].form_control_name
+                              ].hasError('required')
+                            "
+                          >
+                            Please Enter
+                            <span>{{ productAttributes[j].label_name }} </span>
+                          </mat-error>
+                          <mat-error
+                            *ngIf="
+                              submittedStoresAttributeForm &&
+                              (productsDynamicForm?.controls?.productItem.controls[
+                                i
+                              ].controls[
+                                productAttributes[j].form_control_name
+                              ].hasError('pattern') ||
+                                (productsDynamicForm?.controls?.productItem?.controls[
+                                  i
+                                ].controls[
+                                  productAttributes[j].form_control_name
+                                ].hasError('pattern') &&
+                                  productsDynamicForm?.controls?.productItem?.controls[
+                                    i
+                                  ].controls[
+                                    productAttributes[j].form_control_name
+                                  ].hasError('maxlength'))) &&
+                              !productsDynamicForm?.controls?.productItem?.controls[
+                                i
+                              ].controls[
+                                productAttributes[j].form_control_name
+                              ].hasError('minlength')
+                            "
+                          >
+                            Please Enter
+                            <span
+                              >valid {{ productAttributes[j].label_name }}
+                            </span>
+                          </mat-error>
+                          <mat-error
+                            *ngIf="
+                              submittedStoresAttributeForm &&
+                              productsDynamicForm?.controls?.productItem?.controls[
+                                i
+                              ].controls[
+                                productAttributes[j].form_control_name
+                              ].hasError('minlength') &&
+                              !productsDynamicForm?.controls?.productItem?.controls[
+                                i
+                              ].controls[
+                                productAttributes[j].form_control_name
+                              ].hasError('maxlength')
+                            "
+                          >
+                            Please Enter minimum of
+                            <span
+                              >{{
+                                productsDynamicForm.controls.productItem.controls[
+                                  i
+                                ].controls[
+                                  productAttributes[j].form_control_name
+                                ].getError("minlength").requiredLength
+                              }}
+                              characters
+                            </span>
+                          </mat-error>
+                          <mat-error
+                            *ngIf="
+                              submittedStoresAttributeForm &&
+                              !productsDynamicForm?.controls?.productItem?.controls[
+                                i
+                              ].controls[
+                                productAttributes[j].form_control_name
+                              ].hasError('minlength') &&
+                              !productsDynamicForm?.controls?.productItem?.controls[
+                                i
+                              ].controls[
+                                productAttributes[j].form_control_name
+                              ].hasError('pattern') &&
+                              productsDynamicForm?.controls?.productItem?.controls[
+                                i
+                              ].controls[
+                                productAttributes[j].form_control_name
+                              ].hasError('maxlength')
+                            "
+                          >
+                            Please Enter maximun of
+                            <span
+                              >{{
+                                productsDynamicForm?.controls?.productItem?.controls[
+                                  i
+                                ].controls[
+                                  productAttributes[j].form_control_name
+                                ].getError("maxlength").requiredLength
+                              }}
+                              characters
+                            </span>
+                          </mat-error>
+                        </mat-form-field>
+                        <div
+                          style="
+                            float: right;
+                            margin-top: -10px;
+                            margin-right: 6px;
+                          "
+                          *ngIf="
+                            productAttributes[j].form_control_name ===
+                            'terms_conditions'
+                          "
+                        >
+                          {{ wordCount }} /1024
+                        </div>
+                      </div>
+                    </div>
+                    <div *ngSwitchCase="'dropdown'" class="structure-select">
+                      <div *ngIf="!productAttributes[j].is_hide">
+                        <mat-form-field
+                          class="custom-input block-ele mandatory w-100"
+                          floatLabel="never"
+                        >
+                          <label
+                            class="custom-label"
+                            [class.mandatory]="productAttributes[j]?.required"
+                            >{{ productAttributes[j]?.label_name }}</label
+                          >
+                          <mat-select
+                            placeholder="Select {{
+                              productAttributes[j].value
+                            }}"
+                            [errorStateMatcher]="matcher"
+                            [formControlName]="
+                              productAttributes[j].form_control_name
+                            "
+                            (selectionChange)="
+                              dropDownSelectionChange(
+                                $event,
+                                productAttributes[j],
+                                i,
+                                productAttributes
+                              )
+                            "
+                            [disabled]="!productAttributes[j].is_editable"
+                            [compareWith]="compareObjects"
+                          >
+                            <!-- *ngFor="let attr of productAttributes[j]?.options" -->
+                            <mat-option
+                              *ngFor="let attr of dropDownlistarray?.name[i]"
+                              [value]="attr"
+                              [innerHtml]="
+                                attr.label || attr.first_name || attr.name
+                              "
+                            >
+                            </mat-option>
+                            <mat-option
+                              *ngIf="dropDownlistarray?.name[i].length === 0"
+                              disabled
+                              >No options available</mat-option
+                            >
+                          </mat-select>
+
+                          <mat-error
+                            *ngIf="
+                              submittedStoresAttributeForm &&
+                              productsDynamicForm?.controls?.productItem?.controls[
+                                i
+                              ].controls[
+                                productAttributes[j].form_control_name
+                              ].hasError('required')
+                            "
+                          >
+                            Please Select
+                            <span>{{ productAttributes[j].label_name }}</span>
+                          </mat-error>
+                        </mat-form-field>
+                      </div>
+                    </div>
+
+                    <div
+                      *ngSwitchCase="'auto_suggest'"
+                      class="structure-select"
+                    >
+                      <div *ngIf="!productAttributes[j].is_hide">
+                        <mat-form-field
+                          class="custom-input block-ele mandatory w-100"
+                          floatLabel="never"
+                        >
+                          <label
+                            class="custom-label"
+                            [class.mandatory]="productAttributes[j]?.required"
+                            >{{ productAttributes[j]?.label_name }}</label
+                          >
+                          <input
+                            type="text"
+                            placeholder="Enter {{
+                              productAttributes[j]?.label_name
+                            }}"
+                            matInput
+                            [formControlName]="
+                              productAttributes[j].form_control_name
+                            "
+                            [errorStateMatcher]="matcher"
+                            [matAutocomplete]="auto"
+                            [readOnly]="!productAttributes[j].is_editable"
+                          />
+                          <button
+                            type="button"
+                            mat-button
+                            matSuffix
+                            mat-icon-button
+                            aria-label="Clear"
+                            (click)="
+                              clear(
+                                $event.target.value,
+                                productAttributes[j]?.label_name
+                              )
+                            "
+                          >
+                            <mat-icon>keyboard_arrow_down</mat-icon>
+                          </button>
+                          <mat-autocomplete
+                            #auto="matAutocomplete"
+                            [displayWith]="displayView"
+                          >
+                            <mat-option
+                              (onSelectionChange)="
+                                autoSuggestselectionChange(
+                                  attr,
+                                  productAttributes[j],
+                                  j
+                                )
+                              "
+                              [value]="attr.name"
+                              *ngFor="let attr of productAttributes[j]?.options"
+                            >
+                              {{ attr.label || attr.name }}</mat-option
+                            >
+                            <mat-option
+                              *ngIf="productAttributes[j]?.options.length === 0"
+                              disabled
+                              >No options available</mat-option
+                            >
+                          </mat-autocomplete>
+
+                          <mat-error
+                            *ngIf="
+                              submittedStoresAttributeForm &&
+                              productsDynamicForm?.controls.productItem?.controls[
+                                i
+                              ]?.controls[
+                                productAttributes[j].form_control_name
+                              ].hasError('required')
+                            "
+                          >
+                            Please Enter
+                            <span>{{ productAttributes[j].label_name }}</span>
+                          </mat-error>
+                          <p
+                            class="custom-edit-err"
+                            *ngIf="showError && !newClientadded"
+                          >
+                            {{ errormessage }}
+                          </p>
+                        </mat-form-field>
+                      </div>
+                      <div
+                        *ngIf="
+                          showError &&
+                          !newClientadded &&
+                          module === 'create_estimate'
+                        "
+                      >
+                        <span
+                          class="add-link mb-16"
+                          *ngIf="addNew"
+                          (click)="addOrganization()"
+                        >
+                          <mat-icon class="mat-icon material-icons"
+                            >add</mat-icon
+                          >Add New Client
+                        </span>
+                      </div>
+                    </div>
+                    <div
+                      *ngSwitchCase="'product_dropdown'"
+                      class="structure-select"
+                    >
+                      <div *ngIf="!productAttributes[j].is_hide">
+                        <mat-form-field
+                          class="custom-input block-ele mandatory w-100"
+                          floatLabel="never"
+                        >
+                          <label
+                            class="custom-label"
+                            [class.mandatory]="productAttributes[j]?.required"
+                            >{{ productAttributes[j]?.label_name }}</label
+                          >
+                          <input
+                            type="text"
+                            placeholder="Select {{
+                              productAttributes[j]?.label_name
+                            }}"
+                            matInput
+                            [formControlName]="
+                              productAttributes[j].form_control_name
+                            "
+                            [errorStateMatcher]="matcher"
+                            [matAutocomplete]="auto"
+                            [readOnly]="!productAttributes[j].is_editable"
+                          />
+                          <button
+                            type="button"
+                            mat-button
+                            matSuffix
+                            mat-icon-button
+                            aria-label="Clear"
+                            (click)="
+                              clear(
+                                $event.target.value,
+                                productAttributes[j]?.label_name
+                              )
+                            "
+                          >
+                            <mat-icon>keyboard_arrow_down</mat-icon>
+                          </button>
+                          <mat-autocomplete
+                            #auto="matAutocomplete"
+                            [displayWith]="displayView"
+                          >
+                            <mat-option
+                              class="products-custom-mat-option"
+                              [value]="attr.name"
+                              *ngFor="let attr of productAttributes[j]?.options"
+                            >
+                              <div
+                                (click)="changeProduct(attr, i)"
+                                class="product-title"
+                              >
+                                <div>
+                                  <span
+                                    class="product-name product-name-overlap"
+                                    >{{ attr.name }} </span
+                                  ><span class="product-units">{{
+                                    attr.uom_name
+                                  }}</span>
+                                </div>
+                                <span class="product-rate"
+                                  >price: {{ attr.price }}
+                                </span>
+                              </div>
+                            </mat-option>
+                            <div class="add-new-item" (click)="addNewProduct()">
+                              <img [src]="newItemIcon" alt="addNew" />
+                              <span>Add New Item</span>
+                            </div>
+                            <mat-option
+                              *ngIf="productAttributes[j]?.options.length === 0"
+                              disabled
+                              >No options available</mat-option
+                            >
+                          </mat-autocomplete>
+
+                          <mat-error
+                            *ngIf="
+                              submittedStoresAttributeForm &&
+                              productsDynamicForm?.controls.productItem?.controls[
+                                i
+                              ]?.controls[
+                                productAttributes[j].form_control_name
+                              ].hasError('required')
+                            "
+                          >
+                            Please Enter
+                            <span>{{ productAttributes[j].label_name }}</span>
+                          </mat-error>
+                          <p
+                            class="custom-edit-err"
+                            *ngIf="showError && !newClientadded"
+                          >
+                            {{ errormessage }}
+                          </p>
+                        </mat-form-field>
+                      </div>
+                      <div
+                        *ngIf="
+                          showError &&
+                          !newClientadded &&
+                          module === 'create_estimate'
+                        "
+                      >
+                        <span
+                          class="add-link mb-16"
+                          *ngIf="addNew"
+                          (click)="addOrganization()"
+                        >
+                          <mat-icon class="mat-icon material-icons"
+                            >add</mat-icon
+                          >Add New Client
+                        </span>
+                      </div>
+                    </div>
+
+                    <div *ngSwitchDefault>
+                      <mat-form-field
+                        class="custom-input block-ele mandatory w-100"
+                        floatLabel="never"
+                      >
+                        <input
+                          matInput
+                          placeholder="Enter {{
+                            productAttributes[j].label_name
+                          }}"
+                          [errorStateMatcher]="matcher"
+                          [formControlName]="
+                            productAttributes[j].form_control_name
+                          "
+                          [maxlength]="
+                            productAttributes[j].label_element_data_length
+                          "
+                        />
+                        <mat-error
+                          *ngIf="
+                            submittedStoresAttributeForm &&
+                            (productsDynamicForm?.controls?.productAttributes?.controls[
+                              i
+                            ].controls[
+                              productAttributes[j].form_control_name
+                            ].hasError('required') ||
+                              productsDynamicForm?.controls?.productAttributes
+                                ?.controls[i].controls[
+                                productAttributes[j].form_control_name
+                              ].invalid)
+                          "
+                        >
+                          Please Enter
+                          <!-- <span class="capitalize">{{
+                      productAttributes[j].label_name
+                    }}</span> -->
+                          <span>{{ productAttributes[j].label_name }}</span>
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+                  </div>
+
+                  <!-- <div
+              class="divTableCell"
+              style="line-height: 72px; text-align: center"
+            >
+              <mat-icon
+                title="Delete"
+                (click)="deleteRow(i)"
+                style="cursor: pointer; vertical-align: super"
+                mat-button
+                >delete</mat-icon
+              >
+            </div> -->
+                </div>
+              </div>
+            </div>
+            <div
+              class="delete-row"
+              style="text-align: center"
+              *ngIf="
+                module != 'add_products_in_po' &&
+                module != 'add_product_in_shipment'
+              "
+            >
+              <mat-icon
+                title="Delete"
+                (click)="deleteRow(i)"
+                style="cursor: pointer; vertical-align: super"
+                mat-button
+                >delete</mat-icon
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+      <mat-error class="error-msg" *ngIf="productError">
+        Please select atleast one {{ language.pageNavbar.product }}
+      </mat-error>
+      <mat-error class="error-msg" *ngIf="productselecterror">
+        Please provide the details for the {{ language.pageNavbar.product }}.
+      </mat-error>
+    </div>
+
+    <div
+      class="order-totals-wrapper"
+      *ngIf="
+        module != 'add_products_in_po' && module != 'add_product_in_shipment'
+      "
+    >
+      <div
+        class="order-left-nav d-flex"
+        style="justify-content: flex-start; gap: 8px"
+      >
+        <div
+          *ngIf="
+            orginalDropdOptions.name &&
+            productsDynamicForm.get('productItem')['controls'].length !==
+              orginalDropdOptions['name']?.length
+          "
+          class="add-new-line"
+          (click)="addNewLine()"
+          style="padding: 6px"
+        >
+          <img [src]="newItemIcon" alt="img" />
+          <span>Add {{ language.pageNavbar.products }}</span>
+        </div>
+        <mat-error class="error-msg" *ngIf="isAddProduct">
+          Please select a client
+        </mat-error>
+        <!-- <div
+          *ngIf="importLineItems"
+          (click)="uploadLineItemDoc()"
+          class="import_line_items"
+        >
+          Import Line Items
+          <span><img [src]="importIcon" /></span>
+        </div> -->
+      </div>
+    </div>
+  </div>
+  <mat-spinner
+    class="medium-spinner page-fixed"
+    *ngIf="fetchingData"
+  ></mat-spinner>
+</div>

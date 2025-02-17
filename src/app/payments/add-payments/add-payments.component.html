@@ -1,0 +1,45 @@
+<div class="ins-main-container">
+    <mat-toolbar>
+      <div class="create-ins-title-wrapper">
+        <span class="img-icon">
+          <img [src]="createOrderIcon" alt="Icon" />
+        </span>
+        <h2 class="ins-main-title">{{ data.title }} {{ "Payment" }}</h2>
+      </div>
+    </mat-toolbar>
+    <mat-dialog-content
+      class="create-quote-popup"
+    >
+      <div class="page-inner-container">
+        <div class="inner-content">
+          <div class="estimate-error">
+            <app-form-builder
+              [module]="'add_payments'"
+              (trigger)="formEmitEvent($event)"
+            ></app-form-builder>
+            <mat-spinner
+              class="medium-spinner page-fixed"
+              *ngIf="fetchingData"
+            ></mat-spinner>
+          </div>
+        </div>
+      </div>
+    </mat-dialog-content>
+    <mat-dialog-actions>
+      <div class="conformPFi">
+        <button class="back-btn-ui" mat-dialog-close>
+          {{ "Close" }}
+        </button>
+  
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="saveInsurance()"
+          [disabled]="(detailsForm && detailsForm.invalid) || disableBtn"
+        >
+          {{ "Submit" }}
+        </button>
+      </div>
+    </mat-dialog-actions>
+  </div>
+  

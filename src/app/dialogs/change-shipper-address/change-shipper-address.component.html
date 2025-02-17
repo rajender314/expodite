@@ -3,22 +3,32 @@
   <span fxFlex></span>
 </mat-toolbar>
 <mat-dialog-content>
-  <mat-selection-list class="address-selection" *ngFor="let list of contactAddressList">
-
-    <mat-list-option  disableRipple="true" class="orders-list" [disabled]="list.id == selectedCategory.id" [selected]="list.selected" (click)="selectAddress(list.id, list)">
-      <p>{{list.address1}}</p>
-      <p>{{list.address2}}</p>
-      <p>{{list.city}}</p>
-      <p>{{list.state}}</p>
-      <p>{{list.country_name}}</p>
-      <p>{{list.postal_code}}</p>
-
-    </mat-list-option>
-  </mat-selection-list>
+  <mat-radio-group class="custom-radio-group" [(ngModel)]="shippingId" (change)="selectAddress($event)">
+    <div *ngFor="let list of contactAddressList">
+      <mat-radio-button
+        class="orders-list"
+        [value]="list.id"
+        [disabled]="list.id == selectedCategory.id"
+        [disableRipple]="true" 
+      >
+      <p>{{ list.address1 }}</p>
+      <p>{{ list.address2 }}</p>
+      <p>{{ list.city }}</p>
+      <p>{{ list.state }}</p>
+      <p>{{ list.country }}</p>
+      <p>{{ list.postal_code }}</p>
+      </mat-radio-button>
+    </div>
+  </mat-radio-group>
 </mat-dialog-content>
 <mat-dialog-actions>
   <span fxFlex></span>
-  <button mat-button mat-dialog-close>Cancel</button>
-  <button mat-raised-button (click)="changeShipperAdd()" [disabled] = "disabledSave">Change</button>
-  <!--<button *ngIf="!success" mat-raised-button mat-dialog-close color="warn" (click)="confirm()"></button>-->
+  <button class="back-btn-ui" mat-dialog-close>Cancel</button>
+  <button
+    mat-raised-button
+    (click)="changeShipperAdd()"
+    [disabled]="disabledSave"
+  >
+    Change
+  </button>
 </mat-dialog-actions>

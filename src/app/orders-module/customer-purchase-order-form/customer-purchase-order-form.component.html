@@ -1,0 +1,174 @@
+<!-- *ngIf="
+  is_automech
+    ? (order.selectedOrder.status_id >= 17 ||
+        order.selectedOrder.status_slug == 'processed' ||
+        order.selectedOrder.status_slug == 'delivered' ||
+        order.selectedOrder.status_slug == 'in_transit') &&
+      !(order.selectedOrder.status_slug == 'cancelled')
+    : (order.selectedOrder.status_id >= 17 ||
+        order.selectedOrder.status_slug == 'processed' ||
+        order.selectedOrder.status_slug == 'delivered' ||
+        order.selectedOrder.status_slug == 'in_transit') &&
+      !(order.selectedOrder.status_slug == 'cancelled')
+" -->
+<div #freight *ngIf="factoryPermission">
+  <div class="shipping-container" [class.collapse]="!freightlgistics">
+    <!--&& (order.packageStatus == 1 || order.packageStatus == 2) -->
+    <mat-toolbar class="package-toolbar">
+      <img class="shipping-image" [src]="images.Shipping_Bill_Icon" />
+      <span>Order Confirmation</span>
+      <span fxFlex></span>
+      <div *ngIf="viewActivityLogIcon">
+        <button
+          mat-icon-button
+          class="action-orderbtn"
+          (click)="openActivityModal('other_order_details')"
+        >
+          <img [src]="images.activity_log_icon" title="Activity Log" />
+        </button>
+      </div>
+      <button mat-icon-button (click)="togglefreightlogistics()">
+        <img
+          [src]="images.grey_arrow"
+          mat-icon-button
+          *ngIf="freightlgistics"
+        />
+        <mat-icon class="toggle-arrow" *ngIf="!freightlgistics"
+          >keyboard_arrow_down
+        </mat-icon>
+      </button>
+    </mat-toolbar>
+    <div class="shipping-sec" style="padding: 16px" *ngIf="freightlgistics">
+      <app-form-builder
+        [getInputValidationTypes]="getInputValidationTypes"
+        [related_to_id]="order.selectedOrder.id"
+        module="customer_purchase_order"
+        (trigger)="formEmitEvent($event)"
+        [undoOnCancel]="undoOnCancel"
+        (emitUploadInfo)="emitUploadInfo($event)"
+        [disableEdit]="disableEdit"
+        [uploadDocFlag]="uploadDocFlag"
+        [PermissionKey]="'generate_sales_contract'"
+      ></app-form-builder>
+      <!-- <div class="container-title-div">
+        <p class="heading">Containers</p>
+        <button class="add-row-btn" (click)="addNewLine()" mat-raised-button>
+          Add Containers
+        </button>
+      </div> -->
+
+      <!-- <div >
+       
+        <div>
+        <app-ag-grid-view
+        [tableName]="'freight_container_details'"
+        [newColumnAdded]="newColumnAdded"
+      ></app-ag-grid-view>
+    </div>
+      </div> -->
+
+      <!-- <app-freight-dynamic-form 
+      module="add_container"
+      (trigger)="containerFormEmitEvent($event)"
+      [Contacts]="editID"
+      >
+      </app-freight-dynamic-form> -->
+      <!-- <div style="padding-top: 10px;">
+        <mat-error
+          class="error-msg"
+          *ngIf="
+            saveBtnClicked &&
+            (!freightContainerForm ||
+            !freightContainerForm.value.freighContainerAtrray.length
+            )
+          "
+        >
+          Please Include One Container
+        </mat-error>
+      </div> -->
+
+      <mat-list
+        class="footer-bottom fxflex"
+        fxLayout="row"
+        fxLayoutAlign="end center"
+      >
+        <span fxFlex></span>
+        <section class="section-right">
+          <button
+            *ngIf="
+              order_Permissions.enable_skip_order_confirmation &&
+              !saveBtnClicked &&
+              isEditPermission
+            "
+            type="button"
+            mat-button
+            (click)="skipForm()"
+          >
+            Skip and Proceed to Create Shipment
+          </button>
+
+          <button
+            *ngIf="
+              !order_Permissions.enable_skip_order_confirmation &&
+              freightandlogistics?.dirty &&
+              !saveBtnClicked
+            "
+            type="button"
+            class="back-btn-ui"
+            (click)="cancelFreight()"
+          >
+            Cancel
+          </button>
+          <button
+            *ngIf="freightandlogistics?.dirty || showSaveBtn"
+            type="submit"
+            mat-raised-button
+            (click)="submmitFreightcost(freightandlogistics)"
+            [disabled]="
+              freightandlogistics?.invalid ||
+              saveSubmmitFreight ||
+              saveBtnClicked
+            "
+          >
+            Save
+            <span *ngIf="saveBtnClicked">
+              <mat-icon style="height: 16px; width: 16px"
+                ><mat-spinner
+                  class="white-spinner"
+                  diameter="20"
+                ></mat-spinner></mat-icon
+            ></span>
+          </button>
+        </section>
+        <!-- <section class="section-right" *ngIf="saveBtnClicked">
+          <button mat-raised-button disabled="true">
+            <mat-icon> Save ></mat-icon>
+          </button>
+        </section> -->
+        <div class="cb"></div>
+      </mat-list>
+    </div>
+    <!-- <div
+      class="container-title-div"
+      style="margin: 0 30px"
+      *ngIf="showAddContainerBtn"
+    >
+      <p class="heading">Containers</p>
+      <button class="add-row-btn" (click)="addNewLine()" mat-raised-button>
+        Add Containers
+      </button>
+    </div>
+    <div
+      class="shipping-container"
+      style="margin-top: 0"
+      *ngIf="showAddContainerBtn"
+    >
+      <div class="shipping-sec" style="margin-bottom: 0">
+        <app-ag-grid-view
+          [tableName]="'freight_container_details'"
+          [newColumnAdded]="newColumnAdded"
+        ></app-ag-grid-view>
+      </div>
+    </div> -->
+  </div>
+</div>

@@ -1,0 +1,35 @@
+// @import "../../roles/roles-details/roles-details.component";
+// .add-new-address {
+//     display: flex;
+//     align-items: baseline;
+//     .add-new {
+//         color:#FA515B;
+//         font-size: 14px;
+//         cursor: pointer;
+//         padding-left: 10px;
+//         &:hover {
+//             color:#e85a5d;
+//         }
+//     }
+// }
+
+perfect-scrollbar {
+  .ps {
+    .ps-content {
+      height: 100% !important;
+      .roles-form {
+        height: calc(100% - 68px) !important;
+        .min-container {
+          height: 100% !important;
+          .form-fields {
+            overflow: auto !important;
+          }
+        }
+      }
+    }
+  }
+}
+
+// .perfect-scroll .ps-content {
+//   height: 100% !important;
+// }

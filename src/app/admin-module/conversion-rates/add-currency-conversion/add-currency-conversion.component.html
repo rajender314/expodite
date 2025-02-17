@@ -1,0 +1,85 @@
+<div class="order-main-container">
+  <mat-toolbar>
+    <div class="create-order-title-wrapper">
+      <h2 class="order-main-title">
+        <span>
+            {{data.curr_edit ? "Edit Currency Exchange Rate" : "Add Currency Exchange Rate"}}
+        </span>
+    </h2>
+    </div>
+  </mat-toolbar>
+  <mat-dialog-content>
+    <div class="page-inner-container">
+      <form [formGroup]="currencyForm" class="d-flex add-currency">
+        <div class="width-50">
+        <mat-form-field class="custom-input mandatory" floatLabel="never" style="width: 100%;">
+          <label class = "custom-label mandatory">Currency Name (ex: United States Dollar)</label>
+          <input
+            matInput
+            formControlName="currency_name"
+            placeholder="Enter Currency Name"
+            required
+          />
+          <mat-error
+            *ngIf="
+              this.currencyForm.controls.currency_name.hasError('required')
+            "
+          >
+            Please enter the currency name
+          </mat-error>
+        </mat-form-field>
+      </div>
+      <div class="width-50">
+        <mat-form-field class="custom-input mandatory " floatLabel="never" style="width: 100%;">
+          <label class = "custom-label mandatory">Currency Code (ex: USD)</label>
+          <input
+            matInput
+            formControlName="currency_code"
+            minlength = 3
+            maxlength = 3
+            placeholder="Enter Currency Code"
+            required
+          />
+          <mat-error
+            *ngIf="currencyForm.controls.currency_code.hasError('required')"
+          >
+            Please enter the currency code
+          </mat-error>
+          <mat-error
+            *ngIf="
+              currencyForm.controls.currency_code.hasError('min') ||
+              currencyForm.controls.currency_code.hasError('max')
+            "
+          >
+            Currency Code must be of 3 characters
+          </mat-error>
+        </mat-form-field>
+      </div>
+      <div class="width-50">
+        <mat-form-field class="custom-input mandatory " floatLabel="never" style="width: 100%;">
+          <label class = "custom-label mandatory">Exchange Rate (ex: USD to INR)</label>
+          <input
+            matInput
+            formControlName="exch_rate"
+            placeholder="Enter Exchange Rate"
+            required
+          />
+          <mat-error
+            *ngIf="currencyForm.controls.exch_rate.hasError('required')"
+          >
+            Please enter the exchange rate
+          </mat-error>
+          <mat-error *ngIf="currencyForm.controls.exch_rate.hasError('min')">
+            Exchange Rate must be greater than 0
+          </mat-error>
+        </mat-form-field>
+      </div>
+      </form>
+    </div>
+  </mat-dialog-content>
+  <mat-dialog-actions>
+    <span fxFlex></span>
+    <button  class="back-btn-ui" mat-dialog-close>Cancel</button>
+    <button mat-raised-button (click)="addCurrency(currencyForm)" [disabled]="!currencyForm.dirty || !currencyForm.valid">Save</button>
+  </mat-dialog-actions>
+</div>

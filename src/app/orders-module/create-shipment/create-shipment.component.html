@@ -1,0 +1,124 @@
+<div class="pfi-main-container">
+  <mat-toolbar style="display: flex; justify-content: space-between">
+    <div class="create-pfi-title-wrapper">
+      <span class="img-icon">
+        <img [src]="shipmentsIcon" alt="Icon" />
+      </span>
+      <h2 class="pfi-main-title">Create Shipment</h2>
+    </div>
+    <mat-icon
+      mat-dialog-close
+      style="cursor: pointer"
+      aria-hidden="false"
+      aria-label="Example home icon"
+      >close</mat-icon
+    >
+  </mat-toolbar>
+  <mat-dialog-content
+    (scroll)="onWindowScroll($event)"
+    class="create-quote-popup"
+  >
+    <div class="page-inner-container">
+      <div class="products-container">
+        <div class="test">
+          <mat-tab-group #allTabs (selectedIndexChange)="onTabChange($event)">
+            <mat-tab class="pfi-tab" label="Buyer & Shipping Information">
+              <div class="inner-content">
+                <div class="estimate-error">
+                  <app-form-builder
+                    [module]="'create_shipment'"
+                    (changeAddress)="getSelectedAddress($event)"
+                    (trigger)="formEmitEvent($event)"
+                    (changeclietId)="changeclietId($event)"
+                    [related_to_id]="data.orders[0].id ? data.orders[0].id : ''"
+                    [Contacts]="data.orders[0].id ? data.orders[0].id : ''"
+                    [isSubmitBtnClicked]="submiteBtnClicked"
+                    overrideForm="true"
+                  ></app-form-builder>
+                </div>
+                <div class="address-error">
+                  <app-select-address
+                    [module]="'pfi_address_form'"
+                    [totalFormFields]="returnedDynmicDropdowns"
+                    [clientSelectedId]="clientSelectedId"
+                    (trigger)="getSelectedAddress($event)"
+                    [Contacts]="data.orders[0].id ? data.orders[0].id : ''"
+                  ></app-select-address>
+                </div>
+              </div>
+            </mat-tab>
+            <mat-tab class="pfi-tab" label="Products">
+              <div class="inner-content">
+                <div class="product-error">
+                  <app-products-form
+                    [module]="'add_product_in_shipment'"
+                    [clientSelectedId]="clientSelectedId"
+                    (trigger)="emitNewProductsData($event)"
+                    [Contacts]="data.orders[0].id ? data.orders[0].id : ''"
+                    [isSubmitBtnClicked]="submiteBtnClicked"
+                    [selected_order_ids]="data.ordersId"
+                    type="add_product_in_order"
+                  >
+                  </app-products-form>
+                </div>
+                <div class="subtotal-error">
+                  <app-sub-total-form
+                    [module]="'subtotal_form'"
+                    [subTotalSum]="subTotalVal"
+                    [selectedCurrency]="selectedCurrency"
+                    (trigger)="subTotalFormEvent($event)"
+                    [related_to_id]="data.orders[0].id ? data.orders[0].id : ''"
+                    [isSubmitBtnClicked]="submiteBtnClicked"
+                  ></app-sub-total-form>
+                </div>
+              </div>
+            </mat-tab>
+            <mat-tab class="pfi-tab" label="Payment Terms">
+              <div class="inner-content">
+                <app-form-builder
+                  [module]="'shipment_payment_terms'"
+                  (trigger)="paymentformEmitEvent($event)"
+                  [isSubmitBtnClicked]="submiteBtnClicked"
+                  [related_to_id]="data.orders[0].id ? data.orders[0].id : ''"
+                  overrideForm="true"
+                ></app-form-builder>
+              </div>
+            </mat-tab>
+
+            <mat-tab class="pfi-tab" label="Regulatory Details">
+              <div class="inner-content">
+                <app-form-builder
+                  [module]="'shipment_other_specifications'"
+                  (trigger)="specificationsformEmitEvent($event)"
+                  [isSubmitBtnClicked]="submiteBtnClicked"
+                  [related_to_id]="data.orders[0].id ? data.orders[0].id : ''"
+                  overrideForm="true"
+                ></app-form-builder>
+              </div>
+            </mat-tab>
+          </mat-tab-group>
+        </div>
+      </div>
+      <mat-spinner
+        class="medium-spinner page-fixed"
+        *ngIf="fetchingData"
+      ></mat-spinner>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions>
+    <div class="conformPFi">
+      <button mat-button (click)="onClose(allTabs, tabIndex)">
+        {{ closeBtnLabel }}
+      </button>
+      <!-- [disabled]="isDisableBtn" -->
+      <button
+        mat-raised-button
+        color="primary"
+        (click)="saveShipment(allTabs, tabIndex)"
+      >
+        {{ btnLabel }}
+      </button>
+    </div>
+  </mat-dialog-actions>
+</div>

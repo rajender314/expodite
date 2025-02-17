@@ -1,0 +1,46 @@
+.payment {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
+
+.content {
+  padding: 16px 24px;
+}
+
+.table-container {
+  min-height: 100px;
+  height: auto;
+  overflow-y: auto;
+  max-height: 300px;
+}
+
+.table-container .mat-table .mat-row .mat-cell {
+  display: table-cell;
+  padding: 10px;
+}
+
+.no-payment {
+  padding: 16px 10px;
+  color: #565656;
+}
+
+th.mat-header-cell {
+  padding: 10px;
+}
+.view-more {
+  color: #565656;
+  font-weight: 600;
+  padding: 10px;
+  border-top: 1px solid #dfe3e9;
+  display: flex;
+  justify-content: flex-end;
+  cursor: pointer;
+  &:hover {
+    text-decoration: underline;
+  }
+}
+.invoice-nbr {
+  font-size: 14px;
+  color: #565656;
+}

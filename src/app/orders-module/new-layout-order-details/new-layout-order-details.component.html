@@ -1,0 +1,1523 @@
+<div class="orders">
+  <div>
+    <mat-horizontal-stepper #stepper>
+      <mat-step-header></mat-step-header>
+
+      <mat-step>
+        <div *ngIf="!fetchingData">
+          <mat-toolbar class="inner-detail-toolbar" id="order-toolbar">
+            <div class="inv-back" (click)="backToOrders(stepper)">
+              <mat-icon class="back-to-orders">arrow_back</mat-icon>
+            </div>
+            <img [src]="images.small_icon" />
+            <span
+              class="title"
+              *ngIf="!clientPermission"
+              title="{{ orders.selectedOrder.order_no }}"
+              >{{ orders.selectedOrder.order_no }}</span
+            >
+            <span
+              class="title"
+              *ngIf="clientPermission"
+              title="{{ orders.selectedOrder.po_nbr }}"
+              >{{ orders.selectedOrder.po_nbr }}</span
+            >
+            <div
+              class="order-detail-status"
+              [ngStyle]="{ background: orders.selectedOrder.status_color_code }"
+            >
+              {{ selectedOrderStatus }}
+            </div>
+            <span fxFlex></span>
+
+            <span class="order-date"
+              >Client Name:
+              <b>{{ orders.selectedOrder.client_name }}</b>
+            </span>
+            <span class="vertical-divider"></span>
+            <span class="order-date"
+              >Order Date:
+              <b>{{ orders.selectedOrder.order_date }}</b>
+            </span>
+            <span class="vertical-divider"></span>
+            <button
+              *ngIf="
+                order_Permissions.enable_create_po ||
+                order_Permissions.enable_cancel_order
+              "
+              style="padding-bottom: 5px"
+              [matMenuTriggerFor]="belowMenu"
+              mat-button
+            >
+              <img
+                [src]="images.admin_settings"
+                alt="Actions"
+                title="Actions"
+              />
+            </button>
+
+            <mat-menu #belowMenu="matMenu" yPosition="below">
+              <button
+                *ngIf="order_Permissions.enable_cancel_order"
+                mat-button
+                class="cancel-order-button"
+                [disableRipple]="true"
+                (click)="cancelAllOrder()"
+              >
+                Cancel this Order
+              </button>
+              <button
+                mat-button
+                *ngIf="order_Permissions.enable_create_po"
+                class="cancel-order-button"
+                [disableRipple]="true"
+                (click)="createPO()"
+              >
+                Create PO
+              </button>
+            </mat-menu>
+            <!-- <button
+              mat-button
+              class="cancel-order-button"
+              [disableRipple]="true"
+              *ngIf="
+                disableCancel != undefined &&
+                !(orders.selectedOrder.status_slug == 'cancelled') &&
+                blockContent &&
+                !disableCancel &&
+                factoryPermission &&
+                !(orders.selectedOrder.status_slug == 'delivered')
+              "
+              (click)="cancelAllOrder()"
+            >
+              Cancel this Order
+            </button>
+            <button
+              mat-button
+              class="cancel-order-button"
+              [disableRipple]="true"
+              *ngIf="
+                disableCancel != undefined &&
+                disableCancel &&
+                blockContent &&
+                factoryPermission &&
+                !(orders.selectedOrder.status_slug == 'delivered')
+              "
+              (click)="deliverOrder()"
+            >
+              Mark as Delivered
+            </button>
+            <button
+              mat-button
+              class="cancel-order-button"
+              [disableRipple]="true"
+              *ngIf="
+                selectedOrderStatus == 'Delivered' ||
+                selectedOrderStatus == 'Mail Sent'
+              "
+              (click)="deliverOrder()"
+            >
+              Delivery Info
+            </button>
+            <button
+              mat-button
+              class="cancel-order-button"
+              *ngIf="factoryPermission && !clientPermission"
+              [disabled]="
+                sendDocumentMails == false || selectedOrderStatus == 'Cancelled'
+              "
+              [disableRipple]="true"
+              (click)="sendMails()"
+            >
+              Email Documents
+            </button> -->
+          </mat-toolbar>
+          <div
+            class="inner-detail-container"
+            id="innerDetailContent"
+            fxLayout="row"
+          >
+            <div class="side-nav">
+              <mat-list class="inner-detail-list">
+                <mat-list-item
+                  class="inactive-tab"
+                  title="Activity"
+                  (click)="moveToActivity()"
+                  [class.active]="activeTab == 'activity'"
+                >
+                  <mat-icon
+                    mat-list-icon
+                    class="icon-menu"
+                    style="background: #ef5350"
+                  >
+                    <img [src]="images.activity_small" title="Activity" />
+                  </mat-icon>
+                  <h4 mat-line>Activity</h4>
+                </mat-list-item>
+
+                <mat-list-item
+                  class="inactive-tab"
+                  title="Buyer & Shipping Information"
+                  (click)="moveToDetails()"
+                  [class.active]="activeTab == 'details'"
+                >
+                  <mat-icon
+                    mat-list-icon
+                    class="icon-menu"
+                    style="background: #f07e0a"
+                  >
+                    <img
+                      [src]="images.orders_small"
+                      style="position: relative; top: 3px"
+                      title="Buyer & Shipping Information"
+                    />
+                  </mat-icon>
+                  <h4 mat-line>Buyer & Shipping Information</h4>
+                </mat-list-item>
+                <mat-list-item
+                  (click)="moveToElement(items, 'packaging')"
+                  class="inactive-tab"
+                  title="Products"
+                  [ngClass]="{ active: activeTab == 'packaging' }"
+                >
+                  <mat-icon
+                    mat-list-icon
+                    class="icon-menu"
+                    style="background: #8b5729"
+                  >
+                    <img [src]="images.pkgDetails_small" title="Products" />
+                  </mat-icon>
+                  <h4 mat-line>Products</h4>
+                </mat-list-item>
+                <mat-list-item
+                  class="inactive-tab"
+                  title="Payments And Delivery Terms"
+                  (click)="moveToElement(payment, 'payments')"
+                  [class.active]="activeTab == 'payments'"
+                >
+                  <mat-icon
+                    mat-list-icon
+                    class="icon-menu"
+                    style="background: #679136"
+                  >
+                    <img
+                      [src]="images.shippingDetails_small"
+                      title="Payments And Delivery Terms"
+                    />
+                  </mat-icon>
+                  <h4 mat-line>Payments And Delivery Terms</h4>
+                </mat-list-item>
+
+                <mat-list-item
+                  class="inactive-tab"
+                  title="Regulatory Details"
+                  (click)="moveToElement(specs, 'specs')"
+                  [class.active]="activeTab == 'specs'"
+                >
+                  <mat-icon
+                    mat-list-icon
+                    class="icon-menu"
+                    style="background: #679136"
+                  >
+                    <img
+                      [src]="images.shippingDetails_small"
+                      title="Regulatory Details"
+                    />
+                  </mat-icon>
+                  <h4 mat-line>Regulatory Details</h4>
+                </mat-list-item>
+                <!-- *ngIf="orders.selectedOrder.status_slug !== 'order_confirmed'" -->
+                <mat-list-item
+                  (click)="moveToElement(uploadSale, 'uploadSales')"
+                  class="inactive-tab"
+                  title="Order Confirmation"
+                  [ngClass]="{ active: activeTab == 'uploadSales' }"
+                >
+                  <mat-icon
+                    mat-list-icon
+                    class="icon-menu"
+                    style="background: #679136"
+                  >
+                    <img
+                      [src]="images.shippingDetails_small"
+                      title="Order Confirmation"
+                    />
+                  </mat-icon>
+                  <h4 mat-line>Order Confirmation</h4>
+                </mat-list-item>
+                <mat-list-item
+                  *ngIf="order_Permissions.enable_shipments"
+                  class="inactive-tab"
+                  title="Shipments"
+                  (click)="moveToElement(shipment, 'shipments')"
+                  [class.active]="activeTab == 'shipments'"
+                >
+                  <mat-icon
+                    mat-list-icon
+                    class="icon-menu"
+                    style="background: #ef5350"
+                  >
+                    <img [src]="images.export_register" title="Shipments" />
+                  </mat-icon>
+                  <h4 mat-line>Shipments</h4>
+                </mat-list-item>
+                <mat-divider
+                  *ngIf="orderDocumentsArr.length"
+                  class="divider"
+                ></mat-divider>
+                <div
+                  *ngIf="dynamicDocLoader && order_Permissions.enable_shipments"
+                >
+                  <app-order-documents
+                    [orderDocMap]="orderDocuments"
+                    [removeDocHighlight]="removeDocHighlight"
+                    (documentEventId)="handleDocumentEventId($event)"
+                    [typeId]="typeId"
+                    *ngFor="let typeId of orderDocumentsArr"
+                  >
+                  </app-order-documents>
+                </div>
+              </mat-list>
+            </div>
+            <div
+              fxFlex
+              class="inner-detail-content order-detail-content"
+              id="printAll"
+              #scrollContainer
+              (scroll)="scrollOrdersContainer($event)"
+              style="padding: 26px 0;"
+            >
+              <div class="app-container order-form-view">
+                <!-- New Activity Log -->
+                <div class="activity-container" #activity>
+                  <div>
+                    <mat-toolbar class="package-toolbar">
+                      <img
+                        class="logo-img"
+                        [src]="images.activity_small"
+                        title="Activity"
+                      />
+                      <span>Activity Log</span>
+                      <span fxFlex></span>
+                    </mat-toolbar>
+                    <div class="address-container activity-status">
+                      <mat-list *ngFor="let activity of orders.activityDetails">
+                        <mat-list-item class="activity-list">
+                          <div class="activity-progress today-activity"></div>
+                          <div class="activity-details">
+                            <span class="activity-name">
+                              {{ activity.name }}
+                            </span>
+                            <span>{{ activity.date_added }}</span>
+                          </div>
+                        </mat-list-item>
+                      </mat-list>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- _New Order Details -->
+                <!-- *ngIf="order_Permissions?.order_details" -->
+                <div [class]="details.print ? 'print' : 'no-print'">
+                  <div
+                    class="order-inner-container"
+                    #details
+                    [class.collapse]="!displayTabs.order_details"
+                  >
+                    <mat-toolbar class="package-toolbar">
+                      <img class="logo-img" [src]="images.ordersIcon_o" />
+                      <span>Buyer & Shipping Information</span>
+                      <span fxFlex></span>
+                      <div *ngIf="viewActivityLogIcon">
+                        <button
+                          mat-icon-button
+                          class="action-orderbtn"
+                          (click)="openActivityModal('order_details')"
+                        >
+                          <img
+                            [src]="images.activity_log_icon"
+                            title="Activity Log"
+                          />
+                        </button>
+                      </div>
+                      <!--commenting edit order -->
+                      <div
+                        class="packages-icons"
+                        *ngIf="order_Permissions.enable_edit_order"
+                      >
+                        <button
+                          mat-icon-button
+                          (click)="editOrder()"
+                          [disabled]="editOrderBtn"
+                        >
+                          <mat-icon
+                            class="edit-icon"
+                            title="Edit"
+                            mat-icon-button
+                            >mode_edit
+                          </mat-icon>
+                        </button>
+                      </div>
+                      <!--end-->
+                      <!-- <a
+                        *ngIf="
+                          !clientPermission &&
+                          orders.selectedOrder.status != 'Cancelled'
+                        "
+                        target="_blank"
+                        [ngClass]="{
+                          'events-none':
+                            orders.selectedOrder.status == 'Cancelled'
+                        }"
+                        href="generate_pdf?id={{
+                          orders.selectedOrder.id
+                        }}&is_printable=1"
+                      >
+                        <button mat-icon-button class="action-orderbtn">
+                          <img [src]="images.printer_icon" title="Print" />
+                        </button>
+                      </a>
+                      <a
+                        *ngIf="orders.selectedOrder.status != 'Cancelled'"
+                        href="generate_pdf?id={{
+                          orders.selectedOrder.id
+                        }}&is_printable=0"
+                        [ngClass]="{
+                          'events-none':
+                            orders.selectedOrder.status == 'Cancelled'
+                        }"
+                      > 
+                        <button mat-icon-button class="action-orderbtn">
+                          <img [src]="images.download_arrow" title="Download" />
+                        </button>
+                      </a>-->
+                      <button
+                        mat-icon-button
+                        (click)="hideTabs('order_details')"
+                      >
+                        <img
+                          [src]="images.grey_arrow"
+                          mat-icon-button
+                          *ngIf="displayTabs.order_details"
+                        />
+                        <mat-icon
+                          class="toggle-arrow"
+                          *ngIf="!displayTabs.order_details"
+                          >keyboard_arrow_down
+                        </mat-icon>
+                      </button>
+                    </mat-toolbar>
+                    <div *ngIf="displayTabs.order_details">
+                      <div
+                        class="address-container"
+                        fxLayout="row"
+                        style="min-height: 400px"
+                      >
+                        <div class="shipper-secction" fxFlex="33">
+                          <h4 class="gray-title">SHIPPER</h4>
+                          <div
+                            class="address-inner-content"
+                            *ngIf="orders.selectedOrder.status == 'Placed'"
+                          >
+                            The shipper address will be updated once the order
+                            is accepted.
+                          </div>
+                          <div
+                            class="address-inner-content text-capitalized"
+                            *ngIf="
+                              orders.selectedOrder.status != 'Placed' &&
+                              orders.companyShpAddrDt
+                            "
+                          >
+                            <b>{{ orders.companyShpAddrDt.address1 }}</b>
+                            <p style="margin: 0px">
+                              {{ orders.companyShpAddrDt.address2 }}
+                            </p>
+                            <p style="margin: 0px">
+                              {{ orders.companyShpAddrDt?.address3 }}
+                            </p>
+                            <p style="margin: 0px">
+                              {{ orders.companyShpAddrDt?.address4 }}
+                            </p>
+                            <p style="margin: 0px">
+                              {{ orders.companyShpAddrDt.city }} -
+                              {{ orders.companyShpAddrDt.postal_code }}
+                            </p>
+                            <p style="margin: 0px">
+                              {{ orders.companyShpAddrDt.state }}
+                            </p>
+                            <p style="margin: 0px">
+                              {{ orders.companyShpAddrDt.country }}
+                            </p>
+                          </div>
+
+                          <!-- orders.selectedOrder.status_slug != 'received' &&
+                          orders.selectedOrder.status_slug !=
+                            'order_ready' &&
+                          orders.selectedOrder.status_slug !=
+                            'confirmation_pending,' -->
+                          <button
+                            mat-button
+                            class="cancel-order-button change-shipper"
+                            [disabled]="
+                              order_Permissions?.enable_shipper_address
+                            "
+                            [class.disableClass]="
+                              order_Permissions?.enable_shipper_address
+                            "
+                            [class.events-none]="
+                              order_Permissions?.enable_shipper_address
+                            "
+                            *ngIf="blockContent && factoryPermission"
+                            (click)="changeAddress()"
+                          >
+                            <mat-icon>mode_edit</mat-icon>Change Shipper Address
+                          </button>
+                          <div class="instructions">
+                            <span
+                              title="{{
+                                orders.selectedOrder.special_instructions
+                              }}"
+                              *ngIf="
+                                orders.selectedOrder.special_instructions &&
+                                factoryPermission &&
+                                !clientPermission
+                              "
+                              >Special Instructions:
+                              <b>{{
+                                orders.selectedOrder.special_instructions
+                              }}</b>
+                            </span>
+                          </div>
+                          <div class="instructions">
+                            <span
+                              title="{{
+                                orders.selectedOrder.special_instructions
+                              }}"
+                              *ngIf="
+                                orders.selectedOrder.dispatch_date &&
+                                factoryPermission &&
+                                !clientPermission
+                              "
+                            >
+                              Dispatch Date:
+                              <b>{{
+                                orders.selectedOrder.dispatch_date
+                                  | date : "MMM dd, yyyy"
+                              }}</b>
+                            </span>
+                          </div>
+                          <div class="instructions">
+                            <span
+                              title="{{
+                                orders.selectedOrder.special_instructions
+                              }}"
+                              *ngIf="factoryPermission && !clientPermission"
+                              >Expected Delivery Date:
+                              <b>{{
+                                orders.selectedOrder.delivery_date
+                                  | date : "MMM dd, yyyy"
+                              }}</b>
+                            </span>
+                          </div>
+                        </div>
+                        <div class="vertical-divider"></div>
+                        <div fxFlex="33" class="order-billing">
+                          <div class="shipper-secction">
+                            <h4 class="gray-title">BILL TO PARTY</h4>
+                            <p class="shippers-text shipper-hdng">
+                              {{ orders.billingAddr.billing_company }}
+                            </p>
+                            <div class="address-inner-content">
+                              <b class="bill-address">{{
+                                orders.billingAddr.billing_address1
+                              }}</b>
+                              <p class="bill-address text-capitalized">
+                                {{ orders.billingAddr.billing_address2 }}
+                              </p>
+                              <p class="bill-address text-capitalized">
+                                {{ orders.billingAddr?.billing_address3 }}
+                              </p>
+                              <p class="bill-address text-capitalized">
+                                {{ orders.billingAddr?.billing_address4 }}
+                              </p>
+                              <p
+                                class="bill-address text-capitalized"
+                                *ngIf="
+                                  orders.billingAddr.billing_city ||
+                                  orders.billingAddr.billing_postal_code
+                                "
+                              >
+                                {{ orders.billingAddr.billing_city }} -
+                                {{ orders.billingAddr.billing_postal_code }}
+                              </p>
+                              <p class="bill-address text-capitalized">
+                                {{ orders.billingAddr.billing_state }}
+                              </p>
+                              <p class="bill-address text-capitalized">
+                                {{ orders.billingAddr.billing_country }}
+                              </p>
+                            </div>
+                          </div>
+                          <div class="shipper-secction mt_30">
+                            <h4 class="gray-title">SHIP TO PARTY</h4>
+                            <p class="shippers-text shipper-hdng">
+                              {{ orders.shippingAddr.shipping_company }}
+                            </p>
+                            <div class="address-inner-content">
+                              <b class="bill-address">{{
+                                orders.shippingAddr.shipping_address1
+                              }}</b>
+                              <p class="bill-address text-capitalized">
+                                {{ orders.shippingAddr.shipping_address2 }}
+                              </p>
+                              <p class="bill-address">
+                                {{ orders.shippingAddr?.shipping_address3 }}
+                              </p>
+                              <p class="bill-address">
+                                {{ orders.shippingAddr?.shipping_address4 }}
+                              </p>
+                              <p
+                                class="bill-address text-capitalized"
+                                *ngIf="
+                                  orders.shippingAddr.shipping_city ||
+                                  orders.shippingAddr.shipping_postal_code
+                                "
+                              >
+                                {{ orders.shippingAddr.shipping_city }} -
+                                {{ orders.shippingAddr.shipping_postal_code }}
+                              </p>
+                              <p class="bill-address text-capitalized">
+                                {{ orders.shippingAddr.shipping_state }}
+                              </p>
+                              <p class="bill-address">
+                                {{ orders.shippingAddr.shipping_country }}
+                              </p>
+                            </div>
+                          </div>
+                          <div
+                            class="shipper-secction mt_30"
+                            *ngIf="showNotifyAddress"
+                          >
+                            <h4 class="gray-title">NOTIFY TO PARTY</h4>
+                            <p class="shippers-text shipper-hdng">
+                              {{ orders.notifyAddr.notify_company }}
+                            </p>
+                            <div class="address-inner-content">
+                              <b class="bill-address">{{
+                                orders.notifyAddr.notify_address1
+                              }}</b>
+                              <p class="bill-address text-capitalized">
+                                {{ orders.notifyAddr.notify_address2 }}
+                              </p>
+                              <p class="bill-address">
+                                {{ orders.notifyAddr?.notify_address4 }}
+                              </p>
+                              <p class="bill-address">
+                                {{ orders.notifyAddr?.notify_address3 }}
+                              </p>
+
+                              <p
+                                class="bill-address text-capitalized"
+                                *ngIf="
+                                  orders.notifyAddr.notify_city ||
+                                  orders.notifyAddr.notify_postal_code
+                                "
+                              >
+                                {{ orders.notifyAddr.notify_city }} -
+                                {{ orders.notifyAddr.notify_postal_code }}
+                              </p>
+                              <p class="bill-address text-capitalized">
+                                {{ orders.notifyAddr.notify_state }}
+                              </p>
+                              <p class="bill-address text-capitalized">
+                                {{ orders.notifyAddr.notify_country }}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                        <div
+                          fxFlex
+                          class="order-po-container"
+                          *ngIf="!is_automech"
+                        >
+                          <div class="order-po">
+                            <a class="no-img">
+                              <img class="logo-img" [src]="images.file_pdf" />
+                            </a>
+                            <div class="po-numbheader">
+                              <p>
+                                <span>PO No - </span>
+
+                                <span
+                                  (keyup)="
+                                    editInLineitems(
+                                      $event.target.innerText,
+                                      'po_nbr',
+                                      orderId
+                                    )
+                                  "
+                                  class="editable-cell"
+                                  contenteditable="true"
+                                  *ngIf="
+                                    orders.selectedOrder.status !=
+                                      'In-transit' &&
+                                    orders.selectedOrder.status !=
+                                      'Cancelled' &&
+                                    orders.selectedOrder.status !=
+                                      'Delivered' &&
+                                    factoryPermission &&
+                                    adminUser
+                                  "
+                                >
+                                  {{ orders.selectedOrder.po_nbr }}</span
+                                >
+                                <span>{{ errormes }}</span>
+                                <span
+                                  contenteditable="false"
+                                  *ngIf="
+                                    orders.selectedOrder.status ==
+                                      'In-transit' ||
+                                    orders.selectedOrder.status ==
+                                      'Cancelled' ||
+                                    orders.selectedOrder.status ==
+                                      'Delivered' ||
+                                    !factoryPermission ||
+                                    !adminUser
+                                  "
+                                  >{{ orders.selectedOrder.po_nbr }}</span
+                                >
+                              </p>
+                            </div>
+                          </div>
+                          <div class="po-date">
+                            <mat-form-field
+                              class="custom-deliveryDate custom-deliveryDatePo"
+                              floatLabel="never"
+                              style="position: relative; bottom: 21px"
+                            >
+                              <label class="custom-labeldate po-date"
+                                >PO Date</label
+                              >
+                              <input
+                                matInput
+                                class="datepicker"
+                                (focus)="openCalendar(picker2)"
+                                (click)="openCalendar(picker2)"
+                                [disabled]="
+                                  orders.selectedOrder.status == 'In-transit' ||
+                                  orders.selectedOrder.status == 'Cancelled' ||
+                                  orders.selectedOrder.status == 'Delivered' ||
+                                  !factoryPermission ||
+                                  !adminUser
+                                "
+                                [(ngModel)]="po_date2"
+                                [matDatepicker]="picker2"
+                                placeholder="PO Date"
+                                readonly
+                                (dateChange)="
+                                  editInLineitems(po_date2, 'po_date', orderId)
+                                "
+                              />
+                              <mat-datepicker-toggle
+                                class="mat-picker"
+                                matSuffix
+                                [for]="picker2"
+                              >
+                              </mat-datepicker-toggle>
+                              <mat-datepicker
+                                #picker2
+                                startView="year"
+                              ></mat-datepicker>
+                            </mat-form-field>
+                          </div>
+                        </div>
+                      </div>
+                      <div fxLayout="row"></div>
+                    </div>
+                  </div>
+                </div>
+                <!-- *ngIf="order_Permissions?.order_details" -->
+                <div>
+                  <div
+                    class="order-inner-container"
+                    #items
+                    [class.collapse]="!displayTabs.items"
+                  >
+                    <mat-toolbar class="package-toolbar">
+                      <img class="logo-img" [src]="images.package_icon" />
+                      <span>Products</span>
+                      <span fxFlex></span>
+
+                      <button mat-icon-button (click)="hideTabs('items')">
+                        <img
+                          [src]="images.grey_arrow"
+                          mat-icon-button
+                          *ngIf="displayTabs.items"
+                        />
+                        <mat-icon
+                          class="toggle-arrow"
+                          *ngIf="!displayTabs.items"
+                          >keyboard_arrow_down
+                        </mat-icon>
+                      </button>
+                    </mat-toolbar>
+                    <div
+                      class="orders-table"
+                      [ngClass]="!displayTabs.items ? 'visible-hidden' : ''"
+                    >
+                      <app-ag-grid-view
+                        [orders]="orders"
+                        [selectOrder]="selectOrder"
+                        [originFileAttachments]="originFileAttachments"
+                        [selectPO]="selectPO"
+                        (emitGridEvent)="triggerGridEvent($event)"
+                        [tableName]="'orderDetail'"
+                      ></app-ag-grid-view>
+                      <div class="freight-container">
+                        <table
+                          class="invoice-costTable order-details"
+                          style="width: 100%"
+                        >
+                          <tbody>
+                            <tr>
+                              <td colspan="4" style="width: 60%">
+                                <table>
+                                  <tbody>
+                                    <tr>
+                                      <td></td>
+                                    </tr>
+                                  </tbody>
+                                </table>
+                              </td>
+
+                              <td colspan="4" rowspan="2">
+                                <table
+                                  style="width: 100%; border-collapse: collapse"
+                                  class="add-line-table"
+                                >
+                                  <tbody>
+                                    <tr>
+                                      <td class="costTable-row" colspan="2">
+                                        Sub Total
+                                      </td>
+                                      <td
+                                        class="costTable-row"
+                                        style="width: 160px"
+                                      >
+                                        <span style="padding-right: 5px">
+                                          {{
+                                            orders.selectedOrder?.subtotal
+                                          }}</span
+                                        >
+                                      </td>
+                                    </tr>
+                                    <tr>
+                                      <td class="costTable-row" colspan="2">
+                                        Insurance
+                                      </td>
+                                      <td
+                                        class="costTable-row values1 editfreight-orders"
+                                        style="width: 160px"
+                                      >
+                                        <div
+                                          style="
+                                            display: flex;
+                                            justify-content: flex-end;
+                                          "
+                                        >
+                                          <input
+                                            #orderDetailEditInsurance
+                                            style="width: 100%"
+                                            class="numaricEdit charges"
+                                            oninput="javascript: if (!/^\d+(\.\d{0,3})?$/.test(this.value)) this.value = this.value.slice(0, -1);"
+                                            [ngStyle]="{
+                                              border: editinsurancevalueState
+                                                ? '1px solid #075da8'
+                                                : 'none'
+                                            }"
+                                            (keyup)="
+                                              savefreighdescount(
+                                                $event,
+                                                'insurance'
+                                              )
+                                            "
+                                            [readonly]="
+                                              !editinsurancevalueState ||
+                                              selectedOrderStatus == 'Cancelled'
+                                            "
+                                            onpaste="javascript:event.preventDefault();"
+                                            [(ngModel)]="
+                                              orders.selectedOrder.insurance
+                                            "
+                                            (focus)="removeCommas($event)"
+                                            (blur)="onBlur($event, 'insurance')"
+                                          />
+
+                                          <div style="display: flex">
+                                            <mat-icon
+                                              *ngIf="editinsurancevalueState"
+                                              (mousedown)="
+                                                editInsuranceFreight(
+                                                  $event,
+                                                  1,
+                                                  'insurance'
+                                                )
+                                              "
+                                              style="
+                                                padding-left: 2px;
+                                                font-size: 24px;
+                                              "
+                                              class="mat-circle-check close-circle-icons-order"
+                                              >check_circle_outline</mat-icon
+                                            >
+                                            <mat-icon
+                                              style="font-size: 24px"
+                                              *ngIf="editinsurancevalueState"
+                                              class="close-conversion close-circle-icons-order"
+                                              (click)="closeEdit()"
+                                              >highlight_off</mat-icon
+                                            >
+                                          </div>
+                                        </div>
+                                      </td>
+                                      <td
+                                        class="costTable-head font-normal edit-new-style"
+                                      >
+                                        <mat-icon
+                                          *ngIf="
+                                            !editinsurancevalueState &&
+                                            selectedOrderStatus !== 'Cancelled'
+                                          "
+                                          (mousedown)="
+                                            editInsurancefre('insurance')
+                                          "
+                                          class="editfreight-orders"
+                                          >edit</mat-icon
+                                        >
+                                      </td>
+                                    </tr>
+                                    <tr>
+                                      <td class="costTable-row" colspan="2">
+                                        Freight
+                                      </td>
+
+                                      <td
+                                        class="costTable-row values1 editfreight-orders"
+                                        style="width: 160px"
+                                      >
+                                        <div
+                                          style="
+                                            display: flex;
+                                            justify-content: flex-end;
+                                          "
+                                        >
+                                          <input
+                                            #orderDetailEditFright
+                                            oninput="javascript: if (!/^\d+(\.\d{0,3})?$/.test(this.value)) this.value = this.value.slice(0, -1);"
+                                            [ngStyle]="{
+                                              border: editfreightState
+                                                ? '1px solid #075da8'
+                                                : 'none'
+                                            }"
+                                            (keyup)="
+                                              savefreighdescount(
+                                                $event,
+                                                'freight'
+                                              )
+                                            "
+                                            [readonly]="
+                                              !editfreightState ||
+                                              selectedOrderStatus == 'Cancelled'
+                                            "
+                                            style="width: 100%"
+                                            oninput="javascript: if (!/^\d+(\.\d{0,3})?$/.test(this.value)) this.value = this.value.slice(0, -1);"
+                                            class="numaricEdit charges"
+                                            [(ngModel)]="
+                                              orders.selectedOrder.freight
+                                            "
+                                            onpaste="javascript:event.preventDefault();"
+                                            (focus)="removeCommas($event)"
+                                            (blur)="onBlur($event, 'freight')"
+                                          />
+
+                                          <div style="display: flex">
+                                            <mat-icon
+                                              *ngIf="editfreightState"
+                                              (mousedown)="
+                                                editInsuranceFreight(
+                                                  $event,
+                                                  2,
+                                                  'freight'
+                                                )
+                                              "
+                                              style="
+                                                padding-left: 2px;
+                                                font-size: 24px;
+                                              "
+                                              class="mat-circle-check close-circle-icons-order"
+                                              >check_circle_outline</mat-icon
+                                            >
+                                            <mat-icon
+                                              style="font-size: 24px"
+                                              *ngIf="editfreightState"
+                                              class="close-conversion close-circle-icons-order"
+                                              (click)="closeEdit()"
+                                              >highlight_off</mat-icon
+                                            >
+                                          </div>
+                                        </div>
+                                      </td>
+                                      <td
+                                        class="costTable-head font-normal edit-new-style"
+                                      >
+                                        <mat-icon
+                                          *ngIf="
+                                            !editfreightState &&
+                                            selectedOrderStatus !== 'Cancelled'
+                                          "
+                                          (mousedown)="
+                                            editInsurancefre('freight')
+                                          "
+                                          class="editfreight-orders"
+                                          >edit</mat-icon
+                                        >
+                                      </td>
+                                    </tr>
+                                    <tr>
+                                      <td class="costTable-row" colspan="2">
+                                        Discount
+                                        <span
+                                          *ngIf="
+                                            orders.selectedOrder.discount !==
+                                            '0.00'
+                                          "
+                                          >(-)</span
+                                        >
+                                      </td>
+                                      <td
+                                        class="costTable-row values1 editfreight-orders"
+                                        style="width: 160px"
+                                      >
+                                        <div
+                                          style="
+                                            display: flex;
+                                            justify-content: flex-end;
+                                          "
+                                        >
+                                          <input
+                                            #orderDetailEditDiscount
+                                            style="width: 100%"
+                                            [ngStyle]="{
+                                              border: editDescountstateState
+                                                ? '1px solid #075da8'
+                                                : 'none'
+                                            }"
+                                            (keyup)="
+                                              savefreighdescount(
+                                                $event,
+                                                'discount'
+                                              )
+                                            "
+                                            [readonly]="
+                                              !editDescountstateState ||
+                                              selectedOrderStatus == 'Cancelled'
+                                            "
+                                            class="numaricEdit charges"
+                                            oninput="javascript: if (!/^\d+(\.\d{0,3})?$/.test(this.value)) this.value = this.value.slice(0, -1);"
+                                            [(ngModel)]="
+                                              orders.selectedOrder.discount
+                                            "
+                                            onpaste="javascript:event.preventDefault();"
+                                            (focus)="removeCommas($event)"
+                                            (blur)="onBlur($event, 'discount')"
+                                          />
+
+                                          <div style="display: flex">
+                                            <mat-icon
+                                              *ngIf="editDescountstateState"
+                                              (mousedown)="
+                                                editInsuranceFreight(
+                                                  $event,
+                                                  3,
+                                                  'discount'
+                                                )
+                                              "
+                                              style="
+                                                padding-left: 2px;
+                                                font-size: 24px;
+                                              "
+                                              class="mat-circle-check close-circle-icons-order"
+                                              >check_circle_outline</mat-icon
+                                            >
+                                            <mat-icon
+                                              style="font-size: 24px"
+                                              *ngIf="editDescountstateState"
+                                              class="close-conversion close-circle-icons-order"
+                                              (click)="closeEdit()"
+                                              >highlight_off</mat-icon
+                                            >
+                                          </div>
+                                        </div>
+                                      </td>
+                                      <td
+                                        class="costTable-head font-normal edit-new-style"
+                                      >
+                                        <mat-icon
+                                          *ngIf="
+                                            !editDescountstateState &&
+                                            selectedOrderStatus !== 'Cancelled'
+                                          "
+                                          (mousedown)="
+                                            editInsurancefre('discount')
+                                          "
+                                          class="editfreight-orders"
+                                          >edit</mat-icon
+                                        >
+                                      </td>
+                                    </tr>
+                                    <ng-container
+                                      *ngFor="
+                                        let column of orders.selectedOrder
+                                          .extra_col;
+                                        index as colIndex
+                                      "
+                                    >
+                                      <!-- *ngIf="!is_aapl" -->
+                                      <tr>
+                                        <td class="costTable-row delete">
+                                          <mat-icon
+                                            class="delete-icon"
+                                            title="Delete"
+                                            (click)="
+                                              deleteLineItemorderDetails(column)
+                                            "
+                                          >
+                                            delete</mat-icon
+                                          >
+                                        </td>
+                                        <td
+                                          [attr.colspan]="1"
+                                          class="costTable-row cost-key"
+                                          (input)="
+                                            changeInvoiceExtraKey(
+                                              colIndex,
+                                              $event
+                                            )
+                                          "
+                                        >
+                                          {{ column.line_item }}
+                                        </td>
+                                        <td
+                                          [attr.colspan]="2"
+                                          class="costTable-row"
+                                          (keydown)="
+                                            changeInvoiceExtraValue(
+                                              colIndex,
+                                              $event
+                                            )
+                                          "
+                                        >
+                                          {{ column.value }}
+                                        </td>
+                                      </tr>
+                                    </ng-container>
+                                  </tbody>
+                                </table>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div
+                        class="footer"
+                        style="justify-content: space-between"
+                      >
+                        <div
+                          *ngIf="
+                            blockContent &&
+                            factoryPermission &&
+                            !clientPermission
+                          "
+                        >
+                          <span
+                            [class.disableClass]="
+                              selectedOrderStatus == 'Cancelled'
+                            "
+                            class="add-Line"
+                            (click)="addlineitemorders()"
+                          >
+                            <mat-icon>add</mat-icon>
+                            Add Line Item
+                          </span>
+                        </div>
+                        <div>
+                          <span class="total-text">Total:</span>
+                          <span class="total-text">{{
+                            orders.selectedOrder?.currency_type
+                          }}</span>
+                          <span contenteditable="false">
+                            <!-- (keydown)="changePrice(element, $event, 0)" -->
+                            {{ orders.selectedOrder.total }}</span
+                          >
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- Payments Form  -->
+                <ng-container>
+                  <div #payments>
+                    <app-estimate-payments
+                      [module]="'order_payment_terms'"
+                      [factoryPermission]="factoryPermission"
+                      [viewActivityLogIcon]="viewActivityLogIcon"
+                      [getInputValidationTypes]="getInputValidationTypes"
+                      [minimizeAll]="minimizeAll"
+                    ></app-estimate-payments>
+                  </div>
+                </ng-container>
+                <ng-container class="proforma-top">
+                  <div #Specs>
+                    <app-estimate-specification
+                      [module]="'order_other_specifications'"
+                      [factoryPermission]="factoryPermission"
+                      [viewActivityLogIcon]="viewActivityLogIcon"
+                      [getInputValidationTypes]="getInputValidationTypes"
+                      [minimizeAll]="minimizeAll"
+                    ></app-estimate-specification>
+                  </div>
+                </ng-container>
+                <div>
+                  <!-- [class]="details.print ? 'print' : 'no-print'" -->
+                  <!-- class="order-inner-container"
+                  [class.collapse]="!displayTabs.items" -->
+                  <div #uploadSales>
+                    <app-customer-purchase-order-form
+                      [getInputValidationTypes]="getInputValidationTypes"
+                      [order_Permissions]="order_Permissions"
+                      [factoryPermission]="factoryPermission"
+                      [order]="orders"
+                      [is_automech]="is_automech"
+                      (trigger)="getFormEvent($event)"
+                      [saveFreightFlag]="saveShippedFlag"
+                      [dependentForm]="shippingform"
+                      [viewActivityLogIcon]="viewActivityLogIcon"
+                      (orderPermissions)="orderPermissions($event)"
+                      (setOrderReady)="setOrderReady()"
+                      (moveToElement)="moveToElement(shipment, 'shipments')"
+                      (setMinimizeAll)="setMinimizeAll()"
+                    ></app-customer-purchase-order-form>
+                    <div class="add-paid">
+                      <span fxFlex></span>
+                      <!-- <button
+                      [disabled]="conformorderButton"
+                      mat-raised-button
+                      *ngIf="
+                        orders.selectedOrder.status_slug == 'accepted' &&
+                        salesDocuments.length
+                      "
+                      (click)="confirmSales()"
+                    >
+                      Confirm Sales Contract/Purchase Order
+                    </button> -->
+                    </div>
+                  </div>
+                </div>
+                <div
+                  *ngIf="order_Permissions.enable_shipments"
+                  class="order-inner-container"
+                  #shipments
+                  [class.collapse]="!displayTabs.shipments"
+                >
+                  <mat-toolbar class="package-toolbar">
+                    <img class="logo-img" [src]="images.package_icon" />
+                    <span>Shipments</span>
+                    <span fxFlex></span>
+                    <button
+                      *ngIf="shipmetOrderProducts?.result.data.length"
+                      mat-raised-button
+                      color="warn"
+                      id="2"
+                      class="create-order-btn"
+                      (click)="createShipment()"
+                    >
+                      Create Shipment
+                    </button>
+                    <!-- <button mat-icon-button (click)="hideTabs('shipments')">
+                      <img
+                        [src]="images.grey_arrow"
+                        mat-icon-button
+                        *ngIf="displayTabs.shipments"
+                      />
+                      <mat-icon
+                        class="toggle-arrow"
+                        *ngIf="!displayTabs.shipments"
+                        >keyboard_arrow_down
+                      </mat-icon>
+                    </button> -->
+                  </mat-toolbar>
+                  <perfect-scrollbar>
+                    <div class="list-view-table" style="padding: 0px 2px">
+                      <div
+                        class="table-header-ui top-sticky z-index-8"
+                        style="top: 16px"
+                      >
+                        <div class="container-ui">
+                          <mat-list-item
+                            class="order-list-row mat-list-item header-cleint"
+                          >
+                            <div
+                              class="item-container justify-start p-l-16"
+                              fxFlex="40"
+                            >
+                              Shipment number
+                            </div>
+                            <div
+                              class="item-container justify-left"
+                              style="padding-left: 20px"
+                              fxFlex="40"
+                            >
+                              Date
+                            </div>
+                            <!-- <div
+                              class="item-container justify-start pl-12"
+                              fxFlex="16"
+                            >
+                              Country
+                            </div>
+                            <div
+                              class="item-container justify-start pl-12"
+                              fxFlex="16"
+                            >
+                              Account Manager
+                            </div>
+                            <div
+                              class="item-container justify-right"
+                              fxFlex="14"
+                              style="justify-content: end"
+                            >
+                              Amount
+                            </div> -->
+                            <div
+                              class="item-container status-align p-r-16 status-padding"
+                              fxFlex="20"
+                            >
+                              Status
+                            </div>
+                          </mat-list-item>
+                        </div>
+                      </div>
+                      <div
+                        class="container-ui new-center-empty-ui"
+                        *ngIf="fetchingShipments"
+                      >
+                        <mat-spinner
+                          class="medium-spinner"
+                          *ngIf="fetchingShipments"
+                        ></mat-spinner>
+                      </div>
+
+                      <div
+                        *ngIf="!fetchingShipments"
+                        class="global_list_view container-ui"
+                        infiniteScroll
+                        [infiniteScrollDistance]="1"
+                        [infiniteScrollThrottle]="50"
+                        [scrollWindow]="false"
+                      >
+                        <!-- (scrolled)="onScroll()" -->
+                        <div fxLayout="column" fxFlex="100">
+                          <div *ngIf="order_shipments.length">
+                            <div
+                              [routerLink]="['shipments', order?.shipment_id]"
+                              class="list-item-card"
+                              *ngFor="let order of order_shipments"
+                            >
+                              <mat-list-item class="order-list-row">
+                                <!-- (click)="shipmentsDetailsRoute(stepper, order)" -->
+                                <div
+                                  (click)="$event.stopPropagation()"
+                                  class="item-container"
+                                  fxFlex="40"
+                                >
+                                  <div
+                                    class="d-flex align-items-center avatar-cell o-hidden"
+                                  >
+                                    <div class="icon-sec">
+                                      <img
+                                        [src]="images.estimatesIcon"
+                                        title="Estimates"
+                                      />
+                                    </div>
+                                    <div
+                                      [routerLink]="[
+                                        'shipments',
+                                        order?.shipment_id
+                                      ]"
+                                      class="content-sec o-hidden ellipsis-text"
+                                    >
+                                      <h1
+                                        title="{{ order.shipment_no }}"
+                                        class="ellipsis-text"
+                                      >
+                                        {{ order.shipment_no }}
+                                        <mat-icon
+                                          *ngIf="order.special_instructions"
+                                          class="flag-orders"
+                                          title="{{
+                                            order.special_instructions
+                                          }}"
+                                        >
+                                          flag</mat-icon
+                                        >
+                                      </h1>
+                                      <small
+                                        title="{{ order.product_name }}"
+                                        class="ellipsis-text"
+                                      >
+                                        {{ order.product_names }}</small
+                                      >
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <div class="item-container" fxFlex="40">
+                                  <div
+                                    class="d-flex align-items-center avatar-cell o-hidden"
+                                  >
+                                    <div
+                                      class="content-sec o-hidden ellipsis-text"
+                                    >
+                                      <h1
+                                        class="normal ellipsis-text"
+                                        title="{{ order.client_name }}"
+                                      >
+                                        {{ order.shipment_date }}
+                                      </h1>
+                                    </div>
+                                  </div>
+                                </div>
+                                <!-- <div
+                                  class="item-container country po_no"
+                                  fxFlex="16"
+                                >
+                                  <p mat-line title="{{ order.country }}">
+                                    {{ order.country }}
+                                  </p>
+                                </div>
+                                <div
+                                  class="item-container country account_manager"
+                                  fxFlex="16"
+                                >
+                                  <p
+                                    mat-line
+                                    title="{{ order.account_manager }}"
+                                  >
+                                    {{ order.account_manager }}
+                                  </p>
+                                </div>
+                                <div
+                                  class="item-container amount_container text-right country"
+                                  fxFlex="14"
+                                  style="justify-content: end"
+                                >
+                                  <p mat-line title="{{ order.total_amount }}">
+                                    {{ order.currency }}
+                                    {{ order.total_amount }}
+                                  </p>
+                                </div> -->
+                                <div
+                                  class="item-container status-cell status-tag-container status-padding"
+                                  fxFlex="20"
+                                >
+                                  <div
+                                    class="client-status"
+                                    [ngStyle]="{
+                                      background: order.color_code
+                                    }"
+                                  >
+                                    {{ order.status }}
+                                  </div>
+                                  <span fxFlex></span>
+                                  <mat-icon class="go-to-details"
+                                    >keyboard_arrow_right</mat-icon
+                                  >
+
+                                  <!-- <p class="client-status"
+                                                            title="{{order.orders.status}}"
+                                                            [ngClass]="{'accepted':order.orders.status == 'Accepted' , 'in-transit':order.orders.status == 'In-transit', 'delivered':order.orders.status == 'Delivered', 'cancelled':order.orders.status == 'Cancelled','received':order.orders.status == 'Received','processing':order.orders.status == 'Processing'}">
+                                                            {{order.orders.status}} </p> -->
+                                </div>
+                              </mat-list-item>
+                            </div>
+                          </div>
+
+                          <!-- <div
+                              class="container-ui new-center-empty-ui"
+                              > -->
+                          <mat-card
+                            class="no-results"
+                            *ngIf="!order_shipments.length"
+                          >
+                            <div class="empty-img-holder">
+                              <!-- <img [src]='images.ordersIcon_o'> -->
+                              <span class="material-icons"> info </span>
+                            </div>
+                            <p class="no-result-text">No Data Found</p>
+                          </mat-card>
+                          <!-- </div> -->
+
+                          <!-- <div
+                              class="container-ui new-center-empty-ui"
+                              *ngIf="fetchingData"
+                            >
+                              <mat-spinner
+                                class="medium-spinner"
+                                *ngIf="fetchingData"
+                              ></mat-spinner>
+                            </div> -->
+                        </div>
+                      </div>
+                    </div>
+                  </perfect-scrollbar>
+
+                  <!-- <div *ngFor="let shipments of order_shipments">
+                    <div
+                      [routerLink]="['shipments', shipments?.shipment_id]"
+                      class="shipment-links"
+                    >
+                      {{ shipments?.shipment_no }}
+                    </div>
+                  </div> -->
+                </div>
+                <div *ngIf="order_Permissions.enable_shipments">
+                  <ng-container
+                    *ngFor="let item of dymanicdocumentdata; let i = index"
+                  >
+                    <app-dynamic-documents
+                      [item]="item"
+                      [orderId]="orderId"
+                      type="generateOrderDocument"
+                    ></app-dynamic-documents>
+                  </ng-container>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="container-ui new-center-empty-ui" *ngIf="showNoDatFound">
+          <mat-card class="no-results">
+            <div class="empty-img-holder">
+              <span class="material-icons"> info </span>
+            </div>
+            <p class="no-result-text">No Data Found</p>
+          </mat-card>
+        </div>
+      </mat-step>
+    </mat-horizontal-stepper>
+    <div *ngIf="totalSpinner">
+      <mat-spinner class="medium-spinner"></mat-spinner>
+    </div>
+  </div>
+</div>

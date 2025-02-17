@@ -1,0 +1,192 @@
+<div
+  [attr.id]="'invoice-' + (item.id ? item.id : item.module)"
+  class="inner-container dynamic_form"
+  [class.inner-container-close]="!showDiv"
+  *ngIf="item.is_display"
+>
+  <!-- [class.collapse]="!showTaxInvoice" -->
+  <mat-toolbar class="package-toolbar">
+    <mat-icon
+      mat-list-icon
+      class="post_ship_icon icon-menu detail_view_right_icons"
+      style="background-color: #f07e0a"
+    >
+      <img [src]="images.orders_small" />
+    </mat-icon>
+    <div class="invoice-toolbar">
+      <div class="invoice-number">
+        <!-- <span class="details-span">{{ item.inv_nbr }}</span> -->
+        <!-- <span class="order-detail-status">{{ item.status }}</span> -->
+        <span class="pad-lft">{{ item.name }}</span>
+      </div>
+      <!-- <div class="xyz">
+        <span class="details-date">{{ item?.date }}</span>
+      </div> -->
+    </div>
+    <span fxFlex></span>
+    <!-- *ngIf="viewActivityLogIcon" -->
+    <div *ngIf="item.id">
+      <!-- ngIf="editExist.length" -->
+      <button
+        (click)="onEdit(item)"
+        mat-icon-button
+        *ngIf="showDiv && item.is_editable && isEditPermission"
+      >
+        <mat-icon class="edit-icon" title="Edit" mat-icon-button
+          >mode_edit
+        </mat-icon>
+      </button>
+      <!-- <button
+        mat-icon-button
+        class="action-orderbtn"
+        id="Editbutton"
+        (click)="onSave()"
+      >
+        Save
+      </button>
+      <button
+        mat-icon-button
+        class="action-orderbtn"
+        id="Editbutton"
+        (click)="onClick()"
+      >
+        Edit
+      </button> -->
+    </div>
+    <div
+      *ngIf="item.id !== 'certificate_of_origin' && item.id !== 'draft_bl'"
+      class="packages-icons"
+    >
+      <!-- *ngIf="!clientPermission && !isMerchantExporter" -->
+      <a target="_blank" href="{{ type }}?id={{ item.id }}&is_printable=1">
+        <button mat-icon-button>
+          <img [src]="images.printer_icon" title="Print" />
+        </button>
+      </a>
+      <!-- *ngIf="!isMerchantExporter" -->
+      <a href="{{ type }}?id={{ item.id }}&is_printable=0">
+        <button mat-icon-button>
+          <img [src]="images.download_arrow" title="Download" />
+        </button>
+      </a>
+      <!--customs invoice new document adding for aapl-->
+      <!-- <a
+        *ngIf="!clientPermission && isMerchantExporter"
+        target="_blank"
+        href="generateCustomsInvoice?orders_id={{
+          orders.selectedOrder.id
+        }}&is_printable=1"
+      >
+        <button mat-icon-button>
+          <img [src]="images.printer_icon" title="Print" />
+        </button>
+      </a> -->
+
+      <!-- <a
+        *ngIf="!clientPermission && isMerchantExporter"
+        href="generateCustomsInvoice?orders_id={{
+          orders.selectedOrder.id
+        }}&is_printable=0"
+      >
+        <button mat-icon-button>
+          <img [src]="images.download_arrow" title="Download" />
+        </button>
+      </a> -->
+
+      <!-- <a
+        *ngIf="!clientPermission && isMerchantExporter && viewExcelIcon"
+        href="generateCustomsInvoice?orders_id={{
+          orders.selectedOrder.id
+        }}&is_excel=1&is_printable=0"
+      >
+        <button mat-icon-button>
+          <img [src]="images.excel_icon" title="Download Excel" />
+        </button>
+      </a> -->
+      <!-- <button mat-icon-button (click)="toggleTaxInvoice()"> -->
+      <!-- <img [src]="images.grey_arrow" mat-icon-button *ngIf="showTaxInvoice" />
+        <mat-icon class="toggle-arrow" *ngIf="!showTaxInvoice">
+          keyboard_arrow_down</mat-icon
+        >
+      </button> -->
+      <button style="flex: '3'" (click)="toggleDiv()" mat-icon-button>
+        <img
+          [src]="images.grey_arrow"
+          mat-icon-button
+          class="expand-icon"
+          [class.close]="!showDiv"
+        />
+      </button>
+    </div>
+  </mat-toolbar>
+
+  <!-- <div [innerHTML]="item.document_body"></div> -->
+  <!-- {{ some }} -->
+  <div *ngIf="!item?.static" class="layout" [class.minimize-div]="!showDiv">
+    <div >
+      <div
+        #containerRef
+        [attr.id]="item.id"
+        style="padding: 24px; line-height: 1.5"
+        [innerHTML]="this.item.document_body"
+      ></div>
+      <div
+        *ngIf="editMode"
+        class="footer-bottom fxflex"
+        style="padding: 14px"
+        fxLayout="row"
+        fxLayoutAlign="end center"
+      >
+        <span fxFlex></span>
+        <section class="section-right">
+          <button (click)="onEdit()" type="button" mat-button>Cancel</button>
+
+          <button (click)="onSave()" type="submit" mat-raised-button>
+            Save
+          </button>
+        </section>
+        <div class="cb"></div>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin: 26px" *ngIf="item.static">
+    <app-form-builder
+      [module]="item.module"
+      (trigger)="formEmitEvent($event)"
+      (emitUploadInfo)="emitUploadInfo($event)"
+      [related_to_id]="id"
+      [undoOnCancel]="undoOnCancel"
+    ></app-form-builder>
+
+    <mat-list
+      class="footer-bottom fxflex"
+      fxLayout="row"
+      fxLayoutAlign="end center"
+      *ngIf="activeState"
+    >
+      <span fxFlex></span>
+      <section class="section-right" *ngIf="!saveBtnClicked">
+        <button type="button" class="back-btn-ui" (click)="cancelFreight()">
+          Cancel
+        </button>
+        <button
+          type="submit"
+          mat-raised-button
+          (click)="saveStoreAttributeApi()"
+          [disabled]="freightandlogistics?.invalid || saveSubmmitFreight"
+        >
+          Save
+        </button>
+      </section>
+      <section class="section-right" *ngIf="saveBtnClicked">
+        <button mat-raised-button disabled="true">
+          <mat-icon>
+            <mat-spinner class="white-spinner" diameter="20"></mat-spinner
+          ></mat-icon>
+        </button>
+      </section>
+      <div class="cb"></div>
+    </mat-list>
+  </div>
+</div>

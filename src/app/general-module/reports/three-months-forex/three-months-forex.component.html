@@ -1,0 +1,96 @@
+<section class="center-section-scroll vh-100 d-flex body-color">
+  <div class="page-header-ui">
+    <div class="flex-fixed-header page-title">
+      <div class="d-flex">
+        <div class="inv-back" [routerLink]="['/reports']">
+          <mat-icon class="back-to-orders">arrow_back</mat-icon>
+        </div>
+        <h1 title="Foreign Inward Remittence Certificate Report">
+          Forex Gain/Loss Report ({{durationName}})
+        </h1>
+      </div>
+      <div class="d-flex align-items-center">
+        <div
+          class="view-section"
+          *ngIf=" durations.length"
+        >
+          <mat-form-field appearance="fill" class="custom-input custom-client" style="margin-top: 14px; margin-right: 4px;">
+            <mat-select
+              [(ngModel)]="savedViewValue"
+              placeholder="Saved Views"
+              (ngModelChange)="getSelectedView(savedViewValue)"
+            >
+              <mat-option
+                *ngFor="let view of durations; let i = index"
+                [value]="view.id"
+                class="with-delete-icon"
+                >{{ view.name }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <button
+        mat-raised-button
+        class="mat-button mat-primary-btn"
+        (click)="getForexExportReport()"
+        *ngIf="adminService.rolePermissions.export_report == 1"
+      >
+        Export
+      </button>
+        <button
+        mat-raised-button
+        class="mat-button mat-primary-btn filter-btn"
+        (click)="openFilters()"
+      >
+      <div>
+        <mat-icon [matBadge]="filterCount">filter_list</mat-icon>
+        <span>Filters</span>
+      </div>
+        <div (click)="clearFilters($event)" title="Clear Filters" *ngIf="filterCount" style="display: flex;">
+        <img [src]="images.removeIcon" alt="img" class="removeRedIcon">
+        </div>
+      </button>
+      </div>
+    </div>
+  </div>
+  <div class="reports-grid" style="overflow: auto">
+    <!-- <mat-spinner class="medium-spinner" *ngIf="fetchingData"></mat-spinner> -->
+
+    <ng-container>
+      <ag-grid-angular
+        class="ag-theme-alpine ag-theme-balham reports_grid grouped-grid"
+        [gridOptions]="ReportsService.gridOptions"
+        [columnDefs]="columnDefs"
+        [defaultColDef]="defaultColDef"
+        [rowModelType]="rowModelType"
+        [masterDetail]="true"
+        [detailCellRendererParams]="detailCellRendererParams"
+        [rowData]="rowData"
+        (gridReady)="onGridReady($event)"
+        rowHeight="40"
+        headerHeight="30"
+        (sortChanged)="onSortChanged($event)"
+        [overlayNoRowsTemplate]="ReportsService.noRowsTemplate"
+        [sideBar]="sideBar"
+        (firstDataRendered)="ReportsService.onFirstDataRendered($event)"
+      ></ag-grid-angular>
+    </ng-container>
+  </div>
+
+
+  <div class="pagination-footer" >
+    <div class="container-ui d-flex space-between align-items-center" style="max-width: unset;padding: 0 20px;">
+      <div>
+        <p>Showing {{ listCount }} out of {{ totalCount }}</p>
+      </div>
+      <div>
+        <app-pagination
+        [pageLimit]="totalCount"
+        (pageloadMore)="loadMore($event)"
+        [pageNumber]="pageNumber"
+      >
+      </app-pagination>
+      </div>
+    </div>
+  </div>
+</section>

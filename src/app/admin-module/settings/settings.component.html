@@ -1,39 +1,82 @@
-<div class="center-section-scroll vh-100 d-flex body-white" style="border-left: solid 1px #d6d9dc;" fxFlex>
-    <div class="page-header-ui">
-        <div class="flex-fixed-header page-title ">
-            <h2 style="font-weight: 400;">Settings</h2>
-        </div> </div>
-   <perfect-scrollbar class="padding-16">
-    <form [formGroup]="detailsForm" class="organisation-details compny-form" >
-        <div class="min-container" >
-            <div class="form-fields cmpn-fields" style="padding-top: 16px;">
-                <div class=" compny-box-field">
-                    <label class="custom-label mandatory pad-rt" style="font-size: 14px; color: #565656; text-transform: capitalize;" >Stop Outgoing Emails</label>
-                    <br>
-                    <mat-radio-group class="share_section" style="display: inline-block;padding-top: 12px;"  formControlName="mailFlag">
-                        <mat-radio-button class="radio-sec " color="primary" value="true">Yes</mat-radio-button>
-                        <mat-radio-button class="radio-sec" color="primary" value="false">No</mat-radio-button>
-                    </mat-radio-group>
-                </div>
-                <div  class=" compny-box-field" style="padding-top: 10px;">
-                    <mat-form-field fxFlex="50" class="custom-input mandatory compny-sub-flx" floatLabel="never">
-                        <label class="custom-label mandatory">Packing Cost Constant</label>
-                        <input matInput type="number"  maxlength=50 placeholder="Enter Packing Cost Constant" type="number" formControlName="packageNumber" id="phone" />
-                        <mat-error *ngIf="!detailsForm.controls.packageNumber.pristine &&  detailsForm.controls.packageNumber.hasError('required')">Please Enter Packing Cost Constant </mat-error>
-                    </mat-form-field>
-                </div>
-            </div>
-           
+<div
+  class="center-section-scroll vh-100 d-flex body-white"
+  style="border-left: solid 1px #d6d9dc"
+  fxFlex
+>
+  <div class="page-header-ui">
+    <div class="flex-fixed-header page-title">
+      <h2 class="admin-heading">Settings</h2>
+    </div>
+  </div>
+  <perfect-scrollbar class="padding-16">
+    <form [formGroup]="detailsForm" class="organisation-details compny-form">
+      <div class="min-container">
+        <div class="form-fields cmpn-fields" style="padding-top: 16px">
+          <div class="compny-box-field">
+            <label
+              class="custom-label mandatory pad-rt"
+              style="
+                font-size: 14px;
+                color: #565656;
+                text-transform: capitalize;
+              "
+              >Stop Outgoing Emails</label
+            >
+            <br />
+            <mat-radio-group
+              class="share_section"
+              style="display: inline-block; padding-top: 12px"
+              formControlName="mailFlag"
+            >
+              <mat-radio-button class="radio-sec" color="primary" value="true"
+                >Yes</mat-radio-button
+              >
+              <mat-radio-button class="radio-sec" color="primary" value="false"
+                >No</mat-radio-button
+              >
+            </mat-radio-group>
+          </div>
         </div>
+      </div>
+      <div class="min-container" style="padding-top: 16px">
+        <!-- <div class="form-fields cmpn-fields" style="padding-top: 16px">
+          <div class="compny-box-field">
+            <div class="select-product">
+              Enforce all items are packaged before Customs Invoice can be
+              generated
+              <mat-checkbox
+                class="mat-checkbox-inner-container"
+                formControlName="force_package"
+              >
+              </mat-checkbox>
+            </div>
+          </div>
+        </div> -->
+        <mat-checkbox color="primary" formControlName="force_package">
+          Enforce all items are packaged before Customs Invoice can be
+          generated.</mat-checkbox
+        >
+      </div>
     </form>
-   </perfect-scrollbar>
-   <div class="footer animated slideInUp cmpny-footer" fxLayout="row" fxLayoutAlign="start center" *ngIf="detailsForm.dirty" >
-       <div class="min-container d-flex justify-content-end">
-        <button type="button" mat-button (click)="cancel(detailsForm)">{{language.defaults.cancel}}</button>
-        <button type="submit" mat-raised-button [disabled]="detailsForm.invalid" (click)="updateOrganization(detailsForm)" >{{language.defaults.save}}</button>
-    
-       </div>
-   </div>
-    
+  </perfect-scrollbar>
+  <div
+    class="footer animated slideInUp cmpny-footer"
+    fxLayout="row"
+    fxLayoutAlign="start center"
+    *ngIf="detailsForm.dirty"
+  >
+    <div class="min-container d-flex justify-content-end">
+      <button type="button" class="back-btn-ui" (click)="cancel(detailsForm)">
+        {{ language.defaults.cancel }}
+      </button>
+      <button
+        type="submit"
+        mat-raised-button
+        [disabled]="detailsForm.invalid"
+        (click)="updateOrganization(detailsForm)"
+      >
+        {{ language.defaults.save }}
+      </button>
+    </div>
+  </div>
 </div>
-

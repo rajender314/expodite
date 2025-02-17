@@ -1,0 +1,12 @@
+.upload-open {
+    opacity: 0;
+}
+
+.upload-error {
+    color: #f44336;
+    padding-top: 8px;
+}
+.disable-upload {
+   cursor: default;
+   opacity: 0.6; 
+}

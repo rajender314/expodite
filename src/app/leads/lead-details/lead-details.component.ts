@@ -41,6 +41,7 @@ export class LeadDetailsComponent implements OnInit {
       .then(response => {
         if (response.result.success) {
           this.overViewData = response.result.data.data[0];
+          console.log(this.overViewData)
           this.contactLength  =this.overViewData?.contacts?.length;
           if(this.overViewData?.contacts?.length){
             this.contactLength = true

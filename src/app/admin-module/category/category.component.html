@@ -1,4 +1,20 @@
-<div fxLayout="row">
-  <app-category-list  class="tabs-list" [update]="updatedCategoryDetails" (trigger)="getSelectedCategory($event)"></app-category-list>
-  <app-category-details  class="inner-content" [category]="selectedCategory" style="width:100%;" (trigger)="updateCategoryDetails($event)" ></app-category-details>
-</div>
+<!-- <div fxLayout="row">
+  <app-category-list
+    class="tabs-list"
+    [updateList]="updateList"
+    [update]="updatedCategoryDetails"
+    (trigger)="getSelectedCategory($event)"
+  ></app-category-list>
+  <app-category-details
+    class="inner-content"
+    [category]="selectedCategory"
+    style="width: 100%; padding: 0"
+    (trigger)="updateCategoryDetails($event)"
+  ></app-category-details>
+</div> -->
+<!-- [module]="'add_categories'" -->
+<app-form-builder-list-view
+  [form_module_name]="'add_categories'"
+  [noDataImage]="images.no_category"
+  [namingConvention]="'Categories'"
+></app-form-builder-list-view>

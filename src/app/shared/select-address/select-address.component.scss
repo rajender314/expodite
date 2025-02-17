@@ -1,0 +1,119 @@
+.address-selection {
+  padding: 15px 0px;
+  max-height: 250px;
+  overflow: auto;
+  padding-bottom: 8px;
+
+  .mat-list-option {
+    height: auto;
+    margin: 0;
+    padding: 15px 8px !important;
+  }
+
+  .mat-list-item-content {
+    flex-direction: row !important;
+    align-items: flex-start !important;
+  }
+
+  .mat-list-text {
+    font-size: 14px;
+    color: #565656;
+    letter-spacing: -0.18px;
+    line-height: 25px;
+    padding: 0px 16px !important;
+
+    p {
+      &:first-child {
+        font-weight: 500;
+      }
+    }
+  }
+}
+
+.add-link {
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: none !important;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 6px;
+
+  .mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 18px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+  }
+}
+
+.orders-list.create-order {
+  height: auto !important;
+}
+
+.cofirmOrderActionsBlock {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  align-items: center;
+  justify-content: flex-end;
+  width: 100%;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+.custom-multi-select {
+  margin-top: 30px;
+  position: relative;
+
+  label {
+    z-index: 1;
+    position: absolute;
+    top: -18px;
+    left: 0;
+    font-size: 14px;
+    color: #565656;
+  }
+
+  .custom-multi-select-input {
+    padding: 0.4375em 0;
+  }
+
+  .ng-select-container {
+    color: #333;
+    background-color: #fff;
+    border-radius: 4px;
+    border: 1px solid #dfe3e9;
+    min-height: 36px;
+    align-items: center;
+  }
+}
+
+.custom-deliveryDate {
+  &.mt-30 {
+    margin-top: 30px !important;
+  }
+}
+
+.image-block {
+  width: 250px;
+  overflow: hidden;
+}
+
+.d-col {
+  flex-direction: column;
+}
+
+.custom-edit-err {
+  margin-top: 0.5416666667em;
+  font-size: 11px;
+  color: red;
+}
+
+.mb-16 {
+  margin-bottom: 16px;
+}
+.address-error {
+  padding: 10px 4px !important;
+}

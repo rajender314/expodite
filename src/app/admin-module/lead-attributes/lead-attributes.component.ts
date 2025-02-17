@@ -1,34 +1,26 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit } from "@angular/core";
 
 @Component({
-  selector: 'app-lead-attributes',
-  templateUrl: './lead-attributes.component.html',
-  styleUrls: ['./lead-attributes.component.scss'],
-  
+  selector: "app-lead-attributes",
+  templateUrl: "./lead-attributes.component.html",
+  styleUrls: ["./lead-attributes.component.scss"],
 })
 export class LeadAttributesComponent implements OnInit {
   selectedAttribute: object;
-  	updatedRoleDetails: object;
+  updatedRoleDetails: object;
   updatedCategoryDetails: object;
-  constructor(
-    
-  ) { 
-    
-  }
+  constructor() {}
 
-  ngOnInit(): void {
-    
-  }
+  ngOnInit(): void {}
   getSelectedRole(data: any): void {
-    //console.log(data)
-		if (data) this.selectedAttribute = data;
+    if (data) this.selectedAttribute = data;
     else this.selectedAttribute = {};
     //console.log(this.selectedAttribute )
-	}
- 	updateDetails(result): void {
-		this.updatedRoleDetails = {
-			id: result.flag,
-			result: result.data
-		}
-  	}
+  }
+  updateDetails(result): void {
+    this.updatedRoleDetails = {
+      id: result.flag,
+      result: result.data,
+    };
+  }
 }

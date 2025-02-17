@@ -756,3 +756,16 @@
     margin-left: 4px;
     position: absolute;
 }
+.current-series{
+    background-color: rgba(0,0,0,.12) !important;
+}
+// .pta{
+//     line-height:26px !important;top:-26px !important;
+// }
+
+.ellipsis {
+    width: 300px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

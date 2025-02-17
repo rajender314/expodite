@@ -1,11 +1,11 @@
 <div class="center-section-scroll vh-100 d-flex body-white" fxFlex>
 	<div  class="flex-fixed-header menu-title">
-    <h2 style="font-weight: 400;" *ngIf="selectedContainer" title="{{selectedContainer.name?'Package':'Add Package'}}" [innerHtml]="selectedContainer.name?'Package':'Add Package'"></h2>
+    <h2 class="admin-heading" *ngIf="selectedContainer" title="{{selectedContainer.name?'Package':'Add Package'}}" [innerHtml]="selectedContainer.name?'Package':'Add Package'"></h2>
 </div>
-<perfect-scrollbar class="padding-16">
-  <form [formGroup]="detailsForm" (ngSubmit)="createContainer(detailsForm)">
-    <mat-spinner class="medium-spinner" *ngIf="fetchingData"></mat-spinner>
-    <div class="min-container" *ngIf="!noContainers && !fetchingData" [class.user-footer]="detailsForm.dirty">
+<perfect-scrollbar class="perfect-scroll">
+  <mat-spinner class="medium-spinner" *ngIf="fetchingData"></mat-spinner>
+  <form [formGroup]="detailsForm" (ngSubmit)="createContainer(detailsForm)" class="roles-form" *ngIf="!noContainers && !fetchingData">
+    <div class="min-container"  [class.user-footer]="detailsForm.dirty" style="overflow: auto;">
        
         <!-- <div>
           <mat-form-field fxFlex="80" class="custom-input mandatory" floatLabel="never">
@@ -98,7 +98,7 @@
       </div>
       <div class="footer" fxLayout="row" fxLayoutAlign="start center" *ngIf="detailsForm.dirty">
           <div class="min-container d-flex justify-content-end">
-            <button type="button" mat-button (click)="cancel(detailsForm)">{{language.defaults.cancel}}</button>
+            <button type="button"  class="back-btn-ui" (click)="cancel(detailsForm)">{{language.defaults.cancel}}</button>
             <button type="submit" mat-raised-button>{{addContainers}}</button>
           </div> 
           

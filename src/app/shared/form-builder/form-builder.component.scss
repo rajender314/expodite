@@ -1,0 +1,61 @@
+.fields-list {
+  display: flex;
+  // gap: 16px;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  .w-50 {
+    width: calc(50% - 8px);
+  }
+  .w-100 {
+    width: calc(100% - 8px);
+    &.mb-8 {
+      margin-bottom: 8px;
+      margin-top: 8px;
+    }
+  }
+  .checkbox-field {
+    display: flex !important;
+    .form-elements {
+      display: flex;
+      align-items: center;
+    }
+  }
+}
+
+.display-none {
+  display: none;
+}
+.textarea-styles {
+  min-height: 65px;
+}
+.rich-text {
+  .custom-label {
+    font-size: 14px;
+    color: #565656;
+    font-weight: 600;
+  }
+  .quill-container {
+    padding-top: 10px;
+  }
+  .error-class {
+    padding: 6px 4px;
+    color: #f44336;
+    font-size: 11px;
+    font-family: Roboto;
+  }
+}
+
+// .highlight {
+//   font-weight: bold;
+//   color: blue;
+// }
+
+.policy-date {
+  float: right;
+  font-weight: bold;
+}
+.disabledSpan {
+  pointer-events: none;
+  opacity: 0.5;
+  cursor: not-allowed;
+}

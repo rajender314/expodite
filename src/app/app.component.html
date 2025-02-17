@@ -1,30 +1,48 @@
-<div appTimer class="app dashboard nav-font-family " fxLayout="column">
-    <mat-sidenav-container fxFlex>
-        <mat-sidenav class="app-menu primary-color" #sidenav>
-                <div class="active-module instance_name" *ngIf="adminService.appFnvironment == 'Local' ||
-                adminService.appFnvironment == 'Stage' ">
-                    <p >{{adminService.appFnvironment}}</p>
-				<!-- <p *ngIf="adminService.appFnvironment == 'Stage'">{{adminService.appFnvironment}}</p>  -->
-        
-                        <!-- <button mat-raised-button color="warn"  (click)="createPurchaseOrder()" class="create-order-btn">Create Purchase Order</button>
+<div appTimer class="app dashboard nav-font-family" fxLayout="column">
+  <mat-sidenav-container fxFlex>
+    <mat-sidenav class="app-menu primary-color" #sidenav>
+      <div
+        class="active-module instance_name"
+        *ngIf="
+          adminService.appFnvironment == 'Local' ||
+          adminService.appFnvironment == 'Stage'
+        "
+      >
+        <p>{{ adminService.appFnvironment }}</p>
+        <!-- <p *ngIf="adminService.appFnvironment == 'Stage'">{{adminService.appFnvironment}}</p>  -->
+
+        <!-- <button mat-raised-button color="warn"  (click)="createPurchaseOrder()" class="create-order-btn">Create Purchase Order</button>
                         <button mat-raised-button color="warn" *ngIf="createOrderPermission" (click)="createOrder()" class="create-order-btn">Create Order</button> -->
-                    </div>
-            <div class="app-logo">
+      </div>
+      <!-- <div class="app-logo">
                 <div class="logo"  [routerLink]="['/overview']" routerLinkActive="active" [ngStyle]="{'background-image': 'url(' + brandLogo + ')'}"></div>
+            </div> -->
+      <div
+        class="app-logo logo-center"
+        [routerLink]="['/overview']"
+        routerLinkActive="active"
+      >
+        <img src="{{ brandLogo }}" alt="Logo" />
+      </div>
+      <perfect-scrollbar class="app-navigation">
+        <mat-nav-list *ngFor="let item of ENVDATA">
+          <mat-list-item
+            *ngIf="item.display == 'yes'"
+            [routerLink]="['/' + item.routerlink]"
+            (click)="goToModule(item)"
+            routerLinkActive="active"
+          >
+            <div class="app-list-item-content">
+              <div class="app-list-item">
+                <img [src]="[item.icon]" title="{{ item.name }}" />
+                <span class="app-list-line nav-font-family">{{
+                  item.name
+                }}</span>
+              </div>
             </div>
-           
-            <perfect-scrollbar  class="app-navigation" >
-                <mat-nav-list *ngFor="let item of ENVDATA">
-                    <mat-list-item *ngIf="item.display == 'yes'"  routerLink="/{{item.routerlink}}" routerLinkActive="active">
-                        <div class="app-list-item-content">
-                            <div class="app-list-item">
-                                <img [src]="[item.icon]" title="{{item.name}}">
-                                <span class="app-list-line nav-font-family">{{item.name}}</span>
-                            </div>
-                        </div>                       
-                    </mat-list-item>
-                   
-                    <!-- <mat-list-item *ngIf="leftNav.orders && ENVDATA?.ORDER_MANAGEMENT == 'yes'" (click)="ordersPage()" [routerLink]="['/orders']" routerLinkActive="active">
+          </mat-list-item>
+
+          <!-- <mat-list-item *ngIf="leftNav.orders && ENVDATA?.ORDER_MANAGEMENT == 'yes'" (click)="ordersPage()" [routerLink]="['/orders']" routerLinkActive="active">
                         <div class="app-list-item-content">
                             <div class="app-list-item">
                                 <img [src]="ordersIcon" title="Orders">
@@ -32,7 +50,7 @@
                             </div>
                         </div>
                     </mat-list-item>
-                    
+
                     <mat-list-item *ngIf="leftNav.invoices  && ENVDATA?.INVOICES == 'yes'" (click)="invoicePage()"[routerLink]="['/invoices']" routerLinkActive="active">
                         <div class="app-list-item-content">
                             <div class="app-list-item">
@@ -49,26 +67,26 @@
                             </div>
                         </div>
                     </mat-list-item>
-                    
+
                     <mat-list-item *ngIf="leftNav.clients" [routerLink]="['/clients']" routerLinkActive="active">
                         <div class="app-list-item-content">
                             <div class="app-list-item">
                                 <img [src]="clientsIcon" title="Clients">
                                 <span class="app-list-line" *ngIf="!myProfile">Clients</span>
                                 <span class="app-list-line" *ngIf="myProfile">Profile</span>
-                                
+
                             </div>
                         </div>
                     </mat-list-item>
-                    
+
                     <mat-divider></mat-divider>
                     <mat-list-item *ngIf="leftNav.vendors  && ENVDATA?.VENDOR_MANAGEMENT == 'yes'" [routerLink]="['/vendors']" routerLinkActive="active">
                         <div class="app-list-item-content">
                             <div class="app-list-item">
                                 <img [src]="vendorsIcon" title="Vendors">
                                 <span class="app-list-line" >Vendors</span>
-                               
-                                
+
+
                             </div>
                         </div>
                     </mat-list-item>
@@ -108,43 +126,87 @@
                             </div>
                         </div>
                     </mat-list-item> -->
-                     <!-- <mat-divider></mat-divider> -->
+          <!-- <mat-divider></mat-divider> -->
+        </mat-nav-list>
+        <!-- <mat-list-item [routerLink]="['/accounts']" routerLinkActive="active">
+                        <div class="app-list-item-content">
+                            <div class="app-list-item">
 
-                </mat-nav-list>               
-            </perfect-scrollbar>
-            <div class="app-user-container">
-                <button mat-icon-button [matMenuTriggerFor]="menu">
-                    <img class="mat-avatar" [src]="userDetails.profile_image_url?userDetails.profile_image_url:placeholderIcon"
-                    alt="user">
-                    <mat-icon>keyboard_arrow_right</mat-icon>
-                </button>
-                <mat-menu #menu="matMenu" [overlapTrigger]="false" xPosition="after" class="login-user-details-ui">
-                    <div class="d-flex login-user-details">
-                        <div class="media mr-2">
-                            <img class="img" [src]="userDetails.profile_image_url?userDetails.profile_image_url:placeholderIcon"
-                            alt="user">
+                                <span class="app-list-line">Accounts</span>
+                            </div>
                         </div>
-                        <div class="media-body">
-                            <h5 class="mb-1">{{firstName}} {{lastName}}</h5>
-                            <small>{{adminService.loggedUserEmail}}</small>
-                        </div>
-                    </div>
-                    <button mat-menu-item [routerLink]="['/change-password']">Manage Account</button>
-                    <button mat-menu-item (click)="logout()">{{language.defaults.logout}}</button>
-                </mat-menu>
+                    </mat-list-item>           -->
+      </perfect-scrollbar>
+      <div class="app-user-container">
+        <button mat-icon-button [matMenuTriggerFor]="menu">
+          <img
+            class="mat-avatar"
+            [src]="
+              userDetails.profile_image_url
+                ? userDetails.profile_image_url
+                : placeholderIcon
+            "
+            alt="user"
+          />
+          <mat-icon>keyboard_arrow_right</mat-icon>
+        </button>
+        <mat-menu
+          #menu="matMenu"
+          [overlapTrigger]="false"
+          xPosition="after"
+          class="login-user-details-ui"
+        >
+          <div class="d-flex login-user-details">
+            <div class="media mr-2">
+              <img
+                class="img"
+                [src]="
+                  userDetails.profile_image_url
+                    ? userDetails.profile_image_url
+                    : placeholderIcon
+                "
+                alt="user"
+              />
             </div>
-        </mat-sidenav>
-        <!-- <div fxLayout="row" fxLayoutAlign="space-between">
+            <div class="media-body">
+              <h5 class="mb-1">{{ firstName }} {{ lastName }}</h5>
+              <small>{{ adminService.loggedUserEmail }}</small>
+            </div>
+          </div>
+          <button mat-menu-item (click)="goToChangePwd()">
+            Manage Account
+          </button>
+          <button mat-menu-item (click)="logout()">
+            {{ language.defaults.logout }}
+          </button>
+        </mat-menu>
+      </div>
+    </mat-sidenav>
+    <!-- <div fxLayout="row" fxLayoutAlign="space-between">
         </div> -->
-        <mat-sidenav-content class="app-sidenav-content" [class.toggle-menu-hide]="showSubMenu && showToggleMenu" 
-        [class.toggle-menu-show]="showSubMenu && !showToggleMenu">
-            <router-outlet></router-outlet>
-        </mat-sidenav-content>
-    </mat-sidenav-container>
-   
+    <mat-sidenav-content
+      class="app-sidenav-content"
+      [class.toggle-menu-hide]="showSubMenu && showToggleMenu"
+      [class.toggle-menu-show]="showSubMenu && !showToggleMenu"
+    >
+      <router-outlet></router-outlet>
+      <!-- <app-test1></app-test1>
+      <app-test2></app-test2> -->
+    </mat-sidenav-content>
+  </mat-sidenav-container>
 </div>
 
 <div class="responsive-submenu" *ngIf="showSubMenu && isAdminScreen">
-    <span class="material-icons" *ngIf="showToggleMenu" (click)="showToggleMenu = !showToggleMenu">menu</span>
-    <span class="material-icons" *ngIf="!showToggleMenu" (click)="showToggleMenu = !showToggleMenu">menu_open </span>
-  </div>
+  <span
+    class="material-icons"
+    *ngIf="showToggleMenu"
+    (click)="showToggleMenu = !showToggleMenu"
+    >menu</span
+  >
+  <span
+    class="material-icons"
+    *ngIf="!showToggleMenu"
+    (click)="showToggleMenu = !showToggleMenu"
+    >menu_open
+  </span>
+</div>

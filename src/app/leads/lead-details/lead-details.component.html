@@ -1,8 +1,9 @@
 <div>
    <mat-toolbar class="inner-detail-toolbar lead-header-view">
-      <div class="inv-back">
+      <div class="inv-back 111">
          <mat-icon class="back-to-orders back" [routerLink]="'/leads'">arrow_back</mat-icon>
-         <span class="title" title="">{{overViewData?.lead_id}}</span>
+         <span class="title" style="overflow: unset;    font-size: 18px;
+         " title="{{overViewData?.lead_id}}">{{overViewData?.lead_id}}</span>
       </div>
       <div>
          <button mat-button (click)="createAppointment()" [disabled]="disbtnQc || !contactLength">

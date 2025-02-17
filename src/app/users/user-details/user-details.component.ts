@@ -45,6 +45,8 @@ export class UserDetailsComponent implements OnInit, OnChanges {
   @ViewChild("myInput") inputEl: ElementRef;
   @Input() userId;
   @Output() UpdateUser = new EventEmitter<object>();
+  @Input() isEditPerm;
+  @Input() isAddPerm;
   public language = language;
   public images = Images;
   saveUser = "Add User";
@@ -161,8 +163,27 @@ public noZeroValidator(control: FormControl) {
   fileSelected(event): void {
   }
 
-
+  public disableUpload = false;
   ngOnChanges(changes: { [propKey: string]: SimpleChange }) {
+    if(this.userId) {
+      if(!this.isEditPerm) {
+        this.userForm.disable();
+        this.disableUpload = true;
+      } else {
+        this.userForm.enable();
+        this.disableUpload = false;
+      }
+
+    } else if(this.userId == 0) {
+      if(this.isAddPerm) {
+        this.userForm.enable();
+        this.disableUpload = false;
+      } else {
+        this.userForm.disable();
+        this.disableUpload = true;
+      }
+
+    }
     // console.log(this.userId)
     if (this.userId == 0) {
     
@@ -217,13 +238,14 @@ public noZeroValidator(control: FormControl) {
       // this.userForm.value.status = true;
     }
     
+
+
   }
 
   ngOnInit() {
     this.createForm();
     this.getRolesList();
     this.adminService.loggedUserEmail = App.user_details.email;
-
     
   }
 
@@ -262,6 +284,10 @@ public noZeroValidator(control: FormControl) {
     //     .startWith(null)
     //     .map(state => state ? this.onValueChange(state) : this.rolesList.slice());
     // }, 1000);
+
+
+
+
   }
 
   onValueChange(name: string) {

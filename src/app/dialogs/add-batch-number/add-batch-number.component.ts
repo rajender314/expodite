@@ -1,7 +1,5 @@
 import { OrdersComponent } from './../../orders-module/orders/orders.component';
-// import { OrdersComponent } from './../../orders-module/orders.component';
 import { Component, OnInit, Inject, ViewEncapsulation } from "@angular/core";
-import { MatChipInputEvent } from "@angular/material/chips";
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { MatStepper, MatStepperModule } from "@angular/material/stepper";
 import { Images } from "../../images/images.module";
@@ -32,6 +30,7 @@ export class AddBatchNumberComponent implements OnInit {
   public noAddBatches: boolean = true;
   public disableBtn: boolean = false;
   public batchCategoryName: string;
+  public title: string = '';
   public order = {
     fetchingBatches: true,
     batches: [],
@@ -55,15 +54,16 @@ export class AddBatchNumberComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.getBatchesList();
+    this.data.isMerchantExporter ? this.getContainers() : this.getBatchesList();
     this.noBatches = false;
-    // console.log(this.data)
+    console.log(this.data)
+    let prefix = (this.data.flag == 'edit' ? 'Edit' : 'Add');
+    this.title = this.data.isMerchantExporter ? prefix + ' Packing' : prefix + ' Batch Quantity';
   }
 
   getBatchesList(): void {
     this.order.fetchingBatches = true;
 
-    // console.log(this.data);
     if (this.data.product.batch_nbr && this.data.product.batch_nbr.length) {
       this.InventoryService.BatchesList({
         product_id: this.data.product.order_product_id,
@@ -77,7 +77,7 @@ export class AddBatchNumberComponent implements OnInit {
           if (this.order.batches && this.order.batches.length) {
             this.noAddBatches = false;
             this.batchCategoryName = this.order.batches[0].category_name;
-            this.order.batches.map(function(value) {
+            this.order.batches.map(function (value) {
               value["selected"] = false;
             });
           } else {
@@ -98,9 +98,9 @@ export class AddBatchNumberComponent implements OnInit {
           if (this.order.batches && this.order.batches.length) {
             this.noAddBatches = false;
             this.batchCategoryName = this.order.batches[0].category_name;
-            this.order.batches.map(function(value) {
-                value["selected"] = false;
-              });
+            this.order.batches.map(function (value) {
+              value["selected"] = false;
+            });
           } else {
             this.noAddBatches = true;
           }
@@ -111,8 +111,7 @@ export class AddBatchNumberComponent implements OnInit {
 
   selectBatch(batch) {
     batch.selected = !batch.selected;
-    // this.order.selectesBatchList = false;
-    this.order.batches.map(function(value) {
+    this.order.batches.map(function (value) {
       if (batch.id != value.id) {
         // value['selected'] = false;
       }
@@ -133,26 +132,18 @@ export class AddBatchNumberComponent implements OnInit {
     this.timeout = setTimeout(() => {
       this.InventoryService.BatchesList(param).then(response => {
         if (response.result.success) {
-          // this.noBatches = false;
           this.order.fetchingBatches = false;
           this.order.batches = response.result.data.batchesDt;
-          if (this.order.batches.length) {
-            this.noBatches = false;
-            // console.log("nothere");
-          } else {
-            // console.log("here");
-            this.noBatches = true;
-          }
-          this.order.batches.map(function(value) {
+          this.noBatches = !this.order.batches.length;
+          this.order.batches.map(function (value) {
             value["selected"] = false;
           });
         }
         this.searching = false;
-        // else this.noRecords();
       });
     }, 1000);
   }
-  
+
   valueDecriment(batch: any, container: any) {
     if (batch.quantity[container.id] != "0") {
       batch.quantity[container.id] = parseInt(batch.quantity[container.id]) - 1;
@@ -169,7 +160,7 @@ export class AddBatchNumberComponent implements OnInit {
 
     let orders = this.order.containers;
 
-    orders.map(function(value) {
+    orders.map(function (value) {
       totalQuantity =
         totalQuantity +
         parseInt(value.type_name) * parseInt(batch.quantity[value.id] || 0);
@@ -182,90 +173,43 @@ export class AddBatchNumberComponent implements OnInit {
     }
   }
 
-  /*calculateTotalQuantity(batch){
+  onChange(event, batch, container) {
     let totalQuantity = 0;
-    let batchQuantity = 0;
-let disable:boolean;
+
+    let orders = this.order.containers;
 
 
-    let orders = this.order.containers
-//     this.order.selectedBatch.map(function(batchValue){
- 
-// if(batchValue.selected){
-  orders.map(function(value){
-    
-              //  console.log(value)
-              
-           
-                totalQuantity = totalQuantity+parseInt(value.type_name)*parseInt(batch.quantity[value.id] || 0); 
-                if(batch.remain_quan  <= totalQuantity){
+    this.order.selectedBatch.map(batchData => {
+      orders.map(function (value) {
+        if (value.id === container.id) {
+          totalQuantity =
+            totalQuantity +
+            (parseInt(value.type_name) || 0) * (parseInt(batchData.quantity[value.id]) || 0);
+        } else {
+          totalQuantity =
+            totalQuantity +
+            (parseInt(value.type_name) || 0) * (parseInt(batchData.quantity[value.id]) || 0);
+        }
 
-                                           disable = true
-                  
-                              }else{
-                                disable = false
-                              }
-                              // console.log(batch.remain_quan)
-              // console.log(totalQuantity)
-           
-          })
+      });
+    })
 
-          this.order.disableContainerAdd = disable
-    //   console.log(totalQuantity)
-// }
-    
-batchQuantity = totalQuantity
-      
-    // })
-   
-    this.order.totalQuantity = batchQuantity;
-    // if(this.data.product.product_quantity<=batchQuantity){
-    //   this.order.disableContainerAdd = true;
-    // }else{
-    //   this.order.disableContainerAdd = false;
-    // }
-  }*/
-  onChange(event ,batch,container ) {
-// console.log(event);
-// console.log(batch);
-// console.log(container);
-let totalQuantity = 0;
-
-let orders = this.order.containers;
-
-
-this.order.selectedBatch.map(batchData  => {
-  orders.map(function(value) {
-    // console.log(value);
-    if (value.id === container.id) {
-      totalQuantity =
-      totalQuantity +
-     ( parseInt(value.type_name) || 0) * (parseInt(batchData.quantity[value.id]) || 0);
-    } else {
-      totalQuantity =
-      totalQuantity +
-      ( parseInt(value.type_name) || 0)  * (parseInt(batchData.quantity[value.id]) || 0);
-    }
-   
-  });
-})
-
-          // console.log(totalQuantity);
-          this.order.totalQuantity = totalQuantity;
-          this.calculateTotalQuantity(batch);
+    this.order.totalQuantity = totalQuantity;
+    this.calculateTotalQuantity(batch);
   }
   valueIncriment(batch: any, container: any) {
     let totalQuantity = 0;
 
     let orders = this.order.containers;
 
-    orders.map(function(value) {
+    orders.map(function (value) {
       totalQuantity =
         totalQuantity +
         parseInt(value.type_name) * parseInt(batch.quantity[value.id] || 0);
     });
 
-    if (totalQuantity + parseInt(container.type_name) > batch.remain_quan) {
+    if (totalQuantity + parseInt(container.type_name) >
+      (this.data.isMerchantExporter ? this.data.product.product_quantity : batch.remain_quan)) {
       return false;
     }
 
@@ -286,24 +230,37 @@ this.order.selectedBatch.map(batchData  => {
 
   getContainers(): void {
     this.order.fetchingContainers = true;
+    this.showSpinner = true;
     this.adminService
       .getContainersList({ status: 1 })
       .then(response => {
         this.order.fetchingContainers = false;
         if (response.result.success) {
           this.order.containers = response.result.data.ContainersDt;
-          let selectedBatch = this.order.selectedBatch;
-          this.order.totalQuantity = 0;
-          this.order.containers.map(function(value) {
-            selectedBatch.map(function(batch) {
+          let selectedBatch = this.data.isMerchantExporter ? [{ 'selected': true, "quantity": {}, "id": 0 }] : this.order.selectedBatch;
+          this.order.totalQuantity = (this.data.flag == 'edit' && this.data.isMerchantExporter) ? this.data.product.product_quantity : 0;
+          let selectedContainers = this.data.isMerchantExporter ? this.data.containers : [];
+          let isMerchant = this.data.isMerchantExporter
+          this.order.containers.map(function (value) {
+            selectedBatch.map(function (batch) {
               batch["quantity"][value.id] = 0;
               selectedBatch["disableContainerAdd"] = false;
+              if (isMerchant) {
+                selectedContainers.map(function (container) {
+                  if (batch["quantity"][value.id] == 0 && container.container_id == value.id) {
+                    batch["quantity"][value.id] = container.qty;
+                  } else {
+                    return;
+                  }
+                })
+              }
             });
             value["quantity"] = 0;
-          });
+          }, selectedContainers);
           this.order.selectedBatch = selectedBatch;
-          //  console.log(this.order.selectedBatch)
+          this.order.batches = selectedBatch
         }
+        this.showSpinner = false;
       })
       .catch(error => console.log(error));
   }
@@ -312,7 +269,7 @@ this.order.selectedBatch.map(batchData  => {
     let selectedBatch = [];
     let selectedList = [];
     let sum = 0;
-    selectedList = this.order.batches.map(function(value) {
+    selectedList = this.order.batches.map(function (value) {
       if (value.selected) {
         value.quantity = {};
         selectedBatch.push(value);
@@ -322,18 +279,13 @@ this.order.selectedBatch.map(batchData  => {
     });
     this.order.selectedBatch = selectedBatch;
 
-    // console.log(selectedBatch);
-    selectedBatch.map(function(value) {
+    selectedBatch.map(function (value) {
       sum = sum + value.remain_quan;
-      // console.log(sum);
     });
-    // console.log(sum);
-    // console.log(this.data.product.product_quantity);
     if (sum >= this.data.product.product_quantity) {
       this.batchError = false;
       if (selectedList.length) {
         this.getContainers();
-        // console.log(this.order.selectedBatch);
         stepper.next();
       }
       if (!selectedList.length) {
@@ -348,17 +300,16 @@ this.order.selectedBatch.map(batchData  => {
 
   addBatchNumber() {
     this.showSpinner = true;
-    let selectedBatchId = 0;
     let containersList = [];
     let containers = this.order.containers;
     this.disableBtn = true;
-    
-    this.order.batches.map(function(batch) {
+
+    this.order.batches.map(function (batch) {
       if (batch.selected) {
         let container = {};
         container["batch_id"] = batch.id;
         container["container"] = [];
-        containers.map(function(value) {
+        containers.map(function (value) {
           if (batch.quantity[value.id] != "0") {
             let obj = {};
             obj["container_types_id"] = value.id;
@@ -370,53 +321,38 @@ this.order.selectedBatch.map(batchData  => {
         containersList.push(container);
       }
     });
-   
-    this.ordersService
-      .saveBatchNumber({
-        orders_products_id: this.data.product.order_product_id,
-        packing_id: this.data.container,
-        orders_id: this.data.selectedOrder.id,
-        container: containersList,
+    if (this.data.flag == "proforma") {
+      this.ordersService
+        .saveProformaBatchNumber({
+          orders_products_id: this.data.product.order_product_id,
+          packing_id: this.data.container,
+          orders_id: this.data.selectedOrder.id,
+          container: containersList,
 
-      })
-      .then(response => {
-        this.showSpinner = false;
-        this.dialogRef.close({ success: true });
-      })
-      .catch(error => console.log(error));
+        })
+        .then(response => {
+          this.showSpinner = false;
+          this.dialogRef.close({ success: true, result: response });
+        })
+        .catch(error => console.log(error));
+    } else {
+      this.ordersService
+        .saveBatchNumber({
+          orders_products_id: this.data.product.order_product_id,
+          packing_id: this.data.container,
+          orders_id: this.data.selectedOrder.id,
+          container: containersList,
+
+        })
+        .then(response => {
+          this.showSpinner = false;
+          this.dialogRef.close({ success: true });
+        })
+        .catch(error => console.log(error));
+    }
+
+
   }
-
-  // addBatchNumber1(){
-  //   let selectedBatchId = 0;
-  //   this.order.batches.map(function(value){
-  //     if(value.selected){
-  //       selectedBatchId = value.id;
-  //     }
-  //   });
-  //   let containersList = [];
-  //   this.order.containers.map(function(value){
-  //     if(value.quantity!='0'){
-  //       let container = {};
-  //       let batchId = selectedBatchId
-  //       container['container_types_id'] = value.id;
-  //       container['quantity'] = value.quantity;
-  //       container['quantity_type'] = value.type_name;
-  //       containersList.push(batchId);
-  //       containersList.push(container);
-  //     }
-  //   });
-  //   this.ordersService.saveBatchNumber({
-  //     orders_products_id: this.data.product.order_product_id,
-  //     batches_id: selectedBatchId,
-  //     orders_id: this.data.selectedOrder.id,
-  //     container: containersList
-  //   })
-  //   .then(response => {
-  //     this.dialogRef.close({ success: true });
-  //   })
-  //   .catch(error => console.log(error))
-    // console.log(123)
-  // }
 
   goToPrev(stepper: MatStepper) {
     stepper.previous();

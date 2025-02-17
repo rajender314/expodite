@@ -1,9 +1,13 @@
 <div class="center-section-scroll vh-100 d-flex media-list-data holy-grail body-white  ">
 	<div class="flex-fixed-header menu-title  ">
 		<h2 style="font-weight: 400;">{{language.defaults.roleCount}} ({{totalCount}})</h2>
-		<span class="add-link" (click)="getRole()">
+		<!-- <span class="add-link" (click)="getRole()">
 			<mat-icon>add</mat-icon>Add
-		</span>
+		</span> -->
+		<span class="add-link custom-tooltip import-img" (click)="getRole()" *ngIf="isAddPerm">
+			<img [src]='images.add'>
+			 <span class="tooltiptext">Add</span>
+		  </span>
 	</div>
 
 	<div class="app-search-container search-small">
@@ -25,7 +29,7 @@
 			<mat-spinner class="medium-spinner" *ngIf="fetchingData"></mat-spinner>
 			<mat-list class="media-list" *ngIf="!fetchingData">
 				<mat-list-item @AdminListAnimate *ngFor="let list of rolesList" class=" " (click)="getRole(list)"
-					[class.active]="list.id === selectedRole.id">
+					[class.active]="list.id === selectedRole.id" class="menu-main-list">
 					<div class="media d-flex align-items-center">
 						<div class="media-body " style="padding-left: 2px;">
 							<h1 class="font-weight-bold d-block text-nowrap single  " title="{{list.name}}"

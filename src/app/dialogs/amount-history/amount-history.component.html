@@ -1,0 +1,63 @@
+<mat-toolbar>
+    <span fxFlex style="font-size: 18px;"> Received Amount History of Invoice </span>
+	<h2 mat-dialog-title  style="font-size: 18px;    padding-right: 32px;
+    ">- {{historyDatainv}}</h2>
+	<!-- <span fxFlex> Receive Amount History - {{historyDatainv}}</span> -->
+</mat-toolbar>
+<mat-dialog-content>
+    <!-- <h3>{{historyDatainv}}</h3> -->
+	<!-- <div class="hist-main" *ngFor="let history of historyData;let key = index">
+        <div class="hist-sub"> 
+        <div class="pad-20">{{history.type}} {{history.received_amount}}</div>
+        <div class="pad-20"> {{history.date_added}}</div>
+        <span class="material-icons" (click)="historyEdit(history)" title="Edit" style="font-size:16px;">
+            edit
+            </span>
+        </div>
+        
+    </div> -->
+    
+    <div fxLayout="column" fxFlex="100" >
+        
+        <div >
+            <div class="multi-list-ui">
+                <mat-list
+                   >
+                   
+                    <div class="list-item-card">
+                        <mat-list-item class="order-list-row"
+                            
+                            *ngFor="let order of historyData">
+                            <div class="item-container" fxFlex="25">
+                                
+                                    
+                                    <p mat-line class="order-info"
+                                        >
+                                        {{order.type}}  {{order.received_amount}}</p>
+                               
+                            </div>
+                            <div class="item-container po_no text-right" fxFlex="50">
+                                <p mat-line >
+                                    {{order.date_added}}  </p>
+                            </div>
+                            <div class="item-container amount_container text-right" fxFlex="25">
+                                <span class="material-icons" (click)="historyEdit(order)" title="Edit" style="font-size:16px;">
+                                    edit
+                                    </span>
+                                    <!-- {{order.orders.total_amount}}  -->
+                            </div>
+                            
+                        </mat-list-item>
+                    </div>
+                </mat-list>
+            </div>
+        </div>
+</div>
+        
+
+</mat-dialog-content>
+<mat-dialog-actions>
+	<span fxFlex></span>
+
+	<button mat-raised-button (click)="close()">Close</button>
+</mat-dialog-actions>

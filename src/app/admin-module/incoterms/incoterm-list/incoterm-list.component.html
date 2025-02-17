@@ -1,0 +1,52 @@
+
+<div class="center-section-scroll vh-100 d-flex media-list-data holy-grail body-white ">
+
+	<div class="flex-fixed-header menu-title  ">
+	  <h2 style="font-weight: 400;" (click)="backToList()">Incoterms ({{totalCount}})</h2>
+	  <!-- <span class="add-link" (click)="getShipment()">
+		<mat-icon>add</mat-icon>Add
+	  </span> -->
+	  <span class="add-link custom-tooltip import-img" (click)="getShipment()" 
+	 *ngIf="isAddPerm" 
+	  >
+		<img [src]='images.add'>
+		 <span class="tooltiptext">Add</span>
+	  </span>
+	
+  
+	</div>
+	<div class="app-search-container search-small ">
+	  <mat-form-field class="search" floatLabel="never">
+		<input matInput placeholder={{language.defaults.search}} #search (keyup)="searchShipments(search.value, $event)"
+		  (blur)="!search.value.length ? open = false : open = true">
+		<mat-icon matPrefix class="org-search">search</mat-icon>
+		<mat-icon matSuffix *ngIf="searching" class="spinner">
+		  <mat-spinner class="small-spinner"></mat-spinner>
+		</mat-icon>
+		<mat-icon matSuffix *ngIf="!searching && search.value.length"
+		  (click)="search.value = '';searchShipments(search.value)">close</mat-icon>
+	  </mat-form-field>
+	</div>
+	<perfect-scrollbar class="p-l-8 p-r-8 ">
+	  <div class="list-items" infiniteScroll [infiniteScrollDistance]="1" [infiniteScrollThrottle]="50"
+		(scrolled)="onScroll()" [scrollWindow]="false">
+		<mat-spinner class="medium-spinner" *ngIf="fetchingData"></mat-spinner>
+		<mat-list *ngIf="!fetchingData" class="media-list">
+		  <mat-list-item @AdminListAnimate *ngFor="let list of shipmentType" (click)="getShipment(list)"
+			[class.active]="list.id === selectedShipment.id"  class="admin-internal-menu-list">
+  
+			<div class="media d-flex align-items-center">
+			  <div class="media-body" style="padding-left: 2px;">
+				<h1 class="font-weight-bold d-block text-nowrap single " title="{{list.name}}">{{list.name}}</h1>
+			  </div>
+			</div>
+  
+		  </mat-list-item>
+		  <mat-list-item *ngIf="paginationScroll">{{language.defaults.loading}}</mat-list-item>
+  
+		</mat-list>
+		<div class="search-empty admin-search" *ngIf="noShipments && !fetchingData">No Incoterms Found</div>
+	  </div>
+	</perfect-scrollbar>
+	<app-pagination *ngIf="totalCount!=0" [pageLimit]="totalCount" (pageloadMore)="loadMore($event)"></app-pagination>
+  </div>

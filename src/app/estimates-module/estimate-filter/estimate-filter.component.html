@@ -1,0 +1,385 @@
+<div
+  style="display: flex; flex-direction: column; height: 100%"
+  class="filter-popup"
+>
+  <mat-toolbar>
+    <h2 mat-dialog-title>Filters</h2>
+    <span fxFlex></span>
+  </mat-toolbar>
+  <mat-dialog-content class="filter-field-container">
+    <div  class="fields">
+      <div class="fxFlex custom-date-container filter-dates order-date-picker2"
+      *ngIf="showFields.start_date"
+      style="margin-bottom: 12px;max-width: unset;"
+      >
+        <div
+          class="label font-600"
+          style="
+            color: #565656;
+            text-transform: capitalize;
+            font-size: 14px;
+            padding-top: 2px;
+            letter-spacing: normal;
+          "
+        >
+          Start Date
+        </div>
+        <input
+          class="datepicker"
+          [matDatepicker]="picker"
+          (click)="openCalendar(picker)"
+          (dateChange)="datePickerChange($event, 'start_date')"
+          [(ngModel)]="start_date"
+          placeholder="Select Start Date"
+          readonly
+        />
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+      </div>
+      <div class="fxFlex custom-date-container filter-dates order-date-picker2"
+      *ngIf="showFields.end_date"  style="margin-bottom: 12px;max-width: unset;">
+        <div
+          class="label font-600"
+          style="
+            color: #565656;
+            text-transform: capitalize;
+            font-size: 14px;
+            padding-top: 2px;
+            letter-spacing: normal;
+          "
+        >
+          End Date
+        </div>
+        <input
+          class="datepicker"
+          [matDatepicker]="picker2"
+          (click)="openCalendar(picker2)"
+          [(ngModel)]="end_date"
+          (dateChange)="datePickerChange()"
+          placeholder="Select End Date"
+          [min]="endDateMax"
+          readonly
+        />
+        <mat-datepicker-toggle
+          matSuffix
+          [for]="picker2"
+        ></mat-datepicker-toggle>
+        <mat-datepicker #picker2></mat-datepicker>
+      </div>
+      <div *ngIf="showFields.status">
+        <mat-form-field
+          class="custom-input custom-client"
+          floatLabel="never"
+          style="width: 100%; margin-top: 20px"
+        >
+          <label class="custom-label font-600">Status</label>
+          <mat-select
+            panelClass="myPanelClass"
+            class="chips-select"
+            [placeholder]="slectedStatus.value?.length ? '' : 'Select Status'"
+            [formControl]="slectedStatus"
+            multiple
+          >
+            <mat-select-trigger>
+              <mat-chip-list *ngIf="slectedStatus.value?.length">
+                <mat-chip
+                  *ngFor="let prodId of slectedStatus.value"
+                  [removable]="true"
+                  (removed)="removeClient(prodId, slectedStatus)"
+                >
+                  {{ getClientName(prodId, data.statusList) }}
+                  <mat-icon matChipRemove>cancel</mat-icon>
+                </mat-chip>
+              </mat-chip-list>
+            </mat-select-trigger>
+            <mat-option
+              [value]="status.id"
+              class="orders-list"
+              *ngFor="let status of data.statusList"
+              (click)="selectionChanged()"
+            >
+              {{ status.name }}</mat-option
+            >
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <div *ngIf="showFields.country">
+        <mat-form-field
+          class="custom-input custom-client"
+          floatLabel="never"
+          style="width: 100%; margin-top: 20px"
+        >
+          <label class="custom-label font-600">Country</label>
+          <mat-select
+            panelClass="myPanelClass"
+            class="chips-select"
+            [placeholder]="
+              slectedCountries.value?.length ? '' : 'Select Country'
+            "
+            [formControl]="slectedCountries"
+            multiple
+          >
+            <mat-select-trigger>
+              <mat-chip-list *ngIf="slectedCountries.value?.length">
+                <mat-chip
+                  *ngFor="let prodId of slectedCountries.value"
+                  [removable]="true"
+                  (removed)="removeClient(prodId, slectedCountries)"
+                >
+                  {{ getClientName(prodId, data.countries) }}
+                  <mat-icon matChipRemove>cancel</mat-icon>
+                </mat-chip>
+              </mat-chip-list>
+            </mat-select-trigger>
+            <mat-option
+              [value]="status.id"
+              class="orders-list"
+              *ngFor="let status of data.countries"
+              (click)="selectionChanged()"
+            >
+              {{ status.name }}</mat-option
+            >
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <div *ngIf="showFields.category">
+        <mat-form-field
+          class="custom-input custom-client"
+          floatLabel="never"
+          style="width: 100%; margin-top: 20px"
+        >
+          <label class="custom-label font-600">Category</label>
+          <mat-select
+            panelClass="myPanelClass"
+            class="chips-select"
+            [placeholder]="
+              slectedCatogories.value?.length ? '' : 'Select Catogory'
+            "
+            [formControl]="slectedCatogories"
+            multiple
+          >
+            <mat-select-trigger>
+              <mat-chip-list *ngIf="slectedCatogories.value?.length">
+                <mat-chip
+                  *ngFor="let prodId of slectedCatogories.value"
+                  [removable]="true"
+                  (removed)="removeClient(prodId, slectedCatogories)"
+                >
+                  {{ getClientName(prodId, data.catagiries) }}
+                  <mat-icon matChipRemove>cancel</mat-icon>
+                </mat-chip>
+              </mat-chip-list>
+            </mat-select-trigger>
+            <mat-option
+              [value]="status.id"
+              class="orders-list"
+              *ngFor="let status of data.catagiries"
+              (click)="selectionChanged()"
+            >
+              {{ status.name }}</mat-option
+            >
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <div *ngIf="showFields.clients">
+        <mat-form-field
+          class="custom-input custom-client"
+          floatLabel="never"
+          style="width: 100%; margin-top: 20px"
+        >
+          <label class="custom-label font-600">Clients</label>
+          <mat-select
+            panelClass="myPanelClass"
+            class="chips-select"
+            [placeholder]="
+              slectedClients.value?.length ? '' : 'Select Clients'
+            "
+            [formControl]="slectedClients"
+            multiple
+          >
+            <mat-select-trigger>
+              <mat-chip-list *ngIf="slectedClients.value?.length">
+                <mat-chip
+                  *ngFor="let prodId of slectedClients.value"
+                  [removable]="true"
+                  (removed)="removeClient(prodId, slectedClients)"
+                >
+                  {{ getClientName(prodId, data.clients) }}
+                  <mat-icon matChipRemove>cancel</mat-icon>
+                </mat-chip>
+              </mat-chip-list>
+            </mat-select-trigger>
+            <mat-option
+              [value]="status.id"
+              class="orders-list"
+              *ngFor="let status of data.clients"
+              (click)="selectionChanged()"
+            >
+              {{ status.name }}</mat-option
+            >
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <div *ngIf="showFields.policy_providers">
+        <mat-form-field
+          class="custom-input custom-client"
+          floatLabel="never"
+          style="width: 100%; margin-top: 20px"
+        >
+          <label class="custom-label font-600">Policy Providers</label>
+          <mat-select
+            panelClass="myPanelClass"
+            class="chips-select"
+            [placeholder]="
+              slectedPolicyProviders.value?.length ? '' : 'Select Policy Providers'
+            "
+            [formControl]="slectedPolicyProviders"
+            multiple
+          >
+            <mat-select-trigger>
+              <mat-chip-list *ngIf="slectedPolicyProviders.value?.length">
+                <mat-chip
+                  *ngFor="let prodId of slectedPolicyProviders.value"
+                  [removable]="true"
+                  (removed)="removeClient(prodId, slectedPolicyProviders)"
+                >
+                  {{ getClientName(prodId, data.policyProvider) }}
+                  <mat-icon matChipRemove>cancel</mat-icon>
+                </mat-chip>
+              </mat-chip-list>
+            </mat-select-trigger>
+            <mat-option
+              [value]="status.id"
+              class="orders-list"
+              *ngFor="let status of data.policyProvider"
+              (click)="selectionChanged()"
+            >
+              {{ status.name }}</mat-option
+            >
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <div *ngIf="showFields.policy_types">
+        <mat-form-field
+          class="custom-input custom-client"
+          floatLabel="never"
+          style="width: 100%; margin-top: 20px"
+        >
+          <label class="custom-label font-600">Policy Types</label>
+          <mat-select
+            panelClass="myPanelClass"
+            class="chips-select"
+            [placeholder]="
+              slectedPolicyTypes.value?.length ? '' : 'Select Policy Types'
+            "
+            [formControl]="slectedPolicyTypes"
+            multiple
+          >
+            <mat-select-trigger>
+              <mat-chip-list *ngIf="slectedPolicyTypes.value?.length">
+                <mat-chip
+                  *ngFor="let prodId of slectedPolicyTypes.value"
+                  [removable]="true"
+                  (removed)="removeClient(prodId, slectedPolicyTypes)"
+                >
+                  {{ getClientName(prodId, data.policyType) }}
+                  <mat-icon matChipRemove>cancel</mat-icon>
+                </mat-chip>
+              </mat-chip-list>
+            </mat-select-trigger>
+            <mat-option
+              [value]="status.id"
+              class="orders-list"
+              *ngFor="let status of data.policyType"
+              (click)="selectionChanged()"
+            >
+              {{ status.name }}</mat-option
+            >
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <div *ngIf="showFields.currency">
+        <mat-form-field
+          class="custom-input custom-client"
+          floatLabel="never"
+          style="width: 100%; margin-top: 20px"
+        >
+          <label class="custom-label font-600">Currency</label>
+          <mat-select
+            panelClass="myPanelClass"
+            class="chips-select"
+            [placeholder]="
+              selectedCurrencies.value?.length ? '' : 'Select Currency'
+            "
+            [formControl]="selectedCurrencies"
+            multiple
+          >
+            <mat-select-trigger>
+              <mat-chip-list *ngIf="selectedCurrencies.value?.length">
+                <mat-chip
+                  *ngFor="let prodId of selectedCurrencies.value"
+                  [removable]="true"
+                  (removed)="removeClient(prodId, selectedCurrencies)"
+                >
+                  {{ getClientName(prodId, data.currency) }}
+                  <mat-icon matChipRemove>cancel</mat-icon>
+                </mat-chip>
+              </mat-chip-list>
+            </mat-select-trigger>
+            <mat-option
+              [value]="status.id"
+              class="orders-list"
+              *ngFor="let status of data.currency"
+              (click)="selectionChanged()"
+            >
+              {{ status.name }}</mat-option
+            >
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <div *ngIf="showFields.duration">
+        <mat-form-field
+          class="custom-input custom-client"
+          floatLabel="never"
+          style="width: 100%; margin-top: 20px"
+        >
+          <label class="custom-label font-600">Duration</label>
+          <mat-select
+            panelClass="myPanelClass"
+            class="chips-select"
+            [placeholder]="
+              selectedDuration.value?.length ? '' : 'Select Duration'
+            "
+            [formControl]="selectedDuration"
+          >
+            <!-- <mat-select-trigger>
+              <mat-chip-list *ngIf="selectedDuration.value?.length">
+                <mat-chip
+                  *ngFor="let prodId of selectedDuration.value"
+                  [removable]="true"
+                  (removed)="removeClient(prodId, selectedDuration)"
+                >
+                  {{ getClientName(prodId, data.durations) }}
+                  <mat-icon matChipRemove>cancel</mat-icon>
+                </mat-chip>
+              </mat-chip-list>
+            </mat-select-trigger> -->
+            <mat-option
+              [value]="status.id"
+              class="orders-list"
+              *ngFor="let status of data.durations"
+              (click)="selectionChanged()"
+            >
+              {{ status.name }}</mat-option
+            >
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div>
+  </mat-dialog-content>
+  <mat-dialog-actions>
+    <span fxFlex></span>
+    <button  class="back-btn-ui" mat-dialog-close>Close</button>
+    <button mat-raised-button (click)="applyFilters()" [disabled]="disableBtn">Apply Filters</button>
+  </mat-dialog-actions>
+</div>

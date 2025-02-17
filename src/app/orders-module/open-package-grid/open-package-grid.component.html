@@ -1,0 +1,12 @@
+<div style="padding: 6px 12px;overflow-x: scroll;max-height: 400px;">
+  <table>
+    <tr *ngFor="let product of packageTable; index as batchIndex">
+      <td
+        *ngFor="let item of product | keyvalue"
+        [ngStyle]="{ 'background-color': item.value.background }"
+      >
+        <div [innerHTML]="getSanitizedHtml(item.value.html)"></div>
+      </td>
+    </tr>
+  </table>
+</div>

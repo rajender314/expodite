@@ -1,0 +1,42 @@
+<div class="overflow-hiden">
+  <div class="custom-cell" *ngIf="params.column.colDef.field == 'product_name'">
+    <img
+      [src]="params?.data?.product_image || noProductImg"
+      alt="Image"
+      class="custom-cell-image"
+      (click)="
+        openPreview(
+          params?.data?.product_image && params?.data?.product_image != ''
+            ? params?.data?.product_image
+            : noProductImg,
+          1,
+          'product_image'
+        )
+      "
+    />
+    <div
+      class="custom-cell-name prodcuct-ellipsis"
+      *ngIf="params?.data && params?.data[params.column.colDef.field]"
+    >
+      {{ params.data[params.column.colDef.field] }}
+    </div>
+  </div>
+  <div
+    class="custom-cell ag-qty"
+    *ngIf="params.column.colDef.field == 'product_quantity'"
+  >
+    <div class="label">{{ params.value }}</div>
+    <span class="qty-split" (click)="splitQty()" *ngIf="showSplitBtn"
+      >Split</span
+    >
+  </div>
+  <div class="custom-header" *ngIf="params.column.colDef.field == 'select_all'">
+    <input
+      type="checkbox"
+      [checked]="params.value"
+      (change)="onChange($event)"
+    />
+    <!-- <mat-checkbox   [checked]="params.value" 
+    (change)="onChange($event)"></mat-checkbox> -->
+  </div>
+</div>

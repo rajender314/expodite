@@ -1,26 +1,46 @@
-import { Component, OnInit, Output, EventEmitter, Input, OnChanges, SimpleChange } from '@angular/core';
-import { language } from '../../../language/language.module';
+import {
+  Component,
+  OnInit,
+  Output,
+  EventEmitter,
+  Input,
+  OnChanges,
+  SimpleChange,
+} from "@angular/core";
+import { language } from "../../../language/language.module";
 
-import * as _ from 'lodash';
+import * as _ from "lodash";
 
-import { Param } from '../../../custom-format/param';
-import { AdminService } from '../../../services/admin.service';
-import { trigger, style, transition, animate, keyframes, query, stagger } from '@angular/animations';
+import { Param } from "../../../custom-format/param";
+import { AdminService } from "../../../services/admin.service";
+import {
+  trigger,
+  style,
+  transition,
+  animate,
+  keyframes,
+  query,
+  stagger,
+} from "@angular/animations";
+import { Images } from "../../../images/images.module";
+import { LeadsService } from "../../../leads/leads.service";
+import { UtilsService } from "../../../services/utils.service";
 
 @Component({
-  selector: 'app-contact-address-list',
-  templateUrl: './contact-address-list.component.html',
-  styleUrls: ['./contact-address-list.component.scss'],
+  selector: "app-contact-address-list",
+  templateUrl: "./contact-address-list.component.html",
+  styleUrls: ["./contact-address-list.component.scss"],
   animations: [
-    trigger('AdminListAnimate', [
-      transition(':enter', [
-        style({ transform: 'translateX(-100px)', opacity: 0 }),
-        animate('500ms cubic-bezier(0.35, 1, 0.25, 1)', style('*'))
-      ])
-    ])
-  ]
+    trigger("AdminListAnimate", [
+      transition(":enter", [
+        style({ transform: "translateX(-100px)", opacity: 0 }),
+        animate("500ms cubic-bezier(0.35, 1, 0.25, 1)", style("*")),
+      ]),
+    ]),
+  ],
 })
 export class ContactAddressListComponent implements OnInit, OnChanges {
+  public images = Images;
   fetchingData: boolean;
   searching: boolean;
   paginationScroll: boolean;
@@ -36,34 +56,47 @@ export class ContactAddressListComponent implements OnInit, OnChanges {
   @Input() update;
   @Output() trigger = new EventEmitter<object>();
 
-  private param: Param = {
+  private param: any = {
     page: 1,
     perPage: 12,
-    sort: 'ASC',
-    search: ''
-  }
-  constructor(private adminService: AdminService) {
+    sort: "ASC",
+    search: "",
+  };
 
-  }
+  constructor(
+    private adminService: AdminService,
+    private leadService: LeadsService,
+    private utilsService: UtilsService
+  ) {}
 
   backToList() {
     this.listActive = false;
   }
+  public modulesList = [];
 
   ngOnInit() {
-    this.getContacts(this.param);
+    // this.getContacts(this.param);
+    this.utilsService.getModuleList().then((response) => {
+      this.modulesList = response.result.data.modulesDt;
+      const indx = _.findIndex(this.modulesList, { slug: "contact_addresses" });
+      if (indx > -1) {
+        this.param.form_id = this.modulesList[indx].id;
+        console.log(indx, this.param);
+        this.getContacts(this.param);
+      }
+    });
   }
   ngOnChanges(changes: { [propKey: string]: SimpleChange }) {
     if (this.update) {
-
       if (this.update.delete) {
-        this.contactAddressList = this.contactAddressList.filter(contactList => {
-          if (contactList.id === this.update.id) {
-            return false;
+        this.contactAddressList = this.contactAddressList.filter(
+          (contactList) => {
+            if (contactList.id === this.update.id) {
+              return false;
+            }
+            return true;
           }
-          return true;
-        });
-
+        );
         if (this.contactAddressList.length) {
           this.noContacts = false;
           this.selectedContact = this.contactAddressList[0];
@@ -71,12 +104,11 @@ export class ContactAddressListComponent implements OnInit, OnChanges {
           this.noContacts = true;
           this.selectedContact = {};
         }
-
       } else if (this.update.id) {
         this.noContacts = false;
         let types = [];
         this.noContacts = false;
-        this.contactAddressList.map(contactList => {
+        this.contactAddressList.map((contactList) => {
           if (contactList.id === this.update.id) {
             types.push(this.update.result);
           } else {
@@ -84,7 +116,9 @@ export class ContactAddressListComponent implements OnInit, OnChanges {
           }
         });
         this.contactAddressList = types;
-        this.selectedContact = _.find(this.contactAddressList, { id: this.update.id })
+        this.selectedContact = _.find(this.contactAddressList, {
+          id: this.update.id,
+        });
       } else {
         this.noContacts = false;
         this.totalCount = this.totalCount + 1;
@@ -93,34 +127,30 @@ export class ContactAddressListComponent implements OnInit, OnChanges {
       }
       this.trigger.emit(this.selectedContact);
     }
-    // this.getContacts(this.param, 'pagination');
-
+    this.getContacts(this.param, "pagination");
   }
 
   getContacts(param: object, flag?: string, cb?): void {
-    if (flag == 'pagination') this.paginationScroll = true;
+    console.log(param, 44);
+    if (flag == "pagination") this.paginationScroll = true;
     else this.fetchingData = true;
-    this.adminService
-      .getContactsList(param)
-      .then(response => {
+    this.leadService
+      .getModuleSavedList(param)
+      .then((response) => {
         this.paginationScroll = false;
         this.fetchingData = false;
         if (cb) this.searching = false;
         if (response.result.success) {
-          this.totalCount = response.result.data.count;
-          this.totalPages = Math.ceil(Number(this.totalCount) / this.param.perPage);
-          this.contactAddressList = response.result.data.companyShpAddrDt;
-          // if (cb) this.contactAddressList = [];
-          // let data = response.result.data.companyShpAddrDt;
-          // data.map(res => {
-          //   this.contactAddressList.push(res);
-          // });
+          this.totalCount = response.result.data.total;
+          this.totalPages = Math.ceil(
+            Number(this.totalCount) / this.param.perPage
+          );
+          this.contactAddressList = response.result.data.list;
           if (this.totalCount == 0) this.noRecords();
-          else this.getContact(this.contactAddressList[0])
-        }
-        else this.noRecords();
+          else this.getContact(this.contactAddressList[0]);
+        } else this.noRecords();
       })
-      .catch(error => console.log(error))
+      .catch((error) => console.log(error));
   }
 
   noRecords(): void {
@@ -128,7 +158,7 @@ export class ContactAddressListComponent implements OnInit, OnChanges {
     this.noContacts = true;
     this.contactAddressList = [];
     this.selectedContact = {};
-    this.trigger.emit({ flag: 'new' });
+    this.trigger.emit({ flag: "new" });
   }
 
   getContact(data?: any): void {
@@ -145,20 +175,19 @@ export class ContactAddressListComponent implements OnInit, OnChanges {
     this.searching = true;
     if (this.timeout) clearTimeout(this.timeout);
     this.timeout = setTimeout(() => {
-      this.getContacts(this.param, 'search', () => { });
-    }, 1000)
+      this.getContacts(this.param, "search", () => {});
+    }, 1000);
   }
 
   onScroll(): void {
     if (this.param.page < this.totalPages && this.totalPages != 0) {
       this.param.page++;
-      this.getContacts(this.param, 'pagination');
+      this.getContacts(this.param, "pagination");
     }
   }
 
   loadMore(param) {
     param.search = this.param.search;
-    this.getContacts(param, 'pagination');
+    this.getContacts(param, "pagination");
   }
-
 }

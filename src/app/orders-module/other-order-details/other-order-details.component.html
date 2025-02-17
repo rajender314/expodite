@@ -1,0 +1,77 @@
+<!-- *ngIf="
+  is_automech
+    ? order.selectedOrder.status_id >= 17 ||
+      order.selectedOrder.status_slug == 'processed' ||
+      order.selectedOrder.status_slug == 'delivered' ||
+      order.selectedOrder.status_slug == 'in_transit'
+    : (order.selectedOrder.status_id >= 17 ||
+        order.selectedOrder.status_slug == 'processed' ||
+        order.selectedOrder.status_slug == 'delivered' ||
+        order.selectedOrder.status_slug == 'in_transit') &&
+      !showDrumsList &&
+      !isSampleDocs
+" -->
+<div
+  #otherOrder
+  class="shipping-container"
+  [class.collapse]="!showOtherOrderDetails"
+  *ngIf="order_Permissions && order_Permissions?.other_order_details"
+>
+  <!-- (order.packageStatus == 1 || order.packageStatus == 2) && -->
+  <mat-toolbar class="package-toolbar">
+    <img class="othercost-image" [src]="images.shippingDetails_small" />
+    <span>Other Order Details</span>
+    <span fxFlex></span>
+    <div *ngIf="viewActivityLogIcon">
+      <button
+        mat-icon-button
+        class="action-orderbtn"
+        (click)="openActivityModal('other_order_details')"
+      >
+        <img [src]="images.activity_log_icon" title="Activity Log" />
+      </button>
+    </div>
+    <button mat-icon-button (click)="toggleOtherOrderDetails()">
+      <img
+        [src]="images.grey_arrow"
+        mat-icon-button
+        *ngIf="showOtherOrderDetails"
+      />
+      <mat-icon class="toggle-arrow" *ngIf="!showOtherOrderDetails"
+        >keyboard_arrow_down
+      </mat-icon>
+    </button>
+  </mat-toolbar>
+  <div class="shipping-sec" style="padding: 16px" *ngIf="showOtherOrderDetails">
+    <app-form-builder
+      [related_to_id]="order.selectedOrder.id"
+      module="other_order_details"
+      (trigger)="formEmitEvent($event)"
+      [undoOnCancel]="undoOnCancel"
+      [saveFreightFlag]="saveFreightFlag"
+    ></app-form-builder>
+
+    <mat-list
+      class="footer-bottom fxflex"
+      *ngIf="otherOrderDetailsForm?.dirty || otherOrderDetailsState"
+      fxLayout="row"
+      fxLayoutAlign="end center"
+    >
+      <span fxFlex></span>
+      <section class="section-right">
+        <button type="button"  class="back-btn-ui" (click)="cancelOtherDetails()">
+          Cancel
+        </button>
+        <button
+          type="submit"
+          mat-raised-button
+          (click)="submitOtherOrderDetails(otherOrderDetailsForm)"
+          [disabled]="otherOrderDetailsForm?.invalid || othrOrdrDtlsSave"
+        >
+          Save
+        </button>
+      </section>
+      <div class="cb"></div>
+    </mat-list>
+  </div>
+</div>

@@ -1,0 +1,77 @@
+<div>
+  <div class="shipping-container" [class.collapse]="!showPayments">
+    <mat-toolbar class="package-toolbar">
+      <img class="shipping-image" [src]="headerIcon" />
+      <span>{{ title ? title : language.pageNavbar.paymentAndDelivery }}</span>
+      <span fxFlex></span>
+      <div *ngIf="viewActivityLogIcon">
+        <button
+          mat-icon-button
+          class="action-orderbtn"
+          (click)="openActivityModal(module)"
+        >
+          <img [src]="images.activity_log_icon" title="Activity Log" />
+        </button>
+      </div>
+      <button mat-icon-button (click)="togglePayments()">
+        <img [src]="images.grey_arrow" mat-icon-button *ngIf="showPayments" />
+        <mat-icon class="toggle-arrow" *ngIf="!showPayments"
+          >keyboard_arrow_down
+        </mat-icon>
+      </button>
+    </mat-toolbar>
+    <div class="shipping-sec" [ngClass]="!showPayments ? 'visible-hidden' : ''">
+      <app-form-builder
+        [getInputValidationTypes]="getInputValidationTypes"
+        [module]="module"
+        (trigger)="formEmitEvent($event)"
+        [undoOnCancel]="undoOnCancel"
+        [related_to_id]="routeId"
+        [Contacts]="routeId"
+        [disableEdit]="disableEdit"
+      ></app-form-builder>
+      <mat-list
+        class="footer-bottom fxflex"
+        *ngIf="paymentsForm?.dirty"
+        fxLayout="row"
+        fxLayoutAlign="end center"
+      >
+        <span fxFlex></span>
+        <section class="section-right">
+          <button
+            type="button"
+            class="back-btn-ui"
+            (click)="cancelPayment()"
+            *ngIf="!onSubmit"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            mat-raised-button
+            (click)="submmitPayment()"
+            [disabled]="paymentsForm?.invalid || onSubmit"
+          >
+            Save
+            <span *ngIf="onSubmit">
+              <mat-icon style="height: 16px; width: 16px"
+                ><mat-spinner
+                  class="white-spinner"
+                  diameter="20"
+                ></mat-spinner></mat-icon
+            ></span>
+          </button>
+        </section>
+
+        <!-- <section class="section-right" *ngIf="onSubmit">
+          <button mat-raised-button disabled="true">
+            <mat-icon>
+              <mat-spinner class="white-spinner" diameter="20"></mat-spinner
+            ></mat-icon>
+          </button>
+        </section> -->
+        <div class="cb"></div>
+      </mat-list>
+    </div>
+  </div>
+</div>

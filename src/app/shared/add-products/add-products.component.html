@@ -1,0 +1,307 @@
+<div>
+  <div class="products-table">
+    <div
+      class="divTable"
+      [formGroup]="productsDynamicForm"
+      style="border: 1px solid #e3e3e3"
+    >
+      <div class="divTableRow product-table-header">
+        <div
+          class="divTableCell product-data-cell"
+          style="text-align: left; width: 300px"
+        >
+          Product Details
+        </div>
+        <div class="divTableCell" style="text-align: left">Quantity</div>
+        <div class="divTableCell" style="text-align: left">Price/Unit</div>
+        <div class="divTableCell" style="text-align: left">Amount</div>
+        <div class="divTableCell" style="text-align: left">&nbsp;</div>
+      </div>
+      <div
+        class="divTableBody"
+        formArrayName="productItem"
+        *ngFor="
+          let item of productsDynamicForm.get('productItem')['controls'];
+          let i = index
+        "
+      >
+        <div class="divTableRow" [formGroupName]="i">
+          <div class="divTableCell product-data-cell">
+            <mat-form-field
+              class="custom-input mandatory products"
+              floatLabel="never"
+              style="width: 300px; margin-top: 0px"
+            >
+              <input
+                placeholder="Select Product(s)"
+                matInput
+                [matAutocomplete]="product"
+                [value]="item.value.name"
+                (keyup)="searchProducts($event)"
+                (keydown)="clearPr($event)"
+              />
+              <button
+                type="button"
+                mat-button
+                matSuffix
+                mat-icon-button
+                aria-label="Clear"
+              >
+                <mat-icon>keyboard_arrow_down</mat-icon>
+              </button>
+              <mat-autocomplete #product="matAutocomplete" auto>
+                <mat-option
+                  class="products-custom-mat-option"
+                  *ngFor="let product of order.products"
+                  [value]="product.name"
+                >
+                  <div
+                    (click)="changeProduct(product, i)"
+                    class="product-title"
+                  >
+                    <div>
+                      <span class="product-name product-name-overlap"
+                        >{{ product.name }} </span
+                      ><span class="product-units">{{ product.uom_name }}</span>
+                    </div>
+                    <span class="product-rate"
+                      >price: {{ product.price }}
+                    </span>
+                  </div>
+                </mat-option>
+                <div class="add-new-item" (click)="addNewProduct()">
+                  <img [src]="newItemIcon" alt="addNew" />
+                  <span>Add New Item</span>
+                </div>
+              </mat-autocomplete>
+            </mat-form-field>
+          </div>
+          <div class="divTableCell">
+            <mat-form-field
+              class="custom-input mandatory"
+              floatLabel="never"
+              style="margin-top: 0px"
+            >
+              <input
+                matInput
+                formControlName="quantity"
+                placeholder="Quantity"
+                (keyup)="enterQty($event, i)"
+                class="input-right"
+                oninput="javascript:  if (!/^(-?\d+(\.\d{0,3})?)?$/.test(this.value)) this.value = this.value.slice(0, -1);"
+              />
+              <mat-error
+                class="error-msg"
+                *ngIf="item.controls.quantity.hasError('pattern')"
+              >
+                Please enter Valid Quantity
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <div class="divTableCell">
+            <mat-form-field
+              class="custom-input mandatory"
+              floatLabel="never"
+              style="margin-top: 0px"
+            >
+              <input
+                matInput
+                formControlName="price"
+                placeholder="1.00"
+                [value]="item.value.price"
+                class="input-right"
+                type="text"
+                (keyup)="enterProd($event, i)"
+                oninput="javascript:  if (!/^(-?\d+(\.\d{0,3})?)?$/.test(this.value)) this.value = this.value.slice(0, -1);"
+              />
+              <mat-error
+                class="error-msg"
+                *ngIf="item.controls.price.hasError('pattern')"
+              >
+                Please enter Valid Price/Unit
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <div class="divTableCell">
+            <mat-form-field
+              class="custom-input mandatory"
+              floatLabel="never"
+              style="margin-top: 0px"
+            >
+              <input
+                matInput
+                formControlName="amount"
+                readonly
+                placeholder="1.00"
+                [value]="item.value.amount"
+                class="input-right"
+                type="number"
+              />
+            </mat-form-field>
+          </div>
+          <div
+            class="divTableCell"
+            style="line-height: 72px; text-align: center"
+          >
+            <mat-icon
+              title="Delete"
+              (click)="deleteRow(i)"
+              style="cursor: pointer; vertical-align: super"
+              mat-button
+              >delete</mat-icon
+            >
+          </div>
+        </div>
+      </div>
+      <mat-error class="error-msg" *ngIf="productError">
+        Please select atleast one product
+      </mat-error>
+      <mat-error class="error-msg" *ngIf="productselecterror">
+        Please provide the details for the product.
+      </mat-error>
+    </div>
+
+    <div class="order-totals-wrapper">
+      <div class="order-left-nav d-flex">
+        <div class="add-new-line" (click)="addNewLine()">
+          <img [src]="newItemIcon" alt="" />
+          <span>Add Product</span>
+        </div>
+        <mat-error class="error-msg" *ngIf="isAddProduct">
+          Please select a client
+        </mat-error>
+      </div>
+      <div class="sub-total-wrapper">
+        <div class="sub-total d-flex">
+          <p style="flex: 1">
+            Sub Total <span>( {{ selectedCurrency || order.currency }} )</span>
+          </p>
+          <p class="">{{ subTotal | number }}</p>
+        </div>
+        <form class="sub-total-freight" [formGroup]="productsForm">
+          <div class="order-discount d-flex">
+            <div class="discount-tag">
+              <p class="discount-label mt-10">Freight</p>
+              <mat-form-field
+                class="custom-input"
+                floatLabel="never"
+                style="margin-top: 4px"
+              >
+                <input
+                  matInput
+                  formControlName="freight"
+                  type="number"
+                  placeholder="0.00"
+                  oninput="javascript:  if (!/^(-?\d+(\.\d{0,3})?)?$/.test(this.value)) this.value = this.value.slice(0, -1);"
+                  min="0"
+                  max="99999999"
+                  step="0.01"
+                  [readonly]="subTotal == 0"
+                  [class.disableClass]="subTotal == 0"
+                  [value]=""
+                  (keyup)="enterFreight($event)"
+                  (wheel)="onWheel($event)"
+                  (keydown)="preventInputE($event)"
+                />
+                <mat-error
+                  class="error-msg"
+                  *ngIf="productsForm.controls.freight?.hasError('pattern')"
+                  style="margin-top: 8px; font-size: 10px"
+                >
+                  Please Enter Up To 7 Characters With 3 Decimals Max
+                </mat-error>
+              </mat-form-field>
+            </div>
+            <p class="mt-10">{{ freightamt | number }}</p>
+          </div>
+          <div class="order-discount d-flex">
+            <div class="discount-tag">
+              <p class="discount-label mt-10">Insurance</p>
+              <mat-form-field
+                class="custom-input"
+                floatLabel="never"
+                style="margin-top: 4px"
+              >
+                <input
+                  matInput
+                  formControlName="insurance"
+                  type="number"
+                  placeholder="0.00"
+                  min="0"
+                  maxlength="10"
+                  [readonly]="subTotal == 0"
+                  [class.disableClass]="subTotal == 0"
+                  [value]=""
+                  (keyup)="enterInsurance($event)"
+                  (wheel)="onWheel($event)"
+                  (keydown)="preventInputE($event)"
+                  oninput="javascript:  if (!/^(\d+(\.\d{0,3})?)?$/.test(this.value)) this.value = this.value.slice(0, -1);"
+                />
+                <mat-error
+                  class="error-msg"
+                  *ngIf="productsForm.controls.insurance?.hasError('pattern')"
+                  style="margin-top: 8px; font-size: 10px"
+                >
+                  Please Enter Up To 7 Characters With 3 Decimals Max
+                </mat-error>
+              </mat-form-field>
+            </div>
+            <p class="mt-10">{{ insuranceValue | number }}</p>
+          </div>
+          <div class="order-discount precentage d-flex scroll-error">
+            <div class="discount-tag">
+              <p class="discount-label mt-10">Discount</p>
+              <mat-form-field
+                class="custom-input percentaged"
+                floatLabel="never"
+                style="padding-top: 0px"
+                style="margin-top: 4px"
+              >
+                <input
+                  matInput
+                  formControlName="discount"
+                  type="number"
+                  placeholder="0.00"
+                  min="0"
+                  max=""
+                  step="0.01"
+                  (keydown)="handleKeyDown($event)"
+                  [readonly]="subTotal == 0"
+                  [class.disableClass]="subTotal == 0"
+                  [value]=""
+                  (keyup)="enterDiscount($event)"
+                  (wheel)="onWheel($event)"
+                  (keydown)="preventInputE($event)"
+                  oninput="javascript:  if (!/^(\d+(\.\d{0,3})?)?$/.test(this.value)) this.value = this.value.slice(0, -1);"
+                />
+                <mat-error
+                  class="error-msg"
+                  *ngIf="
+                    !discountError &&
+                    productsForm.controls.discount?.hasError('pattern')
+                  "
+                  style="margin-top: 8px; font-size: 10px"
+                >
+                  Please Enter Up To 7 Characters With 3 Decimals Max
+                </mat-error>
+                <p *ngIf="discountError" class="error-discount">
+                  Discount cannot exceed sub total
+                </p>
+              </mat-form-field>
+            </div>
+            <p class="mt-10">
+              <span style="font-size: 11px">(-)</span>
+              {{ discount | number }}
+            </p>
+          </div>
+        </form>
+        <div class="sub-total d-flex">
+          <p style="flex: 1">
+            Total <span>( {{ order.currency }} )</span>
+          </p>
+          <p class="">{{ total | number }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

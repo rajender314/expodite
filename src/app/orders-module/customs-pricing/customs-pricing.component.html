@@ -1,0 +1,818 @@
+<div class="inner-container" style="min-height: unset !important">
+  <mat-toolbar class="package-toolbar">
+    <mat-icon
+      mat-list-icon
+      class="post_ship_icon icon-menu detail_view_right_icons"
+      style="background-color: #f07e0a"
+    >
+      <img [src]="images.orders_small" />
+    </mat-icon>
+    <div class="invoice-toolbar">
+      <div class="invoice-number">
+        <!-- <span class="details-span">
+          {{ invoiceData?.customs_invoice[0].invoice_no }} -
+        </span> -->
+        <div class="po-nbr-edit">
+          <!-- <span
+            class="title"
+            *ngIf="!clientPermission"
+            title="{{ po?.selectedPo?.add_po[0].po_nbr }}"
+            >{{ po?.selectedPo?.add_po[0].po_no }}</span
+          > -->
+
+          <div class="nbr-field-container">
+            <!-- [attr.contenteditable]="
+            !(
+              poDetails?.add_po[0]?.status_slug === 'po_cancelled' ||
+              poDetails?.add_po[0]?.status_slug === 'po_sent'
+            )
+          " -->
+            <!-- {{ poDetails?.add_po[0]?.discount }} -->
+            <mat-form-field
+              class="custom-input mandatory"
+              floatLabel="never"
+              *ngIf="editQuoteNoState"
+            >
+              <input
+                style="width: 100%"
+                matInput
+                #poInvEditInput
+                class="po-nmbr"
+                (keyup)="savechangesPO($event)"
+                [value]="invoiceData?.customs_invoice[0].invoice_no"
+                maxlength="25"
+              />
+            </mat-form-field>
+            <div *ngIf="!editQuoteNoState" style="font-size: 18px;">
+              {{ invoiceData?.customs_invoice[0].invoice_no ? invoiceData?.customs_invoice[0].invoice_no : '--' }}
+            </div>
+
+            <div class="save-icons" style="margin: 0 6px" *ngIf="editQuoteNoState">
+              <mat-icon
+                *ngIf="editQuoteNoState"
+                (click)="editQuoteNo($event)"
+                class="mat-circle-check close-circle-icons-po"
+                style="font-size: 24px"
+                >check_circle_outline</mat-icon
+              >
+              <mat-icon
+                *ngIf="editQuoteNoState"
+                class="close-conversion close-circle-icons-po"
+                (click)="closeNumberEdit()"
+                style="font-size: 24px"
+                >highlight_off</mat-icon
+              >
+            </div>
+          </div>
+          <div
+            style="display: flex; cursor: pointer"
+            class="po-nbr-edit-icon"
+          >
+            <mat-icon
+            *ngIf="!editQuoteNoState && isEditPermission"
+              class="edit-icon"
+              title="Edit"
+              mat-icon-button
+              (click)="editpoQPD()"
+            >
+              mode_edit
+            </mat-icon>
+          </div>
+        </div>
+        <!-- <span
+          class="order-detail-status"
+          [ngClass]="{
+            due: invoiceData?.customs_invoice[0].status == 'Due',
+            overdue: invoiceData?.customs_invoice[0].status == 'Overdue',
+            open: invoiceData?.customs_invoice[0].status == 'Partially Paid',
+            paid: invoiceData?.customs_invoice[0].status == 'Paid'
+          }"
+          [ngStyle]="{
+            'background-color':
+              invoiceData?.customs_invoice[0]?.status_color_code
+          }"
+          >{{ invoiceData?.customs_invoice[0].status }}</span
+        > -->
+        <span>Customs Invoice </span>
+
+ 
+      </div>
+      <!-- <div class="xyz">
+        <span class="details-date">
+          {{ invoiceData?.customs_invoice[0].invoice_date }}
+        </span>
+      </div> -->
+    </div>
+    <span fxFlex></span>
+
+    <div *ngIf="viewActivityLogIcon">
+      <button
+        mat-icon-button
+        class="action-orderbtn"
+        (click)="openActivityModal('customs_invoice')"
+      >
+        <img [src]="images.activity_log_icon" title="Activity Log" />
+      </button>
+    </div>
+    <!-- <div class="packages-icons"> -->
+    <div
+      class="edit-delete"
+      *ngIf="order_Permissions.generate_pre_shipping_documents"
+    >
+      <div class="delete_icon" title="Print" style="padding: 4px 6px">
+        <a
+          target="_blank"
+          href="generateShipmentDocument?shipment_id={{
+            orderId
+          }}&type=custom_invoice&is_printable=1"
+        >
+          <img [src]="PrintIcon" alt="print" />
+        </a>
+      </div>
+      <div class="delete_icon" title="Download" style="padding: 4px 6px">
+        <a
+          target="_blank"
+          href="generateShipmentDocument?shipment_id={{
+            orderId
+          }}&type=custom_invoice&is_printable=0"
+        >
+          <img [src]="images.download_arrow" alt="download" />
+        </a>
+      </div>
+      <!-- </div> -->
+      <!-- <a
+        target="_blank"
+        href="generateCommercialInvoice?id={{ invId }}&is_printable=1"
+      >
+        <button mat-icon-button>
+          <img [src]="images.printer_icon" title="Print" />
+        </button>
+      </a>
+
+      <a href="generateCommercialInvoice?id={{ invId }}&is_printable=0">
+        <button mat-icon-button>
+          <img [src]="images.download_arrow" title="Download" />
+        </button>
+      </a> -->
+
+      <!-- <a
+        *ngIf="viewExcelIcon"
+        href="generateCommercialInvoice?invoice_id={{
+          invoiceData?.invoice_id
+        }}&is_excel=1&is_printable=0"
+      >
+        <button mat-icon-button>
+          <img [src]="images.excel_icon" title="Download Excel" />
+        </button>
+      </a> -->
+
+      <button style="flex: '3'" (click)="toggleDiv()" mat-icon-button>
+        <img
+          [src]="images.grey_arrow"
+          mat-icon-button
+          class="expand-icon"
+          [class.close]="!showDiv"
+        />
+      </button>
+    </div>
+  </mat-toolbar>
+  <!-- [class.minimize-div]="!showDiv" -->
+  <div class="layout" *ngIf="showDiv">
+    <div class="address-container" fxLayout="row">
+      <div class="shipper-secction" fxFlex="30">
+        <div style="display: flex">
+          <h4 class="gray-title">BILL TO PARTY</h4>
+          <div style="display: flex; cursor: pointer" *ngIf="show_edit && isEditPermission">
+            <span
+              (click)="
+                updateAddress(
+                  'add_billing_address',
+                  invoiceData.add_billing_address[0]
+                )
+              "
+            >
+              <mat-icon class="mat-icon-notify1" mat-icon-button>edit</mat-icon>
+            </span>
+          </div>
+        </div>
+
+        <div class="address-inner-content">
+          <p class="shippers-text shipper-hdng">
+            {{ invoiceData.add_billing_address[0]?.billing_company }}
+          </p>
+          <b class="bill-address">{{
+            invoiceData.add_billing_address[0]?.billing_address1
+          }}</b>
+          <p class="bill-address text-capitalized">
+            {{ invoiceData.add_billing_address[0]?.billing_address2 }}
+          </p>
+          <p class="bill-address text-capitalized">
+            {{ invoiceData.add_billing_address[0]?.billing_address3 }}
+          </p>
+          <p class="bill-address text-capitalized">
+            {{ invoiceData.add_billing_address[0]?.billing_address4 }}
+          </p>
+          <p
+            class="bill-address text-capitalized"
+            *ngIf="
+              invoiceData.add_billing_address[0]?.billing_city ||
+              invoiceData.add_billing_address[0]?.billing_postal_code
+            "
+          >
+            {{ invoiceData.add_billing_address[0]?.billing_city }} -
+            {{ invoiceData.add_billing_address[0]?.billing_postal_code }}
+          </p>
+          <p class="bill-address text-capitalized">
+            {{ invoiceData.add_billing_address[0]?.billing_state }}
+          </p>
+          <p class="bill-address text-capitalized">
+            {{ invoiceData.add_billing_address[0]?.billing_country }}
+          </p>
+        </div>
+        <div class="shipper-secction mt_16"></div>
+        <div class="shipper-secction" class="notify1">
+          <h4 class="gray-title">NOTIFY TO PARTY</h4>
+          <div style="display: flex; cursor: pointer" *ngIf="show_edit && isEditPermission">
+            <span
+              (click)="
+                updateAddress(
+                  'add_notify_address',
+                  invoiceData.add_notify_address[0]
+                )
+              "
+            >
+              <mat-icon class="mat-icon-notify1" mat-icon-button>edit</mat-icon>
+            </span>
+          </div>
+        </div>
+
+        <div
+          class="address-inner-content"
+          *ngIf="
+            invoiceData?.add_notify_address &&
+            invoiceData?.add_notify_address.length
+          "
+        >
+          <p class="shippers-text shipper-hdng">
+            {{ invoiceData?.add_notify_address[0]?.notify_company }}
+          </p>
+          <b class="bill-address">{{
+            invoiceData?.add_notify_address[0]?.notify_address1
+          }}</b>
+          <p class="bill-address text-capitalized">
+            {{ invoiceData?.add_notify_address[0].notify_address2 }}
+          </p>
+          <p class="bill-address">
+            {{ invoiceData?.add_notify_address[0].notify_address4 }}
+          </p>
+          <p class="bill-address">
+            {{ invoiceData?.add_notify_address[0].notify_address3 }}
+          </p>
+
+          <p
+            class="bill-address text-capitalized"
+            *ngIf="
+              invoiceData?.add_notify_address[0].notify_city ||
+              invoiceData?.add_notify_address[0].notify_postal_code
+            "
+          >
+            {{ invoiceData?.add_notify_address[0].notify_city }} -
+            {{ invoiceData?.add_notify_address[0].notify_postal_code }}
+          </p>
+          <p class="bill-address text-capitalized">
+            {{ invoiceData?.add_notify_address[0].notify_state }}
+          </p>
+          <p class="bill-address text-capitalized">
+            {{ invoiceData?.add_notify_address[0].notify_country }}
+          </p>
+        </div>
+      </div>
+      <div class="vertical-divider"></div>
+      <div fxFlex="30">
+        <div class="shipper-secction">
+          <div style="display: flex">
+            <h4 class="gray-title">SHIP TO PARTY</h4>
+            <div style="display: flex; cursor: pointer" *ngIf="show_edit && isEditPermission">
+              <span
+                (click)="
+                  updateAddress('add_address', invoiceData.add_address[0])
+                "
+              >
+                <mat-icon class="mat-icon-notify1" mat-icon-button
+                  >edit</mat-icon
+                >
+              </span>
+            </div>
+          </div>
+
+          <div class="address-inner-content">
+            <p class="shippers-text shipper-hdng">
+              {{ invoiceData.add_address[0].shipping_company }}
+            </p>
+            <b class="bill-address">{{
+              invoiceData.add_address[0].shipping_address1
+            }}</b>
+            <p class="bill-address text-capitalized">
+              {{ invoiceData.add_address[0].shipping_address2 }}
+            </p>
+            <p class="bill-address text-capitalized">
+              {{ invoiceData.add_address[0].shipping_address3 }}
+            </p>
+            <p class="bill-address text-capitalized">
+              {{ invoiceData.add_address[0].shipping_address4 }}
+            </p>
+            <p
+              class="bill-address text-capitalized"
+              *ngIf="
+                invoiceData.add_address[0].shipping_city ||
+                invoiceData.add_address[0].shipping_postal_code
+              "
+            >
+              {{ invoiceData.add_address[0].shipping_city }} -
+              {{ invoiceData.add_address[0].shipping_postal_code }}
+            </p>
+            <p class="bill-address text-capitalized">
+              {{ invoiceData.add_address[0].shipping_state }}
+            </p>
+            <p class="bill-address text-capitalized">
+              {{ invoiceData.add_address[0].shipping_country }}
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="vertical-divider"></div>
+      <div fxFlex="30">
+        <div class="shipper-secction">
+          <h4 class="gray-title">INVOICE DETAILS</h4>
+          <div class="address-inner-content">
+            <p class="bill-address">
+              Invoice No :&nbsp;&nbsp;
+              <span style="font-weight: bold">{{
+                invoiceData?.customs_invoice[0].invoice_no
+              }}</span>
+            </p>
+            <p class="bill-address">
+              Invoice Date :&nbsp;&nbsp;
+              <span style="font-weight: bold">{{
+                invoiceData?.customs_invoice[0]?.invoice_date
+              }}</span>
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="vertical-divider"></div>
+
+      <div
+        style="
+          margin-top: 35px;
+          display: flex;
+          gap: 8px;
+          flex-direction: column;
+        "
+      >
+        <div class="" style="width: 166px">
+          <p class="bill-address">
+            PO No :&nbsp;&nbsp;
+            <span style="font-weight: bold">{{
+              invoiceData?.customs_invoice[0]?.po_nbr
+            }}</span>
+          </p>
+        </div>
+        <div class="">
+          <p class="bill-address">
+            PO Date :&nbsp;&nbsp;
+            <span style="font-weight: bold; line-height: 20px">{{
+              invoiceData?.customs_invoice[0]?.po_date
+            }}</span>
+          </p>
+        </div>
+      </div>
+    </div>
+    <div fxLayout="row">
+      <div class="orders-table">
+        <app-ag-grid-view
+          [orders]="ordersInfo"
+          [isEditable]="show_edit"
+          [originFileAttachments]="originFileAttachments"
+          (emitGridEvent)="triggerGridEvent($event)"
+          [tableName]="'customsInvoice'"
+          [paymentsId]="invId"
+          [isEditable]="isEditPermission"
+        ></app-ag-grid-view>
+        <table class="invoice-table estimate-invoice">
+          <tbody>
+            <tr class="invoice-row">
+              <td
+                class="invoice-tdata gst-data"
+                colspan="4"
+                style="padding: 0; width: 50%"
+              >
+                <div class="gst-details">
+                  <span
+                    class="gst-one"
+                    style="padding-bottom: 0px; font-weight: 600"
+                  >
+                    {{ currency_type }}
+                    to INR Conversion
+                    <span style="color: #ff0000">*</span>
+                  </span>
+                  <div class="tax-conversion-input">
+                    <mat-form-field
+                      class="custom-input"
+                      floatLabel="never"
+                      style="margin-top: 0px; width: 20%"
+                    >
+                      <!--
+                                                (keyup)="
+                                                  changeConversion($event)
+                                                 
+                                                " -->
+                      <input
+                        matInput
+                        [ngClass]="{ 'custom-input-class': !conversion_edit }"
+                        [class.mat-focused]="conversion_edit"
+                        [readonly]="!conversion_edit"
+                        type="number"
+                        [(ngModel)]="currency_conversion"
+                        placeholder="Value"
+                        min="0"
+                        max="9999"
+                        step="0.01"
+                        pattern="^\d{1,4}(\.\d{1,2})?$"
+                        oninput="javascript: if (!/^(\d{1,4}(\.\d{0,3})?)?$/.test(this.value)) this.value = this.value.slice(0, -1);"
+                      />
+                    </mat-form-field>
+                    <div style="padding-bottom: 12px" *ngIf="show_edit && isEditPermission">
+                      <mat-icon
+                        *ngIf="!conversion_edit"
+                        style="
+                          padding-top: 2px;
+                          font-size: 20px;
+                          cursor: pointer;
+                        "
+                        (click)="startEditing()"
+                        class="edit-icon-estimate"
+                        >edit</mat-icon
+                      >
+
+                      <div
+                        *ngIf="conversion_edit"
+                        style="display: flex; gap: 4px; margin-left: 4px"
+                      >
+                        <mat-icon
+                          class="mat-circle-check"
+                          (click)="saveTaxConversion()"
+                          style="padding-left: 2px"
+                          >check_circle_outline</mat-icon
+                        >
+                        <!-- *ngIf="conversion_edit" -->
+                        <mat-icon
+                          (click)="closeConverionRate()"
+                          class="close-conversion"
+                          style="padding-left: 2px"
+                          >highlight_off</mat-icon
+                        >
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </td>
+              <td
+                class="invoice-tdata table-invoice invoice-tdata-border proforma-inovice"
+                colspan="4"
+                rowspan="2"
+                style="width: 50%"
+              >
+                <table class="invoice-costTable">
+                  <thead>
+                    <tr>
+                      <th
+                        class="costTable-head font-normal"
+                        colspan="2"
+                        style="width: 45%"
+                      >
+                        {{
+                          invoiceData.subtotal_form[0]?.totals?.subtotal.label
+                        }}
+                      </th>
+                      <th class="costTable-head font-normal pr-0">
+                        {{
+                          invoiceData.subtotal_form[0]?.totals?.subtotal.value
+                        }}
+                      </th>
+                      <th
+                        class="costTable-head font-normal edit-new-style"
+                      ></th>
+                    </tr>
+                    <tr>
+                      <th
+                        class="costTable-head font-normal"
+                        colspan="2"
+                        style="width: 45%"
+                      >
+                        {{
+                          invoiceData.subtotal_form[0]?.totals?.insurance.label
+                        }}
+                      </th>
+                      <th
+                        class="costTable-head font-normal values1 editfreight-orders-commercial d-flex justify-end pr-0"
+                        style="padding: 17px 12px"
+                      >
+                        <input
+                          #commercialInvEditInput
+                          class="numaricEdit charges"
+                          [(ngModel)]="
+                            invoiceData.subtotal_form[0]?.totals?.insurance
+                              .value
+                          "
+                          [ngStyle]="{
+                            border: editStateUpdate
+                              ? '1px solid #075da8'
+                              : 'none'
+                          }"
+                          *ngIf="editStateUpdate"
+                          onpaste="javascript:event.preventDefault();"
+                          [disabled]="!show_edit"
+                          (focus)="removeCommasHandler($event)"
+                          (blur)="onBlur($event, 'insurance')"
+                          (keyup)="numaricChange($event, 'insurance')"
+                          (input)="validateDecimalInput($event)"
+                        />
+
+                        <!-- oninput="javascript:  if (!/^(\d+(\.\d{0,3})?)?$/.test(this.value)) this.value = this.value.slice(0, -1);" -->
+                        <span *ngIf="!editStateUpdate">{{
+                          invoiceData.subtotal_form[0]?.totals?.insurance.value
+                        }}</span>
+
+                        <div class="save-icons">
+                          <mat-icon
+                            *ngIf="editStateUpdate"
+                            (mousedown)="
+                              saveCommercialEdit('Insurance', 'insurance')
+                            "
+                            style="padding-left: 2px"
+                            class="mat-circle-check close-circle-icons-order"
+                            >check_circle_outline</mat-icon
+                          >
+                          <mat-icon
+                            *ngIf="editStateUpdate"
+                            class="close-conversion close-circle-icons-order"
+                            (click)="closeEditcommercial()"
+                            >highlight_off</mat-icon
+                          >
+                        </div>
+                      </th>
+                      <th class="costTable-head font-normal edit-new-style">
+                        <mat-icon
+                          *ngIf="!editStateUpdate && show_edit && isEditPermission"
+                          (mousedown)="editCommercial('insurance')"
+                          class="editfreight-orders-commercial"
+                          >edit</mat-icon
+                        >
+                      </th>
+                    </tr>
+                    <tr>
+                      <th
+                        class="costTable-head font-normal"
+                        colspan="2"
+                        style="width: 45%"
+                      >
+                        {{
+                          invoiceData.subtotal_form[0]?.totals?.freight.label
+                        }}
+                      </th>
+                      <th
+                        class="costTable-head font-normal values1 editfreight-orders-commercial d-flex justify-end pr-0"
+                        style="padding: 10px 0px"
+                      >
+                        <input
+                          #commercialInvEditInput
+                          class="numaricEdit charges"
+                          [(ngModel)]="
+                            invoiceData.subtotal_form[0]?.totals?.freight.value
+                          "
+                          [ngStyle]="{
+                            border: editFreightState
+                              ? '1px solid #075da8'
+                              : 'none'
+                          }"
+                          *ngIf="editFreightState"
+                          (keyup)="numaricChange($event, 'freight')"
+                          onpaste="javascript:event.preventDefault();"
+                          [disabled]="!show_edit"
+                          (focus)="removeCommasHandler($event)"
+                          (blur)="onBlur($event, 'freight')"
+                          (input)="validateDecimalInput($event)"
+                        />
+                        <!-- oninput="javascript:  if (!/^(\d+(\.\d{0,3})?)?$/.test(this.value)) this.value = this.value.slice(0, -1);" -->
+                        <span *ngIf="!editFreightState">{{
+                          invoiceData.subtotal_form[0]?.totals?.freight.value
+                        }}</span>
+
+                        <div class="save-icons">
+                          <mat-icon
+                            *ngIf="editFreightState"
+                            (mousedown)="
+                              saveCommercialEdit('Freight Charges', 'freight')
+                            "
+                            style="padding-left: 2px"
+                            class="mat-circle-check close-circle-icons-order"
+                            >check_circle_outline</mat-icon
+                          >
+                          <mat-icon
+                            *ngIf="editFreightState"
+                            class="close-conversion close-circle-icons-order"
+                            (click)="closeEditcommercial()"
+                            >highlight_off</mat-icon
+                          >
+                        </div>
+                      </th>
+                      <th class="costTable-head font-normal edit-new-style">
+                        <mat-icon
+                          *ngIf="!editFreightState && show_edit && isEditPermission"
+                          (mousedown)="editCommercial('freight')"
+                          class="editfreight-orders-commercial"
+                          >edit</mat-icon
+                        >
+                      </th>
+                    </tr>
+                    <tr>
+                      <th
+                        class="costTable-head font-normal"
+                        colspan="2"
+                        style="width: 45%"
+                      >
+                        {{
+                          invoiceData.subtotal_form[0]?.totals?.discount.label
+                        }}
+                      </th>
+                      <th
+                        class="costTable-head font-normal values1 editfreight-orders-commercial d-flex justify-end pr-0"
+                        style="padding: 18px"
+                      >
+                        <input
+                          #commercialInvEditInput
+                          class="numaricEdit charges"
+                          [ngStyle]="{
+                            border: editDescountState
+                              ? '1px solid #075da8'
+                              : 'none'
+                          }"
+                          *ngIf="editDescountState"
+                          [readonly]="!editDescountState"
+                          [(ngModel)]="
+                            invoiceData.subtotal_form[0]?.totals?.discount.value
+                          "
+                          (keyup)="numaricChange($event, 'discount')"
+                          [disabled]="!show_edit"
+                          (focus)="removeCommasHandler($event)"
+                          (blur)="onBlur($event, 'discount')"
+                          (input)="validateDecimalInput($event)"
+                        />
+
+                        <!-- oninput="javascript: if
+                        (!/^(\d+(\.\d{0,3})?)?$/.test(this.value)) this.value =
+                        this.value.slice(0, -1);" -->
+                        <span *ngIf="!editDescountState">{{
+                          invoiceData.subtotal_form[0]?.totals?.discount.value
+                        }}</span>
+
+                        <div class="save-icons">
+                          <mat-icon
+                            *ngIf="editDescountState"
+                            (mousedown)="
+                              saveCommercialEdit('Discount', 'discount')
+                            "
+                            style="padding-left: 2px"
+                            class="mat-circle-check close-circle-icons-order"
+                            >check_circle_outline</mat-icon
+                          >
+                          <mat-icon
+                            *ngIf="editDescountState"
+                            class="close-conversion close-circle-icons-order"
+                            (click)="closeEditcommercial()"
+                            >highlight_off</mat-icon
+                          >
+                        </div>
+                      </th>
+                      <th class="costTable-head font-normal edit-new-style">
+                        <mat-icon
+                          *ngIf="!editDescountState && show_edit && isEditPermission"
+                          (mousedown)="editCommercial('discount')"
+                          class="editfreight-orders-commercial"
+                          >edit</mat-icon
+                        >
+                      </th>
+                    </tr>
+                    <tr
+                      *ngFor="
+                        let extraCharge of invoiceData?.add_line_items;
+                        index as chargeIndex
+                      "
+                    >
+                      <th
+                        class="costTable-row delete"
+                        style="border-bottom: 1px solid #d3d3d3"
+                        *ngIf="show_edit && isEditPermission"
+                      >
+                        <mat-icon
+                          class="delete-icon"
+                          title="Delete"
+                          (click)="deleteLineItemCustomPricing(extraCharge)"
+                        >
+                          delete</mat-icon
+                        >
+                      </th>
+                      <th
+                        [attr.colspan]="show_edit && isEditPermission ? 1 : 2"
+                        class="costTable-head font-normal"
+                        style="
+                          border-right: 1px solid #d3d3d3;
+                          border-left: 1px solid #d3d3d3;
+                        "
+                      >
+                        {{ extraCharge.line_item }}
+                      </th>
+                      <th
+                        style="border-right: 0px"
+                        class="costTable-head font-normal values1 editfreight-orders-commercial d-flex justify-end"
+                      >
+                        <input
+                          #commercialInvEditInput
+                          [readonly]="editExtraCol !== chargeIndex"
+                          [ngStyle]="{
+                            border:
+                              editExtraCol == chargeIndex
+                                ? '1px solid #075da8'
+                                : 'none'
+                          }"
+                          class="numaricEdit charges"
+                          *ngIf="editExtraCol == chargeIndex"
+                          [(ngModel)]="extraCharge.value"
+                          (keyup)="
+                            numaricChange($event, 'add_line_items', chargeIndex)
+                          "
+                          oninput="this.value = this.value.match(/^(-?\d*(\.\d{0,3})?)?/)?.[0] || '';"
+                          [disabled]="!show_edit"
+                          (focus)="removeCommasHandler($event)"
+                          (blur)="onBlur($event, 'extra_col')"
+                        />
+                        <span *ngIf="editExtraCol != chargeIndex">
+                          {{ extraCharge.value }}
+                        </span>
+
+                        <div class="save-icons">
+                          <mat-icon
+                            *ngIf="editExtraCol === chargeIndex"
+                            (mousedown)="saveAddline(extraCharge, chargeIndex)"
+                            style="padding-left: 2px"
+                            class="mat-circle-check close-circle-icons-order"
+                            >check_circle_outline</mat-icon
+                          >
+                          <mat-icon
+                            *ngIf="editExtraCol === chargeIndex"
+                            class="close-conversion close-circle-icons-order"
+                            (click)="closeEditcommercial()"
+                            >highlight_off</mat-icon
+                          >
+                        </div>
+                      </th>
+                      <th class="costTable-head font-normal edit-new-style">
+                        <mat-icon
+                          *ngIf="editExtraCol != chargeIndex && show_edit && isEditPermission"
+                          (mousedown)="editCommercial('extra_col', chargeIndex)"
+                          class="editfreight-orders-commercial"
+                          >edit</mat-icon
+                        >
+                      </th>
+                    </tr>
+                  </thead>
+                </table>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div
+          class="footer invoice-footer"
+          style="justify-content: space-between"
+        >
+          <div *ngIf="show_edit && isEditPermission">
+            <span class="add-Line" (click)="addlineitemCustoms()">
+              <mat-icon>add</mat-icon>
+              Add Line Item
+            </span>
+          </div>
+          <span fxFlex></span>
+          <span class="total-text"
+            >{{ invoiceData.subtotal_form[0]?.totals?.total.label }}:</span
+          >
+          <span class="total-text">{{
+            ordersInfo.selectedOrder?.create_shipment[0]?.currency_type
+          }}</span>
+          <span class="total-text"> </span>
+          <span> {{ invoiceData.subtotal_form[0]?.totals?.total.value }} </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

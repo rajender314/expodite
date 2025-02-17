@@ -17,6 +17,7 @@ import {  HTTP_INTERCEPTORS } from '@angular/common/http';
 
 import { PERFECT_SCROLLBAR_CONFIG, PerfectScrollbarConfigInterface, PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { TableComponent } from '../custom-material/table/table.component';
+import { CommonModule } from '@angular/common';
 
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
       suppressScrollX: true
@@ -37,6 +38,7 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
   imports: [
    
     InventoryRoutingModule,
+    CommonModule,
     SharedModule,
     
     

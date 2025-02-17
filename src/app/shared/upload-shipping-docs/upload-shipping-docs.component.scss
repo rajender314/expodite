@@ -1,0 +1,189 @@
+
+
+.image-upload{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    // align-items: center;
+    justify-content: flex-start;
+    &.justify{
+        justify-content: start;
+    }
+}
+
+.address-container{
+    padding: 30px 20px;
+    &.activity-status {
+        padding:5px 20px 45px 6px;
+    }
+
+    .gray-title{
+        font-size: 13px;
+        font-weight: 500;
+        color: #979797;
+        letter-spacing: 1.86px;
+        margin-top: 0px;
+        margin-bottom: 13px;
+    }
+    .address-inner-content{
+        font-size: 14px;
+        color: #565656;
+        letter-spacing: -0.18px;
+        line-height: 25px;
+        padding-right: 15px;
+        // b.bill-address{
+        //     word-break: break-word;
+        // }
+        p.bill-address{
+            margin: 0;
+            word-break: break-word;
+
+        }
+        p.invoice-contact{
+            // font-weight: 500;
+            margin: 0;
+        }
+    }
+    .vertical-divider{
+        opacity: 0.33;
+        border-left: 1px solid #979797;
+        margin: 0px 50px;
+    }
+    .order-po-container{
+        position: relative;
+        .order-po{
+            background: rgba(246,247,248,0.89);
+            border: 1px solid #CFCFCF;
+            height: 197px;
+            width: 156px;
+            position: absolute;
+            right: 0;
+        }
+        .po-date{
+            position: absolute;
+            right: 0;
+            top: 215px;
+            width: 156px;
+            .editable-cell{
+                display: inline-block;
+                min-width: 64px;
+                border: 1px solid transparent;
+                // background-color: #fff4b4;
+                &:focus{
+                    border: 1px solid #4A90E2
+                }
+            }
+        }
+    }
+    .po-numbheader{
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        max-height: 50px;
+        height:40px;
+        display: flex;
+        align-items: center;
+        border-top: 1px solid #CFCFCF;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        // white-space: pre-line;
+        padding: 0px 8px;
+        .editable-cell {
+          display: inline-block;
+          min-width: 64px;
+          border: 1px solid transparent;
+        //   background-color: #fff4b4;
+          &:focus{
+              border: 1px solid #4A90E2
+          }
+        }
+    }
+    .po-number{
+            background: #FFFFFF;
+            border-top: 1px solid #CFCFCF;
+            border-radius: 2px;
+            height: 38px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #565656;
+            letter-spacing: -0.16px;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            align-items: center;
+            padding: 0px 15px;
+
+    }
+    .notify-address {
+        top: 20px;
+        position: relative;
+    }
+}
+
+.shipping-status2{
+    padding: 5px 0;
+}
+.shipping-sec{
+    margin: 10px 0;
+    @media screen and (max-width: 1025px) {
+        &.other-cost-form{
+            // background-color: red !important;
+        flex-wrap: wrap;
+        }
+    }
+    justify-content: space-between;
+    &.edit-section{
+        align-items: center;
+        justify-content: flex-start;
+        .shipping-mode{
+            margin-bottom: 0;
+            padding-left: 36px;
+        }
+    }
+}
+
+.upload-drop {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    // width: 20px;
+    gap: 10px;
+    font-size: 14px;
+    color: #464646;
+    span {
+      cursor: pointer;
+      width: 100%;
+    }
+    span:hover {
+      // cursor: pointer;
+      color: lightgrey;
+    }
+    span.pointer.create-po:hover {
+      color: #075da8;
+    }
+    .extra-col {
+      border-bottom: 1px solid #565656 !important;
+    }
+  }
+
+  .not-allowed {
+    pointer-events: none;
+  }
+  .file-name {
+    color: #565656;
+    font-weight: 500;
+    padding-top: 4px;
+    font-size: 12px;
+    &.truncate {
+        position: absolute;
+        bottom: 4px;
+        width: 160px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+  }
+

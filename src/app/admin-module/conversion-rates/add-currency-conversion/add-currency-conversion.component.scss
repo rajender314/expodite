@@ -1,0 +1,16 @@
+.width-50 {
+    width: calc(50% - 16px);
+}
+.d-flex {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    width: 100%;
+    padding: 18px 0px;
+    padding-top: 0px;
+}
+.mat-form-field-subscript-wrapper {
+    mat-error {
+        margin-top: 8px !important;
+    }
+}

@@ -1,0 +1,34 @@
+<div class="order-main-container">
+  <mat-toolbar>
+    <div class="create-order-title-wrapper">
+      <span class="img-icon">
+        <img [src]="createOrderIcon" alt="Icon" />
+      </span>
+      <h2 class="order-main-title">Create Order</h2>
+    </div>
+  </mat-toolbar>
+  <mat-dialog-content>
+    <div class="page-inner-container">
+      <div class="products-container">
+        <div class="details-title">
+          <h2>Order Details</h2>
+        </div>
+        <form>
+          <app-form-builder [module]="'create_order'" (trigger)="formEmitEvent($event)"
+            ></app-form-builder>
+        </form>
+      </div>
+      <mat-spinner class="medium-spinner page-fixed" *ngIf="fetchingData"></mat-spinner>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions>
+    <div class="cofirmOrderActionsBlock">
+      <button mat-button mat-dialog-close>Close</button>
+      <button mat-raised-button id="createorder" color="primary"
+        [disabled]="createbtnDisabled || !productsForm || productsForm?.invalid " (click)="createOrderConfirm()">
+        Confirm Order
+      </button>
+    </div>
+  </mat-dialog-actions>
+</div>

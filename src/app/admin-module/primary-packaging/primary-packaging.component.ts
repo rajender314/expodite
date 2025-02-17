@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { AdminService } from '../../services/admin.service';
 
 @Component({
   selector: 'app-primary-packaging',
@@ -9,9 +10,12 @@ export class PrimaryPackagingComponent implements OnInit {
   selectedContainer: object;
   updatedContainersDetails: object;
 
-  constructor() { }
+  constructor(public adminService: AdminService) { }
 
   ngOnInit(): void {
+    this.adminService.getPermissions().subscribe(res => {
+      this.adminService.rolePermissions = res.role_details.roles_permissions;
+    })
   }
   getSelectedContainer(data: any): void {
     if(data.status == undefined) {

@@ -1,0 +1,19 @@
+<mat-toolbar>
+  <h2 mat-dialog-title>Delete Bank Details</h2>
+  <span fxFlex></span>
+  <!--<button mat-icon-button mat-dialog-close>
+    <mat-icon>close</mat-icon>
+  </button>-->
+</mat-toolbar>
+<mat-dialog-content class="delete-body">
+  <div class="delete-address">{{data.msg}}</div>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <span fxFlex></span>
+  <button mat-button mat-dialog-close >{{language.defaults.cancel}}</button>
+  <button mat-raised-button  (click)="deleteAddress()" >Delete </button>
+  <!-- <button mat-raised-button mat-dialog-close  >OK</button> -->
+
+</mat-dialog-actions>
+
+<!-- {{data.address1}}? -->

@@ -1,0 +1,289 @@
+<div class="order-inner-container" #Packaging>
+  <!-- [class.collapse]="!showItems" -->
+  <mat-toolbar class="package-toolbar">
+    <mat-icon
+      mat-list-icon
+      class="post_ship_icon icon-menu detail_view_right_icons"
+      style="background: #8b5729"
+    >
+      <img class="logo-img" [src]="images.pkgDetails_small" />
+    </mat-icon>
+    <span>Packages</span>
+    <span fxFlex></span>
+
+    <div *ngIf="viewActivityLogIcon" style="margin-right: 6px">
+      <!-- <button
+        mat-icon-button
+        class="action-orderbtn"
+        (click)="openActivityModal('new_create_package')"
+      > -->
+      <div class="edit-delete">
+        <div
+          class="edit_icon"
+          title="User Activity Tracker"
+          (click)="openActivityModal('new_create_package')"
+          style="padding: 5px 5px"
+        >
+          <img [src]="images.activity_log_icon" />
+        </div>
+      </div>
+      <!-- </button> -->
+    </div>
+    <!-- <a
+      *ngIf="!clientPermission && orders.selectedOrder.status != 'Cancelled'"
+      target="_blank"
+      [ngClass]="{
+        'events-none': orders.selectedOrder.status == 'Cancelled'
+      }"
+      href="generate_pdf?id={{ orders.selectedOrder.id }}&is_printable=1"
+    >
+      <button mat-icon-button class="action-orderbtn">
+        <img [src]="images.printer_icon" title="Print" />
+      </button>
+    </a> -->
+    <!-- <a
+      *ngIf="orders.selectedOrder.status != 'Cancelled'"
+      href="generate_pdf?id={{ orders.selectedOrder.id }}&is_printable=0"
+      [ngClass]="{
+        'events-none': orders.selectedOrder.status == 'Cancelled'
+      }"
+    >
+      <button mat-icon-button class="action-orderbtn">
+        <img [src]="images.download_arrow" title="Download" />
+      </button>
+    </a> -->
+    <!-- <button mat-icon-button (click)="toggleItems()">
+      <img [src]="images.grey_arrow" mat-icon-button *ngIf="show" />
+      <mat-icon class="toggle-arrow" *ngIf="!show"
+        >keyboard_arrow_down
+      </mat-icon>
+    </button> -->
+    <!-- && !order_Permissions.add_package -->
+    <div *ngIf="!isOpenFormat && adminService.rolePermissions.add_packing == 1" style="margin-right: 6px">
+      <!-- <button class="add-row-btn" (click)="addPackage()" mat-raised-button>
+        Add Package
+      </button> -->
+      <div class="edit-delete">
+        <div
+          class="edit_icon"
+          title="Add Package"
+          (click)="addPackage()"
+          style="padding: 3px 3px"
+        >
+          <img [src]="images.add" alt="add" style="width: 100%; height: 100%" />
+        </div>
+      </div>
+    </div>
+    <div *ngIf="isOpenFormat">
+      <!-- <button class="add-row-btn" (click)="editPackage()" mat-raised-button>
+        Edit
+      </button> -->
+      <!-- <button class="add-row-btn" (click)="deletePackage()" mat-raised-button>
+        Delete 
+      </button> -->
+
+      <div class="edit-delete">
+        <div
+          class="edit_icon"
+          *ngIf="!order_Permissions.disable_edit_package && adminService.rolePermissions.edit_packing == 1"
+          (click)="editPackage()"
+          title="Edit"
+        >
+          <img [src]="EditIcon" alt="edit" />
+        </div>
+
+        <div
+          class="delete_icon"
+          (click)="deletePackage()"
+          title="Delete"
+          *ngIf="!order_Permissions.disable_edit_package && adminService.rolePermissions.edit_packing == 1"
+        >
+          <img [src]="images.deleteIcon" alt="delete" />
+        </div>
+
+        <div
+          *ngIf="
+            order_Permissions.generate_pre_shipping_documents &&
+            packageTable?.length
+          "
+          class="delete_icon"
+          title="Print"
+          style="padding: 4px 6px"
+        >
+          <!-- <a
+            target="_blank"
+            href="generateOpenFormatPacking?id={{ shipmentId }}&is_printable=1"
+          > -->
+          <a
+            target="_blank"
+            href="generateShipmentDocument?shipment_id={{
+              shipmentId
+            }}&type=packing_list&is_printable=1"
+          >
+            <img [src]="PrintIcon" alt="print" />
+          </a>
+        </div>
+        <div
+          *ngIf="
+            order_Permissions.generate_pre_shipping_documents &&
+            packageTable?.length
+          "
+          class="delete_icon"
+          title="Download"
+          style="padding: 4px 6px"
+        >
+          <!-- <a
+            target="_blank"
+            href="generateOpenFormatPacking?id={{ shipmentId }}&is_printable=0"
+          > -->
+          <a
+            target="_blank"
+            href="generateShipmentDocument?shipment_id={{
+              shipmentId
+            }}&type=packing_list&is_printable=0"
+          >
+            <img [src]="images.download_arrow" alt="download" />
+          </a>
+        </div>
+      </div>
+    </div>
+    <div
+      *ngIf="
+        !isOpenFormat &&
+        order_Permissions.generate_pre_shipping_documents &&
+        packageTable?.packages?.length
+      "
+    >
+      <div class="edit-delete">
+        <div class="delete_icon" title="Print" style="padding: 4px 6px">
+          <!-- <a
+            target="_blank"
+            href="generateShipmentDocument?shipment_id={{
+              shipmentId
+            }}&type=packing_list&is_printable=1"
+          > -->
+          <a
+            target="_blank"
+            href="generateShipmentDocument?shipment_id={{
+              shipmentId
+            }}&type=packing_list&is_printable=1"
+          >
+            <img [src]="PrintIcon" alt="print" />
+          </a>
+        </div>
+        <div class="delete_icon" title="Download" style="padding: 4px 6px">
+          <!-- <a
+            target="_blank"
+            href="generateShipmentDocument?shipment_id={{
+              shipmentId
+            }}&type=packing_list&is_printable=0"
+          > -->
+          <a
+            target="_blank"
+            href="generateShipmentDocument?shipment_id={{
+              shipmentId
+            }}&type=packing_list&is_printable=0"
+          >
+            <img [src]="images.download_arrow" alt="download" />
+          </a>
+        </div>
+      </div>
+    </div>
+  </mat-toolbar>
+  <!-- <div class="inner-container"> -->
+  <!-- <div class="shipping-sec" style="margin-bottom: 0"> -->
+  <app-packing-details-table
+    *ngIf="packageTable && !isOpenFormat"
+    [packageTable]="packageTable"
+    (addPackage)="addPackage($event)"
+    (importEvent)="emitImportEvnt($event)"
+    [order_Permissions]="order_Permissions"
+  ></app-packing-details-table>
+
+  <div *ngIf="isOpenFormat">
+    <app-open-package-grid
+      [packageTable]="packageTable"
+    ></app-open-package-grid>
+  </div>
+  <div class="summary-description" style="padding-top: 2px">
+    <div class="package-summary-container">
+      <div class="card1">
+        <div class="details">
+          <div>
+            <div
+              style="
+                display: flex;
+                cursor: pointer;
+                gap: 4px;
+                padding-bottom: 6px;
+              "
+            >
+              <h4>Marks and No's :</h4>
+            </div>
+            <div
+              style="padding: 0"
+              [innerHTML]="declarations?.marks_and_nos"
+            ></div>
+          </div>
+          <div>
+            <div
+              style="
+                display: flex;
+                cursor: pointer;
+                gap: 4px;
+                padding-bottom: 6px;
+                padding-top: 6px;
+              "
+            >
+              <h4>Declaration for Packing list :</h4>
+            </div>
+            <div [innerHTML]="declarations?.packing_declarations"></div>
+          </div>
+        </div>
+        <div
+          class="edit_icon"
+          style="padding: 6px 6px"
+          (click)="onFooterEdit()"
+          *ngIf="!order_Permissions.disable_edit_package && adminService.rolePermissions.edit_packing == 1"
+          title="Edit"
+        >
+          <img [src]="EditIcon" alt="edit" />
+        </div>
+      </div>
+      <div
+        class="summary"
+        style="display: flex; flex-direction: column; gap: 20px"
+      >
+        <h4>Shipment Packaging Weight and Volume Overview :</h4>
+        <div>
+          <p class="summary-keys">
+            <span class="label">Total {{ cbm_label?.cbm_label }} : </span>
+            <span style="padding-right: 4px">{{
+              packageTable?.summary?.total_cbm
+            }}</span>
+          </p>
+          <p class="summary-keys">
+            <span class="label">Total Net Weight : </span>
+            <span style="padding-right: 4px"
+              >{{ packageTable?.summary?.total_net_wt }} Kgs</span
+            >
+          </p>
+          <p class="summary-keys">
+            <span class="label"> Total Gross Weight :</span>
+            <span style="padding-right: 4px">
+              {{ packageTable?.summary?.total_gross_wt }} Kgs</span
+            >
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- <app-ag-grid-view
+          [orders]="orders"
+          [tableName]="'shipment_package_details'"
+          [newColumnAdded]="newPackageAdded"
+        ></app-ag-grid-view> -->
+  <!-- <app-sample-ag-grid></app-sample-ag-grid> -->
+  <!-- </div> -->
+  <!-- </div> -->
+</div>

@@ -84,7 +84,7 @@
 
 	<div class="document-footer" *ngIf="activeState" >
 		<div class="min-container d-flex justify-content-end">
-		<button type="button" mat-button (click)="cancelProductTypes()">{{language.defaults.cancel}}</button>
+		<button type="button"  class="back-btn-ui" (click)="cancelProductTypes()">{{language.defaults.cancel}}</button>
 		<button type="submit" mat-raised-button (click)="saveProductData()">{{language.defaults.save}}</button>
 	</div>
 	</div>

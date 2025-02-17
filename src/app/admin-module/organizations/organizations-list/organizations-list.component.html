@@ -2,9 +2,18 @@
   <div class="flex-fixed-header menu-title">
 
     <h1>{{language.defaults.clientCount}} ({{totalCount}})</h1>
-    <span class="add-link" (click)="addOrganization()">
-      <mat-icon>add</mat-icon>Add
-    </span>
+ <span class="add-link custom-tooltip import-img"
+ *ngIf="adminService.rolePermissions.add_client == 1"
+ (click)="addOrganization()" >
+			<img [src]='images.add'>
+			 <span class="tooltiptext">Add</span>
+		  </span>
+		  <span class="add-link custom-tooltip import-img" 
+      *ngIf="adminService.rolePermissions.add_client == 1"
+      (click)="importClients()" >
+			<img [src]='images.import'>
+			  <span class="tooltiptext">Import</span>
+		   </span>
   </div>
   <div class="app-search-container search-small">
     <mat-form-field class="search" floatLabel="never">
@@ -22,9 +31,9 @@
     <div infiniteScroll [infiniteScrollDistance]="1" [infiniteScrollThrottle]="50" (scrolled)="onScroll()"
       [scrollWindow]="false">
       <mat-spinner class="medium-spinner" *ngIf="fetchingData"></mat-spinner>
-      <mat-list class="media-list" @clientsAnimate *ngIf="!fetchingData">
+      <mat-list class="media-list" @clientsAnimate *ngIf="!fetchingData && adminService.rolePermissions.view_clients == 1">
         <mat-list-item *ngFor="let list of organizationsList" [ngClass]="{'active':list.id==selectedOrganizations.id}"
-          (click)="getOrganization(list)">
+          (click)="getOrganization(list)" class="admin-internal-menu-list">
           <!-- <mat-icon mat-list-icon *ngIf="list.company_logo">
           <img class="mat-avatar" [src]="list.company_logo ? list.company_logo : 'public/signatures/assets/images/avatar.png'" [alt]="list.company_name" />
         </mat-icon> -->
@@ -36,17 +45,17 @@
             <div class="media-aside align-self-center ">
               <span class="b-avatar badge-light-primary rounded-circle badge-light-info"
                 style="width: 32px; height: 32px;">
-                <span class="b-avatar-text " *ngIf="!list.company_logo">{{list.name | firstWord }}</span>
-                <span class="b-avatar-img img" *ngIf="list.company_logo">
+                <span class="b-avatar-text " *ngIf="!list.upload_logo">{{list.company_name || list.name | firstWord }}</span>
+                <span class="b-avatar-img img" *ngIf="list.upload_logo">
                   <img class="mat-avatar"
-                    [src]="list.company_logo ? list.company_logo : 'public/signatures/assets/images/avatar.png'"
+                    [src]="list.upload_logo ? list.upload_logo.url : 'public/signatures/assets/images/avatar.png'"
                     [alt]="list.company_name ? list.company_name : ''" />
                 </span>
 
               </span>
             </div>
             <div class="media-body">
-              <h1 class="font-weight-bold d-block text-nowrap single" [innerHtml]="list.name"></h1>
+              <h1 class="font-weight-bold d-block text-nowrap single" [innerHtml]="list.company_name || list.name"></h1>
             </div>
           </div>
         </mat-list-item>

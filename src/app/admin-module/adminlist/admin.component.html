@@ -1,31 +1,54 @@
 <div class="admin" fxLayout="row">
-  
-  <div class="center-section-scroll vh-100 d-flex secundory-menu " id="forResponsive">
+  <div
+    class="center-section-scroll vh-100 d-flex secundory-menu"
+    id="forResponsive"
+  >
     <div class="flex-fixed-header menu-title">
-      <h1 >Admin</h1>
+      <h1>Admin</h1>
     </div>
-    <perfect-scrollbar class="flex-scroll-items p-l-8 p-r-8 ">
-      <mat-list class="media-list ">
-        <mat-list-item @AdminListAnimate *ngFor="let list of sideList" [routerLink]="[list.route]" routerLinkActive="active">
+    <perfect-scrollbar class="flex-scroll-items p-l-16 p-r-8">
+      <mat-list class="media-list">
+        <mat-list-item
+          @AdminListAnimate
+          *ngFor="let list of sideList"
+          [routerLink]="[list.routerlink]"
+          routerLinkActive="active"
+          class="main-list"
+        >
           <div class="media d-flex align-items-center">
             <div class="media-aside align-self-center">
-              <span class="b-avatar badge-light-primary  badge-light-info" style="border-radius: 0px;">
-                <span class="b-avatar-img img " style="border-radius: 0px;">
-                  <img class="admin-icons" [src]='list.icon'>
+              <span
+                class="b-avatar badge-light-primary badge-light-info"
+                style="border-radius: 0px"
+              >
+                <span
+                  class="b-avatar-img img"
+                  [class.admin-bgColor]="
+                    list.name == 'Document Template' ||
+                    list.name == 'Quotation Settings' ||
+                    list.name == 'Order Settings' ||
+                    list.name == 'PO Settings' ||
+                    list.name == 'Invoice Settings'
+                  "
+                  style="border-radius: 0px"
+                >
+                  <img
+                    class="admin-icons"
+                    [src]="list.icon"
+                    style="width: 20px; height: 20px"
+                  />
                 </span>
               </span>
             </div>
             <div class="media-body">
-              <h1 style="padding-bottom: 0;">{{list.name}}</h1>
+              <h1 style="padding-bottom: 0">{{ list.name }}</h1>
             </div>
           </div>
-           
         </mat-list-item>
-    </mat-list>
+      </mat-list>
     </perfect-scrollbar>
-
   </div>
-  <div class="center-section-scroll vh-100 d-flex body-color ">
+  <div class="center-section-scroll vh-100 d-flex body-color">
     <router-outlet></router-outlet>
   </div>
 </div>

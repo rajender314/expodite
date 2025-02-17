@@ -1,0 +1,34 @@
+<mat-toolbar color="primary">
+  <h2 mat-dialog-title>Add {{ data.naming }}</h2>
+  <span fxFlex></span>
+</mat-toolbar>
+<mat-dialog-content>
+  <form class="addLineForm" style="padding: 0">
+    <mat-form-field class="custom-input mandatory" floatLabel="never">
+      <label class="custom-label mandatory">{{ data.naming }}</label>
+      <input
+        matInput
+        [placeholder]="'Add ' + data.naming"
+        [(ngModel)]="countryStateName"
+        name="countryName"
+        required
+      />
+      <!-- <mat-error *ngIf="lineItemForm.controls.lineItem.hasError('required')"
+        >Please Enter Line Item</mat-error
+      > -->
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <span fxFlex></span>
+  <button class="back-btn-ui" mat-dialog-close>Cancel</button>
+
+  <!-- [disabled]="disabledSave || !lineItemForm || lineItemForm?.invalid" -->
+  <button
+    (click)="add()"
+    [disabled]="disabledSave || !countryStateName"
+    mat-raised-button
+  >
+    Add {{ data.naming }}
+  </button>
+</mat-dialog-actions>

@@ -1,0 +1,332 @@
+<div>
+  <div class="main">
+    <!-- <div
+      class="inner-container"
+      [class.collapse]="!showPackage" *ngIf="showAddpackage"
+      
+    >
+      <mat-toolbar class="package-toolbar">
+        <img class="logo-img" [src]="images.package_icon" />
+        <span>Packing Details</span>
+        <span fxFlex></span>
+        <button mat-icon-button (click)="togglePackage()">
+          <img [src]="images.grey_arrow" mat-icon-button />
+        </button>
+      </mat-toolbar>
+      <div class="package-container" *ngIf="showPackage">
+        <div>
+          <button class="add-package-button" (click)="addPackage('')">
+            <img [src]="newItemIcon" alt="" />
+            <span>Add Package</span>
+          </button>
+        </div>
+      </div>
+    </div> -->
+
+    <div>
+      <div class="main">
+        <div class="inner-container" [class.collapse]="!showPackage">
+          <mat-toolbar class="package-toolbar">
+            <img class="logo-img" [src]="images.package_icon" />
+            <span>Packing Details</span>
+            <span fxFlex></span>
+            <div *ngIf="viewActivityLogIcon">
+              <button
+                mat-icon-button
+                class="action-orderbtn"
+                (click)="openActivityModal('order_packing_details')"
+              >
+                <img [src]="images.activity_log_icon" title="Activity Log" />
+              </button>
+            </div>
+            <div *ngIf="productsData?.length">
+              <a
+                target="_blank"
+                href="generateOrderPackagePdf?id={{ data.id }}&is_printable=1"
+              >
+                <button mat-icon-button>
+                  <img [src]="images.printer_icon" title="Print" />
+                </button>
+              </a>
+              <a href="generateOrderPackagePdf?id={{ data.id }}&is_printable=0">
+                <button mat-icon-button>
+                  <img [src]="images.download_arrow" title="Download" />
+                </button>
+              </a>
+            </div>
+            <button mat-icon-button (click)="togglePackage()">
+              <img
+                [src]="images.grey_arrow"
+                mat-icon-button
+                *ngIf="showPackage"
+              />
+              <mat-icon class="toggle-arrow" *ngIf="!showPackage"
+                >keyboard_arrow_down
+              </mat-icon>
+            </button>
+          </mat-toolbar>
+          <div *ngIf="showPackage">
+            <table
+              class="package-details-table"
+              *ngFor="let package of productsData; index as productIndex"
+            >
+              <tbody>
+                <tr class="product-details">
+                  <td colspan="4" class="package-head" style="padding: 0px">
+                    <mat-toolbar
+                      class="package-head"
+                      style="
+                        display: flex;
+                        justify-content: space-between;
+                        background-color: #9db5d92e;
+                      "
+                    >
+                      <div>
+                        <span class="product-name"
+                          >{{ productIndex + 1 }} .
+                          {{ package?.container_name }} &nbsp;&nbsp;
+                          {{ package?.height }}x{{ package?.weight }}x{{
+                            package?.dimensions
+                          }}
+                          ({{ package?.uom_name }}) &nbsp; &nbsp;Tare Wt.
+                          {{ package?.tare_weight }} Kgs
+                        </span>
+                      </div>
+                      <div style="display: flex; align-items: center">
+                        <span
+                          class="add-batch add-Line m_t_10"
+                          title=""
+                          style="
+                            margin-top: 2px;
+                            justify-content: flex-end;
+                            gap: 4px;
+                          "
+                        >
+                          <span
+                            class="edit-batch"
+                            (click)="addPackage(package.packing_id, 'edit')"
+                          >
+                            Edit Packaging
+                          </span>
+                          <mat-icon>edit</mat-icon>
+                        </span>
+                      </div>
+                    </mat-toolbar>
+                  </td>
+                </tr>
+                <tr class="after-batch">
+                  <td colspan="4" class="after-batch-data">
+                    <table class="package-tables">
+                      <thead>
+                        <tr>
+                          <th style="text-align: center">Part No.</th>
+                          <th style="text-align: center">
+                            Description Of Goods
+                          </th>
+                          <th style="text-align: center" class="table-right">
+                            PO No.
+                          </th>
+                          <th style="text-align: center" class="table-right">
+                            Quantity
+                          </th>
+                          <th
+                            class="table-right"
+                            style="width: 150px; text-align: center"
+                          >
+                            U/M
+                          </th>
+                          <th style="text-align: center" class="table-right">
+                            Net Weight<br />
+                            (in kg)
+                          </th>
+                          <th style="text-align: center" class="table-right">
+                            Gross Weight<br />
+                            (in kg)
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr
+                          *ngFor="
+                            let product of package.products;
+                            index as batchIndex
+                          "
+                        >
+                          <td class="package-sno">
+                            {{ product?.name }}
+                          </td>
+                          <td>{{ product?.description }}</td>
+                          <td class="table-right">{{ product?.po_nbr }}</td>
+                          <td class="table-right">{{ product?.quantity }}</td>
+                          <td class="table-right">
+                            <span class="package-weight" style="width: 200px">{{
+                              product?.uom_name
+                            }}</span>
+                          </td>
+                          <td class="table-right">
+                            <span class="package-weight">{{
+                              product?.net_weight
+                            }}</span>
+                          </td>
+
+                          <td class="table-right">
+                            <p class="package-weight">-</p>
+                          </td>
+                        </tr>
+
+                        <tr class="package-total">
+                          <td class="table-right" colspan="3">Total</td>
+                          <td class="table-right">
+                            {{ package?.total_quantity }}
+                          </td>
+                          <td class="table-right"></td>
+                          <td class="table-right gross-details">
+                            {{ package?.total_net_weight }}
+                          </td>
+                          <td class="table-right gross-details">
+                            {{ package?.total_gross_weight }}
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div style="padding: 6px">
+              <div class="add-import">
+                <button
+                  *ngIf="disableAddPackage"
+                  class="add-package-button"
+                  (click)="addPackage('')"
+                >
+                  <img [src]="newItemIcon" alt="" />
+                  <span>Add Packaging</span>
+                </button>
+                <button
+                  *ngIf="disableAddPackage"
+                  (click)="uploadLineItemDocPackage()"
+                  class="import-items"
+                >
+                  Import Packaging
+                  <span><img [src]="images.importIcon" /></span>
+                </button>
+              </div>
+            </div>
+            <div class="summary-footer" *ngIf="productsData?.length">
+              <div class="summary-description">
+                <div
+                  style="
+                    display: flex;
+                    cursor: pointer;
+                    gap: 4px;
+                    padding-bottom: 6px;
+                  "
+                >
+                  <h4>Additional Package Details :</h4>
+                  <span (click)="descriptionEdit()">
+                    <mat-icon
+                      style="
+                        font-size: 18px;
+                        width: 18px;
+                        height: 18px;
+                        position: relative;
+                        top: -1px;
+                      "
+                      mat-icon-button
+                      >edit</mat-icon
+                    >
+                  </span>
+                </div>
+
+                <span *ngIf="!editDescription">
+                  <!-- <p style="line-height: 1.4; padding-top: 2px">
+                    {{ packageDescription }}
+                  </p> -->
+                  <p
+                    class="invoice-contact"
+                    [innerHTML]="packageDescription"
+                  ></p>
+                </span>
+                <div style="clear: both"></div>
+
+                <mat-form-field
+                  class="custom-input block-ele grid-full"
+                  floatLabel="never"
+                  *ngIf="editDescription"
+                  style="
+                    margin-top: 0px;
+                    position: relative;
+                    left: -10px;
+                    top: -8px;
+                  "
+                >
+                  <textarea
+                    matInput
+                    placeholder="Enter Additional Package Details"
+                    autofocus="on"
+                    style="
+                      height: 90px;
+                      line-height: 1.4;
+                      padding: 4px 10px;
+                      border-width: 2px;
+                    "
+                    rows="3"
+                    (keyup)="valChanged($event)"
+                    [(ngModel)]="packageDescription"
+                    maxlength="1024"
+                  >
+                  </textarea>
+                </mat-form-field>
+
+                <div
+                  class="footer-bottom fxflex save-line-item"
+                  fxLayout="row"
+                  fxLayoutAlign="end center"
+                  *ngIf="showPackageSavePanel"
+                >
+                  <span fxFlex></span>
+                  <section
+                    class="section-right"
+                    style="position: relative; left: -26px"
+                  >
+                    <button
+                      type="button"
+                      (click)="cancelPackageDescription()"
+                       class="back-btn-ui"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      (click)="editPackageDescription()"
+                      mat-raised-button
+                    >
+                      Save
+                    </button>
+                  </section>
+                  <div class="cb"></div>
+                </div>
+              </div>
+              <div class="summary">
+                <h4>Summary:</h4>
+                <p>
+                  Total Net Weight:
+                  <span>{{ summaryPackage.total_net_weight }} Kgs</span>
+                </p>
+                <p>
+                  Total Tare Weight:
+                  <span>{{ summaryPackage.total_tare_weight }} Kgs</span>
+                </p>
+                <p>
+                  Total Gross Weight:
+                  <span>{{ summaryPackage.total_gross_weight }} Kgs</span>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

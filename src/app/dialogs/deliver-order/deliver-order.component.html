@@ -1,5 +1,7 @@
 <mat-toolbar color="primary">
-  <h2 mat-dialog-title>Deliver Order</h2>
+  <h2 mat-dialog-title>
+    {{ data.flag == true ? "Delivery Info" : "Deliver Order" }}
+  </h2>
   <span fxFlex></span>
 </mat-toolbar>
 <mat-dialog-content class="delete-body-form">
@@ -7,32 +9,58 @@
   <ng-container *ngIf="showForm">
     <div class="form-row" layout="row">
       <form [formGroup]="deliverOrderForm">
-        <mat-form-field class="custom-deliveryDate mandatory" floatLabel="never">
+        <mat-form-field
+          class="custom-deliveryDate mandatory"
+          floatLabel="never"
+        >
           <label class="custom-labeldate">Date of Delivery</label>
-          <input matInput class="datepicker" (click)="openCalendar(picker1)" formControlName="delivery_date" [disabled]="data.flag == 'Delivered'"
-            [matDatepicker]="picker1" placeholder="Date of Delivery">
-          <mat-error class="error-msg"
-            *ngIf="!deliverOrderForm.controls.delivery_date.pristine && deliverOrderForm.controls.delivery_date.hasError('required')">
+          <input
+            matInput
+            class="datepicker"
+            (click)="openCalendar(picker1)"
+            formControlName="delivery_date"
+            [disabled]="data.flag == true"
+            [matDatepicker]="picker1"
+            placeholder="Date of Delivery"
+          />
+          <mat-error
+            class="error-msg"
+            *ngIf="
+              !deliverOrderForm.controls.delivery_date.pristine &&
+              deliverOrderForm.controls.delivery_date.hasError('required')
+            "
+          >
             Please Select Date of Delivery
           </mat-error>
-          <mat-datepicker-toggle class="mat-picker" matSuffix [for]="picker1"></mat-datepicker-toggle>
+          <mat-datepicker-toggle
+            class="mat-picker"
+            matSuffix
+            [for]="picker1"
+          ></mat-datepicker-toggle>
           <mat-datepicker #picker1 startView="year"></mat-datepicker>
         </mat-form-field>
       </form>
       <div class="proof-of-delivery">
         <label class="" for="files">Proof of delivery</label>
         <span class="hidden-file">
-          <input type="file" #fileInput ng2FileSelect [uploader]="uploader" (onFileSelected)="onFileSelected($event)" [disabled]="data.flag == 'Delivered'"
-            [multiple]="false" />
+          <input
+            type="file"
+            #fileInput
+            ng2FileSelect
+            [uploader]="uploader"
+            (onFileSelected)="onFileSelected($event)"
+            [disabled]="data.flag == true"
+            [multiple]="false"
+          />
         </span>
         <div class="btn-group" (click)="fileInput.click()">
-          <button mat-button class="mat-button" [disabled]="data.flag == 'Delivered'">
+          <button mat-button class="mat-button" [disabled]="data.flag == true" style="background-color: unset !important;">
             <span class="material-icons">add</span> Upload Proof
           </button>
         </div>
       </div>
     </div>
-      <!-- <div *ngFor="let item of uploader.queue">
+    <!-- <div *ngFor="let item of uploader.queue">
         <span>
           {{ item?.file?.name }}
         </span>
@@ -46,12 +74,19 @@
         </span>
       </div> -->
     <ng-container *ngIf="uploadedFile">
-      <div *ngFor="let item of uploadedFile">
+      <div style="margin-bottom: 8px" *ngFor="let item of uploadedFile">
         <span>
           {{ item?.original_name }}
         </span>
         <span>
-          <button type="button" mat-icon-button class="mat-icon-button" title="Delete" (click)="deleteUploads(item, i)" [disabled]="data.flag == 'Delivered'">
+          <button
+            type="button"
+            mat-icon-button
+            class="mat-icon-button"
+            title="Delete"
+            (click)="deleteUploads(item, i)"
+            [disabled]="data.flag == true"
+          >
             <span class="material-icons">delete</span>
           </button>
         </span>
@@ -62,13 +97,20 @@
   <div class="clients-loader" *ngIf="loading">
     <mat-spinner class="medium-spinner"></mat-spinner>
   </div>
-
 </mat-dialog-content>
 <mat-dialog-actions>
   <span fxFlex></span>
-  <button mat-button mat-dialog-close *ngIf="data.flag != 'Delivered'">Cancel</button>
-  <button mat-raised-button [disabled]="deliverOrderForm.invalid" 
-  (click)="deliverOrder()" *ngIf="data.flag != 'Delivered'">Mark As Delivered</button>
-  <button mat-raised-button mat-dialog-close *ngIf="data.flag == 'Delivered'">OK</button>
+  <button  class="back-btn-ui" mat-dialog-close *ngIf="data.flag != true">Cancel</button>
+  <button
+    mat-raised-button
+    [disabled]="deliverOrderForm.invalid"
+    (click)="deliverOrder()"
+    *ngIf="data.flag != true"
+  >
+    Mark As Delivered
+  </button>
+  <button mat-raised-button mat-dialog-close *ngIf="data.flag == true">
+    OK
+  </button>
   <!--<button *ngIf="!success" mat-raised-button mat-dialog-close color="warn" (click)="confirm()"></button>-->
 </mat-dialog-actions>

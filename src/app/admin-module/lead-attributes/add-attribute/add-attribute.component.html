@@ -1,26 +1,49 @@
 <mat-toolbar>
-	<h2 mat-dialog-title></h2>
-	<span fxFlex>Add Attribute</span>
+  <h2 mat-dialog-title></h2>
+  <span fxFlex>Add Attribute</span>
 </mat-toolbar>
 <mat-dialog-content>
-	<form [formGroup]="attributeForm">
-		<mat-form-field class="custom-input mandatory" floatLabel="never">
-			<label class="custom-label">Label</label>
-			<input matInput placeholder="Enter Label" maxlength="150" formControlName="label">
-			<mat-error *ngIf="submitForm && (attributeForm.controls.label.hasError('required') || attributeForm.controls.label.hasError('whitespace'))">Please Enter Label Name</mat-error>
-			
-		</mat-form-field>
-		<mat-form-field class="custom-input mandatory" floatLabel="never">
-			<label class="custom-label">Type</label>
-			<mat-select placeholder="Select" formControlName="ui_element_id">
-				<mat-option *ngFor="let formField of formFields" [value]="formField.id">{{formField.label}}</mat-option>
-			</mat-select>
-			<mat-error *ngIf="submitForm && attributeForm.controls.ui_element_id.hasError('required')">Please Select type</mat-error>
-		</mat-form-field>
-	</form>
+  <form [formGroup]="attributeForm">
+    <mat-form-field class="custom-input mandatory" floatLabel="never">
+      <label class="custom-label">Label</label>
+      <input
+        matInput
+        placeholder="Enter Label"
+        maxlength="150"
+        formControlName="label"
+      />
+      <mat-error
+        *ngIf="
+          submitForm &&
+          (attributeForm.controls.label.hasError('required') ||
+            attributeForm.controls.label.hasError('whitespace'))
+        "
+        >Please Enter Label Name</mat-error
+      >
+    </mat-form-field>
+    <mat-form-field class="custom-input mandatory" floatLabel="never">
+      <label class="custom-label">Type</label>
+      <mat-select placeholder="Select" formControlName="form_element_id">
+        <mat-option
+          *ngFor="let formField of formFields"
+          [value]="formField.id"
+          >{{ formField.label }}</mat-option
+        >
+      </mat-select>
+      <mat-error
+        *ngIf="
+          submitForm &&
+          attributeForm.controls.form_element_id.hasError('required')
+        "
+        >Please Select type</mat-error
+      >
+    </mat-form-field>
+  </form>
 </mat-dialog-content>
 <mat-dialog-actions>
-	<span fxFlex></span>
-	<button mat-button >Cancel</button>
-	<button mat-raised-button (click)="addCustomAttribute(attributeForm)">Add Attribute</button>
+  <span fxFlex></span>
+  <button mat-button mat-dialog-close>Cancel</button>
+  <button mat-raised-button (click)="addCustomAttribute(attributeForm)">
+    Add Attribute
+  </button>
 </mat-dialog-actions>

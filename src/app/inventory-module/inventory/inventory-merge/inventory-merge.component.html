@@ -105,7 +105,7 @@
           <div class="w-100 container-ui justify-content-end d-flex">
             <div [innerHtml]="'Total Quantity: ' + totalQuatity"></div>
             <span fxFlex></span>
-            <button mat-button (click)="cancelMerge()">{{language.defaults.cancel}}</button>
+            <button  class="back-btn-ui" (click)="cancelMerge()">{{language.defaults.cancel}}</button>
             <button mat-raised-button (click)="createMerge()">Merge Batch</button> 
           </div>
        

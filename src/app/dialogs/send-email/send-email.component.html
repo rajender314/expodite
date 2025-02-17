@@ -1,0 +1,20 @@
+<mat-toolbar color="primary">
+  <h2 mat-dialog-title>Email Document</h2>
+  <span fxFlex></span>
+</mat-toolbar>
+<mat-dialog-content class="delete-body">
+  <p>
+    Are you sure you want to send the email to
+    <span class="mail-id">{{ data.details.po?.attention_email }}</span> ? Please
+    double-check your recipient before proceeding.
+  </p>
+</mat-dialog-content>
+<mat-spinner class="medium-spinner" *ngIf="showSpinner"></mat-spinner>
+
+<mat-dialog-actions>
+  <span fxFlex></span>
+  <button mat-dialog-close class="back-btn-ui">No</button>
+  <button mat-raised-button (click)="SendEmail()" [disabled]="disabledSave">
+    Yes
+  </button>
+</mat-dialog-actions>

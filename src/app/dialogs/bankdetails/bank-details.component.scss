@@ -1,0 +1,58 @@
+// mat-form-field{
+//     display: flex;
+//     flex-direction: column;
+// }
+// mat-dialog-content{
+//     // max-height:80vh;
+//     max-height: 500px;
+// }
+// .address-form{
+//     width:100%
+// }
+// .select-address {
+//     display: flex;
+//     flex-direction: column;
+//     .address-check {
+//         margin-bottom: 10px;
+//         .mat-checkbox{
+//             .mat-checkbox-layout .mat-checkbox-label {
+//                 color: #565656;
+//             }
+//         }
+//     }
+// }
+// mat-dialog-actions{
+//     padding: 24px;
+// }
+// mat-toolbar{
+//     span,h2{
+//         display: flex;
+//         align-items: center;
+//     }
+// }
+
+// mat-toolbar{
+//     background-color:#075DA8;
+//     color:#fff;
+// }
+// .selection-address.mat-selection-list {
+//     margin-top: 8px;
+//     padding-top:0px;
+//     .mat-list-option.address-list.mat-list-item {
+//         height: 30px;
+//           .mat-list-item-content {
+//             padding: 0px !important;
+//              .mat-list-text {
+//                 color:#565656;
+//                 font-size:14px;
+//                 padding-left: 8px;
+//             }
+//          }
+//         &:hover {
+//             background-color:transparent; 
+//         }
+//     }
+// }
+// // .selection-address.mat-selection-list .mat-list-item .mat-list-item-content, .mat-selection-list .mat-list-option .mat-list-item-content {
+// //     padding: 0px !important;
+// // }

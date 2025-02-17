@@ -1,0 +1,24 @@
+<div class="ag-container" [id]="tableName">
+  <ag-grid-angular
+    [class]="gridClass"
+    [sideBar]="sidebarPanel"
+    [columnDefs]="colDefs"
+    [animateRows]="true"
+    rowHeight="64"
+    headerHeight="30"
+    [gridOptions]="gridOptions"
+    (gridReady)="onGridReady($event)"
+    [frameworkComponents]="frameworkComponents"
+    [defaultColDef]="defaultColDef"
+    rowSelection="multiple"
+    [rowMultiSelectWithClick]="true"
+    [suppressRowClickSelection]="true"
+    [loadingOverlayComponent]="loadingCellRenderer"
+    [suppressDragLeaveHidesColumns]="true"
+    [overlayNoRowsTemplate]="noRowsTemplate"
+    (firstDataRendered)="ReportsService.onFirstDataRendered($event)"
+  >
+  </ag-grid-angular>
+</div>
+
+<!-- <div>adssds</div> -->

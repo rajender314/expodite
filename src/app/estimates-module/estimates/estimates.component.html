@@ -1,0 +1,686 @@
+<mat-spinner class="medium-spinner" *ngIf="invoiceGenerateLoader"></mat-spinner>
+
+<div class="orders">
+  <div>
+    <mat-horizontal-stepper #stepper>
+      <mat-step-header></mat-step-header>
+      <mat-step>
+        <div fxLayout="row">
+          <!-- Orders List view filters sidebar -->
+          <div class="center-section-scroll vh-100 d-flex secundory-menu">
+            <div class="flex-fixed-header menu-title">
+              <h1>{{ estimateslanguage }}s ({{ totalCount }})</h1>
+            </div>
+            <perfect-scrollbar
+              class="flex-scroll-items p-l-8 p-r-8 estimate-flter-panel"
+            >
+              <div @ordersAnimate class="align-flex">
+                <div
+                  class="fxFlex custom-date-container filter-dates order-date-picker"
+                  style="max-width: 284px; margin-bottom: 14px"
+                >
+                  <div class="label font-600" style="color: #565656; text-transform: capitalize;font-size: 14px;letter-spacing: normal;">
+                    Created Date
+                  </div>
+                  <input
+                    class="datepicker"
+                    [(ngModel)]="orders.mfg_date"
+                    [matDatepicker]="picker"
+                    (click)="openCalendar(picker)"
+                    (dateChange)="datePickerChange()"
+                    (focus)="openCalendar(picker)"
+                    placeholder="Select Created Date"
+                    readonly
+                  />
+                  <mat-datepicker-toggle
+                    matSuffix
+                    [for]="picker"
+                  ></mat-datepicker-toggle>
+                  <mat-datepicker #picker></mat-datepicker>
+                </div>
+               
+                <div class="fxFlex side-nav-section" *ngIf="blockContent">
+                  <mat-form-field
+                    class="custom-input custom-client"
+                    floatLabel="never"
+                    style="width: 100%"
+                  >
+                    <label class="custom-label font-600">Clients</label>
+                    <mat-select
+                      panelClass="myPanelClass"
+                      placeholder="Select Client"
+                      (selectionChange)="clientChange()"
+                      [formControl]="orders.selectedClients"
+                      (openedChange)="openedChange($event)"
+                      class="chips-select"
+                      multiple
+                    >
+                      <mat-select-trigger>
+                        <mat-chip-list
+                          *ngIf="orders.selectedClients.value?.length"
+                        >
+                          <mat-chip
+                            *ngFor="
+                              let clientId of orders.selectedClients.value
+                            "
+                            [removable]="true"
+                            (removed)="removeClient(clientId)"
+                          >
+                            {{ getClientName(clientId) }}
+                            <mat-icon matChipRemove>cancel</mat-icon>
+                          </mat-chip>
+                        </mat-chip-list>
+                      </mat-select-trigger>
+                      <mat-option
+                        *ngFor="let client of orders.organizations"
+                        [value]="client.id"
+                        (click)="checkboxChange(client, 'client')"
+                      >
+                        {{ client.name }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+                <div class="fxFlex side-nav-section" *ngIf="blockContent">
+                  <mat-form-field
+                    class="custom-input custom-client"
+                    floatLabel="never"
+                    style="width: 100%"
+                  >
+                    <label class="custom-label font-600">Products</label>
+                    <mat-select
+                      panelClass="myPanelClass"
+                      placeholder="Select Products"
+                      (selectionChange)="clientChange()"
+                      [formControl]="orders.selectedProduct"
+                      (openedChange)="openedChange($event)"
+                      class="chips-select"
+                      multiple
+                    >
+                      <mat-select-trigger>
+                        <mat-chip-list
+                          *ngIf="orders.selectedProduct.value?.length"
+                        >
+                          <mat-chip
+                            *ngFor="let prodId of orders.selectedProduct.value"
+                            [removable]="true"
+                            (removed)="removeProd(prodId)"
+                          >
+                            {{ getProductName(prodId) }}
+                            <mat-icon matChipRemove>cancel</mat-icon>
+                          </mat-chip>
+                        </mat-chip-list>
+                      </mat-select-trigger>
+                      <mat-option
+                        *ngFor="let prod of orders.productsList"
+                        [value]="prod.id"
+                        (click)="checkboxChange(prod)"
+                      >
+                        {{ prod.name }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+                 <div class="fxFlex side-nav-section" *ngIf="blockContent">
+                  <mat-form-field
+                    class="custom-input custom-client"
+                    floatLabel="never"
+                    style="width: 100%"
+                  >
+                    <label class="custom-label font-600">Account Manager</label>
+                    <mat-select
+                      panelClass="myPanelClass"
+                      placeholder="Select Account Manager"
+                      (selectionChange)="clientChange()"
+                      [formControl]="orders.selectedManager"
+                      (openedChange)="openedChange($event)"
+                      class="chips-select"
+                      multiple
+                    >
+                      <mat-select-trigger>
+                        <mat-chip-list
+                          *ngIf="orders.selectedManager.value?.length"
+                        >
+                          <mat-chip
+                            *ngFor="let prodId of orders.selectedManager.value"
+                            [removable]="true"
+                            (removed)="removeManager(prodId)"
+                          >
+                            {{ getManagerName(prodId) }}
+                            <mat-icon matChipRemove>cancel</mat-icon>
+                          </mat-chip>
+                        </mat-chip-list>
+                      </mat-select-trigger>
+                      <mat-option
+                      (click)="checkboxChange(manager)"
+                      [value]="manager.account_manager"
+                      class="orders-list"
+                      *ngFor="let manager of orders.accountManagerList"
+                    >
+                      {{ manager.account_manager }}</mat-option
+                    >
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+             
+                <div class="fxFlex side-nav-section" *ngIf="blockContent">
+                  <mat-form-field
+                    class="custom-input custom-client"
+                    floatLabel="never"
+                    style="width: 100%"
+                  >
+                    <label class="custom-label font-600">Country</label>
+                    <mat-select
+                      panelClass="myPanelClass"
+                      class="chips-select"
+                      placeholder="Select Country"
+                      (selectionChange)="clientChange()"
+                      [formControl]="orders.selectedCountry"
+                      (openedChange)="openedChange($event)"
+                      multiple
+                    >
+                      <mat-select-trigger>
+                        <mat-chip-list
+                          *ngIf="orders.selectedCountry.value?.length"
+                        >
+                          <mat-chip
+                            *ngFor="let prodId of orders.selectedCountry.value"
+                            [removable]="true"
+                            (removed)="removeCountry(prodId)"
+                          >
+                            {{ getCountryName(prodId) }}
+                            <mat-icon matChipRemove>cancel</mat-icon>
+                          </mat-chip>
+                        </mat-chip-list>
+                      </mat-select-trigger>
+                      <mat-option
+                        (click)="checkboxChange(country)"
+                        [value]="country.id"
+                        class="orders-list"
+                        *ngFor="let country of orders.countrysList"
+                      >
+                        {{ country.name }}</mat-option
+                      >
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+              </div>
+              <mat-spinner
+                class="medium-spinner"
+                *ngIf="filtersLoader"
+              ></mat-spinner>
+            </perfect-scrollbar>
+
+            <div class="flex-fixed-footer" *ngIf="showFilter">
+              <button
+                class="secondarytextlink"
+                 class="back-btn-ui"
+                (click)="clearFilterData()"
+              >
+                {{ language.defaults.clear }}
+              </button>
+              <span fxFlex></span>
+              <button
+                mat-raised-button
+                class="app-white-btn"
+                (click)="applyFilterData()"
+                [disabled]="disableFilter"
+              >
+                Apply Filter
+              </button>
+            </div>
+          </div>
+          <!-- end Orders List view filters sidebar -->
+
+          <!-- Orders List view -->
+          <div class="center-section-scroll vh-100 d-flex body-color">
+            <div class="page-header-ui">
+              <div class="flex-fixed-header page-title container-ui">
+                <div class="d-flex">
+                  <div class="search-ui" style="width: 300px">
+                    <input
+                      matInput
+                      placeholder=""
+                      #search
+                      (keyup)="searchOrders(search.value, $event)"
+                      placeholder="Search By {{ estimateslanguage }} Number "
+                      (blur)="
+                        !search.value.length ? (open = false) : (open = true)
+                      "
+                      [(ngModel)]="params.search"
+                    />
+                    <mat-icon
+                      matPrefix
+                      (click)="open = !open"
+                      class="org-search"
+                      >search</mat-icon
+                    >
+                    <mat-icon matSuffix *ngIf="searching" class="spinner">
+                      <mat-spinner class="small-spinner"></mat-spinner>
+                    </mat-icon>
+                    <mat-icon
+                      class="search-close"
+                      matSuffix
+                      *ngIf="!searching && search.value.length"
+                      (click)="search.value = ''; searchOrders(search.value)"
+                      >close</mat-icon
+                    >
+                  </div>
+                  <div *ngIf="multiActions" class="merge-button">
+                    <button
+                      mat-raised-button
+                      color="warn"
+                      id="2"
+                      class="create-order-btn"
+                      (click)="createOrderFromQuote()"
+                    >
+                      Create Order
+                    </button>
+                  </div>
+                </div>
+                <div class="d-flex" *ngIf="adminService.rolePermissions.create_quotation == 1">
+                  <button
+                    mat-raised-button
+                    color="warn"
+                    (click)="createEstimate()"
+                    class="create-order-btn"
+                  >
+                    Create {{ estimateslanguage }}
+                  </button>
+                </div>
+              </div>
+            </div>
+            <perfect-scrollbar>
+              <div class="list-view-table">
+                <div
+                  class="table-header-ui top-sticky z-index-8"
+                  style="top: 16px"
+                  *ngIf="orders.data.length"
+                >
+                  <div class="container-ui" *ngIf="!clientPermission">
+                    <mat-list-item
+                      class=" mat-list-item header-cleint"
+                    >
+                      <div
+                        class="item-container justify-start p-l-16"
+                        fxFlex="16"
+                      >
+                        {{ estimateslanguage }} number
+                      </div>
+                      <div
+                        class="item-container justify-left"
+                        style="padding-left: 20px"
+                        fxFlex="18"
+                      >
+                        Attention
+                      </div>
+                      <div
+                        class="item-container justify-start pl-12"
+                        fxFlex="16"
+                      >
+                        Country
+                      </div>
+                      <div
+                        class="item-container justify-start pl-12"
+                        fxFlex="16"
+                      >
+                        Account Manager
+                      </div>
+                      <div
+                        class="item-container justify-right"
+                        fxFlex="14"
+                        style="justify-content: end"
+                      >
+                        Amount
+                      </div>
+                      <div
+                        class="item-container status-align p-r-16 status-padding"
+                        fxFlex="20"
+                      >
+                        Status
+                      </div>
+                    </mat-list-item>
+                  </div>
+                </div>
+                <div
+                  class="global_list_view container-ui p-b-16"
+                  infiniteScroll
+                  [infiniteScrollDistance]="1"
+                  [infiniteScrollThrottle]="50"
+                  (scrolled)="onScroll()"
+                  [scrollWindow]="false"
+                >
+                  <div fxLayout="column" fxFlex="100">
+                    <div *ngIf="!clientPermission">
+                      <div *ngIf="!fetchingData" class="multi-list-ui">
+                        <mat-list
+                          @ordersAnimate
+                          *ngFor="let orderItem of orders.data; let key = index"
+                        >
+                          <h3 mat-subheader class="list-date">
+                            {{ orderItem.date }}
+                          </h3>
+                          <div class="list-item-card">
+                            <mat-list-item
+                              class="order-list-row"
+                              (click)="orderDetails(stepper, order)"
+                              *ngFor="let order of orderItem.list"
+                            >
+                              <div
+                                (click)="$event.stopPropagation()"
+                                class="item-container"
+                                fxFlex="16"
+                              >
+                                <div
+                                  class="d-flex align-items-center avatar-cell o-hidden"
+                                >
+                                  <!-- <div class="order-checkbox">
+                                  <mat-checkbox
+                                    *ngIf="is_aapl"
+                                    (click)="$event.stopPropagation()"
+                                    class="example-margin"
+                                    (change)="selectQuotionForOrder(order)"
+                                    [(ngModel)]="order.selceted"
+                                    [checked]="order.selected"
+                                    [disabled]="showCompositeComfirmation"
+                                    >{{ order.index }}
+                                  </mat-checkbox>
+                                  <mat-checkbox
+                                    *ngIf="!is_aapl && !is_merge"
+
+                                    (click)="$event.stopPropagation()"
+                                    class="example-margin"
+                                    (change)="selectQuotionForOrder(order)"
+                                    [(ngModel)]="order.selceted"
+                                    >{{ order.index }}
+                                  </mat-checkbox>
+                                </div> -->
+                                  <div class="icon-sec">
+                                    <img
+                                      [src]="images.estimatesIcon"
+                                      title="Estimates"
+                                    />
+                                  </div>
+                                  <div
+                                    (click)="orderDetails(stepper, order)"
+                                    class="content-sec o-hidden ellipsis-text"
+                                  >
+                                    <h1
+                                      title="{{ order.pfi_no }}"
+                                      class="ellipsis-text"
+                                    >
+                                      {{ order.pfi_no }}
+                                      <mat-icon
+                                        *ngIf="order.special_instructions"
+                                        class="flag-orders"
+                                        title="{{ order.special_instructions }}"
+                                      >
+                                        flag</mat-icon
+                                      >
+                                    </h1>
+                                    <small
+                                      title="{{ order.product_names }}"
+                                      class="ellipsis-text"
+                                    >
+                                      {{ order.product_names }}</small
+                                    >
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div class="item-container" fxFlex="18">
+                                <div
+                                  class="d-flex align-items-center avatar-cell o-hidden"
+                                >
+                                  <mat-icon
+                                    mat-list-icon
+                                    class="avatar-list"
+                                    *ngIf="order.client_image"
+                                  >
+                                    <div
+                                      class="mat-order-avatar"
+                                      [ngStyle]="{
+                                        'background-image':
+                                          'url(' + order.client_image + ')'
+                                      }"
+                                    ></div>
+                                  </mat-icon>
+                                  <div
+                                    mat-list-icon
+                                    class="no-order-image"
+                                    *ngIf="!order.client_image"
+                                  >
+                                    <span class="mat-avatar">{{
+                                      order.client_name | contactImageName : 2
+                                    }}</span>
+                                  </div>
+                                  <div
+                                    class="content-sec o-hidden ellipsis-text"
+                                  >
+                                    <h1
+                                      class="normal ellipsis-text"
+                                      title="{{ order.client_name }}"
+                                    >
+                                      {{ order.client_name }}
+                                    </h1>
+                                    <small
+                                      class="client-name ellipsis-text"
+                                      title="{{ order.name }}"
+                                    >
+                                      {{ order.name }}</small
+                                    >
+                                  </div>
+                                </div>
+                              </div>
+                              <div
+                                class="item-container po_no"
+                                fxFlex="16"
+                              >
+                                <p mat-line title="{{ order.country }}">
+                                  {{ order.country }}
+                                </p>
+                              </div>
+                              <div
+                                class="item-container country account_manager"
+                                fxFlex="16"
+                              >
+                                <p mat-line title="{{ order.account_manager }}">
+                                  {{ order.account_manager }}
+                                </p>
+                              </div>
+                              <div
+                                class="item-container amount_container text-right country"
+                                fxFlex="14"
+                                style="justify-content: end"
+                              >
+                                <p mat-line title="{{ order.total_amount }}">
+                                  {{ order.currency }}
+                                  {{ order.total_amount }}
+                                </p>
+                              </div>
+                              <div
+                                class="item-container status-cell status-tag-container status-padding"
+                                fxFlex="20"
+                              >
+                                <div
+                                  class="client-status"
+                                  [ngClass]="{
+                                    'accepted': order.status == 'Accepted',
+                                    created: order.status == 'Created',
+                                    'in-transit': order.status == 'In-transit',
+                                    delivered: order.status == 'Delivered',
+                                    cancelled: order.status == 'Cancelled',
+                                    received: order.status == 'Received',
+                                    processing: order.status == 'Processing',
+                                    placed: order.status == 'Placed',
+                                    draft: order.status == 'Draft',
+                                    passed: order.status == 'Passed',
+                                    shipped: order.status == 'Shipped',
+                                    fulfilment: order.status == 'Fulfilment',
+                                    pending: order.status == 'Pending',
+                                    expired: order.status == 'Expired'
+                                  }"
+                                >
+                                  {{ order.status }}
+                                </div>
+                                <span fxFlex></span>
+                                <mat-icon class="go-to-details"
+                                  >keyboard_arrow_right</mat-icon
+                                >
+                              </div>
+                            </mat-list-item>
+                          </div>
+                        </mat-list>
+                      </div>
+                    </div>
+                    <div *ngIf="clientPermission">
+                      <div *ngIf="!fetchingData" class="multi-list-ui">
+                        <mat-list
+                          @ordersAnimate
+                          *ngFor="
+                            let orderItem of estimates.data;
+                            let key = index
+                          "
+                        >
+                          <h3 mat-subheader class="list-date">
+                            {{ orderItem.date }}
+                          </h3>
+                          <div class="list-item-card">
+                            <mat-list-item
+                              class="order-list-row"
+                              (click)="orderDetails(stepper, order)"
+                              *ngFor="let order of orderItem.list"
+                            >
+                              <div class="item-container" fxFlex="25">
+                                <div
+                                  class="d-flex align-items-center avatar-cell o-hidden"
+                                >
+                                  <div class="icon-sec">
+                                    <img
+                                      [src]="images.ordersIcon_o"
+                                      title="Orders"
+                                    />
+                                  </div>
+                                  <div class="content-sec">
+                                    <h1 mat-line class="order-number">
+                                      {{ order.po_nbr }}
+                                    </h1>
+                                    <p
+                                      mat-line
+                                      class="order-info"
+                                      title="{{ order.product_names }}"
+                                    >
+                                      {{ order.product_names }}
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                              <div
+                                class="item-container po_no text-right"
+                                fxFlex="25"
+                              >
+                                <p
+                                  mat-line
+                                  title="{{ order.total_quantity }} Kg"
+                                >
+                                  {{ order.total_quantity }} Kg
+                                </p>
+                              </div>
+                              <div
+                                class="item-container amount_container text-right"
+                                fxFlex="25"
+                              >
+                                <p mat-line title="{{ order.total_amount }}">
+                                  {{ order.total_amount }}
+                                </p>
+                                <!-- {{order.orders.total_amount}}  -->
+                              </div>
+                              <div
+                                class="item-container status-cell status-tag-container"
+                                fxFlex="25"
+                              >
+                                <div
+                                  class="client-status"
+                                  [ngClass]="{
+                                    'accepted': order.status == 'Accepted',
+                                    created: order.status == 'Created',
+                                    'in-transit': order.status == 'In-transit',
+                                    delivered: order.status == 'Delivered',
+                                    cancelled: order.status == 'Cancelled',
+                                    received: order.status == 'Received',
+                                    processing: order.status == 'Processing',
+                                    placed: order.status == 'Placed',
+                                    draft: order.status == 'Draft',
+                                    passed: order.status == 'Passed',
+                                    shipped: order.status == 'Shipped',
+                                    fulfilment: order.status == 'Fulfilment',
+                                    pending: order.status == 'Pending',
+                                    expired: order.status == 'Expired'
+                                  }"
+                                >
+                                  {{ order.status }}
+                                </div>
+                                <span fxFlex></span>
+                                <mat-icon class="go-to-details"
+                                  >keyboard_arrow_right</mat-icon
+                                >
+                              </div>
+                            </mat-list-item>
+                          </div>
+                        </mat-list>
+                      </div>
+                    </div>
+
+                    <div
+                      class="container-ui new-center-empty-ui"
+                      *ngIf="fetchingData"
+                    >
+                      <mat-spinner
+                        class="medium-spinner"
+                        *ngIf="fetchingData"
+                      ></mat-spinner>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div
+                class="container-ui new-center-empty-ui"
+                *ngIf="!orders.data.length && !fetchingData"
+              >
+                <mat-card class="no-results">
+                  <div class="empty-img-holder">
+                    <!-- <img [src]='images.ordersIcon_o'> -->
+                    <img [src]="images.estimatesIcon" title="Orders" />
+                  </div>
+                  <p class="no-result-text">No {{ estimateslanguage }} Found</p>
+                </mat-card>
+              </div>
+              <div
+                class="container-ui new-center-empty-ui"
+                *ngIf="totalSpinner"
+              >
+                <mat-spinner class="medium-spinner"></mat-spinner>
+              </div>
+            </perfect-scrollbar>
+            <div class="pagination-footer" *ngIf="totalCount != 0">
+              <div class="container-ui d-flex space-between align-items-center">
+                <div>
+                  <p>Showing {{ listCount }} out of {{ totalCount }}</p>
+                </div>
+                <div>
+                  <app-pagination
+                    [pageLimit]="totalCount"
+                    (pageloadMore)="loadMore($event)"
+                    [pageNumber]="pageNumber"
+                  >
+                  </app-pagination>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- End Orders List View -->
+        </div>
+      </mat-step>
+    </mat-horizontal-stepper>
+  </div>
+</div>

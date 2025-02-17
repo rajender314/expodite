@@ -7,12 +7,15 @@
      <perfect-scrollbar class="p-l-8 p-r-8">
       <div class="fxFlex side-nav-section">
    <mat-list class="media-list ">
-        <ng-container *ngFor="let list of sideListReports">
-      <mat-list-item class="report-item"   [routerLink]="[list.route]" *ngIf="list.selected"
+        <ng-container *ngFor="let list of sideList">
+      <mat-list-item class="report-item main-list"   [routerLink]="[list.routerlink]" 
+        routerLinkActive="active"   
+            [routerLinkActiveOptions]="{ exact: true }"
+
       [ngClass]="{'active-report': list.id == ReportsService.reportId}"  (click)="mainReportView(list)">
   <div class="media d-flex align-items-center">
     <div class="media-body" style="padding-left: 2px;">
-      <h1 class="font-weight-bold d-block text-nowrap single">{{list.name}}</h1>
+      <h1 class="font-600 d-block text-nowrap single">{{list.name}}</h1>
     </div>
   </div>
      
@@ -24,17 +27,20 @@
       </div>
 
        <mat-divider class="divider"></mat-divider>
-    <p style="padding-left: 8px; font-size: 16px;" *ngIf="viewsList?.length">Custom Reports</p>
+    <p class="cust-report" style="padding-left: 8px; font-size: 20px;" *ngIf="viewsList?.length">Custom Reports</p>
     <mat-list class="inner-detail-list custom-reports-list">
       <ng-container *ngFor="let list of viewsList">
-    <mat-list-item   style="height: 66px;" class="report-item" [ngClass]="{'active-report': list.view_id == ReportsService.viewId}"  (click)="reportView(list)"
+    <mat-list-item   style="height: 66px;margin-bottom: 6px;width: 90%;" class="report-item" 
+    [routerLink]="[list.route]"
+    routerLinkActive="active"   
+    [ngClass]="{'active-report': list.view_id == ReportsService.viewId}"  (click)="reportView(list)"
      >
       <!-- <mat-icon mat-list-icon>
       <img class="admin-icons" [src]='list.icon'>
     </mat-icon> -->
     <div class="media d-flex align-items-center"  >
       <div class="media-body" style="padding-left: 2px;">
-        <h1 class="font-weight-bold d-block text-nowrap " >{{list.view_name}}</h1>
+        <h1 class="font-600 d-block text-nowrap " >{{list.view_name}}</h1>
         <small style="color: #777;">in {{labelObj[list.module]}}</small>
         <span mat-line class="user-act" style="color: #777;" (click)="reportView(list)">-by {{list.created_user_name}}</span>
       </div>

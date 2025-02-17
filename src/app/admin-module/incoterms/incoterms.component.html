@@ -1,0 +1,14 @@
+<!-- <div fxLayout="row">
+  <app-incoterm-list class="tabs-list" [update]="updatedShipmentDetails"
+    (trigger)="getSelectedShipment($event)" 
+    [isAddPerm]="adminService.rolePermissions.add_inco_terms == 1 ? true : false"
+    ></app-incoterm-list>
+  <app-incoterm-details class="inner-content" [shipments]="selectedShipment" style="width:100%;"
+    (trigger)="updateDetails($event)"></app-incoterm-details>
+</div> -->
+
+<app-form-builder-list-view
+  [form_module_name]="'add_incoterms'"
+  [noDataImage]="images.no_shipments"
+  [namingConvention]="'Inco Terms'"
+></app-form-builder-list-view>

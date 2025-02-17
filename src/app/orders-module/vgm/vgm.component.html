@@ -1,0 +1,382 @@
+<div class="inner-container" [class.collapse]="!showVGM">
+  <mat-toolbar class="package-toolbar">
+    <img class="shipping-image" [src]="images.pdf_download" />
+    <span>VGM</span>
+    <span fxFlex></span>
+    <div *ngIf="viewActivityLogIcon">
+      <button
+        mat-icon-button
+        class="action-orderbtn"
+        (click)="openActivityModal('vgm')"
+      >
+        <img [src]="images.activity_log_icon" title="Activity Log" />
+      </button>
+    </div>
+    <button (click)="editVGM()" mat-icon-button>
+      <mat-icon class="edit-icon" title="Edit" mat-icon-button
+        >mode_edit
+      </mat-icon>
+    </button>
+    <a
+      target="_blank"
+      href="generateVGMPdf?orders_id={{ orderId }}&is_printable=1"
+    >
+      <button mat-icon-button>
+        <img [src]="images.printer_icon" title="Print" />
+      </button>
+    </a>
+    <a href="generateVGMPdf?orders_id={{ orderId }}&is_printable=0">
+      <button mat-icon-button>
+        <img [src]="images.download_arrow" title="Download" />
+      </button>
+    </a>
+    <button mat-icon-button (click)="toggleVGM()">
+      <img [src]="images.grey_arrow" mat-icon-button *ngIf="showVGM" />
+      <mat-icon class="toggle-arrow" *ngIf="!showVGM">
+        keyboard_arrow_down</mat-icon
+      >
+    </button>
+  </mat-toolbar>
+  <div class="Fema-declration table-container" *ngIf="showVGM">
+    <p
+      style="text-align: center; text-decoration: underline; font-weight: 700"
+      class="fema-decl"
+    >
+      INFORMATION ABOUT VERIFIED GROSS MASS OF CONTAINER
+    </p>
+    <div class="fema-container">
+      <div class="VGM-table">
+        <table>
+          <tr>
+            <th>Sr.No</th>
+            <th>Details of Information</th>
+            <th>Particulars</th>
+          </tr>
+          <tr>
+            <td class="pl" style="text-align: center">1*</td>
+            <td class="pl">Booking No:</td>
+            <td class="pl">
+              {{ freightData.carrier_booking_rfno }}
+            </td>
+          </tr>
+          <tr>
+            <td class="pl" style="text-align: center">2*</td>
+            <td class="pl">Name of the Shipper:</td>
+            <td class="pl">{{ compnayDetails?.name }}</td>
+          </tr>
+          <tr>
+            <td class="pl" style="text-align: center">3*</td>
+            <td class="pl">
+              Shipper Registration / License No (IEC No / CIN No)
+            </td>
+            <td class="pl">
+              IEC - {{ compnayDetails?.ie_code }}
+              <!-- <span>CIN. U29299PN1992PTC138015</span> -->
+            </td>
+          </tr>
+          <tr>
+            <td class="pl" style="text-align: center">4*</td>
+            <td class="pl">
+              Name & Designation of the Official of the Shipper authorized to
+              Sign document
+            </td>
+            <td class="pl">
+              <span *ngIf="!editModeVgm">{{
+                inlineVGMData?.vgm_designation
+              }}</span>
+              <mat-form-field
+                style="position: relative; right: 5px; width: 100%"
+                class="custom-input mat-input-custom-spacing mt-0 ml-1"
+                floatLabel="never"
+                *ngIf="editModeVgm"
+              >
+                <input
+                  [(ngModel)]="inlineVGMData.vgm_designation"
+                  type="text"
+                  matInput
+                  placeholder="Name Of Designation"
+                  class="price-value"
+                />
+              </mat-form-field>
+            </td>
+          </tr>
+          <tr>
+            <td class="pl" style="text-align: center">5*</td>
+            <td class="pl">
+              24 x 7 Contact details of Authorized official of Shipper
+            </td>
+            <td class="pl">
+              <span *ngIf="!editModeVgm">{{ vgmOtherizedData }}</span>
+              <mat-form-field
+                style="position: relative; right: 5px; width: 100%"
+                class="custom-input mat-input-custom-spacing mt-0 ml-1"
+                floatLabel="never"
+                *ngIf="editModeVgm"
+              >
+                <input
+                  [(ngModel)]="vgmOtherizedData"
+                  type="text"
+                  matInput
+                  placeholder=" Authorized official"
+                  class="price-value"
+                />
+              </mat-form-field>
+            </td>
+          </tr>
+          <tr>
+            <td class="pl" style="text-align: center">6*</td>
+            <td class="pl">Container No.</td>
+            <td class="pl">
+              <span *ngIf="!editModeVgm">{{
+                inlineVGMData?.container_nbr
+              }}</span>
+              <mat-form-field
+                style="position: relative; right: 5px; width: 100%"
+                class="custom-input mat-input-custom-spacing mt-0 ml-1"
+                floatLabel="never"
+                *ngIf="editModeVgm"
+              >
+                <input
+                  [(ngModel)]="inlineVGMData.container_nbr"
+                  type="text"
+                  matInput
+                  placeholder="Container No"
+                  class="price-value"
+                />
+              </mat-form-field>
+            </td>
+          </tr>
+          <tr>
+            <td class="pl" style="text-align: center">7*</td>
+            <td class="pl">Container Size is (TEU/FUE/Others)</td>
+            <td class="pl">
+              <span *ngIf="!editModeVgm"> {{ inlineVGMData?.type_size }}</span>
+
+              <mat-form-field
+                style="position: relative; right: 5px; width: 100%"
+                class="custom-input mat-input-custom-spacing mt-0 ml-1"
+                floatLabel="never"
+                *ngIf="editModeVgm"
+              >
+                <input
+                  [(ngModel)]="inlineVGMData.type_size"
+                  type="text"
+                  matInput
+                  placeholder="Container Size"
+                  class="price-value"
+                />
+              </mat-form-field>
+            </td>
+          </tr>
+          <tr>
+            <td class="pl" style="text-align: center">8*</td>
+            <td class="pl">
+              Maximum permissible weight of container as per the CSC Plate
+            </td>
+            <td class="pl">
+              <span *ngIf="!editModeVgm">{{
+                inlineVGMData?.max_permissble
+              }}</span>
+
+              <mat-form-field
+                style="position: relative; right: 5px; width: 100%"
+                class="custom-input mat-input-custom-spacing mt-0 ml-1"
+                floatLabel="never"
+                *ngIf="editModeVgm"
+              >
+                <input
+                  [(ngModel)]="inlineVGMData.max_permissble"
+                  type="text"
+                  matInput
+                  placeholder="Maximum Permissible Weight"
+                  class="price-value"
+                />
+              </mat-form-field>
+            </td>
+          </tr>
+          <tr>
+            <td class="pl" style="text-align: center">9*</td>
+            <td class="pl">
+              Weighbridge registration no & address of weighbridge
+            </td>
+            <td class="pl">
+              <span *ngIf="!editModeVgm">{{
+                inlineVGMData?.vgm_weigh_bridge
+              }}</span>
+              <mat-form-field
+                style="position: relative; right: 5px; width: 100%"
+                class="custom-input mat-input-custom-spacing mt-0 ml-1"
+                floatLabel="never"
+                *ngIf="editModeVgm"
+              >
+                <input
+                  [(ngModel)]="inlineVGMData.vgm_weigh_bridge"
+                  type="text"
+                  matInput
+                  placeholder="Weighbridge registration"
+                  class="price-value"
+                />
+              </mat-form-field>
+            </td>
+          </tr>
+          <tr>
+            <td class="pl" style="text-align: center">10*</td>
+            <td class="pl">
+              Weighing Method
+              <span *ngIf="!is_automech">(Method-1 /Method-2)</span>
+            </td>
+            <td class="pl"><span *ngIf="is_automech">Method-1 </span></td>
+          </tr>
+          <tr>
+            <td class="pl" style="text-align: center">11*</td>
+            <td class="pl">Verified Gross Mass of the Container</td>
+            <td class="pl">
+              <!-- {{ packgeVerifiedgross }}
+              Kgs -->
+              <span *ngIf="!editModeVgm">{{ verified_gross_weight }} Kgs</span>
+              <mat-form-field
+                style="position: relative; right: 5px; width: 100%"
+                class="custom-input mat-input-custom-spacing mt-0 ml-1"
+                floatLabel="never"
+                *ngIf="editModeVgm"
+              >
+                <input
+                  [(ngModel)]="verified_gross_weight"
+                  type="text"
+                  matInput
+                  placeholder="Weighbridge registration"
+                  class="price-value"
+                />
+              </mat-form-field>
+            </td>
+          </tr>
+          <tr>
+            <td class="pl" style="text-align: center">12*</td>
+            <td class="pl">
+              Unit Of Measure <span *ngIf="!is_automech">(KG / MT / LBS)</span>
+            </td>
+            <td class="pl">
+              <span *ngIf="is_automech">KG</span>
+            </td>
+          </tr>
+          <tr>
+            <td class="pl" style="text-align: center">13*</td>
+            <td class="pl">Date & Time of Weighing</td>
+            <td class="pl">
+              <span *ngIf="!editModeVgm">{{
+                inlineVGMData?.vgm_date_time_weighing
+              }}</span>
+              <mat-form-field
+                style="position: relative; right: 5px; width: 100%"
+                class="custom-input mat-input-custom-spacing mt-0 ml-1"
+                floatLabel="never"
+                *ngIf="editModeVgm"
+              >
+                <input
+                  [(ngModel)]="inlineVGMData.vgm_date_time_weighing"
+                  type="text"
+                  matInput
+                  placeholder="Date & Time of Weighing"
+                  class="price-value"
+                />
+              </mat-form-field>
+            </td>
+          </tr>
+          <tr>
+            <td class="pl" style="text-align: center">14*</td>
+            <td class="pl">Weighing Slip No.</td>
+            <td class="pl">
+              <span *ngIf="!editModeVgm">{{
+                inlineVGMData?.vgm_weighing_slip_no
+              }}</span>
+              <mat-form-field
+                style="position: relative; right: 5px; width: 100%"
+                class="custom-input mat-input-custom-spacing mt-0 ml-1"
+                floatLabel="never"
+                *ngIf="editModeVgm"
+              >
+                <input
+                  [(ngModel)]="inlineVGMData.vgm_weighing_slip_no"
+                  type="text"
+                  matInput
+                  placeholder="Weighing Slip No"
+                  class="price-value"
+                />
+              </mat-form-field>
+            </td>
+          </tr>
+          <tr>
+            <td class="pl" style="text-align: center">15</td>
+            <td class="pl">Type (Normal / Reefer / Hazardous / Others)</td>
+            <td class="pl">
+              <span *ngIf="!editModeVgm">{{
+                inlineVGMData?.vgm_Type_normal
+              }}</span>
+              <mat-form-field
+                style="position: relative; right: 5px; width: 100%"
+                class="custom-input mat-input-custom-spacing mt-0 ml-1"
+                floatLabel="never"
+                *ngIf="editModeVgm"
+              >
+                <input
+                  [(ngModel)]="inlineVGMData.vgm_Type_normal"
+                  type="text"
+                  matInput
+                  placeholder="Type (Normal / Reefer / Hazardous / Others)"
+                  class="price-value"
+                />
+              </mat-form-field>
+            </td>
+          </tr>
+          <tr>
+            <td class="pl" style="text-align: center">16</td>
+            <td class="pl">If Hazardous, UN No, IMDG Class</td>
+            <td class="pl">
+              <span *ngIf="!editModeVgm">{{
+                inlineVGMData?.vgm_hazardous_un
+              }}</span>
+              <mat-form-field
+                style="position: relative; right: 5px; width: 100%"
+                class="custom-input mat-input-custom-spacing mt-0 ml-1"
+                floatLabel="never"
+                *ngIf="editModeVgm"
+              >
+                <input
+                  [(ngModel)]="inlineVGMData.vgm_hazardous_un"
+                  type="text"
+                  matInput
+                  placeholder="Hazardous, UN No"
+                  class="price-value"
+                />
+              </mat-form-field>
+            </td>
+          </tr>
+        </table>
+      </div>
+      <p style="margin: 0; margin-top: 8px">* Mandatory Fields</p>
+      <div
+        style="padding-top: 40px; display: flex; justify-content: space-between"
+      >
+        <p>Date: {{ currentDate | date : "dd-MM-yyyy" }}</p>
+        <p>Signature & Seal of Authorised person of shipper</p>
+      </div>
+    </div>
+  </div>
+  <div
+    *ngIf="editModeVgm"
+    class="footer-bottom fxflex"
+    style="padding: 14px"
+    fxLayout="row"
+    fxLayoutAlign="end center"
+  >
+    <span fxFlex></span>
+    <section class="section-right">
+      <button (click)="editVGM()" type="button" mat-button>Cancel</button>
+
+      <button (click)="saveVGM('save')" type="submit" mat-raised-button>
+        Save
+      </button>
+    </section>
+    <div class="cb"></div>
+  </div>
+</div>

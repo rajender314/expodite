@@ -1,0 +1,46 @@
+
+.label {
+  font-weight: 500;
+  color: #333;
+}
+.package-summary-container {
+  display: flex;
+  gap: 20px;
+  padding: 14px;
+  .card1 {
+    width: calc(50% - 8px);
+    background-color: #e6ebf2;
+    padding: 12px;
+    border-radius: 6px;
+    display: flex;
+    gap: 12px;
+    justify-content: space-between;
+    .details {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .edit_icon {
+      padding: 6px 7px;
+      background: aliceblue;
+      height: 30px;
+      border-radius: 4px;
+      width: 30px;
+      cursor: pointer;
+    }
+  }
+  .summary {
+    width: calc(50% - 8px);
+    background-color: #e6ebf2;
+    padding: 12px;
+    border-radius: 6px;
+    .summary-keys {
+      padding-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+      .label {
+        font-family: Roboto, "Helvetica Neue", sans-serif;
+      }
+    }
+  }
+}

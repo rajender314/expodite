@@ -1,0 +1,343 @@
+<div style="position: relative">
+  <mat-toolbar class="package-toolbar">
+    <div class="inv-back" (click)="onClose()">
+      <mat-icon class="back-to-orders">arrow_back</mat-icon>
+    </div>
+    <span>User Activity Tracker</span>
+    <span fxFlex></span>
+  </mat-toolbar>
+  <div *ngIf="!noDataMsg" style="height: calc(100vh - 64px); overflow-y: auto">
+    <div *ngFor="let data of logs" class="total-logs-container">
+      <div class="log-date">
+        {{ data.date }}
+      </div>
+      <div class="logs-container">
+        <div *ngFor="let log of data.value" class="single-logs-container">
+          <div class="activity-log-progress">
+            <!-- <img src="log.image" *ngIf="log.image"/>
+            <p class="firstname">P</p> -->
+
+            <span class="b-avatar-img img" *ngIf="log.image">
+              <img class="mat-avatar" [src]="log.image" />
+            </span>
+            <span *ngIf="!log.image" class="firstname">{{
+              log.user | contactImageName : 2
+            }}</span>
+          </div>
+          <div style="width: 100%">
+            <div style="font-weight: 600">{{ log.time }}</div>
+
+            <div style="padding: 10px" class="records-container">
+              <div *ngIf="log.type === 'created'" class="d-flex">
+                <div *ngFor="let changes of log.changes">
+                  <div style="display: flex; justify-content: space-between">
+                    <div>
+                      <span style="font-weight: normal">{{
+                        changes.message
+                      }}</span
+                      >&nbsp;<span class="headings">{{ log.user }}</span>
+                    </div>
+                  </div>
+                  <div *ngIf="log.product_name" style="margin-top: 8px">
+                    <div>
+                      <span>Product Name: </span
+                      ><span class="indiviual-values">{{
+                        log.product_name
+                      }}</span>
+                    </div>
+                  </div>
+
+                  <div
+                    [ngClass]="
+                      getType(changes.old_value) === 'string'
+                        ? 'new-old-values-container '
+                        : 'new-old-values-container jus-space '
+                    "
+                  >
+                    <div
+                      class="value-list"
+                      style="margin-top: 4px; width: calc(50% - 16px)"
+                    >
+                      <ng-container
+                        *ngIf="getType(changes.new_value) === 'object'"
+                      >
+                        <p class="headings">Updated Values :</p>
+
+                        <div
+                          *ngFor="let changes1 of changes.new_value"
+                          style="margin-top: 10px; line-height: 1.7"
+                        >
+                          <div
+                            *ngFor="let obj of changes1 | keyvalue"
+                            class="d-flex justify-btwn flex-direction-row"
+                          >
+                            <div *ngIf="getType(obj.value) === 'object'">
+                              <span>{{ obj.key }} : </span>
+                              <div
+                                *ngFor="let changes2 of obj.value"
+                                style="margin-top: 10px; margin-left: 25px"
+                                class="white-cards"
+                              >
+                                <div
+                                  *ngFor="let obj2 of changes2 | keyvalue"
+                                  class="d-flex justify-btwn flex-direction-row"
+                                >
+                                  <span>{{ obj2.key }}</span> :
+                                  <span class="indiviual-values">
+                                    {{ obj2.value ? obj2.value : "--" }}</span
+                                  >
+                                </div>
+                              </div>
+                            </div>
+                            <div *ngIf="!(getType(obj.value) === 'object')">
+                              <span>{{ obj.key }}</span> :
+                              <span class="indiviual-values">
+                                {{ obj.value ? obj.value : "--" }}</span
+                              >
+                            </div>
+                          </div>
+                        </div>
+                      </ng-container>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="log.type === 'updated'" class="d-flex">
+                <div *ngFor="let changes of log.changes">
+                  <div style="display: flex; justify-content: space-between">
+                    <div>
+                      <span style="font-weight: normal">{{
+                        changes.message
+                      }}</span
+                      >&nbsp;<span class="headings">{{ log.user }}</span>
+                    </div>
+                  </div>
+                  <div *ngIf="log.product_name" style="margin-top: 8px">
+                    <div>
+                      <span>Product Name: </span
+                      ><span class="indiviual-values">{{
+                        log.product_name
+                      }}</span>
+                    </div>
+                  </div>
+                  <div
+                    [ngClass]="
+                      getType(changes.old_value) === 'string'
+                        ? 'new-old-values-container mt-6 white-cards'
+                        : 'new-old-values-container jus-space'
+                    "
+                  >
+                    <ng-container
+                      *ngIf="getType(changes.old_value) === 'string'"
+                    >
+                      <p>
+                        <del>
+                          {{ changes.old_value || "null" }}
+                        </del>
+                      </p>
+                    </ng-container>
+
+                    <ng-container
+                      *ngIf="getType(changes.old_value) === 'object'"
+                    >
+                      <div
+                        class="value-list"
+                        style="margin-top: 4px; width: calc(50% - 16px)"
+                      >
+                        <p class="headings">Previous Values :</p>
+                        <div *ngIf="changes.old_value.length">
+                          <div
+                            *ngFor="let changes1 of changes.old_value"
+                            style="margin-top: 10px; line-height: 1.7"
+                            class="white-cards"
+                          >
+                            <div
+                              *ngFor="let obj of changes1 | keyvalue"
+                              class="d-flex justify-btwn flex-direction-row"
+                            >
+                              <div *ngIf="getType(obj.value) === 'object'">
+                                <span>{{ obj.key }} : </span>
+                                <div
+                                  *ngFor="let changes2 of obj.value"
+                                  style="margin-top: 10px; margin-left: 25px"
+                                  class="updated-card"
+                                >
+                                  <div
+                                    *ngFor="let obj2 of changes2 | keyvalue"
+                                    class="d-flex justify-btwn flex-direction-row"
+                                  >
+                                    <span>{{ obj2.key }}</span> :
+                                    <span class="indiviual-values">
+                                      {{ obj2.value ? obj2.value : "--" }}</span
+                                    >
+                                  </div>
+                                </div>
+                              </div>
+                              <div *ngIf="!(getType(obj.value) === 'object')">
+                                <span>{{ obj.key }}</span> :
+                                <span class="indiviual-values">
+                                  {{ obj.value ? obj.value : "--" }}</span
+                                >
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div
+                          *ngIf="!changes.old_value.length"
+                          class="container-ui white-cards"
+                        >
+                          <div class="no-results" style="padding: 0">
+                            <p class="no-result-text">Not Yet Created</p>
+                          </div>
+                        </div>
+                      </div>
+                    </ng-container>
+
+                    <ng-container
+                      *ngIf="getType(changes.new_value) === 'string'"
+                    >
+                      <p>
+                        <span style="font-weight: 500">
+                          {{ changes.new_value || "null" }}
+                        </span>
+                      </p>
+                    </ng-container>
+
+                    <ng-container
+                      *ngIf="getType(changes.new_value) === 'object'"
+                    >
+                      <div style="margin-top: 4px; width: calc(50% - 16px)">
+                        <p class="headings">Updated Values :</p>
+
+                        <div
+                          *ngFor="let changes1 of changes.new_value"
+                          style="margin-top: 10px; line-height: 1.7"
+                          class="white-cards"
+                        >
+                          <div
+                            *ngFor="let obj of changes1 | keyvalue"
+                            class="d-flex justify-btwn flex-direction-row"
+                          >
+                            <div *ngIf="getType(obj.value) === 'object'">
+                              <span>{{ obj.key }} : </span>
+                              <div
+                                *ngFor="let changes2 of obj.value"
+                                style="margin-top: 10px; margin-left: 25px"
+                                class="updated-card"
+                              >
+                                <div
+                                  *ngFor="let obj2 of changes2 | keyvalue"
+                                  class="d-flex justify-btwn flex-direction-row"
+                                >
+                                  <span>{{ obj2.key }}</span> :
+                                  <span class="indiviual-values">
+                                    {{ obj2.value ? obj2.value : "--" }}</span
+                                  >
+                                </div>
+                              </div>
+                            </div>
+                            <div *ngIf="!(getType(obj.value) === 'object')">
+                              <span>{{ obj.key }}</span> :
+                              <span class="indiviual-values">
+                                {{ obj.value ? obj.value : "--" }}</span
+                              >
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </ng-container>
+                  </div>
+                </div>
+              </div>
+
+              <div *ngIf="log.type === 'deleted'" class="d-flex">
+                <div *ngFor="let changes of log.changes">
+                  <div style="display: flex; justify-content: space-between">
+                    <div>
+                      <span style="font-weight: normal">{{
+                        changes.message
+                      }}</span
+                      >&nbsp;<span class="headings">{{ log.user }}</span>
+                    </div>
+                  </div>
+                  <div *ngIf="log.product_name" style="margin-top: 8px">
+                    <div>
+                      <span>Product Name: </span
+                      ><span class="indiviual-values">{{
+                        log.product_name
+                      }}</span>
+                    </div>
+                  </div>
+
+                  <div
+                    [ngClass]="
+                      getType(changes.old_value) === 'string'
+                        ? 'new-old-values-container '
+                        : 'new-old-values-container jus-space '
+                    "
+                  >
+                    <div
+                      class="value-list"
+                      style="margin-top: 4px; width: calc(50% - 16px)"
+                    >
+                      <ng-container
+                        *ngIf="getType(changes.old_value) === 'object'"
+                      >
+                        <p class="headings">Deleted Values :</p>
+
+                        <div
+                          *ngFor="let changes1 of changes.old_value"
+                          style="margin-top: 10px; line-height: 1.7"
+                        >
+                          <div
+                            *ngFor="let obj of changes1 | keyvalue"
+                            class="d-flex justify-btwn flex-direction-row"
+                          >
+                            <div *ngIf="getType(obj.value) === 'object'">
+                              <span>{{ obj.key }} : </span>
+                              <div
+                                *ngFor="let changes2 of obj.value"
+                                style="margin-top: 10px; margin-left: 25px"
+                                class="white-cards"
+                              >
+                                <div
+                                  *ngFor="let obj2 of changes2 | keyvalue"
+                                  class="d-flex justify-btwn flex-direction-row"
+                                >
+                                  <span>{{ obj2.key }}</span> :
+                                  <span class="indiviual-values">
+                                    {{ obj2.value ? obj2.value : "--" }}</span
+                                  >
+                                </div>
+                              </div>
+                            </div>
+                            <div *ngIf="!(getType(obj.value) === 'object')">
+                              <span>{{ obj.key }}</span> :
+                              <span class="indiviual-values">
+                                {{ obj.value ? obj.value : "--" }}</span
+                              >
+                            </div>
+                          </div>
+                        </div>
+                      </ng-container>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    *ngIf="noDataMsg && !logs.length"
+    class="container-ui new-center-empty-ui"
+  >
+    <div class="no-results">
+      <p class="no-result-text">No Logs Found</p>
+    </div>
+  </div>
+
+  <mat-spinner class="medium-spinner" *ngIf="fetchingData"></mat-spinner>
+</div>

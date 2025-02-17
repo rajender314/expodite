@@ -1,82 +1,28 @@
 <mat-toolbar>
-	<h2 mat-dialog-title>{{data.fieldsData.title ? data.fieldsData.title : 'Add Batch'}}</h2>	
+  <h2 mat-dialog-title>
+    {{ data.fieldsData.title ? data.fieldsData.title : "Add Batch" }}
+  </h2>
 </mat-toolbar>
 <mat-dialog-content>
-	<form [formGroup]="InventoryForm" class="multy-forms">
-		<div fxlayout="row" class="row-ui d-flex"> 
-			<mat-form-field class="custom-input mandatory" floatLabel="never">
-				<label class="custom-label mandatory">Batch Number</label>
-				<input matInput placeholder="Enter Batch Number" maxlength="150" formControlName="batch_nbr">
-				<mat-error *ngIf="submitForm && (InventoryForm.controls.batch_nbr.hasError('required') || InventoryForm.controls.batch_nbr.hasError('whitespace'))">Please Enter Batch Number</mat-error>
-				<div class="server-error" [innerHtml]="batchServerError" *ngIf="InventoryForm.controls.batch_nbr?.valid && batchServerError "></div>
-			</mat-form-field>
-			<mat-form-field class="custom-input mandatory" floatLabel="never">
-				<label class="custom-label mandatory">Category</label>
-				<mat-select placeholder="Select Category" formControlName="category_id" (selectionChange)="selectType($event)">
-					<mat-option *ngFor="let category of categoryData" [value]="category.id">{{category.name}}</mat-option>
-				</mat-select>
-				<mat-error *ngIf="submitForm && InventoryForm.controls.category_id.hasError('required')">Please Select Category</mat-error>
-				<mat-error  *ngIf="!(categoryData?.length)">No Category Found</mat-error>
-			</mat-form-field>
-			
-
-		</div>
-		<div fxlayout="row" class="row-ui d-flex">
-			
-			<mat-form-field class="custom-input mandatory" floatLabel="never" [class.test]="showProdDrpdown"  >
-				<label class="custom-label mandatory">Products</label>
-				<mat-select placeholder="Select Products" formControlName="product_types_id" [(ngModel)]="selectedProduct"  (selectionChange)="selectProduct($event)">
-					<mat-option *ngFor="let product of filterProdList" [value]="product.id">{{product.name}}</mat-option>
-				</mat-select>
-				<mat-error  *ngIf="showProdError">Please Select Product</mat-error>
-				<mat-error  *ngIf="noProductsFound && !showProdError">No Products Found</mat-error>
-			</mat-form-field>
-			<mat-form-field class="custom-input mandatory" floatLabel="never">
-				<label class="custom-label mandatory">Total Quantity</label>
-				<input matInput type="number" min="0" max="9999999999999999"  oninput="validity.valid||(value='')" placeholder="Enter Total Quantity" formControlName="tot_qty">
-				<mat-error *ngIf="submitForm && InventoryForm.controls.tot_qty.hasError('required')">Please Enter Total Quantity</mat-error>
-				<mat-error *ngIf=" InventoryForm.controls.tot_qty.hasError('min')">Please Enter value greater than zero</mat-error>
-
-			</mat-form-field>
-		</div>
-		<div fxlayout="row" class="row-ui">
-			<mat-form-field class="custom-inputdate custom-deliveryDate mandatory" floatLabel="never">
-				<label class="custom-labeldate">Manufacturing Date</label>
-				<input matInput (click)="openCalendar(picker)" [matDatepicker]="picker" readonly="readonly" [min]="minDate1.start_date" (dateChange)="selectManufacringDate($event)"
-				placeholder="Select Manufacturing Date" formControlName="mfd_date">
-				<mat-datepicker-toggle class="mat-picker" matSuffix [for]="picker"></mat-datepicker-toggle>
-				<mat-datepicker #picker startView="year"></mat-datepicker>
-				<mat-error *ngIf="submitForm && InventoryForm.controls.mfd_date.hasError('required')">Please Select Manufacturing Date</mat-error>
-			</mat-form-field>
-			<mat-form-field class="custom-inputdate custom-deliveryDate mandatory" floatLabel="never" >
-				<!-- *ngIf="showExpDatePicker" -->
-				<label class="custom-labeldate">Expiry Date</label>
-				<input matInput (click)="openCalendar(picker2)" [matDatepicker]="picker2" [(ngModel)] = "prefillExpData" [min]="minDate1.expiry_date"  readonly="readonly"
-				placeholder="Select Expiry Date" formControlName="exp_date">
-				<mat-datepicker-toggle class="mat-picker" matSuffix [for]="picker2"></mat-datepicker-toggle>
-				<mat-datepicker #picker2 startView="year"></mat-datepicker>
-				<mat-error *ngIf="submitForm && InventoryForm.controls.exp_date.hasError('required')">Please Select Expiry Date</mat-error>
-			</mat-form-field>
-			<mat-form-field class="custom-input mandatory" floatLabel="never">
-				<label class="custom-label mandatory">Status</label>
-				<mat-select placeholder="Select Status" formControlName="batch_status_id" [(ngModel)]="selectedtype">
-					<mat-option *ngFor="let status of data.statusList" [value]="status.id">{{status.name}}</mat-option>
-				</mat-select>
-				<mat-error *ngIf="submitForm && InventoryForm.controls.batch_status_id.hasError('required')">Please Select Status</mat-error>
-			</mat-form-field>
-		
-			 </div>
-			 
-		<mat-form-field class="custom-input" floatLabel="never">
-			<label class="custom-label">Special Instructions</label>
-			<textarea matInput formControlName="special_instructions" placeholder="Enter Special Instructions"></textarea>
-		</mat-form-field>
-	</form>
+  <form [formGroup]="InventoryForm" class="multy-forms">
+    <app-form-builder
+      [module]="'add_inventory'"
+      (trigger)="formEmitEvent($event)"
+    ></app-form-builder>
+  </form>
+  <div>
+  <mat-spinner class="medium-spinner" *ngIf="showSpinner"></mat-spinner>
+</div>
 </mat-dialog-content>
-<mat-spinner class="medium-spinner" *ngIf="showSpinner"></mat-spinner>
 
 <mat-dialog-actions>
-	<span fxFlex></span>
-	<button mat-button mat-dialog-close>Cancel</button>
-	<button mat-raised-button (click)="addInventory(InventoryForm)"  [disabled] = "disabledSave || InventoryForm.invalid">{{data.fieldsData.title ? data.fieldsData.title : 'Add Batch'}}</button>
+  <span fxFlex></span>
+  <button class="back-btn-ui" mat-dialog-close>Cancel</button>
+  <button
+    mat-raised-button
+    (click)="addInventory(InventoryForm)"
+    [disabled]="disableBtn || InventoryForm.invalid"
+  >
+    {{ data.fieldsData.title ? data.fieldsData.title : "Add Batch" }}
+  </button>
 </mat-dialog-actions>

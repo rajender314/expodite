@@ -2,11 +2,17 @@ import { Component, OnInit, Output, EventEmitter, Input, OnChanges, SimpleChange
 import { language } from '../../../language/language.module';
 
 import * as _ from 'lodash';
-
+import { Images } from '../../../images/images.module';
 import { Param } from '../../../custom-format/param';
 import { AdminService } from '../../../services/admin.service';
 import { trigger, style, transition, animate, keyframes, query, stagger } from '@angular/animations';
 
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Router } from '@angular/router';
+import { SnakbarService } from '../../../services/snakbar.service';
+import { ImportComponent } from '../../../dialogs/import/import.component';
+import { LeadsService } from '../../../leads/leads.service';
+import { UtilsService } from '../../../services/utils.service';
 @Component({
   selector: 'app-category-list',
   templateUrl: './category-list.component.html',
@@ -25,7 +31,7 @@ export class CategoryListComponent implements OnInit {
   public language = language;
   public open = false;
   totalCount: number = 0;
-
+  public images = Images;
   fetchingData: boolean;
   searching: boolean;
   paginationScroll: boolean;
@@ -34,27 +40,44 @@ export class CategoryListComponent implements OnInit {
   private categoryType: Array<any> = [];
   selectedCategory: object;
   categoryId: any;
-
+  public modulesList = [];
   private listActive = true;
   @Input() update;
   @Output() trigger = new EventEmitter<object>();
-
-  private param: Param = {
+  @Input() isAddPerm;
+  private param: any = {
     page: 1,
     perPage: 12,
     sort: 'ASC',
     search: ''
   }
-  constructor(private adminService: AdminService) { }
+  constructor(private adminService: AdminService,
+    public dialog: MatDialog,
+    private router: Router,
+    private snackbar: SnakbarService,
+    private leadService: LeadsService,
+    private utilsService: UtilsService
+    ) { 
+    
+  }
 
   backToList() {
     this.listActive = false;
   }
 
   ngOnInit() {
-    this.getCategorys(this.param);
+  //  this.getFormModules()
+  this.utilsService.getModuleList().then((response) => {
+    this.modulesList = response.result.data.modulesDt;
+    const indx = _.findIndex(this.modulesList, {slug: "add_categories"})
+    if(indx > -1) {
+      this.param.form_id = this.modulesList[indx].id
+      this.getCategorys(this.param);
+    }
+  })
   }
   ngOnChanges(changes: { [propKey: string]: SimpleChange }) {
+    console.log(changes)
     if (this.update) {
 
       if (this.update.delete) {
@@ -99,15 +122,15 @@ export class CategoryListComponent implements OnInit {
   getCategorys(param: object, flag?: string, cb?): void {
     if (flag == 'pagination') this.paginationScroll = true;
     else this.fetchingData = true;
-    this.adminService
-      .getCategoryList(param)
+    this.leadService
+      .getModuleSavedList(param)
       .then(response => {
         this.paginationScroll = false;
         this.fetchingData = false;
         this.searching = false;
         if (response.result.success) {
-          this.totalCount = response.result.data.count;
-          this.categoryType = response.result.data.categoriesDt;
+          this.totalCount = response.result.data.total;
+          this.categoryType = response.result.data.list;
           this.totalPages = Math.ceil(Number(this.totalCount) / this.param.perPage);
           if (this.totalCount == 0) this.noRecords();
           else this.getCategory(this.categoryType[0])
@@ -154,5 +177,19 @@ export class CategoryListComponent implements OnInit {
     param.search = this.param.search;
     this.getCategorys(param, 'pagination');
   }
+  importCatergory(){
+    let toast: object;
+			let dialogRef = this.dialog.open(ImportComponent, {
+				width: '550px',
+				data: 'category'
+			});
+      dialogRef.afterClosed().subscribe(result => {
+				if (result.success==true) {
+					const config = this.router.config.map((route) => Object.assign({}, route));
+				this.router.resetConfig(config);
+        this.getCategorys(this.param,'pagination')
+			}})
+  }
+
 
 }

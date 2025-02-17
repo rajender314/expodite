@@ -1,0 +1,1114 @@
+<div class="container">
+  <div [formGroup]="storesAttributeForm">
+    <div *ngIf="!fetchingData" formArrayName="storeCustomAttributes">
+      <div
+        *ngFor="let attribute of storeCustomAttributes?.controls; let i = index"
+        [formGroupName]="i"
+        class="fields-list"
+      >
+        <div
+          *ngFor="let attribute of existingAttributesData; let j = index"
+          [ngSwitch]="existingAttributesData[j]?.slug"
+          [ngClass]="[
+            existingAttributesData[j]?.slug === 'custom_component' ||
+            existingAttributesData[j]?.slug === 'paragraph_text' ||
+            existingAttributesData[j]?.slug === 'rich_text_editor' ||
+            existingAttributesData[j]?.slug === 'upload' ||
+            existingAttributesData[j]?.slug === 'addresses_checkbox' ||
+            existingAttributesData[j]?.slug === 'upload_documents' ||
+            existingAttributesData[j]?.form_control_name === 'is_pallet' ||
+            existingAttributesData[j]?.form_control_name === 'quantity'
+              ? 'w-100 mb-8'
+              : existingAttributesData[j]?.slug === 'checkboxes'
+              ? 'w-50 checkbox-field'
+              : 'w-50',
+            'custom-class-' + j
+          ]"
+          [ngStyle]="{
+            display: existingAttributesData[j].is_hide ? 'none' : 'block'
+          }"
+        >
+          <div class="form-elements">
+            <div class="stores-attr-data">
+              <div
+                *ngSwitchCase="'single_line_text'"
+                [ngClass]="'form-list-' + i"
+              >
+                <div *ngIf="!existingAttributesData[j].is_hide">
+                  <mat-form-field
+                    [ngClass]="
+                      !existingAttributesData[j].is_editable || disableEdit
+                        ? 'custom-input block-ele mandatory w-100 pointer-none'
+                        : 'custom-input block-ele mandatory w-100'
+                    "
+                    [ngStyle]="{
+                      width:
+                        existingAttributesData[j]?.form_control_name ===
+                        'quantity'
+                          ? '50%'
+                          : '100%'
+                    }"
+                    floatLabel="never"
+                  >
+                    <label
+                      class="custom-label"
+                      [class.mandatory]="existingAttributesData[j]?.required"
+                      >{{ existingAttributesData[j]?.label_name }}
+                      {{ existingAttributesData[j]?.custom_label }}</label
+                    >
+                    <input
+                      matInput
+                      placeholder="Enter {{
+                        existingAttributesData[j]?.label_name
+                      }}"
+                      [errorStateMatcher]="matcher"
+                      [formControlName]="
+                        existingAttributesData[j]?.form_control_name
+                      "
+                      [readonly]="
+                        !existingAttributesData[j].is_editable || disableEdit
+                      "
+                      [type]="
+                        existingAttributesData[j].label_element_data_type ===
+                        'numeric'
+                          ? 'number'
+                          : 'text'
+                      "
+                      (keydown)="
+                        onKeyUpChange(
+                          $event,
+                          existingAttributesData[j]?.form_control_name,
+                          existingAttributesData[j]?.label_element_data_type
+                        )
+                      "
+                      (input)="
+                        onInputChange(
+                          $event,
+                          existingAttributesData[j],
+                          existingAttributesData[j]?.form_control_name,
+                          i,
+                          existingAttributesData[j]?.id
+                        )
+                      "
+                      [ngStyle]="{
+                        'background-color':
+                          !existingAttributesData[j].is_editable || disableEdit
+                            ? '#D0D0D0'
+                            : '',
+                        cursor:
+                          !existingAttributesData[j].is_editable || disableEdit
+                            ? 'not-allowed'
+                            : 'auto'
+                      }"
+                    />
+
+                    <mat-error
+                      *ngIf="
+                        storesAttributeForm.controls.storeCustomAttributes.controls[
+                          i
+                        ].controls[
+                          existingAttributesData[j].form_control_name
+                        ]?.hasError('required') ||
+                        storesAttributeForm.controls.storeCustomAttributes.controls[
+                          i
+                        ].controls[
+                          existingAttributesData[j].form_control_name
+                        ].hasError('whitespace')
+                      "
+                    >
+                      Please Enter
+                      <!-- <span class="capitalize"
+                      >{{ existingAttributesData[j].label_name }}
+                    </span> -->
+                      <span>{{ existingAttributesData[j].label_name }} </span>
+                    </mat-error>
+                    <mat-error
+                      *ngIf="
+                        (storesAttributeForm.controls.storeCustomAttributes.controls[
+                          i
+                        ].controls[
+                          existingAttributesData[j].form_control_name
+                        ].hasError('pattern') ||
+                          (storesAttributeForm.controls.storeCustomAttributes.controls[
+                            i
+                          ].controls[
+                            existingAttributesData[j].form_control_name
+                          ].hasError('pattern') &&
+                            storesAttributeForm.controls.storeCustomAttributes.controls[
+                              i
+                            ].controls[
+                              existingAttributesData[j].form_control_name
+                            ].hasError('maxlength'))) &&
+                        !storesAttributeForm.controls.storeCustomAttributes.controls[
+                          i
+                        ].controls[
+                          existingAttributesData[j].form_control_name
+                        ].hasError('minlength')
+                      "
+                    >
+                      Please Enter
+                      <!-- <span class="capitalize"
+                      >valid {{ existingAttributesData[j].label_name }}
+                    </span> -->
+                      <span
+                        >valid {{ existingAttributesData[j].label_name }}
+                      </span>
+                    </mat-error>
+                    <mat-error
+                      *ngIf="
+                        storesAttributeForm.controls.storeCustomAttributes.controls[
+                          i
+                        ].controls[
+                          existingAttributesData[j].form_control_name
+                        ].hasError('minlength') &&
+                        !storesAttributeForm.controls.storeCustomAttributes.controls[
+                          i
+                        ].controls[
+                          existingAttributesData[j].form_control_name
+                        ].hasError('maxlength')
+                      "
+                    >
+                      Please Enter minimum of
+                      <span
+                        >{{
+                          storesAttributeForm.controls.storeCustomAttributes.controls[
+                            i
+                          ].controls[
+                            existingAttributesData[j].form_control_name
+                          ].getError("minlength").requiredLength
+                        }}
+                        characters
+                      </span>
+                    </mat-error>
+                    <mat-error
+                      *ngIf="
+                        !storesAttributeForm.controls.storeCustomAttributes.controls[
+                          i
+                        ].controls[
+                          existingAttributesData[j].form_control_name
+                        ].hasError('minlength') &&
+                        !storesAttributeForm.controls.storeCustomAttributes.controls[
+                          i
+                        ].controls[
+                          existingAttributesData[j].form_control_name
+                        ].hasError('pattern') &&
+                        storesAttributeForm.controls.storeCustomAttributes.controls[
+                          i
+                        ].controls[
+                          existingAttributesData[j].form_control_name
+                        ].hasError('maxlength')
+                      "
+                    >
+                      {{ existingAttributesData[j].label_name }} Cannot Exceed
+                      <span
+                        >{{
+                          storesAttributeForm.controls.storeCustomAttributes.controls[
+                            i
+                          ].controls[
+                            existingAttributesData[j].form_control_name
+                          ].getError("maxlength").requiredLength
+                        }}
+                        characters
+                      </span>
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+              </div>
+
+              <div *ngSwitchCase="'rich_text_editor'">
+                <div
+                  *ngIf="!existingAttributesData[j].is_hide"
+                  class="rich-text"
+                >
+                  <div
+                    [ngClass]="
+                      !existingAttributesData[j].is_editable || disableEdit
+                        ? 'custom-input block-ele mandatory w-100 pointer-none'
+                        : 'custom-input block-ele mandatory w-100'
+                    "
+                    floatLabel="never"
+                  >
+                    <label
+                      class="custom-label"
+                      [class.mandatory]="existingAttributesData[j]?.required"
+                      >{{ existingAttributesData[j]?.label_name }}</label
+                    >
+                    <div class="quill-container">
+                      <quill-editor
+                        *ngIf="
+                          existingAttributesData[j].is_editable && !disableEdit
+                        "
+                        style="min-height: 110px"
+                        placeholder="Enter {{
+                          existingAttributesData[j]?.label_name
+                        }}"
+                        [formControlName]="
+                          existingAttributesData[j]?.form_control_name
+                        "
+                        [readonly]="
+                          !existingAttributesData[j].is_editable || disableEdit
+                        "
+                      ></quill-editor>
+                      <div
+                        *ngIf="
+                          !existingAttributesData[j].is_editable || disableEdit
+                        "
+                        class="textarea-styles"
+                        [readonly]="true"
+                        [innerHTML]="
+                          storesAttributeForm.controls.storeCustomAttributes
+                            .controls[i].controls[
+                            existingAttributesData[j].form_control_name
+                          ].value
+                        "
+                      ></div>
+                    </div>
+                    <div
+                      class="error-class"
+                      *ngIf="
+                        storesAttributeForm.controls.storeCustomAttributes.controls[
+                          i
+                        ].controls[
+                          existingAttributesData[j].form_control_name
+                        ].hasError('required')
+                      "
+                    >
+                      Please Enter
+                      <span>{{ existingAttributesData[j].label_name }} </span>
+                    </div>
+                    <mat-error
+                      class="error-class"
+                      *ngIf="
+                        !storesAttributeForm.controls.storeCustomAttributes.controls[
+                          i
+                        ].controls[
+                          existingAttributesData[j].form_control_name
+                        ].hasError('required') &&
+                        storesAttributeForm.controls.storeCustomAttributes.controls[
+                          i
+                        ].controls[
+                          existingAttributesData[j].form_control_name
+                        ].hasError('maxlength')
+                      "
+                    >
+                      {{ existingAttributesData[j].label_name }} Cannot Exceed
+                      <span
+                        >{{
+                          storesAttributeForm.controls.storeCustomAttributes.controls[
+                            i
+                          ].controls[
+                            existingAttributesData[j].form_control_name
+                          ].getError("maxlength").requiredLength
+                        }}
+                        characters
+                      </span>
+                    </mat-error>
+                  </div>
+                </div>
+              </div>
+              <div *ngSwitchCase="'number'">
+                <mat-form-field
+                  class="custom-input block-ele mandatory w-100"
+                  floatLabel="never"
+                >
+                  <label
+                    class="custom-label"
+                    [class.mandatory]="existingAttributesData[j]?.required"
+                    >{{ existingAttributesData[j].label_name }}</label
+                  >
+                  <input
+                    matInput
+                    placeholder="Enter {{
+                      existingAttributesData[j].label_name
+                    }}"
+                    [errorStateMatcher]="matcher"
+                    [formControlName]="
+                      existingAttributesData[j]?.form_control_name
+                    "
+                    [maxlength]="
+                      existingAttributesData[j].label_element_data_length
+                    "
+                    [readonly]="
+                      !existingAttributesData[j].is_editable || disableEdit
+                    "
+                    (keyup)="enterQty($event, i, existingAttributesData[j])"
+                    [ngClass]="
+                      !existingAttributesData[j].is_editable || disableEdit
+                        ? 'no-opacity'
+                        : ''
+                    "
+                    oninput="javascript:  if (!/^(-?\d+(\.\d{0,3})?)?$/.test(this.value)) this.value = this.value.slice(0, -1);"
+                    type="number"
+                  />
+
+                  <mat-error
+                    *ngIf="
+                      storesAttributeForm?.controls?.storeCustomAttributes?.controls[
+                        i
+                      ]?.controls[
+                        existingAttributesData[j].form_control_name
+                      ]?.hasError('required') ||
+                      storesAttributeForm?.controls?.storeCustomAttributes
+                        ?.controls[j]?.controls[
+                        existingAttributesData[j].form_control_name
+                      ].invalid
+                    "
+                  >
+                    Please Enter
+                    <span>{{ existingAttributesData[j].label_name }}</span>
+                  </mat-error>
+                  <mat-error
+                    *ngIf="
+                      !storesAttributeForm?.controls?.storeCustomAttributes?.controls[
+                        i
+                      ]?.controls[
+                        existingAttributesData[j].form_control_name
+                      ]?.hasError('required') ||
+                      storesAttributeForm?.controls?.storeCustomAttributes?.controls[
+                        j
+                      ]?.controls[
+                        existingAttributesData[j].form_control_name
+                      ].hasError('pattern')
+                    "
+                  >
+                    Please Enter valid
+                    <span>{{ existingAttributesData[j].label_name }}</span>
+                  </mat-error>
+                </mat-form-field>
+              </div>
+
+              <div *ngSwitchCase="'paragraph_text'">
+                <div *ngIf="!existingAttributesData[j].is_hide">
+                  <mat-form-field
+                    class="custom-input block-ele mandatory w-100"
+                    floatLabel="never"
+                  >
+                    <label
+                      class="custom-label"
+                      [class.mandatory]="existingAttributesData[j]?.required"
+                      >{{ existingAttributesData[j].label_name }}</label
+                    >
+                    <textarea
+                      matInput
+                      class="textarea-styles"
+                      placeholder="Enter {{
+                        existingAttributesData[j].label_name
+                      }}"
+                      [errorStateMatcher]="matcher"
+                      [formControlName]="
+                        existingAttributesData[j].form_control_name
+                      "
+                      [readonly]="
+                        !existingAttributesData[j].is_editable || disableEdit
+                      "
+                      (input)="updateWordCount($event.target.value)"
+                    >
+                    </textarea>
+
+                    <mat-error
+                      *ngIf="
+                        storesAttributeForm.controls.storeCustomAttributes?.controls[
+                          i
+                        ].controls[
+                          existingAttributesData[j].form_control_name
+                        ].hasError('required')
+                      "
+                    >
+                      Please Enter
+                      <span>{{ existingAttributesData[j].label_name }} </span>
+                    </mat-error>
+                    <mat-error
+                      *ngIf="
+                        (storesAttributeForm.controls.storeCustomAttributes.controls[
+                          i
+                        ].controls[
+                          existingAttributesData[j].form_control_name
+                        ].hasError('pattern') ||
+                          (storesAttributeForm.controls.storeCustomAttributes.controls[
+                            i
+                          ].controls[
+                            existingAttributesData[j].form_control_name
+                          ].hasError('pattern') &&
+                            storesAttributeForm.controls.storeCustomAttributes.controls[
+                              i
+                            ].controls[
+                              existingAttributesData[j].form_control_name
+                            ].hasError('maxlength'))) &&
+                        !storesAttributeForm.controls.storeCustomAttributes.controls[
+                          i
+                        ].controls[
+                          existingAttributesData[j].form_control_name
+                        ].hasError('minlength')
+                      "
+                    >
+                      Please Enter
+                      <span
+                        >valid {{ existingAttributesData[j].label_name }}
+                      </span>
+                    </mat-error>
+                    <mat-error
+                      *ngIf="
+                        storesAttributeForm.controls.storeCustomAttributes.controls[
+                          i
+                        ].controls[
+                          existingAttributesData[j].form_control_name
+                        ].hasError('minlength') &&
+                        !storesAttributeForm.controls.storeCustomAttributes.controls[
+                          i
+                        ].controls[
+                          existingAttributesData[j].form_control_name
+                        ].hasError('maxlength')
+                      "
+                    >
+                      Please Enter minimum of
+                      <span
+                        >{{
+                          storesAttributeForm.controls.storeCustomAttributes.controls[
+                            i
+                          ].controls[
+                            existingAttributesData[j].form_control_name
+                          ].getError("minlength").requiredLength
+                        }}
+                        characters
+                      </span>
+                    </mat-error>
+                    <mat-error
+                      *ngIf="
+                        !storesAttributeForm.controls.storeCustomAttributes.controls[
+                          i
+                        ].controls[
+                          existingAttributesData[j].form_control_name
+                        ].hasError('minlength') &&
+                        !storesAttributeForm.controls.storeCustomAttributes.controls[
+                          i
+                        ].controls[
+                          existingAttributesData[j].form_control_name
+                        ].hasError('pattern') &&
+                        storesAttributeForm.controls.storeCustomAttributes.controls[
+                          i
+                        ].controls[
+                          existingAttributesData[j].form_control_name
+                        ].hasError('maxlength')
+                      "
+                    >
+                      Please Enter maximun of
+                      <span
+                        >{{
+                          storesAttributeForm.controls.storeCustomAttributes.controls[
+                            i
+                          ].controls[
+                            existingAttributesData[j].form_control_name
+                          ].getError("maxlength").requiredLength
+                        }}
+                        characters
+                      </span>
+                    </mat-error>
+                  </mat-form-field>
+                  <div
+                    style="float: right; margin-top: -10px; margin-right: 6px"
+                    *ngIf="
+                      existingAttributesData[j].form_control_name ===
+                      'terms_conditions'
+                    "
+                  >
+                    {{ wordCount }} /1024
+                  </div>
+                </div>
+              </div>
+              <div *ngSwitchCase="'dropdown'" class="structure-select">
+                <div *ngIf="!existingAttributesData[j].is_hide">
+                  <mat-form-field
+                    class="custom-input block-ele mandatory w-100"
+                    floatLabel="never"
+                  >
+                    <label
+                      class="custom-label"
+                      [class.mandatory]="existingAttributesData[j]?.required"
+                      >{{ existingAttributesData[j].label_name }}</label
+                    >
+                    <mat-select
+                      placeholder="Select {{
+                        existingAttributesData[j].label_name
+                      }}"
+                      [errorStateMatcher]="matcher"
+                      [formControlName]="
+                        existingAttributesData[j].form_control_name
+                      "
+                      (selectionChange)="
+                        dropDownSelectionChange(
+                          $event,
+                          existingAttributesData[j],
+                          j,
+                          existingAttributesData
+                        )
+                      "
+                      (click)="onDropdownClick()"
+                      [disabled]="
+                        !existingAttributesData[j].is_editable || disableEdit
+                      "
+                      [compareWith]="compareObjects"
+                    >
+                      <!-- <mat-select-trigger>
+                      {{ selectedDropValue[j]?.label }}
+                    </mat-select-trigger> -->
+                      <mat-option
+                        [value]="attr"
+                        *ngFor="let attr of existingAttributesData[j]?.options"
+                        [innerHtml]="attr.label || attr.first_name || attr.name"
+                      >
+                      </mat-option>
+                      <!-- <mat-option *ngFor="let attr of existingAttributesData[j]?.options" [value]="attr.id">
+                        <span [ngClass]="{'highlight': shouldDisplayEndDate(attr)}">
+                          {{ attr.label }}
+                        </span>
+                        
+                        <span *ngIf="shouldDisplayEndDate(attr) && showDate" class="policy-date">
+                          Expires On - {{ attr.policy_end_date }}
+                        </span>
+                      </mat-option> -->
+                      <mat-option
+                        *ngIf="existingAttributesData[j]?.options.length === 0"
+                        disabled
+                        >No options available</mat-option
+                      >
+                    </mat-select>
+
+                    <mat-error
+                      *ngIf="
+                        storesAttributeForm?.controls?.storeCustomAttributes?.controls[
+                          i
+                        ].controls[
+                          existingAttributesData[j].form_control_name
+                        ].hasError('required')
+                      "
+                    >
+                      Please Select
+                      <span>{{ existingAttributesData[j].label_name }}</span>
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+              </div>
+
+              <div *ngSwitchCase="'auto_suggest'" class="structure-select">
+                <div *ngIf="!existingAttributesData[j].is_hide">
+                  <mat-form-field
+                    class="custom-input block-ele mandatory w-100"
+                    floatLabel="never"
+                  >
+                    <label
+                      class="custom-label"
+                      [class.mandatory]="existingAttributesData[j]?.required"
+                      >{{ existingAttributesData[j]?.label_name }}
+                    </label>
+                    <input
+                      [readonly]="
+                        !existingAttributesData[j].is_editable || disableEdit
+                      "
+                      [ngClass]="
+                        !existingAttributesData[j].is_editable || disableEdit
+                          ? 'no-opacity'
+                          : ''
+                      "
+                      type="text"
+                      placeholder="Enter {{
+                        existingAttributesData[j]?.label_name
+                      }}"
+                      matInput
+                      [formControlName]="
+                        existingAttributesData[j].form_control_name
+                      "
+                      [errorStateMatcher]="matcher"
+                      [matAutocomplete]="auto"
+                      [readOnly]="
+                        !existingAttributesData[j].is_editable || disableEdit
+                      "
+                      (keyup)="
+                        selectedClients(
+                          $event.target.value,
+                          existingAttributesData[j]?.form_control_name
+                        )
+                      "
+                      (click)="
+                        selectedClients(
+                          '',
+                          existingAttributesData[j]?.form_control_name
+                        )
+                      "
+                    />
+                    <button
+                      type="button"
+                      mat-button
+                      matSuffix
+                      mat-icon-button
+                      aria-label="Clear"
+                      (click)="
+                        clear(
+                          $event.target.value,
+                          existingAttributesData[j]?.form_control_name
+                        )
+                      "
+                      [disabled]="
+                        !existingAttributesData[j].is_editable || disableEdit
+                      "
+                      style="background-color: unset !important"
+                    >
+                      <mat-icon>keyboard_arrow_down</mat-icon>
+                    </button>
+                    <mat-autocomplete
+                      #auto="matAutocomplete"
+                      [displayWith]="displayFn"
+                    >
+                      <mat-option
+                        (onSelectionChange)="
+                          autoSuggestselectionChange(
+                            attr,
+                            existingAttributesData[j],
+                            j
+                          )
+                        "
+                        [value]="attr"
+                        *ngFor="let attr of existingAttributesData[j]?.options"
+                      >
+                        {{ attr.label || attr.name }}</mat-option
+                      >
+                      <mat-option
+                        *ngIf="existingAttributesData[j]?.options.length === 0"
+                        disabled
+                        >No options available</mat-option
+                      >
+                    </mat-autocomplete>
+
+                    <mat-error
+                      *ngIf="
+                        storesAttributeForm?.controls.storeCustomAttributes?.controls[
+                          i
+                        ]?.controls[
+                          existingAttributesData[j].form_control_name
+                        ].hasError('required')
+                      "
+                    >
+                      Please Enter
+                      <span>{{ existingAttributesData[j].label_name }}</span>
+                    </mat-error>
+                    <p
+                      class="custom-edit-err"
+                      *ngIf="showError && !newClientadded"
+                    >
+                      {{ errormessage }}
+                    </p>
+                  </mat-form-field>
+                </div>
+                <div
+                  *ngIf="
+                    showError && !newClientadded && module === 'create_estimate'
+                  "
+                >
+                  <span
+                    class="add-link mb-16"
+                    *ngIf="addNew"
+                    (click)="addOrganization()"
+                  >
+                    <mat-icon class="mat-icon material-icons">add</mat-icon>Add
+                    New Client
+                  </span>
+                </div>
+              </div>
+
+              <div *ngSwitchCase="'multiple_choice'" class="structure-select">
+                <div *ngIf="!existingAttributesData[j].is_hide">
+                  <mat-form-field
+                    class="custom-input block-ele mandatory w-100"
+                    floatLabel="never"
+                  >
+                    <label
+                      class="custom-label"
+                      [class.mandatory]="existingAttributesData[j]?.required"
+                      >{{ existingAttributesData[j].label_name }}
+                    </label>
+                    <mat-select
+                      multiple
+                      placeholder="Select {{ existingAttributesData[j].value }}"
+                      [formControlName]="
+                        existingAttributesData[j].form_control_name
+                      "
+                      [errorStateMatcher]="matcher"
+                      class="multi-select"
+                      panelClass="my-panel-class"
+                      [backdropClass]="'full-width'"
+                      multiple
+                      [disabled]="
+                        !existingAttributesData[j].is_editable || disableEdit
+                      "
+                    >
+                      <mat-option
+                        [value]="attr.id"
+                        *ngFor="let attr of existingAttributesData[j]?.options"
+                      >
+                        {{ attr.name }}</mat-option
+                      >
+                      <mat-option
+                        *ngIf="existingAttributesData[j]?.options.length === 0"
+                        disabled
+                        >No options available</mat-option
+                      >
+                    </mat-select>
+
+                    <mat-error
+                      *ngIf="
+                        storesAttributeForm.controls.storeCustomAttributes.controls[
+                          i
+                        ].controls[
+                          existingAttributesData[j].form_control_name
+                        ]?.hasError('required')
+                      "
+                    >
+                      Please Select
+                      <span>{{ existingAttributesData[j].label_name }}</span>
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+              </div>
+
+              <div *ngSwitchCase="'checkboxes'">
+                <div *ngIf="!existingAttributesData[j].is_hide">
+                  <mat-checkbox
+                    color="primary"
+                    [formControlName]="
+                      existingAttributesData[j].form_control_name
+                    "
+                    (change)="
+                      checkBoxSelectionChange(
+                        $event,
+                        existingAttributesData[j],
+                        j,
+                        existingAttributesData
+                      )
+                    "
+                  >
+                    {{ existingAttributesData[j].label_name }}</mat-checkbox
+                  >
+
+                  <mat-error
+                    *ngIf="
+                      storesAttributeForm.controls.storeCustomAttributes.controls[
+                        i
+                      ].controls[
+                        existingAttributesData[j].form_control_name
+                      ].hasError('required')
+                    "
+                  >
+                    Please Select
+                    <span>{{ existingAttributesData[j].label_name }}</span>
+                  </mat-error>
+                </div>
+              </div>
+
+              <div *ngSwitchCase="'date_field'" class="structure-select">
+                <div *ngIf="!existingAttributesData[j].is_hide">
+                  <mat-form-field
+                    class="custom-input block-ele mandatory w-100"
+                    floatLabel="never"
+                  >
+                    <label
+                      class="custom-label"
+                      [class.mandatory]="existingAttributesData[j]?.required"
+                      >{{ existingAttributesData[j].label_name }}
+                    </label>
+
+                    <div
+                      class="date-picker-field"
+                      style="position: relative"
+                      *ngIf="
+                        existingAttributesData[j].form_control_name !=
+                          'store_open_date' &&
+                        existingAttributesData[j].form_control_name !=
+                          'store_close_date'
+                      "
+                    >
+                      <input
+                        matInput
+                        class="datepicker"
+                        [errorStateMatcher]="matcher"
+                        placeholder="Select {{
+                          existingAttributesData[j].value
+                        }}"
+                        [formControlName]="
+                          existingAttributesData[j].form_control_name
+                        "
+                        (click)="openCalendar(picker)"
+                        (focus)="openCalendar(picker)"
+                        [matDatepicker]="picker"
+                        placeholder="Rent Start Date"
+                        [readonly]="true"
+                        (dateChange)="
+                          onDateChange(
+                            $event,
+                            j,
+                            existingAttributesData[j].form_control_name
+                          )
+                        "
+                        [min]="
+                          existingAttributesData[j].form_control_name ==
+                          'estimated_date_of_arrival'
+                            ? sailingDate
+                            : existingAttributesData[j].minDate
+                            ? existingAttributesData[j].minDate
+                            : existingAttributesData[j].is_current_date
+                            ? currentDate
+                            : ''
+                        "
+                        [disabled]="
+                          !existingAttributesData[j].is_editable || disableEdit
+                        "
+                      />
+                      <!-- [min]="existingAttributesData[j].minDate" -->
+
+                      <mat-datepicker-toggle
+                        matSuffix
+                        [for]="picker"
+                        style="position: absolute; right: 10px"
+                      >
+                      </mat-datepicker-toggle>
+                      <mat-datepicker #picker></mat-datepicker>
+                    </div>
+                    <mat-error
+                      *ngIf="
+                        storesAttributeForm?.controls?.storeCustomAttributes?.controls[
+                          i
+                        ].controls[
+                          existingAttributesData[j].form_control_name
+                        ].hasError('required')
+                      "
+                    >
+                      Please Select
+                      <span>{{ existingAttributesData[j].label_name }}</span>
+                    </mat-error>
+                    <mat-error
+                      *ngIf="
+                        storesAttributeForm?.controls?.storeCustomAttributes?.controls[
+                          i
+                        ].controls[
+                          existingAttributesData[j].form_control_name
+                        ].hasError('matDatepickerMin') ||
+                        storesAttributeForm?.controls?.storeCustomAttributes?.controls[
+                          i
+                        ].controls[
+                          existingAttributesData[j].form_control_name
+                        ].hasError('matDatepickerParse')
+                      "
+                    >
+                      {{
+                        existingAttributesData[j].form_control_name ===
+                          "estimated_date_of_arrival" && sailingDate
+                          ? "Please Enter Estimated Date of Arrival less than Shipped on Board Date"
+                          : "Please Select valid"
+                      }}
+                      <span>{{
+                        existingAttributesData[j].form_control_name ===
+                          "estimated_date_of_arrival" && sailingDate
+                          ? ""
+                          : existingAttributesData[j].label_name
+                      }}</span>
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+              </div>
+              <div *ngSwitchCase="'upload'">
+                <div>
+                  <div *ngIf="!existingAttributesData[j]?.is_hide">
+                    <app-upload-logo
+                      [formObject]="existingAttributesData[j]"
+                      [module]="module"
+                      [editUpload]="editUpload"
+                      [formData]="storesAttributeForm"
+                      (trigger)="emitUploadEvent($event)"
+                      [uploadedFile]="uploadedFile"
+                    ></app-upload-logo>
+                  </div>
+                </div>
+              </div>
+              <div *ngSwitchCase="'upload_documents'">
+                <div>
+                  <div *ngIf="!existingAttributesData[j]?.is_hide">
+                    <app-upload-shipping-docs
+                      [formObject]="existingAttributesData[j]"
+                      [module]="module"
+                      [formInfo]="storesAttributeForm"
+                      [labelName]="existingAttributesData[j]?.label_name"
+                      [uploadedFile]="uploadedFile"
+                      [uploadObject]="uploadObject"
+                      [editID]="editID"
+                      (trigger)="getDocUploadEvent($event)"
+                      [isDisabled]="
+                        !existingAttributesData[j].is_editable || disableEdit
+                      "
+                    ></app-upload-shipping-docs>
+                  </div>
+                </div>
+              </div>
+              <!-- <div *ngSwitchCase="'addresses_checkbox'">
+              <div>
+                <div *ngIf="!existingAttributesData[j]?.is_hide">
+                  <app-select-address
+                  [formFields]="existingAttributesData[j]"
+                  [totalFormFields]="returnedDynmicDropdowns"
+                    [clientSelectedId]="clientSelectedId"
+                    (trigger)="getSelectedAddress($event)"
+                  ></app-select-address>
+                </div>
+              </div>
+            </div> -->
+              <div *ngSwitchCase="'custom_component'">
+                <div *ngIf="!existingAttributesData[j].is_hide">
+                  <div
+                    *ngIf="
+                      existingAttributesData[j]?.label_name === 'Add Product'
+                    "
+                  >
+                    <!-- <app-products-form
+                    [formFields]="existingAttributesData[j]"
+                    [clientSelectedId]="clintid"
+                    (trigger)="emitNewProductsData($event)"
+                    [module]="module"
+                  >
+                  </app-products-form> -->
+                  </div>
+                  <!-- <div
+                  *ngIf="
+                    existingAttributesData[j]?.label_name === 'Select Address'
+                  "
+                >
+                <app-select-address
+                [formFields]="existingAttributesData[j]"
+                [totalFormFields]="returnedDynmicDropdowns"
+                  [clientSelectedId]="clientSelectedId"
+                  (trigger)="getSelectedAddress($event)"
+                ></app-select-address>
+                </div> -->
+                  <!-- <div
+                  *ngIf="
+                    existingAttributesData[j]?.label_name ===
+                      'Dynamic Row Fields' &&
+                    storesAttributeForm?.value?.storeCustomAttributes[0]
+                      ?.transport_id != '1'
+                  "
+                >
+                  <app-freight-dynamic-form
+                    [storesAttributeForm]="storesAttributeForm"
+                    (trigger)="getContainerData($event)"
+                    [saveFreightFlag]="saveFreightFlag"
+                  ></app-freight-dynamic-form>
+                </div> -->
+                  <!-- <div
+                  *ngIf="
+                    existingAttributesData[j]?.form_control_name ===
+                    'add_containers'
+                  "
+                >
+                  <app-shipping-containers
+                    [storesAttributeForm]="storesAttributeForm"
+                    (trigger)="getContainerData($event)"
+                    [order]="order"
+                    [saveFreightFlag]="saveFreightFlag"
+                  ></app-shipping-containers>
+                </div> -->
+                  <div
+                    *ngIf="
+                      existingAttributesData[j]?.form_control_name ===
+                      'add_transport'
+                    "
+                  >
+                    <app-other-costs-transport-charges
+                      [storesAttributeForm]="storesAttributeForm"
+                      (trigger)="getContainerData($event)"
+                    ></app-other-costs-transport-charges>
+                  </div>
+                  <div
+                    *ngIf="
+                      existingAttributesData[j]?.form_control_name ===
+                        'upload_shipping_document' &&
+                      !existingAttributesData[j]?.is_hide
+                    "
+                  >
+                    <app-upload-shipping-docs
+                      [order]="order"
+                      [selectedOrderStatus]="selectedOrderStatus"
+                      [showTrackOrder]="true"
+                      [labelName]="existingAttributesData[j]?.label_name"
+                      [shipping_id]="shipping_id"
+                    ></app-upload-shipping-docs>
+                  </div>
+                  <div
+                    *ngIf="
+                      existingAttributesData[j]?.form_control_name ===
+                        'upload_supplier_doc' &&
+                      !existingAttributesData[j]?.is_hide
+                    "
+                  >
+                    <app-upload-shipping-docs
+                      [selectedOrderStatus]="selectedOrderStatus"
+                      [labelName]="existingAttributesData[j]?.label_name"
+                    ></app-upload-shipping-docs>
+                  </div>
+                </div>
+
+                <div *ngSwitchDefault>
+                  <mat-form-field
+                    class="custom-input block-ele mandatory w-100"
+                    floatLabel="never"
+                  >
+                    <label
+                      class="custom-label"
+                      [class.mandatory]="
+                        storesCustomAttributesData[i]?.required
+                      "
+                      >{{ existingAttributesData[j]?.label_name }}</label
+                    >
+                    <input
+                      matInput
+                      placeholder="Enter {{
+                        existingAttributesData[j].label_name
+                      }}"
+                      [errorStateMatcher]="matcher"
+                      [formControlName]="
+                        existingAttributesData[j].form_control_name
+                      "
+                      [maxlength]="
+                        existingAttributesData[j].label_element_data_length
+                      "
+                    />
+                    <mat-error
+                      *ngIf="
+                        storesAttributeForm?.controls?.existingAttributesData?.controls[
+                          i
+                        ].controls[
+                          existingAttributesData[j].form_control_name
+                        ].hasError('required') ||
+                        storesAttributeForm?.controls?.existingAttributesData
+                          ?.controls[i].controls[
+                          existingAttributesData[j].form_control_name
+                        ].invalid
+                      "
+                    >
+                      Please Enter
+                      <!-- <span class="capitalize">{{
+                      existingAttributesData[j].label_name
+                    }}</span> -->
+                      <span>{{ existingAttributesData[j].label_name }}</span>
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="position: fixed; top: 50%; left: 50%">
+      <mat-spinner
+        class="medium-spinner page-fixed"
+        *ngIf="fetchingData"
+      ></mat-spinner>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,15 @@
+.roles-radio {
+  display: flex;
+  gap: 10px;
+}
+.accordian-click {
+  .mat-icon {
+    height: 20px;
+    width: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 4px;
+    background: #d5cece;
+  }
+}

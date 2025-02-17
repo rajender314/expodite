@@ -1,32 +1,57 @@
-import { Router, ActivatedRoute  } from '@angular/router';
-import { Component, OnInit } from '@angular/core';
-import { ReportsService } from '../../../services/reports.service';
-import { FormControl, FormBuilder, Validators, FormArray } from '@angular/forms';
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { MatStepper, MatStepperModule } from '@angular/material/stepper';
-import { MatDatepicker } from '@angular/material/datepicker';
-import { SaveViewComponent } from '../../../dialogs/save-view/save-view.component';
-import { DeleteViewComponent } from '../../../dialogs/delete-view/delete-view.component';
-import { SnakbarService } from '../../../services/snakbar.service';
-import * as _ from 'lodash';
-import { constructor } from 'moment';
-import * as moment from 'moment';
-import { Images } from '../../../images/images.module';
+import { Router, ActivatedRoute } from "@angular/router";
+import { Component, OnInit } from "@angular/core";
+import { ReportsService } from "../../../services/reports.service";
+import { OrdersService } from "../../../services/orders.service";
+import {
+  FormControl,
+  FormBuilder,
+  Validators,
+  FormArray,
+} from "@angular/forms";
+import {
+  MatDialog,
+  MatDialogRef,
+  MAT_DIALOG_DATA,
+} from "@angular/material/dialog";
+import { MatStepper, MatStepperModule } from "@angular/material/stepper";
+import { MatDatepicker } from "@angular/material/datepicker";
+import { SaveViewComponent } from "../../../dialogs/save-view/save-view.component";
+import { DeleteViewComponent } from "../../../dialogs/delete-view/delete-view.component";
+import { SnakbarService } from "../../../services/snakbar.service";
+import * as _ from "lodash";
+import * as moment from "moment";
+import { Images } from "../../../images/images.module";
+import { EstimateFilterComponent } from "../../../estimates-module/estimate-filter/estimate-filter.component";
+import { IServerSideDatasource } from "ag-grid-community";
+import { HttpClient } from "@angular/common/http";
+import { AdminService } from "../../../services/admin.service";
 declare var App: any;
 @Component({
-  selector: 'app-orders-dueby-clients',
-  templateUrl: './orders-dueby-clients.component.html',
-  styleUrls: ['./orders-dueby-clients.component.scss']
+  selector: "app-orders-dueby-clients",
+  templateUrl: "./orders-dueby-clients.component.html",
+  styleUrls: ["./orders-dueby-clients.component.scss"],
 })
 export class OrdersDuebyClientsComponent implements OnInit {
-  public deleteIcon: string = App.public_url + 'signatures/assets/images/delete.svg';
-  public sideBar: any;
+  public deleteIcon: string =
+    App.public_url + "signatures/assets/images/delete.svg";
+  public sideBar = {
+    toolPanels: [
+      {
+        id: "columns",
+        labelDefault: "Columns",
+        labelKey: "columns",
+        iconKey: "columns",
+        toolPanel: "agColumnsToolPanel",
+      },
+    ],
+    // hiddenByDefault: true,
+  };
   public rowData = [];
   public currentGridInfo: any = [];
   public viewsList = [];
   public dialogRef: any;
   public isChanged: boolean = false;
-  public savedViewValue: any;
+  public savedViewValue: any = 1;
   public permissionForView: boolean = true;
   public isInitial: boolean;
   public rowDataCopy: any;
@@ -49,392 +74,177 @@ export class OrdersDuebyClientsComponent implements OnInit {
   public today = new Date();
   public images = Images;
   public yearStartDate = new Date(this.today.getFullYear(), 0, 1);
-  filtersForm = this.fb.group({
-    status: [[]],
-    start_date: [this.yearStartDate, Validators.required],
-    end_date: [this.today, Validators.required],
-    country:[[]],
-  });
-  public countries = [];
-  public gridParams = {
 
-  }; 
+  public countries = [];
+  public gridParams: any = {
+    page: 1,
+    perPage: 12,
+    type: "invoices",
+  };
   public params = {
-    module: 'by_clients'
-  }
+    module: "by_clients",
+  };
+  private param: any = {
+    flag: "invoices",
+  };
   public statusList = [];
   public showSaveView = true;
-
+  defaultColDef = {
+    sortingOrder: ["asc", "desc"],
+  };
   openCalendar(picker: MatDatepicker<Date>) {
     picker.open();
   }
   viewMyId: number;
-  constructor(private ReportsService: ReportsService, private fb: FormBuilder,
-     public dialog: MatDialog,private snackbar: SnakbarService,
-     private router: Router,private activateRoute: ActivatedRoute
-     ) { }
-  ngOnInit() {
-    this.viewMyId=0;  
-    this.activateRoute.params.subscribe((res: any) => {
-      if (typeof (res.id) != 'undefined') {  
-      this.viewMyId=parseInt(res.id);  
-      this.showSaveView = false;
-      this.ReportsService.viewId =  this.viewMyId;
+  public showGrid = true;
 
-      } else {
-        this.showSaveView = true;
-
-      }
-     if(this.viewMyId){
-      this.savedViewValue = 1;
-      this.isInitial = true;
-      this.params.module = 'All';
-      this.getViewsList();
-      this.getOrdersDueByClientsReport();
-
-      this.getFiltersData();
-      setTimeout(()=>{ 
-        this.getSelectedView(this.viewMyId);
-      }, 1000);
-      
-     }else{
-      this.savedViewValue = 1;
-      this.isInitial = true;
-      this.getOrdersDueByClientsReport();
-      // console.log(this.orders)
-      this.getViewsList();
-      this.getFiltersData();
-     }     
-     
-
+  constructor(
+    public ReportsService: ReportsService,
+    private OrdersService: OrdersService,
+    private fb: FormBuilder,
+    public dialog: MatDialog,
+    private snackbar: SnakbarService,
+    private router: Router,
+    private activateRoute: ActivatedRoute,
+    private http: HttpClient,
+    public adminService: AdminService
+  ) {}
+  async ngOnInit() {
+    this.adminService.getPermissions().subscribe(res => {
+      this.adminService.rolePermissions = res.role_details.roles_permissions;
     })
-  
+    this.viewMyId = 0;
+    this.activateRoute.params.subscribe(async (res: any) => {
+      this.viewMyId = parseInt(res.id);
+      if(this.viewMyId) {
+        this.showGrid = false;
+      } 
+      setTimeout(async () => {
+        await this.loadReportHeaders();
+      }, 0);
+    });
   }
   cellRenderStatus = (params) => {
     // console.log(params)
     return params.data
       ? `<div class="icon-render">
-              <div class="status"><span class="adStatus" 
-        "> 
+              <div class="status"><span class="adStatus"
+        ">
         ${params.data.status}
         </span></div>
           </div>`
-      : '';
-
-  }
+      : "";
+  };
   getFiltersData(): void {
-    this.ReportsService
-      .getRequiredDataForFilters({
-        status: "",
-        reportType:2
-      })
-      .then(response => {
-        if (response.result.success) {
-          this.statusList = response.result.data.invoiceStatus;
-          this.clients = response.result.data.clients;
-          // console.log(this.statusList);
-          this.countries = response.result.data.countrys;
-        } else {
-
-        }
-
-      });
-  }
-  clearFilters(): void {
-    this.filtersApplied = false;
-    this.filtersForm = this.fb.group({
-      status: [[]],
-      start_date: ["2020-01-01"],
-      end_date: [this.today],
-      country:[[]],
-    });
-    this.gridParams['startDate'] = "";    
-    this.gridParams['endDate'] = "";
-    this.gridParams['selectedStatuses'] = [];
-    this.gridParams['countryIds'] = [];
-    this.gridParams['type'] = "aggrid";
-    this.getGridData();
-
-  }
-  filterOrdersReportData(): void {
-    this.filtersApplied = true;
-    this.isChanged = true;
-    this.gridParams['startDate'] = moment(this.filtersForm.value.start_date).toLocaleString();    
-    this.gridParams['endDate'] = moment(this.filtersForm.value.end_date).toLocaleString();
-    this.gridParams['selectedStatuses'] = this.filtersForm.value.status;
-    this.gridParams['countryIds'] = this.filtersForm.value.country;
-    this.getGridData();
-
-  }
- 
-  
-  getGridData(): void {
-    this.noData = false;
-    this.reportsSpinner = true;
-    this.fetchingData = true;
-    this.ReportsService
-      .ordersDueByClientsReport(this.gridParams)
-      .then(response => {
-        if (response.result.success) {
-          let reportData = response.result.data;
-          this.orders = reportData.finalReportData;
-          this.totalCount = 50 //reportData.count;
-          this.fetchingData = false;
-          if (!this.orders.length) {
-            this.noData = true;
-            // this.adsService.showExportButton = false;
-          }
-          // console.log(reportData)
-          this.columnDefs = this.generateColumns(reportData.headers);
-          // console.log(this.columnDefs)
-          this.rowData = reportData.finalReportData;
-          if(this.isInitial) {
-             this.rowDataCopy = this.rowData;
-             this.isInitial = false;
-          }
-          this.reportsSpinner = false;
-        } else {
-
-        }
-
-      });
-  }
- 
-  getOrdersDueByClientsExportReport(): void {
-    let params ={}
-    console.log(this.filtersForm.value.client)
-    if(this.filtersApplied){
-      params = {
-        startDate: moment(this.filtersForm.value.start_date).toLocaleString(),
-        endDate: moment(this.filtersForm.value.end_date).toLocaleString(),
-        selectedStatuses: this.filtersForm.value.status,
-        countryIds:this.filtersForm.value.country,
-        type: "excel"
+    this.OrdersService.getOrderFilterData(this.param).then((response) => {
+      if (response.result.success) {
+        this.statusList = response.result.data.statuses;
+        // console.log(this.statusList);
+        this.countries = response.result.data.countries;
+      } else {
       }
-    }else{
+    });
+  }
+  clearFilters(e): void {
+    e.stopPropagation();
+    this.filtersApplied = false;
+    this.gridParams = {
+      page: 1,
+      perPage: 12,
+      type: "invoices",
+      startDate: "",
+      endDate: "",
+      selectedStatuses: [],
+      countryIds: [],
+      clear: true,
+    };
+    this.getGridData();
+    this.filterCount = "";
+    setTimeout(() => {
+      this.gridParams = {
+        page: 1,
+        perPage: 12,
+        type: "invoices",
+        startDate: "",
+        endDate: "",
+        selectedStatuses: [],
+        countryIds: [],
+        clear: false,
+      };
+    }, 100);
+  }
+
+  async getGridData() {
+    const datasource = this.ReportsService.getServerSideDatasource(
+      this.gridApi,
+      this.gridParams,
+      `${App.base_url}getReports`,
+      (listCount: number, totalCount: number, gridParams) => {
+        this.listCount = listCount;
+        this.totalCount = totalCount;
+        this.gridParams = gridParams;
+      },
+      this.gridColumnApi,
+      this.viewsList,
+      this.viewMyId
+    );
+    this.gridApi.setServerSideDatasource(datasource);
+  }
+
+  getInvoicesExportReport(): void {
+    let params = {};
+    if (this.filtersApplied) {
+      params = {
+        startDate: this.savedReportData.startDate,
+        endDate: this.savedReportData.endDate,
+        selectedStatuses: this.savedReportData.selectedStatuses,
+        countryIds: this.savedReportData.countryIds,
+        type: "invoices",
+        file: "excel",
+      };
+    } else {
       params = {
         startDate: "",
         endDate: "",
         selectedStatuses: [],
-        countryIds:[],
-        type: "excel"
-      }
+        countryIds: [],
+        type: "invoices",
+        file: "excel",
+      };
     }
-    this.ReportsService
-      .ordersDueByClientsReport(params)
-      .then(response => {
-        if (response.result.success) {
-          let downloadPath = response.result.data.filePath;
-          window.location.href = '' + App.base_url + '' + downloadPath + '';
-        } else {
-
-        }
-
-      });
+    this.ReportsService.getReports(params).then((response) => {
+      if (response.result.success) {
+        let downloadPath = response.result.data.filePath;
+        window.location.href = "" + App.base_url + "" + downloadPath + "";
+      } else {
+      }
+    });
   }
-  generateColumns = (data: any) => {
 
-    let cols = [
-      {
-        headerName: 'Invoice #',
-        editable: false,
-        sortable: true,
-        resizable: true,
-        rowGroup: false,
-        enableRowGroup: true, 
-        field: 'invoice_number',
-        width: 150
-      },
-      {
-        headerName: 'Date',
-        editable: false,
-        sortable: true,
-        resizable: true,
-        rowGroup: false,
-        enableRowGroup: true, 
-        field: 'date_added',
-        width: 150
-      },
-      {
-        headerName: 'Status',
-        editable: false,
-        sortable: true,
-        resizable: true,
-        rowGroup: false,
-        enableRowGroup: true, 
-        field: 'status',
-        width: 150
-      },{
-        headerName: 'Client Name',
-        editable: false,
-        sortable: true,
-        resizable: true,
-        rowGroup: false,
-        enableRowGroup: true, 
-        field: 'client_name',
-        width: 150,
-
-      },
-      // {
-      //   headerName: 'Product Name',
-      //   editable: false,
-      //   sortable: true,
-      //   resizable: true,
-      //   rowGroup: false,
-      //   enableRowGroup: true, 
-      //   field: 'product_name',
-      //   width: 300
-      // },
-      // {
-      //   headerName: 'Product Price',
-      //   headerClass: 'right-align',
-      //   cellClass: 'align-right',
-      //   editable: false,
-      //   sortable: true,
-      //   resizable: true,
-      //   rowGroup: false,
-      //   enableRowGroup: true, 
-      //   field: 'product_price',
-      //   width: 150
-      // },
-      // {
-      //   headerName: 'Quantity',
-      //   headerClass: 'right-align',
-      //   cellClass: 'align-right',
-      //   editable: false,
-      //   sortable: true,
-      //   resizable: true,
-      //   rowGroup: false,
-      //   enableRowGroup: true, 
-      //   enableValue: true,
-      //   aggFunc: 'sum',
-      //   field: 'quantity',
-      //   width: 150
-      // },
-
-      {
-        headerName: 'Currency',
-        editable: false,
-        sortable: true,
-        resizable: true,
-        rowGroup: false,
-        enableRowGroup: true, 
-        field: 'currency_name',
-        width: 100
-      },
-      {
-        headerName: 'Amount',
-        headerClass: 'center-align',
-        cellClass: 'align-right',
-        editable: false,
-        sortable: true,
-        resizable: true,
-        rowGroup: false,
-        enableRowGroup: true, 
-        field: 'total_amount',
-        width: 150
-      },
-      // {
-      //   headerName: 'Shipping Company Name',
-      //   editable: false,
-      //   sortable: true,
-      //   resizable: true,
-      //   rowGroup: false,
-      //   enableRowGroup: true, 
-      //   field: 'shipping_company_name',
-      //   width: 200
-      // },
-      // {
-      //   headerName: 'Ship State',
-      //   editable: false,
-      //   sortable: true,
-      //   resizable: true,
-      //   rowGroup: false,
-      //   enableRowGroup: true, 
-      //   field: 'ship_state',
-      //   width: 150
-      // },
-
-      
-      {
-        headerName: 'Country',
-        editable: false,
-        sortable: true,
-        resizable: true,
-        rowGroup: false,
-        enableRowGroup: true, 
-        field: 'ship_country',
-        width: 150
-      },
-      
-    ];
-    // data.map((col) => {
-
-    //   let column = {
-    //     headerName: col.headerName,
-    //     editable: false,
-    //     field: col.field,
-    //     sortable: true,
-    //     headerClass: '',
-    //     cellClass: '',
-    //     // width: 240,
-    //   }
-
-    //   if (col.field == "status") {
-    //     column['cellRenderer'] = (params) => this.cellRenderStatus(params)
-    //   }
-    //   if (col.field == "product_price" || col.field == "quantity" || col.field == "total_amount") {
-    //     column = {
-    //       headerName: col.headerName,
-    //       editable: false,
-    //       field: col.field,
-    //       sortable: true,
-    //       headerClass: 'right-align',
-    //       cellClass: 'align-right'
-    //     }
-    //   }
-    //   cols.push(column)
-    // })
-    return cols
-  }
-  
-  getOrdersDueByClientsReport(): void {
-    this.getGridData()
+  getInvoicesReport(): void {
+    this.getGridData();
     this.sideBar = {
       toolPanels: [
         {
-          id: 'columns',
-          labelDefault: 'Columns',
-          labelKey: 'columns',
-          iconKey: 'columns',
-          toolPanel: 'agColumnsToolPanel',
+          id: "columns",
+          labelDefault: "Columns",
+          labelKey: "columns",
+          iconKey: "columns",
+          toolPanel: "agColumnsToolPanel",
         },
       ],
       // hiddenByDefault: true,
-    }
+    };
   }
-  
+
   onGridChanged() {
     this.isChanged = true;
-    // console.log(999)
   }
-  onGridReady(params) {
-    //console.log(params)
-    params.api.sizeColumnsToFit(); 
-    // console.log(params)
-    this.gridApi = params.api;
-    this.gridColumnApi = params.columnApi;
-    if(this.savedViewValue != 1) {
-      params.api.sizeColumnsToFit(); 
-      this.setGridOptions(this.currentGridInfo);
-    }
-  }
- 
+
   saveView() {
-   // console.log(this.gridColumnApi)
     let data;
-    if(this.gridColumnApi != undefined) {
-       data = {
+    if (this.gridColumnApi != undefined) {
+      data = {
         groupInfo: this.gridColumnApi.getRowGroupColumns(),
         filterInfo: this.gridApi.getFilterModel(),
         valColumnInfo: this.gridColumnApi.getValueColumns(),
@@ -443,10 +253,10 @@ export class OrdersDuebyClientsComponent implements OnInit {
         allPivoteColumns: this.gridColumnApi.getPivotColumns(),
         sortColumns: this.gridApi.getSortModel(),
         // searchInfo: this.search.value,
-        columnState: this.gridColumnApi.getColumnState() //this.gridApi.columnController.allDisplayedColumns
+        columnState: this.gridColumnApi.getColumnState(), //this.gridApi.columnController.allDisplayedColumns
       };
     } else {
-       data = {
+      data = {
         groupInfo: [],
         filterInfo: [],
         valColumnInfo: [],
@@ -455,196 +265,293 @@ export class OrdersDuebyClientsComponent implements OnInit {
         allPivoteColumns: [],
         sortColumns: [],
         // searchInfo: this.search.value,
-        columnState: [] //this.gridApi.columnController.allDisplayedColumns
+        columnState: [], //this.gridApi.columnController.allDisplayedColumns
       };
     }
-   
+
     var filteredGridValues = this.ReportsService.getGridInfo(data);
     // console.log(filteredGridValues)
     this.dialogRef = this.dialog.open(SaveViewComponent, {
-      width: '550px',
-      height: '340px',
+      width: "550px",
+      height: "340px",
+      disableClose: true,
       data: {
-        filterData: this.filtersForm.value,
+        filterData: this.gridParams,
         gridData: filteredGridValues,
         isFiltersApplied: this.filtersApplied,
-        module: 'by_clients'
-      }
+        module: "by_clients",
+      },
     });
-    this.dialogRef.afterClosed().subscribe(res => {
+    this.dialogRef.afterClosed().subscribe(async (res) => {
       if (res) {
         this.isChanged = false;
-        this.ReportsService.setTriggerData(true)
-
-         this.getViewsList();
-         setTimeout(() => {
+        this.ReportsService.setTriggerData(true);
+        await this.getViewsList();
+        this.fetchingData = false;
+        this.reportsSpinner = false;
+        setTimeout(() => {
           this.savedViewValue = res;
-         }, 100);
-        
+        }, 100);
       }
     });
   }
   setInitialFilters() {
-    this.filtersForm = this.fb.group({
-      status: [[]],
-      start_date: ["2020-01-01"],
-      end_date: [this.today],
-      country:[[]],
-    });
-    this.gridParams['startDate'] = moment(this.filtersForm.value.start_date).toLocaleString();    
-    this.gridParams['endDate'] = moment(this.filtersForm.value.end_date).toLocaleString();
-    this.gridParams['selectedStatuses'] = this.filtersForm.value.status;
-    this.gridParams['countryIds'] = this.filtersForm.value.country;
-   
-    this.gridParams['selectedClients'] = this.filtersForm.value.client;
+    this.gridParams["startDate"] = moment(this.yearStartDate).toLocaleString();
+    this.gridParams["endDate"] = moment(this.today).toLocaleString();
+    this.gridParams["selectedStatuses"] = [];
+    this.gridParams["countryIds"] = [];
+    this.filterCount = "";
   }
-  getSelectedView(id) {
+  public savedReportData;
+  getSelectedView(id, view) {
     this.isChanged = false;
-   
-
-    if(id == 1) {
+    this.viewMyId = parseInt(view.view_id);
+    if (id == 1) {
       this.currentGridInfo = [];
       this.setInitialFilters();
-      this.getOrdersDueByClientsReport();
-      // this.getViewsList();
+      this.getGridData();
       this.getFiltersData();
       this.filtersApplied = false;
-     
     } else {
       this.filtersApplied = true;
       const index = _.findIndex(this.viewsList, { view_id: id });
-      this.savedViewValue = id
-      const filterDataInfo = index > 0 ? this.viewsList[index].applied_filters : [];
-      console.log(filterDataInfo)
-      if(filterDataInfo != "") {
-        this.filtersForm.value.start_date = filterDataInfo.start_date;
-        this.filtersForm.value.end_date = filterDataInfo.end_date;
-        this.filtersForm.value.status = filterDataInfo.status;
-        this.filtersForm.value.country = filterDataInfo.country;
+      this.savedViewValue = id;
+      const filterDataInfo =
+        index > 0 ? this.viewsList[index].applied_filters : [];
+      this.savedReportData = filterDataInfo;
 
-        this.filtersForm = this.fb.group({
-          status: [this.filtersForm.value.status],
-          start_date: [this.filtersForm.value.start_date],
-          end_date: [this.filtersForm.value.end_date],
-          country: [this.filtersForm.value.country],
-        });
-        this.gridParams['startDate'] = moment(this.filtersForm.value.start_date).toLocaleString();    
-        this.gridParams['endDate'] = moment(this.filtersForm.value.end_date).toLocaleString();
-        this.gridParams['selectedStatuses'] = this.filtersForm.value.status;
-        this.gridParams['countryIds'] = this.filtersForm.value.country;
+      if (filterDataInfo != "") {
+        this.gridParams["startDate"] = moment(
+          filterDataInfo.startDate
+        ).toLocaleString();
+        this.gridParams["endDate"] = moment(
+          filterDataInfo.endDate
+        ).toLocaleString();
+        this.gridParams["selectedStatuses"] = filterDataInfo.selectedStatuses;
+        this.gridParams["countryIds"] = filterDataInfo.countryIds;
+        this.filterCount =
+          filterDataInfo?.selectedStatuses?.length +
+          filterDataInfo?.countryIds?.length +
+          2;
         this.getGridData();
-        //this.gridApi.sizeColumnsToFit(); 
-        
+        //this.gridApi.sizeColumnsToFit();
       } else {
         this.setInitialFilters();
-        this.gridApi.setRowData(this.rowDataCopy);
+        // this.gridApi.setRowData(this.rowDataCopy);
+        this.getGridData();
       }
-      
-      this.currentGridInfo = index > 0 ? this.viewsList[index].grid_info : [];
-      this.setGridOptions(this.currentGridInfo);
+
+      // this.currentGridInfo = index > 0 ? this.viewsList[index].grid_info : [];
+      // this.setGridOptions(this.currentGridInfo);
+      this.sideBar = {
+        toolPanels: [
+          {
+            id: "columns",
+            labelDefault: "Columns",
+            labelKey: "columns",
+            iconKey: "columns",
+            toolPanel: "agColumnsToolPanel",
+          },
+        ],
+        // hiddenByDefault: true,
+      };
     }
   }
-  setGridOptions(gridinfo) {
-    // tslint:disable-next-line:prefer-const
-    let allFields = [],
-      colKeys = [],
-      rowGroupFields = [],
-      filters = [],
-      pivoteMode = false,
-      pivoteColumns = [],
-      sortColumns = [],
-      searchInfo = '',
-      columnState = [];
-    // console.log(gridinfo)
-      if (gridinfo) {
-        colKeys = gridinfo['inVisibleColumnsInfo'] || [];
-        filters = gridinfo['filterInfo'] ? gridinfo['filterInfo'][0] || [] : [];
-        rowGroupFields = gridinfo['groupInfo'] || [];
-        pivoteMode = gridinfo['pivoteMode'] || false;
-        pivoteColumns = gridinfo['pivoteColumns'] || [];
-        sortColumns = gridinfo['sortColumns'] || [];
-        searchInfo = gridinfo['searchInfo'] || '';
-        columnState = gridinfo['columnState'] || [];
-      }
-      if (this.gridColumnApi) {
-        const columns = this.gridColumnApi.getAllColumns();
-        columns.forEach(column => {
-          allFields.push(column['colId']);
-          if (!column['visible']) {
-            this.gridColumnApi.setColumnVisible(column['colId'], true);
-          }
-        });
-        // this.visibleColumnsCount = columns.length - colKeys.length;
-        this.gridColumnApi.removeRowGroupColumns(allFields);
-        this.gridColumnApi.setColumnsVisible(colKeys, false);
-        this.gridColumnApi.setPivotMode(pivoteMode);
-        this.gridColumnApi.addRowGroupColumns(rowGroupFields);
-        this.gridColumnApi.removePivotColumns(allFields);
-        this.gridColumnApi.setPivotColumns(pivoteColumns);
-        this.gridApi.setFilterModel(filters);
-        this.gridApi.setSortModel(sortColumns);
-        this.gridApi.setQuickFilter(searchInfo);
-        if (columnState.length > 0) {
-          this.gridColumnApi.setColumnState(columnState);
-        } else {
-          this.gridColumnApi.resetColumnState();
-        }
-        // this.applyStickyFilters();
-      }
-  }
-  deleteView = function(id, i) {
+
+  deleteView = function (id, i) {
     event.stopPropagation();
     const params = {
-      view_id : id
-    }
+      view_id: id,
+    };
     let dialogRef = this.dialog.open(DeleteViewComponent, {
-      width: '550px',
+      width: "550px",
       data: {
-        
-        module: 'by_clients'
-      }
+        module: "by_clients",
+      },
+      disableClose: true,
     });
-    dialogRef.afterClosed().subscribe(res => {
+    dialogRef.afterClosed().subscribe((res) => {
       if (res) {
-        this.ReportsService.deleteViewItem(params)
-        .then(response => {
+        this.fetchingData = true;
+        this.ReportsService.deleteViewItem(params).then((response) => {
+          this.fetchingData = false;
           if (response.result.success) {
             this.isChanged = false;
-           
-            if(id == this.savedViewValue) {
-                this.savedViewValue = 1;
-                this.getSelectedView(this.savedViewValue)
+
+            if (id == this.savedViewValue) {
+              this.savedViewValue = 1;
+              this.getSelectedView(this.savedViewValue);
             }
             this.viewsList.splice(i, 1);
             let toastMsg: object;
-                toastMsg = { msg: 'View deleted successfully', status: 'success' };
-                this.snackbar.showSnackBar(toastMsg);
-          } 
-        })
+            toastMsg = { msg: "View deleted successfully", status: "success" };
+            this.snackbar.showSnackBar(toastMsg);
+          }
+        });
       }
     });
-    
-  }
- 
-  getViewsList = function() {
+  };
+  public newSpinnerFlag = false;
+  getViewsList = async function () {
     // const params = {
     //   module: 'by_clients'
     // }
-    this.ReportsService.getViewsList(this.params)
-      .then(response => {
-        if (response.result.success) {
-          this.viewsList = response.result.data;
-          this.viewsList.forEach(element => {
-            element.grid_info = JSON.parse(element.grid_info);
-            element.applied_filters = JSON.parse(element.applied_filters);
-          });
-          if(this.viewsList.length) {
-            this.viewsList.unshift({ view_name: 'Default View', view_id: 1 });
+    // this.fetchingData = true;
+    // this.reportsSpinner  = true;
+    this.newSpinnerFlag = true;
+    await this.ReportsService.getViewsList(this.params).then((response) => {
+      this.newSpinnerFlag = false;
+      if (response.result.success) {
+        this.viewsList = response.result.data;
+        this.viewsList.forEach((element) => {
+          element.grid_info = JSON.parse(element.grid_info);
+          element.applied_filters = JSON.parse(element.applied_filters);
+        });
+        if (this.viewsList.length) {
+          this.viewsList.unshift({ view_name: "Default View", view_id: 1 });
+        }
+        if (this.viewMyId) {
+          const index = _.findIndex(this.viewsList, { view_id: this.viewMyId });
+          const filterDataInfo =
+            index > 0 ? this.viewsList[index].applied_filters : [];
+          if (filterDataInfo != "") {
+            this.filterCount =
+              filterDataInfo?.selectedStatuses?.length +
+              filterDataInfo?.countryIds?.length +
+              2;
           }
-          
-          // console.log(this.viewsList)
-        } 
-      })
-  }
+        } else {
+          this.setInitialFilters();
+        }
+      }
+    });
+  };
 
+  public filterCount = "";
+  openFilters() {
+    this.dialogRef = this.dialog.open(EstimateFilterComponent, {
+      width: "20%",
+      height: "100vh",
+      position: { right: "0" },
+      disableClose: true,
+      data: {
+        module: "invoices",
+        statusList: this.statusList,
+        filterParams: this.gridParams,
+        countries: this.countries,
+      },
+    });
+    this.dialogRef.afterClosed().subscribe(async (res) => {
+      if (res.success) {
+        this.filtersApplied = true;
+        this.isChanged = true;
+        this.gridParams["startDate"] = moment(
+          res.selectedFilters.start_date
+        ).toLocaleString();
+        this.gridParams["endDate"] = moment(
+          res.selectedFilters.end_date
+        ).toLocaleString();
+        this.gridParams["selectedStatuses"] = res.selectedFilters.status;
+        this.gridParams["countryIds"] = res.selectedFilters.countryIds;
+        this.savedReportData = this.gridParams;
+        await this.getGridData();
+        this.filterCount =
+          res?.selectedFilters?.status?.length +
+          res?.selectedFilters?.countryIds?.length +
+          2;
+      }
+    });
+  }
+  async onGridReady(params: any) {
+    this.gridApi = params.api;
+    this.gridColumnApi = params.columnApi;
+    await this.getFiltersData();
+    await this.getViewsList();
+
+    if (this.gridApi) {
+      const datasource = this.ReportsService.getServerSideDatasource(
+        this.gridApi,
+        this.gridParams,
+        `${App.base_url}getReports`,
+        (listCount: number, totalCount: number, gridParams) => {
+          this.listCount = listCount;
+          this.totalCount = totalCount;
+          this.gridParams = gridParams;
+          const index = _.findIndex(this.viewsList, { view_id: this.viewMyId });
+          if (index > 0) {
+            this.savedViewValue = this.viewsList[index].view_id;
+          }
+        },
+        this.gridColumnApi,
+        this.viewsList,
+        this.viewMyId
+      );
+      params.api.setServerSideDatasource(datasource);
+    }
+  }
+  public listCount = 0;
+
+  public sortModel = [];
+  public rowModelType: any = "serverSide";
+  onSortChanged(ev) {
+    this.sortModel = ev.api.getSortModel();
+  }
+  public pageNumber = false;
+  loadMore(ev) {
+    this.gridParams.page = ev.page;
+    this.gridParams.perPage = ev.perPage;
+    const datasource = this.ReportsService.getServerSideDatasource(
+      this.gridApi,
+      this.gridParams,
+      `${App.base_url}getReports`,
+      (listCount: number, totalCount: number, gridParams) => {
+        this.listCount = listCount;
+        this.totalCount = totalCount;
+        this.gridParams = gridParams;
+      },
+      this.gridColumnApi,
+      this.viewsList,
+      this.viewMyId
+    );
+    this.gridApi.setServerSideDatasource(datasource);
+  }
+  async loadReportHeaders() {
+    try {
+      this.columnDefs = await this.ReportsService.getReportHeaders({
+        type: "invoices",
+      });
+      this.showGrid = true;
+    } catch (error) {
+      console.error("Error fetching report headers:", error);
+    }
+  }
+  getGridInfo() {
+    let data;
+    if (this.gridColumnApi != undefined) {
+      data = {
+        groupInfo: this.gridColumnApi.getRowGroupColumns(),
+        filterInfo: this.gridApi.getFilterModel(),
+        valColumnInfo: this.gridColumnApi.getValueColumns(),
+        allColumnsInfo: this.gridColumnApi.getAllColumns(),
+        pivoteMode: this.gridColumnApi.isPivotMode(),
+        allPivoteColumns: this.gridColumnApi.getPivotColumns(),
+        sortColumns: this.gridApi.getSortModel(),
+        // searchInfo: this.search.value,
+        columnState: this.gridColumnApi.getColumnState(), //this.gridApi.columnController.allDisplayedColumns
+      };
+    } else {
+      data = {
+        groupInfo: [],
+        filterInfo: [],
+        valColumnInfo: [],
+        allColumnsInfo: [],
+        pivoteMode: [],
+        allPivoteColumns: [],
+        sortColumns: [],
+        // searchInfo: this.search.value,
+        columnState: [], //this.gridApi.columnController.allDisplayedColumns
+      };
+    }
+    return data;
+  }
 }

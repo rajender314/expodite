@@ -18,6 +18,8 @@ export class SaveViewComponent implements OnInit {
   public usersList: any = [];
   public errMessage= '';
   public viewsList =[];
+  selectedUsers = new FormControl([]);
+
   constructor(
     private fb: FormBuilder,
     public dialog: MatDialog,
@@ -28,7 +30,6 @@ export class SaveViewComponent implements OnInit {
     private reportsService: ReportsService) { }
 
   ngOnInit() {
-    
     this.createForm();
     this.getUserList();
   }
@@ -36,7 +37,7 @@ export class SaveViewComponent implements OnInit {
     this.saveViewForm = this.fb.group({
       name: [null, [Validators.required]],
       share: ['0'],
-      shared_users: [null, [Validators.required]]
+      shared_users: [[], [Validators.required]]
     });
     this.saveViewForm.get('share').setValidators([Validators.required])
     this.saveViewForm.get('share').updateValueAndValidity();
@@ -78,6 +79,7 @@ export class SaveViewComponent implements OnInit {
   }
   public showMsg = false;
   saveForm() {
+    console.log(this.saveViewForm)
     this.inProcess = true;
     if(this.saveViewForm.value.share == '0') {
         this.saveViewForm.value.shared_users = _.map(this.usersList, 'user_id');
@@ -118,6 +120,17 @@ export class SaveViewComponent implements OnInit {
           this.errMessage = response.result.data.message;
         }
       })
+  }
+  getClientName(clientId: string, options): string {
+    const client = options.find((client) => client.user_id === clientId);
+    return client ? client.username : "";
+  }
+
+  removeClient(clientId: string, selectedList): void {
+    const selectedClients = selectedList.filter((id) => id !== clientId);
+    this.saveViewForm.patchValue({
+      shared_users: selectedClients
+    });
   }
   close() {
     this.dialogRef.close();

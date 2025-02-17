@@ -1,0 +1,42 @@
+<div class="order-inner-container">
+  <mat-toolbar class="package-toolbar">
+    <img [src]="images.newPaymentIcon" />
+    <span
+      >Payments
+      <span *ngIf="overpadiAmount > 0"
+        >(Excess Amount Paid :{{ overpadiAmount }})</span
+      >
+    </span>
+    <span fxFlex></span>
+    <div *ngIf="viewActivityLogIcon">
+      <button
+        mat-icon-button
+        class="action-orderbtn"
+        (click)="openActivityModal('commercial_invoice_add_payment')"
+      >
+        <img [src]="images.activity_log_icon" title="User Activity Tracker" />
+      </button>
+    </div>
+    <!-- *ngIf="!invoiceData?.commercial_invoice[0]?.is_totally_paid" -->
+    <div class="add-paid" *ngIf="adminService.rolePermissions.apply_payment == 1">
+      <span fxFlex></span>
+      <button mat-raised-button (click)="paidInvoice()">Apply Payment</button>
+    </div>
+  </mat-toolbar>
+  <!-- [class.minimize-div]="!showDiv" -->
+  <div>
+    <!-- [orders]="orders"
+      [selectOrder]="selectOrder"
+      [originFileAttachments]="originFileAttachments"
+      [selectPO]="selectPO"
+      (emitGridEvent)="triggerGridEvent($event)" -->
+    <app-ag-grid-view
+      [paymentsId]="invId"
+      (emitGridEvent)="triggerGridEvent($event)"
+      [tableName]="'payments'"
+      [newColumnAdded]="newColumnAdded"
+      (paidInvoice)="paidInvoice($event)"
+      [isEditable]="adminService.rolePermissions.edit_shipment == 1 ? true : false"
+    ></app-ag-grid-view>
+  </div>
+</div>

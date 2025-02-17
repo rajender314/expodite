@@ -1,125 +1,150 @@
-import { Component, OnInit, Input, OnChanges, SimpleChange, Output, EventEmitter,ViewChild, ElementRef } from '@angular/core';
-import { ActivatedRoute, Params } from '@angular/router';
-import { FormBuilder, FormGroup, FormControl, Validators, FormArray } from '@angular/forms';
-import { language } from '../../../language/language.module';
-import { ContainerDeleteComponent } from '../../../dialogs/container-delete/container-delete.component';
-import { Observable } from 'rxjs/Observable';
-import { Images } from '../../../images/images.module';
-import { VERSION } from '@angular/material/core';
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { MatSlideToggleModule, MatSlideToggleChange } from '@angular/material/slide-toggle';
-
-
-
-import * as _ from 'lodash';
-
-import { AdminService } from '../../../services/admin.service';
-import { SnakbarService } from '../../../services/snakbar.service';
-import { trigger,style,transition,animate,keyframes,query,stagger } from '@angular/animations';
-
+import {
+  Component,
+  OnInit,
+  Input,
+  OnChanges,
+  SimpleChange,
+  Output,
+  EventEmitter,
+  ViewChild,
+  ElementRef,
+} from "@angular/core";
+import {
+  FormBuilder,
+  FormGroup,
+  FormControl,
+  Validators,
+  FormArray,
+} from "@angular/forms";
+import { language } from "../../../language/language.module";
+import { ContainerDeleteComponent } from "../../../dialogs/container-delete/container-delete.component";
+import { Images } from "../../../images/images.module";
+import {
+  MatDialog,
+  MatDialogRef,
+  MAT_DIALOG_DATA,
+} from "@angular/material/dialog";
+import * as _ from "lodash";
+import { AdminService } from "../../../services/admin.service";
+import { SnakbarService } from "../../../services/snakbar.service";
+import {
+  trigger,
+  style,
+  transition,
+  animate,
+  keyframes,
+  query,
+  stagger,
+} from "@angular/animations";
+import { UtilsService } from "../../../services/utils.service";
+import { OrderActivityLogComponent } from "../../../orders-module/order-activity-log/order-activity-log.component";
+declare var App: any;
 @Component({
-  selector: 'app-category-details',
-  templateUrl: './category-details.component.html',
-  styleUrls: ['./category-details.component.scss'],
+  selector: "app-category-details",
+  templateUrl: "./category-details.component.html",
+  styleUrls: ["./category-details.component.scss"],
   providers: [AdminService, SnakbarService],
   animations: [
-      trigger('AdminDetailsAnimate', [
-          transition(':enter', [
-              style({ transform: 'scale(0.8)', opacity: 0 }),
-              animate('500ms cubic-bezier(0.35, 1, 0.25, 1)', style('*'))
-          ])
-      ])
-  ]
+    trigger("AdminDetailsAnimate", [
+      transition(":enter", [
+        style({ transform: "scale(0.8)", opacity: 0 }),
+        animate("500ms cubic-bezier(0.35, 1, 0.25, 1)", style("*")),
+      ]),
+    ]),
+  ],
 })
 export class CategoryDetailsComponent implements OnInit {
   @ViewChild("myInput") inputEl: ElementRef;
   @Input() category;
   @Output() trigger = new EventEmitter<object>();
+  @Input() isEditPerm;
 
   detailsForm: FormGroup;
   fetchingData: boolean;
-  deleteHide:boolean;
-  submitcategory:boolean;
-  noCategory= true;
+  deleteHide: boolean;
+  submitcategory: boolean;
+  noCategory = true;
   pointerEvent: boolean;
   selectedCategory: any;
   private language = language;
-  addCategory = "Add Category"
+  addCategory = "Add Category";
   private images = Images;
   status = [
-    { id: 1, value: 'Active', param: true },
-    { id: 0, value: 'Inactive', param: false }
-  ];  
+    { id: 1, value: "Active", param: true },
+    { id: 0, value: "Inactive", param: false },
+  ];
   public selectedtype;
-
+  undoOnCancel: boolean;
+  public viewActivityLogIcon: boolean = false;
   constructor(
     private fb: FormBuilder,
     private snackbar: SnakbarService,
     private adminService: AdminService,
     public dialog: MatDialog,
-  ) { }
+    private utilsService: UtilsService
+  ) {}
 
   ngOnChanges(changes: { [propKey: string]: SimpleChange }) {
+    let viewActivityLog: boolean;
+    console.log(changes);
     this.noCategory = false;
     this.fetchingData = true;
     setTimeout(() => {
       this.fetchingData = false;
     }, 300);
     if (this.category != undefined)
-    
-    if (!_.isEmpty(this.category)) {
-this.addCategory = "Update Category"
-      this.detailsForm.reset();
-      if (this.category.hasOwnProperty('flag')) {
-        this.noCategory = true;
-        this.deleteHide = true;
-        this.selectedCategory = {};
-      }
-      else{
-        this.deleteHide = false;
-        this.noCategory = false;
-        this.fetchingData = false;
-        this.selectedCategory = this.category;
-        this.setForm(this.category);
-        
-      } 
+      if (!_.isEmpty(this.category)) {
+        this.addCategory = "Update Category";
+        this.detailsForm.reset();
+        if (this.category.hasOwnProperty("flag")) {
+          this.noCategory = true;
+          this.deleteHide = true;
+          this.selectedCategory = {};
+        } else {
+          this.deleteHide = false;
+          this.noCategory = false;
+          this.fetchingData = false;
+          this.selectedCategory = this.category;
+        }
+      } else {
+        this.pointerEvent = false;
 
-    }
-    else {
-      this.pointerEvent = false;
-      
-      this.noCategory = false;
-      this.newContainer(true);
-    }
+        this.noCategory = false;
+        this.newContainer(true);
+      }
+    setTimeout(() => {
+      let admin_profile: boolean;
+      App.user_roles_permissions.map(function (val) {
+        if (val.code == "activity_log") {
+          if (val.selected) {
+            viewActivityLog = true;
+          } else {
+            viewActivityLog = false;
+          }
+        }
+      });
+      this.viewActivityLogIcon = viewActivityLog;
+    });
   }
 
   ngOnInit() {
-
     this.createForm();
-
   }
 
   newContainer(flag: boolean): void {
-    // console.log(232332)
     this.submitcategory = false;
     this.addCategory = "Add Category";
-    this.inputEl?.nativeElement.focus()
-    if (flag) 
-    // this.detailsForm.reset();
-      this.selectedCategory = {};
-      this.category = {};
-      this.fetchingData = false;
-      this.deleteHide = true;
-      // 
-      this.detailsForm.patchValue({
-        name:  "",
-        status:  true,
-        description: "",
-  
-      });
-      // this.detailsForm.value.name = ''
-      // this.selectedtype = this.status[0].param;
-
+    this.inputEl?.nativeElement.focus();
+    if (flag) this.selectedCategory = {};
+    this.category = {};
+    this.fetchingData = false;
+    this.deleteHide = true;
+    //
+    this.detailsForm.patchValue({
+      name: "",
+      status: true,
+      description: "",
+    });
   }
 
   setDirty(): void {
@@ -127,101 +152,80 @@ this.addCategory = "Update Category"
   }
   public noWhitespaceValidator(control: FormControl) {
     //console.log('fergrege');
-    let isWhitespace = (control.value || '').trim().length === 0;
+    let isWhitespace = (control.value || "").trim().length === 0;
     let isValid = !isWhitespace;
-    return isValid ? null : { 'whitespace': true };
-}
+    return isValid ? null : { whitespace: true };
+  }
   createForm(): void {
     this.detailsForm = this.fb.group({
-      name: [null, [Validators.required , this.noWhitespaceValidator]],
+      name: [null, [Validators.required, this.noWhitespaceValidator]],
       status: [null, Validators.required],
       description: [null],
-      id:""
+      id: "",
     });
-
-    // this.detailsForm.patchValue({
-     
-    //   status: true ,
-     
-
-    // });
   }
 
   cancel(form: any): void {
     this.submitcategory = false;
-    form.markAsPristine();
-    this.setForm(this.selectedCategory);
+    this.detailsForm.markAsPristine();
+    this.undoOnCancel = true;
+    setTimeout(() => {
+      this.undoOnCancel = false;
+    }, 1000);
   }
-
-  createShipment(form: any): void {
-   
-    // console.log("coming")
-    form.get('name').markAsTouched({ onlySelf: true });
-    form.get('status').markAsTouched({ onlySelf: true });
-    this.submitcategory = true;
-    // form.get('description').markAsTouched({ onlySelf: true });
+  public isUpdating = false;
+  createCategory(form: any): void {
     let toast: object;
-   
     if (!form.valid) return;
-   
-    let param = Object.assign({}, form.value);
-    param.id = this.selectedCategory.id || 0;
-    this.adminService
-      .addCategory(param)
-      .then(response => {
-        if (response.result.success) {
-          this.noCategory = false;
-          this.submitcategory = false;
-          form.markAsPristine();
-          if (param.id) toast = { msg: response.result.message, status: "success" };
-          else toast = { msg: response.result.message, status: "success" };
-          this.selectedCategory = response.result.data.categoriesDt[0];
-          this.trigger.emit({ flag: param.id, data: this.selectedCategory });
+    this.isUpdating = true;
+    setTimeout(() => {
+      let param = {
+        form_data: form.value.storeCustomAttributes[0],
+        id: this.selectedCategory.id || "",
+        moduleName: this.moduleName
+      };
+      this.utilsService.saveStoreAttribute(param).then((res) => {
+        this.isUpdating = false;
+        if (res.success) {
+          toast = {
+            msg: res.message,
+            status: "success",
+          };
+          this.snackbar.showSnackBar(toast);
+          this.trigger.emit({ flag: param.id, data: param.id ? this.selectedCategory :res.data.new_data});
+          this.detailsForm.markAsPristine();
         } else {
-          toast = { msg: response.result.message, status: "error" };
+          toast = {
+            msg: res.message ? res.message : "Failed to Update",
+            status: "error",
+          };
+          this.snackbar.showSnackBar(toast);
         }
-        this.snackbar.showSnackBar(toast);
-      })
-      .catch(error => console.log(error))
+      });
+    }, 500);
   }
-
-  deleteContainer(form: any): void {
-    let toast: object;
-    let dialogRef = this.dialog.open(ContainerDeleteComponent, {
-      panelClass: 'alert-dialog',
-      width: '500px',
-      // height: '240px',
-      data: this.detailsForm.value
-    });
-    dialogRef.afterClosed().subscribe(result => { 
-      if(result.success){
-    this.adminService
-      .deleteContainer({id:this.selectedCategory.id})
-      .then(response => {
-        if (response.result.success) {
-          form.markAsPristine();
-          if (this.selectedCategory.id) toast = { msg: response.result.message, status: "success" };
-          else toast = { msg: response.result.message, status: "success" };
-          this.trigger.emit({ flag: this.selectedCategory.id, delete: true, data: this.selectedCategory });
-        }
-        else {
-          toast = { msg: response.result.message, status: "error" };
-        }
-        this.snackbar.showSnackBar(toast);
-      })
-      .catch(error => console.log(error))
-    }
-  });
+  public moduleName = "";
+  formEmitEvent(ev) {
+    this.moduleName = ev.module;
+    this.detailsForm = ev.form;
+    if(this.isEditPerm) {
+      this.detailsForm.enable();
+      } else {
+        this.detailsForm.disable();
+      }
   }
-  
-  setForm(data: any): void {
-  //  console.log(data)
-    this.detailsForm.patchValue({
-      name: (data && data.name) ? data.name : "",
-      status:  (data) ? data.status : "",
-      description: (data && data.description) ? data.description : "",
-      id: (data && data.id) ? data.id : ""
-
+  openActivityModal(type): void {
+    const dialogRef = this.dialog.open(OrderActivityLogComponent, {
+      width: "50%", // Set the width to 50% of the viewport
+      height: "100%", // Set the height to 100% of the viewport
+      panelClass: "half-page-dialog", // Apply custom styling for the half-page modal
+      position: {
+        right: "0", // Align the modal to the right side of the viewport
+      },
+      data: {
+        module: type,
+        id: this.selectedCategory.id,
+      },
     });
   }
 }

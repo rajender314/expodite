@@ -1,0 +1,284 @@
+<mat-toolbar color="primary">
+  <div
+    class="inv-back"
+    (click)="backToImport()"
+    title="Back to Import"
+    *ngIf="headerLabel != 'Upload Files'"
+  >
+    <mat-icon class="back-to-orders">arrow_back</mat-icon>
+  </div>
+  <h2 mat-dialog-title [title]="headerLabel">{{ headerLabel }}</h2>
+  <span fxFlex></span>
+  <div class="dialog-close" title="Close">
+    <mat-icon matSuffix mat-dialog-close>close</mat-icon>
+  </div>
+</mat-toolbar>
+<mat-dialog-content class="import">
+  <mat-spinner
+    class="medium-spinner page-fixed"
+    *ngIf="fetchingData"
+  ></mat-spinner>
+  <div *ngIf="headerLabel == 'Upload Files'">
+    <form>
+      <div class="image-uploade" [class.not-allowed]="pointerEvent">
+        <div
+          ng2FileDrop
+          [ngClass]="{ 'file-over': hasDropZoneOver }"
+          [uploader]="uploader"
+          (fileOver)="fileOverBase($event)"
+          class="file-drop-zone"
+          (onFileDrop)="fileDrop($event)"
+        >
+          <p class="import-file-heading">Upload Import File</p>
+          <input
+            type="file"
+            id="import-category"
+            [uploader]="uploader"
+            ng2FileSelect
+            (change)="fileSelected($event.target.files)"
+            [hidden]="true"
+          />
+          <label for="import-category">
+            <!-- <span class="material-icons" >
+            photo_library 
+            </span> -->
+            <!-- <img [src]='images.dialogs.upload_icon' title="upload"> -->
+            <img src="signatures/assets/images/uploadicon.svg" title="upload" />
+            <p class="drag-drop">
+              Drag & drop files
+              <span style="text-transform: lowercase"
+                >{{ language.defaults.or }}
+              </span>
+              <span
+                class="primary-text-link"
+                style="
+                  font-weight: normal;
+                  padding: 0;
+                  text-decoration: underline;
+                "
+              >
+                {{ language.defaults.browse }}</span
+              >
+            </p>
+            <div *ngIf="selectedFile">
+              <p class="file-name">{{ selectedFile.name }}</p>
+              <p *ngIf="uploadFilestatus" class="upload-success">
+                File Uploaded
+              </p>
+            </div>
+
+            <small class="support-format"
+              >(Maximum file size is 10 MB Supported file formats : XLSX , XLS
+              )</small
+            >
+          </label>
+        </div>
+
+        <p *ngIf="errorMessage" class="error-msg m_3">{{ errorMessage }}</p>
+        <div *ngIf="isSample">
+          <a href="sampleDownload?type={{ type }}" download class="sample-file">
+            Sample File
+            <span>
+              <img
+                class="sample-img"
+                src="signatures/assets/images/sampleupload.svg"
+                title="sample"
+              />
+            </span>
+          </a>
+        </div>
+        <!-- <a [href]="getFileUrl()" download>Download File</a> -->
+      </div>
+    </form>
+  </div>
+  <div class="error-container">
+    <div class="error-msg" *ngIf="headerLabel != 'Upload Files'">
+      <div class="error-log-text" *ngIf="packingType != 'packing_list'">
+        <mat-icon mat-suffix color="warn">error</mat-icon
+        >{{ importErrorMessage }}
+      </div>
+    </div>
+    <div
+      *ngIf="
+        headerLabel != 'Upload Files' &&
+        errorType == 'headers_mismatch' &&
+        packingType != 'packing_list'
+      "
+    >
+      <div>
+        <p class="format-label">Sample Format</p>
+        <div class="overflow-table">
+          <table class="table error-list-table">
+            <thead style="display: flex">
+              <tr *ngFor="let header of sampleHeaders">
+                <th
+                  [ngClass]="header.missing ? 'error-mismatch' : 'error-name'"
+                >
+                  {{ header.name }}
+                </th>
+              </tr>
+            </thead>
+          </table>
+        </div>
+        <p class="format-label">Uploaded Format</p>
+        <div class="overflow-table">
+          <table class="table error-list-table">
+            <thead style="display: flex">
+              <tr *ngFor="let header of uploadedErrors">
+                <th
+                  [ngClass]="header.missing ? 'error-mismatch' : 'error-name'"
+                >
+                  {{ header.name }}
+                </th>
+              </tr>
+            </thead>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div
+      *ngIf="
+        headerLabel != 'Upload Files' &&
+        errorType == 'grid_list' &&
+        packingType != 'packing_list'
+      "
+    >
+      <table class="error-table">
+        <thead>
+          <tr>
+            <th *ngFor="let column of columnsData">{{ column.headerName }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of rowData" class="tr-class">
+            <td
+              *ngFor="let column of columnsData"
+              [ngClass]="{ 'number-css': isNumber(row[column.field]) }"
+            >
+              {{ row[column.field] }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div
+        *ngIf="cloneRowData.length > 5"
+        (click)="onViewMore()"
+        class="view-more"
+      >
+        {{ vieworeText }}
+      </div>
+    </div>
+
+    <div
+      *ngIf="
+        headerLabel != 'Upload Files' &&
+        errorType == 'list' &&
+        packingType != 'packing_list'
+      "
+    >
+      <div style="margin: 10px 20px">
+        <ul *ngFor="let header of listData">
+          <li class="list-error">{{ header }}</li>
+        </ul>
+      </div>
+      <div
+        *ngIf="cloneRowData.length > 5"
+        (click)="onViewMore()"
+        class="view-more"
+      >
+        {{ vieworeText }}
+      </div>
+    </div>
+  </div>
+  <!--new -->
+
+  <div class="error-container" *ngIf="dataAdded">
+    <div
+      *ngFor="let package of packageListErrors"
+      style="border-bottom: 1px solid rgb(189, 196, 204); padding-bottom: 20px"
+    >
+      <div>
+        <div>
+          <p class="header-label">{{ package.packing_type }}</p>
+        </div>
+        <div
+          class="packing-header"
+          style="display: grid; grid-template-columns: 1fr 1fr"
+        >
+          <div class="myrow">
+            <p class="packing-label">Height :</p>
+            <p class="packing-label-value">{{ package.height }}</p>
+          </div>
+          <div class="myrow">
+            <p class="packing-label">UOM :</p>
+            <p class="packing-label-value">{{ package.uom }}</p>
+          </div>
+          <div class="myrow">
+            <p class="packing-label">Width :</p>
+            <p class="packing-label-value">{{ package.width }}</p>
+          </div>
+          <div class="myrow">
+            <p class="packing-label">Tare Weight :</p>
+            <p class="packing-label-value">{{ package.weight }}</p>
+          </div>
+          <div class="myrow">
+            <p class="packing-label">Depth :</p>
+            <p class="packing-label-value">{{ package.depth }}</p>
+          </div>
+        </div>
+      </div>
+      <div style="padding-top: 14px">
+        <div class="packing-table">
+          <table style="width: 100%; position: relative" class="packing">
+            <thead class="table-header">
+              <tr>
+                <th>Product</th>
+                <th>Quantity</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                class="packing-class"
+                *ngFor="let product of package.prodData"
+              >
+                <ng-container>
+                  <td style="width: 55%" class="product-name">
+                    {{ product.name }}
+                  </td>
+                  <td class="product-name">
+                    {{ product.quantity }}
+                  </td>
+                </ng-container>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</mat-dialog-content>
+<mat-dialog-actions *ngIf="headerLabel == 'Upload Files'">
+  <span fxFlex></span>
+  <button  class="back-btn-ui" mat-dialog-close>Cancel</button>
+  <button
+    mat-raised-button
+    (click)="importFile()"
+    [disabled]="!selectedFile || disabledUpload"
+  >
+    Import
+  </button>
+  <!--<button *ngIf="!success" [disabled] = "disabledSave"   mat-raised-button mat-dialog-close color="warn" (click)="confirm()"></button>-->
+</mat-dialog-actions>
+<mat-dialog-actions *ngIf="dataAdded">
+  <span fxFlex></span>
+  <button  class="back-btn-ui" mat-dialog-close>Cancel</button>
+  <button
+    mat-raised-button
+    (click)="conformPackage()"
+    [disabled]="disbaleConform"
+  >
+    Confirm
+  </button>
+  <!--<button *ngIf="!success" [disabled] = "disabledSave"   mat-raised-button mat-dialog-close color="warn" (click)="confirm()"></button>-->
+</mat-dialog-actions>

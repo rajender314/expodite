@@ -1,0 +1,69 @@
+<div class="order-main-container">
+  <mat-toolbar>
+    <!-- <mat-icon class="info-icon">info</mat-icon>
+        <h2 style="margin-left: 5px">
+          Fill out the form below to cancel your E-Invoice
+        </h2> -->
+    <h2 mat-dialog-title>Cancel E-Invoice</h2>
+  </mat-toolbar>
+  <mat-dialog-content
+    style="align-content: center"
+    (scroll)="onWindowScroll($event)"
+  >
+    <form [formGroup]="detailsForm" style="padding: 0;">
+      <div class="cancel-invoice-text">
+        <mat-icon class="info-icon">info</mat-icon>
+        <h2 style="font-size: 14px;">
+          Fill out the form below to cancel your E-Invoice
+        </h2>
+      </div>
+      <div class="page-inner-container">
+        <mat-form-field
+          class="custom-input mandatory client"
+          floatLabel="never"
+          style="width: 100%"
+        >
+          <label class="custom-label" [class.mandatory]="true">Reason for Cancellation </label>
+          <mat-select formControlName="reasonsControl" required placeholder="Enter Reason for Cancellation">
+            <mat-option
+              *ngFor="let cancelReason of cancelReasons"
+              [value]="cancelReason.value"
+            >
+              {{ cancelReason.reason }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field
+          class="custom-input mandatory client"
+          floatLabel="never"
+          style="width: 100%"
+        >
+          <label class="custom-label" [class.mandatory]="true">Remarks </label>
+          <textarea
+            matInput
+            placeholder="Cancellation Remarks"
+            autofocus="off"
+            autocomplete="off"
+            formControlName="remarksControl"
+            required
+            style="height: 100px;"
+          ></textarea>
+        </mat-form-field>
+      </div>
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions style="justify-content: end">
+    <div class="cofirmOrderActionsBlock" style="justify-content: right">
+      <button  class="back-btn-ui" mat-dialog-close>Close</button>
+      <button
+        mat-raised-button
+        [disabled]="detailsForm.invalid"
+        (click)="cancelEinvoice(detailsForm)"
+      >
+        Cancel E-Invoice
+      </button>
+    </div>
+  </mat-dialog-actions>
+</div>

@@ -1,84 +1,233 @@
 <section class="hiden-stepper">
-	<mat-horizontal-stepper class="inv-stepper" #stepper>
-		<mat-step>
-			<div fxLayout="row">
-				<div class="center-section-scroll vh-100 d-flex secundory-menu">
-					<div class="flex-fixed-header menu-title">
-						<h1>{{language.defaults.inventory}} ({{totalCount}})</h1>  
-						<span class="add-link" *ngIf="addInventoryPermission" (click)="addInventory()">
-							<mat-icon>add</mat-icon>Add
-						</span>                          
-					</div>
-					<perfect-scrollbar class="p-l-8 p-r-8">
-						<div @inventoryAnimate *ngIf="!fetchingFiltersData">
-						<div class="custom-date-container filter-dates top-icon" > 
-							<div class="label">{{language.defaults.dateRange}}</div>
-							<div class="fxFlex custom-date-container inv-date">
-								<input class="datepicker" readonly [max]="toDate" (focus)="openCalendar(picker1)" (click)="openCalendar(picker1)" (dateChange)="datePickerChange()"
-								 [(ngModel)]="fromDate" [matDatepicker]="picker1" placeholder="{{language.defaults.fromDate}}">
-								<mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
-								<mat-datepicker #picker1 startView="year"></mat-datepicker>
-							</div>
-						</div>
-							<!-- <div class="fxFlex custom-date-container inv-date">
+  <mat-horizontal-stepper class="inv-stepper" #stepper>
+    <mat-step>
+      <div fxLayout="row">
+        <div class="center-section-scroll vh-100 d-flex secundory-menu">
+          <div class="flex-fixed-header menu-title">
+            <h1>{{ language.defaults.inventory }} ({{ totalCount }})</h1>
+            <!-- <span
+              class="add-link"
+              *ngIf="addInventoryPermission"
+              (click)="addInventory()"
+            >
+              <mat-icon>add</mat-icon>Add
+            </span> -->
+          </div>
+          <perfect-scrollbar class="p-l-8 p-r-8">
+            <div @inventoryAnimate >
+              <div class="custom-date-container filter-dates top-icon"  style="margin-bottom: 14px;">
+                <div class="font-600" style="color: #565656;padding-top: 12px;">Date Range</div>
+                <div class="fxFlex custom-date-container inv-date">
+                  <input
+                    class="datepicker"
+                    readonly
+                    [max]="toDate"
+                    (focus)="openCalendar(picker1)"
+                    (click)="openCalendar(picker1)"
+                    (dateChange)="datePickerChange()"
+                    [(ngModel)]="fromDate"
+                    [matDatepicker]="picker1"
+                    placeholder="Select Date Range"
+                  />
+                  <mat-datepicker-toggle
+                    matSuffix
+                    [for]="picker1"
+                  ></mat-datepicker-toggle>
+                  <mat-datepicker #picker1 startView="year"></mat-datepicker>
+                </div>
+              </div>
+              <!-- <div class="fxFlex custom-date-container inv-date">
 							<input class="datepicker" [min]="fromDate" (focus)="openCalendar(picker2)" (click)="openCalendar(picker2)" (dateChange)="datePickerChange()"
 							[(ngModel)]="toDate" [matDatepicker]="picker2" placeholder="{{language.defaults.toDate}}">
 							<mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
 							<mat-datepicker #picker2 startView="year"></mat-datepicker>
 						</div> -->
-							<mat-divider class="segment divider" style="margin-top: 10px;"></mat-divider>
-							<div class="fxFlex side-nav-section">
-								<div class="label">Category</div>
-								<mat-selection-list class="status-selection  filters-list">
-									<mat-list-option class="orders-list" [selected]="category.selected" (click)="productChange(category)" *ngFor="let category of categoryList">{{category.name}}</mat-list-option>
-								</mat-selection-list>
-								<mat-divider class="segment"></mat-divider>
-							</div>
-							<mat-divider class="segment divider "></mat-divider>
-							<div class="fxFlex side-nav-section">
-								<div class="label">Status</div>
-								<mat-selection-list class="status-selection  filters-list">
-									<mat-list-option class="orders-list" [selected]="status.selected" (click)="productChange(status)" *ngFor="let status of statusList">{{status.name}}</mat-list-option>
-								</mat-selection-list>
-								<mat-divider class="segment"></mat-divider>
-							</div>
-							<mat-divider class="segment divider "></mat-divider>
-							<div *ngIf="mergePermission"  style="margin-top: 12px; margin-bottom: 12px;" routerLink="/inventory/inventory/inventory-merge">
-								<span class="add-link" (click)="mergeInventory(stepper)">
-									<mat-icon>add</mat-icon>Merge Batches
-								</span>
-							</div>							
-						</div>
-					</perfect-scrollbar>
-					<div class="flex-fixed-footer"   *ngIf="showFilter">
-						<a class="secondarytextlink" (click)="clearInventory()">{{language.defaults.clear}}</a>
-						<span fxFlex></span>
-						<button mat-raised-button class="app-white-btn" (click)="filterInventory()">Apply Filter</button>						
-					</div>
-				</div>
-			
-				
+              <div class="fxFlex side-nav-section">
+                <!-- <div class="label">Category</div>
+                <mat-selection-list class="status-selection filters-list">
+                  <mat-list-option
+                    class="orders-list"
+                    [selected]="category.selected"
+                    (click)="productChange(category)"
+                    *ngFor="let category of categoryList"
+                    >{{ category.name }}</mat-list-option
+                  >
+                </mat-selection-list>
+                <mat-divider class="segment"></mat-divider> -->
 
-				<!-- Inventory List view -->
-                <div class="center-section-scroll vh-100 d-flex  body-color">
-                    <div class="page-header-ui">
-                        <div class="flex-fixed-header page-title container-ui">
-                            <div class="d-flex">
-                                <div class="search-ui" >
-                                    <input matInput placeholder=""
-									#search (keyup)="searchBatches(search.value, $event)"
-                                        placeholder="Search"
-                                        (blur)="!search.value.length ? open = false : open = true">
-                                    <mat-icon matPrefix (click)="open = !open" class="org-search">search</mat-icon>
-                                    <mat-icon matSuffix *ngIf="searching" class="spinner">
-                                        <mat-spinner class="small-spinner"></mat-spinner>
-                                    </mat-icon>
-                                    <mat-icon class="search-info" *ngIf="!search.value.length" matTooltip="Search with Batch Number...">info</mat-icon>
-									<mat-icon class="search-close" matSuffix   *ngIf="!searching && search.value.length" 
-									(click)="search.value = '';searchBatches(search.value)">close</mat-icon>
-								</div>
+                <mat-form-field
+                class="custom-input custom-client"
+                floatLabel="never"
+                style="width: 100%; margin-top: 20px"
+              >
+                <label class="custom-label font-600">Category</label>
+                <mat-select
+                  panelClass="myPanelClass"
+                  class="chips-select"
+                  placeholder="Select Category"
+                  (selectionChange)="clientChange()"
+                  [formControl]="orders.slectedCatogory"
+                  multiple
+                >
+                  <mat-select-trigger>
+                    <mat-chip-list
+                      *ngIf="orders.slectedCatogory.value?.length"
+                    >
+                      <mat-chip
+                        *ngFor="let prodId of orders.slectedCatogory.value"
+                        [removable]="true"
+                        (removed)="
+                          removeClient(prodId, orders.slectedCatogory)
+                        "
+                      >
+                        {{ getClientName(prodId, categoryList) }}
+                        <mat-icon matChipRemove>cancel</mat-icon>
+                      </mat-chip>
+                    </mat-chip-list>
+                  </mat-select-trigger>
+                  <mat-option
+                    (click)="checkboxChange(status)"
+                    [value]="status.id"
+                    class="orders-list"
+                    *ngFor="let status of categoryList"
+                  >
+                    {{ status.name }}</mat-option
+                  >
+                </mat-select>
+              </mat-form-field>
+              </div>
+              <div class="fxFlex side-nav-section">
+                <!-- <div class="label">Category</div>
+                <mat-selection-list class="status-selection filters-list">
+                  <mat-list-option
+                    class="orders-list"
+                    [selected]="category.selected"
+                    (click)="productChange(category)"
+                    *ngFor="let category of categoryList"
+                    >{{ category.name }}</mat-list-option
+                  >
+                </mat-selection-list>
+                <mat-divider class="segment"></mat-divider> -->
 
-								<!-- <mat-form-field class="search" floatLabel="never">
+                <mat-form-field
+                class="custom-input custom-client"
+                floatLabel="never"
+                style="width: 100%; margin-top: 20px"
+              >
+                <label class="custom-label font-600">Status</label>
+                <mat-select
+                  panelClass="myPanelClass"
+                  class="chips-select"
+                  placeholder="Select Status"
+                  (selectionChange)="clientChange()"
+                  [formControl]="orders.slectedStatus"
+                  multiple
+                >
+                  <mat-select-trigger>
+                    <mat-chip-list
+                      *ngIf="orders.slectedStatus.value?.length"
+                    >
+                      <mat-chip
+                        *ngFor="let prodId of orders.slectedStatus.value"
+                        [removable]="true"
+                        (removed)="
+                          removeClient(prodId, orders.slectedStatus)
+                        "
+                      >
+                        {{ getClientName(prodId, statusList) }}
+                        <mat-icon matChipRemove>cancel</mat-icon>
+                      </mat-chip>
+                    </mat-chip-list>
+                  </mat-select-trigger>
+                  <mat-option
+                    (click)="checkboxChange(status)"
+                    [value]="status.id"
+                    class="orders-list"
+                    *ngFor="let status of statusList"
+                  >
+                    {{ status.name }}</mat-option
+                  >
+                </mat-select>
+              </mat-form-field>
+              </div>
+              <!-- <div class="fxFlex side-nav-section">
+                <div class="label">Status</div>
+                <mat-selection-list class="status-selection filters-list">
+                  <mat-list-option
+                    class="orders-list"
+                    [selected]="status.selected"
+                    (click)="productChange(status)"
+                    *ngFor="let status of statusList"
+                    >{{ status.name }}</mat-list-option
+                  >
+                </mat-selection-list>
+              </div>
+              <div
+                *ngIf="mergePermission"
+                style="margin-top: 12px; margin-bottom: 12px"
+                routerLink="/inventory/inventory/inventory-merge"
+              >
+                <span class="add-link" (click)="mergeInventory(stepper)">
+                  <mat-icon>add</mat-icon>Merge Batches
+                </span>
+              </div> -->
+            </div>
+          </perfect-scrollbar>
+          <div class="flex-fixed-footer" *ngIf="showFilter">
+            <!-- <a class="secondarytextlink" (click)="clearInventory()">{{
+              language.defaults.clear
+            }}</a> -->
+            <button
+            class="secondarytextlink"
+             class="back-btn-ui"
+            (click)="clearInventory()"
+          >
+            {{ language.defaults.clear }}
+          </button>
+            <span fxFlex></span>
+            <button
+              mat-raised-button
+              class="app-white-btn"
+              (click)="filterInventory()"
+            >
+              Apply Filter
+            </button>
+          </div>
+        </div>
+
+        <!-- Inventory List view -->
+        <div class="center-section-scroll vh-100 d-flex body-color">
+          <div class="page-header-ui">
+            <div class="flex-fixed-header page-title container-ui">
+              <div class="d-flex">
+                <div class="search-ui">
+                  <input
+                    matInput
+                    placeholder=""
+                    #search
+                    (input)="searchBatches(search.value, $event)"
+                    placeholder="Search By Batch Number"
+                    (blur)="
+                      !search.value.length ? (open = false) : (open = true)
+                    "
+                  />
+                  <mat-icon matPrefix (click)="open = !open" class="org-search"
+                    >search</mat-icon
+                  >
+                  <mat-icon matSuffix *ngIf="searching" class="spinner">
+                    <mat-spinner class="small-spinner"></mat-spinner>
+                  </mat-icon>
+                  <!-- <mat-icon class="search-info" *ngIf="!search.value.length" matTooltip="Search with Batch Number...">info</mat-icon> -->
+                  <mat-icon
+                    class="search-close"
+                    matSuffix
+                    *ngIf="!searching && search.value.length"
+                    (click)="search.value = ''; searchBatches(search.value)"
+                    >close</mat-icon
+                  >
+                </div>
+
+                <!-- <mat-form-field class="search" floatLabel="never">
 									<input matInput placeholder="Search with Batch Number..." #search (keyup)="searchBatches(search.value, $event)" (blur)="!search.value.length ? open = false : open = true">
 									<mat-icon (dateChange)="datePickerChange()" matPrefix (click)="open = !open" class="org-search">search</mat-icon>
 									<mat-icon matSuffix *ngIf="searching" class="spinner">
@@ -86,16 +235,24 @@
 									</mat-icon>
 									<mat-icon matSuffix *ngIf="!searching && search.value.length" (click)="search.value = '';searchBatches(search.value)">close</mat-icon>
 								</mat-form-field> -->
-                            </div>  
-                            <div class="d-flex">
-                                
-                            </div>
-                        </div>
-                    </div>
-                    <perfect-scrollbar>
-
-						<div class="list-view-table p-b-16 customized-table-list">
-							<!-- <div class="table-header-ui top-sticky z-index-8" style="top: 16px">
+              </div>
+              <div class="d-flex">
+                <button
+                  mat-raised-button
+                  color="warn"
+                  *ngIf="addInventoryPermission && adminService.rolePermissions.add_inventory == 1"
+                  (click)="addInventory()"
+                  class="create-order-btn"
+                >
+                  Add Batch
+                </button>
+              </div>
+              <!-- <div class="d-flex"></div> -->
+            </div>
+          </div>
+          <perfect-scrollbar>
+            <div class="list-view-table p-b-16 customized-table-list">
+              <!-- <div class="table-header-ui top-sticky z-index-8" style="top: 16px">
                                 <div class="container-ui" >
                                     <mat-list-item class="order-list-row mat-list-item header-cleint">
                                         <div class="item-container   p-l-12"  fxFlex="40"> Batch Number</div>
@@ -107,123 +264,227 @@
                                     </mat-list-item>
                                 </div>                              
 							</div> -->
-							<div fxLayout="column" class="container-ui"   > 
-								<div class="table-view-for-list">
-									<mat-table *ngIf="totalCount" #table [dataSource]="batchList">
-										<ng-container matColumnDef="name">
-											<mat-header-cell *matHeaderCellDef fxFlex="30"> Batch Number</mat-header-cell>
-											<mat-cell *matCellDef="let Inventory" fxFlex="30"  >
-												<div class="d-flex align-items-center avatar-cell o-hidden w-100 ">
-													<div class="icon-sec">
-														<img [src]='images.batchIcon_o' title="Inventory">
-													</div>
-													<div class="content-sec o-hidden ellipsis-text ">
-														<div class="d-flex" style="display: flex; -webkit-box-align: center; align-items: center; color: rgb(145, 158, 171); overflow: hidden;">
-														<div style=" max-width: calc(100% - 20px); overflow: hidden; text-overflow: ellipsis;">
-															<h1 class="ellipsis-text" title="{{Inventory.batch_nbr}}">{{Inventory.batch_nbr}} </h1></div>
-															<span style=" position: relative; display: inline-block; height: 18px; width: 18px; ">
-																<mat-icon style="color: #FF4842;font-size: 16px;width: 16px;height: 16px;position: absolute;top: -1px;" *ngIf="Inventory.spcl_inst_flag" class="flag-inventory" title="{{Inventory.special_instructions}}">flag</mat-icon>
-															</span>
-														
-													</div>
-														<small class="ellipsis-text" title="{{Inventory.category_name}}">{{Inventory.category_name}}</small>
-														<p>
-																<small class="ellipsis-text" title="{{Inventory.product_name}}">{{Inventory.product_name}}</small>
-														</p>
+              <div fxLayout="column" class="container-ui">
+                <div class="table-view-for-list">
+                  <mat-table
+                    *ngIf="totalCount"
+                    #table
+                    [dataSource]="formBuilderBatchList"
+                  >
+                    <ng-container matColumnDef="name">
+                      <mat-header-cell *matHeaderCellDef fxFlex="30">
+                        Batch Number</mat-header-cell
+                      >
+                      <mat-cell *matCellDef="let Inventory" fxFlex="30">
+                        <div
+                          class="d-flex align-items-center avatar-cell o-hidden w-100"
+                        >
+                          <div class="icon-sec">
+                            <img [src]="images.batchIcon_o" title="Inventory" />
+                          </div>
+                          <div class="content-sec o-hidden ellipsis-text">
+                            <div
+                              class="d-flex"
+                              style="
+                                display: flex;
+                                -webkit-box-align: center;
+                                align-items: center;
+                                color: rgb(145, 158, 171);
+                                overflow: hidden;
+                              "
+                            >
+                              <div
+                                style="
+                                  max-width: calc(100% - 20px);
+                                  overflow: hidden;
+                                  text-overflow: ellipsis;
+                                "
+                              >
+                                <h1
+                                  class="ellipsis-text"
+                                  title="{{ Inventory.batch_number }}"
+                                >
+                                  {{ Inventory.batch_number }}
+                                </h1>
+                              </div>
+                              <span
+                                style="
+                                  position: relative;
+                                  display: inline-block;
+                                  height: 18px;
+                                  width: 18px;
+                                "
+                              >
+                                <mat-icon
+                                  style="
+                                    color: #ff4842;
+                                    font-size: 16px;
+                                    width: 16px;
+                                    height: 16px;
+                                    position: absolute;
+                                    top: -1px;
+                                  "
+                                  *ngIf="Inventory.spcl_inst_flag"
+                                  class="flag-inventory"
+                                  title="{{ Inventory.special_instructions }}"
+                                  >flag</mat-icon
+                                >
+                              </span>
+                            </div>
+                            <small
+                              class="ellipsis-text"
+                              title="{{ Inventory.category_name }}"
+                              >{{ Inventory.category_name }}</small
+                            >
+                            <p>
+                              <small
+                                class="ellipsis-text"
+                                title="{{ Inventory.product_name }}"
+                                >{{ Inventory.product_name }}</small
+                              >
+                            </p>
+                          </div>
+                        </div>
+                      </mat-cell>
+                    </ng-container>
 
-														
-													</div>
+                    <ng-container matColumnDef="mfd_date">
+                      <mat-header-cell *matHeaderCellDef fxFlex="15">
+                        mfg. date</mat-header-cell
+                      >
+                      <mat-cell
+                        class="secound-cell"
+                        *matCellDef="let Inventory"
+                        fxFlex="15"
+                        >{{
+                          Inventory.manufacturing_date | date : "MMM dd, yyyy"
+                        }}</mat-cell
+                      >
+                    </ng-container>
 
-												</div>
-												
-											</mat-cell>
-										</ng-container>
-	
-										<ng-container matColumnDef="mfd_date">
-											<mat-header-cell *matHeaderCellDef fxFlex="15"> mfg. date</mat-header-cell>
-											<mat-cell class="secound-cell" *matCellDef="let Inventory" fxFlex="15">{{Inventory.mfd_date | date: 'MMM yyyy'}}</mat-cell>
-										</ng-container>
-	
-										<ng-container matColumnDef="exp_date">
-											<mat-header-cell *matHeaderCellDef fxFlex="15"> exp. date </mat-header-cell>
-											<mat-cell class="secound-cell" *matCellDef="let Inventory" fxFlex="15">{{Inventory.exp_date | date: 'MMM yyyy'}}</mat-cell>
-										</ng-container>
-	
-										<ng-container matColumnDef="tot_qty">
-											<mat-header-cell class="text-right" fxFlex="20" *matHeaderCellDef>Quantity</mat-header-cell>
-											<mat-cell class="text-right" *matCellDef="let Inventory" fxFlex="20"> {{Inventory.remain_quan+"/"+Inventory.tot_qty}} {{Inventory.uom_name}}
-	
-											</mat-cell>
-										</ng-container>
-	
-										<ng-container matColumnDef="status_name" >
-											<mat-header-cell *matHeaderCellDef fxFlex="20">Status</mat-header-cell>
-											<mat-cell *matCellDef="let Inventory" fxFlex="20" class=" status-cell status-tag-container">
-												<div class="client-status" [ngClass]="{'active':Inventory.status_name == 'Active','merged':Inventory.status_name == 'Merged','cancelled':Inventory.status_name == 'Exhausted','inactive':Inventory.status_name == 'Inactive'}">{{Inventory.status_name}}</div>
-												<span fxFlex></span>
-												<mat-icon class="go-to-details arrow-right">keyboard_arrow_right</mat-icon>
-											</mat-cell>
-										</ng-container>
-										
-										<mat-header-row class="table-row" *matHeaderRowDef="displayedColumns"></mat-header-row>
-										<mat-row (click)="getInventoryDetails(stepper, row)" *matRowDef="let row; columns: displayedColumns;"></mat-row>
-									
-									</mat-table>
-								</div>
-								
-								<!-- <mat-paginator #paginator [length]="5"
+                    <ng-container matColumnDef="exp_date">
+                      <mat-header-cell *matHeaderCellDef fxFlex="15">
+                        exp. date
+                      </mat-header-cell>
+                      <mat-cell
+                        class="secound-cell"
+                        *matCellDef="let Inventory"
+                        fxFlex="15"
+                        >{{
+                          Inventory.expiry_date | date : "MMM dd, yyyy"
+                        }}</mat-cell
+                      >
+                    </ng-container>
+
+                    <ng-container matColumnDef="tot_qty">
+                      <mat-header-cell
+                        class="text-right"
+                        fxFlex="20"
+                        *matHeaderCellDef
+                        >Quantity</mat-header-cell
+                      >
+                      <mat-cell
+                        class="text-right"
+                        *matCellDef="let Inventory"
+                        fxFlex="20"
+                      >
+                        <!-- {{ Inventory.remain_quan + "/" + Inventory.tot_qty }} -->
+                        {{ Inventory.quantity }} /
+
+                        {{ Inventory.uom_name }}
+                      </mat-cell>
+                    </ng-container>
+
+                    <ng-container matColumnDef="status_name">
+                      <mat-header-cell *matHeaderCellDef fxFlex="20"
+                        >Status</mat-header-cell
+                      >
+                      <mat-cell
+                        *matCellDef="let Inventory"
+                        fxFlex="20"
+                        class="status-cell status-tag-container"
+                      >
+                        <div
+                          class="client-status"
+                          [ngClass]="{
+                            active: Inventory.status == 'Active',
+                            merged: Inventory.status == 'Merged',
+                            cancelled: Inventory.status == 'Exhausted',
+                            inactive: Inventory.status == 'Inactive'
+                          }"
+                        >
+                          {{ Inventory.status }}
+                        </div>
+                        <span fxFlex></span>
+                        <mat-icon class="go-to-details arrow-right"
+                          >keyboard_arrow_right</mat-icon
+                        >
+                      </mat-cell>
+                    </ng-container>
+
+                    <mat-header-row
+                      class="table-row"
+                      *matHeaderRowDef="displayedColumns"
+                    ></mat-header-row>
+                    <mat-row
+                      (click)="getInventoryDetails(stepper, row)"
+                      *matRowDef="let row; columns: displayedColumns"
+                    ></mat-row>
+                  </mat-table>
+                </div>
+
+                <!-- <mat-paginator #paginator [length]="5"
 								[pageSize]="5"
 								[pageSizeOptions]="[5, 10, 20]"
 								showFirstLastButtons>
 							  </mat-paginator> -->
-								   <!-- <mat-spinner class="medium-spinner" *ngIf="fetchingData"></mat-spinner> -->
-							</div>
-							<div  class="container-ui new-center-empty-ui" *ngIf="(totalCount == 0 && !searching)">
+                <!-- <mat-spinner class="medium-spinner" *ngIf="fetchingData"></mat-spinner> -->
+              </div>
+              <div
+                class="container-ui new-center-empty-ui"
+                *ngIf="totalCount == 0 && !searching"
+              >
+                <mat-card class="no-results">
+                  <div class="empty-img-holder">
+                    <img [src]="images.batchIcon_o" />
+                  </div>
+                  <p class="no-result-text">No Batches Found</p>
+                </mat-card>
+              </div>
 
-                           
-								<mat-card class="no-results"  >
-									<div class="empty-img-holder"><img [src]='images.batchIcon_o'></div>
-									<p class="no-result-text">No Batches Found</p>
-								</mat-card>
-							</div>
-						
-						 
+              <!-- <app-pagination *ngIf="totalCount!=0" [pageLimit]="totalCount" (pageloadMore)="loadMore($event)"></app-pagination> -->
+            </div>
 
-							
-							<!-- <app-pagination *ngIf="totalCount!=0" [pageLimit]="totalCount" (pageloadMore)="loadMore($event)"></app-pagination> -->
+            <mat-spinner
+              class="medium-spinner"
+              *ngIf="fetchingData"
+            ></mat-spinner>
+            <!-- *ngIf="fetchingData" -->
+          </perfect-scrollbar>
+          <div class="pagination-footer" *ngIf="totalCount != 0">
+            <div class="container-ui d-flex space-between align-items-center">
+              <div>
+                <p>Showing {{ listCount }} out of {{ totalCount }}</p>
+              </div>
+              <div>
+                <app-pagination
+                  [pageLimit]="totalCount"
+                  (pageloadMore)="loadMore($event)"
+                ></app-pagination>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-step>
 
-						</div>
-
-						<mat-spinner class="medium-spinner" *ngIf="fetchingData" ></mat-spinner>
-						<!-- *ngIf="fetchingData" -->
-					</perfect-scrollbar>
-					<div class=" pagination-footer" *ngIf="totalCount!=0">
-							<div class="container-ui d-flex space-between  align-items-center ">
-									<div><p>Showing {{listCount}} out of {{totalCount}}</p></div>
-									<div>
-										<app-pagination [pageLimit]="totalCount" (pageloadMore)="loadMore($event)"></app-pagination>
-									</div>
-							</div>
-	
-						   
-						</div>
-					
-                </div>
-
-			</div>
-
-		</mat-step>
-
-		
-		<!-- Start Merge Inventory -->
-		<!-- <mat-step>
+    <!-- Start Merge Inventory -->
+    <!-- <mat-step>
 			<app-inventory-merge [categories]="categoryList" (back)="goBack(stepper, 0)" (addBatch)="addBatch($event)"></app-inventory-merge>
 		</mat-step> -->
 
-		<!-- End Merge Inventory -->
+    <!-- End Merge Inventory -->
+  </mat-horizontal-stepper>
 
-	</mat-horizontal-stepper>
-
-	<!--</div>-->
-
+  <!--</div>-->
 </section>

@@ -1,9 +1,10 @@
 <mat-toolbar>
-	<h2 mat-dialog-title></h2>
-	<span fxFlex>{{(data.address.id)?"Edit Address":"Add Address"}}</span>
+  <h2 mat-dialog-title>
+    {{ data.address.id ? "Edit Address" : "Add Address" }}
+  </h2>
 </mat-toolbar>
 <mat-dialog-content>
-	<!-- <mat-selection-list class="selection-address">
+  <!-- <mat-selection-list class="selection-address">
 			<mat-list-option *ngFor="let address of clientAddress; let i =index;"
 			selected="{{address.selected ? true:false}}"  
 							checkboxPosition = 'before'
@@ -14,104 +15,82 @@
 				<p>Address {{i+1}}</p>
 			</mat-list-option>
 		</mat-selection-list> -->
-	<form [formGroup]="addressForm" class="">
-		<div class="ex-row"> 
-		 
-			<mat-form-field class="custom-input mandatory  grid-full" floatLabel="never">
-				<label class="custom-label mandatory">{{language.defaults.addressType}}</label>
-				<mat-select placeholder="Select {{language.defaults.addressType}}" formControlName="address_type_id" [disabled]="(data.address.id) ? true : false">
-					<mat-option *ngFor="let addre of address_type" [value]="addre.id">{{addre.name}}</mat-option>
-				</mat-select>
-				<mat-error *ngIf="addressForm.controls.address_type_id.hasError('required')">Please select Address Type</mat-error>
-			</mat-form-field>
-		 
-			
-	 
-			<mat-form-field class="custom-input grid-full " floatLabel="never">
-				<label class="custom-label">{{language.defaults.companyName}}</label>
-				<input matInput maxlength="150" placeholder="Enter {{language.defaults.companyName}}" formControlName="company_name">
-				
-			</mat-form-field>
-		
-			
-			<mat-form-field class="custom-input mandatory grid-full " floatLabel="never">
-				<label class="custom-label mandatory">Address 1</label>
-				<input matInput maxlength="150" placeholder="Enter Address 1" formControlName="address1">
-				<mat-error *ngIf="addressForm.controls.address1.hasError('required') || addressForm.controls.address1.hasError('whitespace')">{{language.validations.address1}}</mat-error>
-			</mat-form-field>
-			<mat-form-field class="custom-input grid-full " floatLabel="never">
-				<label class="custom-label">{{language.defaults.address2}}</label>
-				<input matInput maxlength="150" placeholder="Enter Address 2" formControlName="address2">
-				<!-- <mat-error *ngIf="addressForm.controls.address2.hasError('required') || addressForm.controls.address2.hasError('whitespace')">{{language.validations.address2}}</mat-error> -->
-			</mat-form-field>
-	
-		
-		
-		
-		
-		
-		
-		<mat-form-field class="custom-input mandatory  grid-full" floatLabel="never">
-			<label class="custom-label mandatory">Country</label>
-			<mat-select placeholder={{language.defaults.selectCountry}} (selectionChange)="onCountryChange($event)" formControlName="country_id">
-				<mat-option>Add Country</mat-option>
-				<mat-option *ngFor="let country of countries" [value]="country.id">{{country.name}}</mat-option>
-			</mat-select>
-			<mat-error *ngIf="addressForm.controls.country_id.hasError('required')">Please select country</mat-error>
-		</mat-form-field>
+  <!-- <div style="margin-top: 8px; display: flex; justify-content: space-between">
+    <div>
+      <mat-checkbox
+        *ngIf="data.sameAsShipping"
+        color="primary"
+        [(ngModel)]="sameAsShipping"
+      >
+        Same as Shipping Address</mat-checkbox
+      >
+    </div>
+    <div>
+      <mat-checkbox color="primary" [(ngModel)]="sameAsBilling">
+        Same as Billing Address</mat-checkbox
+      >
+    </div>
+  </div> -->
 
-		<div class="add-new-address d-flex align-items-center grid-full" *ngIf="submitCountry">
-			<mat-form-field fxFlex="60" class="custom-input mandatory" floatLabel="never">
-				<label class="custom-label">Add Country</label>
-				<input matInput placeholder="Add Country" maxlength=10 placeholder="Add Country" formControlName="addCountry">
-				<!-- <mat-error *ngIf="addressForm.controls.addCountry.hasError('required')">Please enter country</mat-error> -->
-			</mat-form-field>
-			<span class="add-new primary-text-link " (click)="addCountry(addressForm)" style=" padding: 10px ;  position: relative;
-			left: 10px;    top: 5px; ">Add Country</span>
+  <div
+    style="margin-top: 8px"
+    *ngIf="data.sameAsShipping || data.sameAsBilling"
+  >
+    <mat-radio-group
+      style="width: 100%; display: flex; gap: 84px"
+      [(ngModel)]="selectedAddress"
+      aria-label="Select Address"
+    >
+      <div>
+        <mat-radio-button
+          color="primary"
+          [value]="'shipping'"
+          [disabled]="!data.sameAsShipping"
+        >
+          Same as Shipping Address
+        </mat-radio-button>
+      </div>
+      <div>
+        <mat-radio-button
+          color="primary"
+          [value]="'billing'"
+          [disabled]="!data.sameAsBilling"
+        >
+          Same as Billing Address
+        </mat-radio-button>
+      </div>
+    </mat-radio-group>
+  </div>
 
-		</div>
-
-		<mat-form-field class="custom-input mandatory grid-full" floatLabel="never">
-			<label class="custom-label mandatory">State</label>
-			<mat-select placeholder={{language.defaults.selectState}} (selectionChange)="onStateChange()" formControlName="state_province_id">
-				<mat-option [value]="">No State</mat-option>
-				<mat-option *ngFor="let state of states" [value]="state.id">{{state.name}}</mat-option>
-			</mat-select>
-			<mat-error *ngIf="addressForm.controls.state_province_id.hasError('required')">Please select State</mat-error>
-
-		</mat-form-field>
-
-		<div class="add-new-address d-flex align-items-center grid-full" *ngIf="!addressForm.get('state_province_id').value && submitState">
-			<mat-form-field fxFlex="60" class="custom-input mandatory" floatLabel="never">
-				<label class="custom-label">Add State</label>
-				<input matInput maxlength=50 placeholder="Add State" formControlName="addState">
-			</mat-form-field>
-			<span class="add-new primary-text-link " (click)="addState(addressForm)" style=" padding: 10px ;  position: relative;
-			left: 10px;    top: 5px; " >Add State</span>
-			<!-- <span class="add-new" (click)="addState(addressForm)">Please add State</span> -->
-		
-		</div>
- 
-
-
-		<mat-form-field class="custom-input mandatory grid-six" floatLabel="never">
-			<label class="custom-label mandatory">{{language.defaults.city}}</label>
-			<input matInput maxlength="150" placeholder='Enter City' formControlName="city">
-			<mat-error *ngIf="addressForm.controls.city.hasError('required') || addressForm.controls.city.hasError('whitespace')">{{language.validations.city}}</mat-error>
-		</mat-form-field>
-		
-		
-		<mat-form-field class="custom-input mandatory grid-six" floatLabel="never">
-			<label class="custom-label mandatory">Postal Code</label>
-			<input matInput maxlength="20" placeholder="Enter Postal Code" formControlName="postal_code">
-			<mat-error *ngIf="addressForm.controls.postal_code.hasError('required') || addressForm.controls.postal_code.hasError('whitespace') ">Please enter postal code</mat-error>
-		</mat-form-field>
-	</div>
-	</form>
+  <form>
+    <app-form-builder
+      [module]="data.module ? data.module : 'add_address'"
+      (trigger)="formEmitEvent($event)"
+      (emitUploadInfo)="emitUploadInfo($event)"
+      [Contacts]="data.id"
+      [address_form_id]="data.prefill_id ? data.prefill_id : ''"
+      [AddressInfo]="{
+        shipping: data.sameAsShipping,
+        billing: data.sameAsBilling
+      }"
+      [selectedAddress]="selectedAddress"
+      [editTypeForRestrict]="data.type === 'edit' ? true : false"
+      [isAddress]="true"
+      [related_to_id]="data.org_id ? data.org_id : ''"
+    ></app-form-builder>
+  </form>
 </mat-dialog-content>
 <mat-spinner class="medium-spinner" *ngIf="showSpinner"></mat-spinner>
 <mat-dialog-actions>
-	<span fxFlex></span>
-	<button mat-button mat-dialog-close>{{language.defaults.cancel}}</button>
-	<button mat-raised-button (click)="addAddress(addressForm)" [disabled] = "disabledSave || !addressForm.dirty">{{newAddress}}</button>
+  <span fxFlex></span>
+  <button class="back-btn-ui" mat-dialog-close>
+    {{ language.defaults.cancel }}
+  </button>
+  <button
+    mat-raised-button
+    (click)="addAddress(addressForm)"
+    [disabled]="disabledSave || !addressForm || addressForm?.invalid"
+  >
+    {{ newAddress }}
+  </button>
 </mat-dialog-actions>

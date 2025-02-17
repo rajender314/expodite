@@ -1,0 +1,434 @@
+<!-- <div class="center-section-scroll vh-100 d-flex body-white">
+  <div class="page-header-ui" *ngIf="!noContacts">
+    <div class="flex-fixed-header page-title">
+      <div>
+        <h2
+          class="admin-heading"
+          title="{{
+            selectedContacts.customs_office_name
+              ? selectedContacts.customs_office_name
+              : 'Add Customs Address'
+          }}"
+          *ngIf="selectedContacts"
+          [innerHtml]="
+            selectedContacts.customs_office_name
+              ? selectedContacts.customs_office_name
+              : 'Add Customs Address'
+          "
+        ></h2>
+      </div>
+    </div>
+  </div>
+  <perfect-scrollbar class="perfect-scroll">
+    <mat-spinner class="medium-spinner" *ngIf="fetchingData"></mat-spinner>
+    <form
+      class="roles-form"
+      [formGroup]="detailsForm"
+      (ngSubmit)="createCustomsAddress(detailsForm)"
+      *ngIf="!noContacts && !fetchingData"
+    >
+      <div
+        class="box min-container d-flex"
+        fxlayout="column"
+        [class.user-footer]="detailsForm.dirty"
+      >
+        <div class="form-fields">
+          <div class="ex-row">
+            <mat-form-field
+              fxFlex="50"
+              class="custom-input mandatory grid-six"
+              floatLabel="never"
+            >
+              <label class="custom-label mandatory">{{
+                language.defaults.customs_office_name
+              }}</label>
+              <input
+                matInput
+                #myInput
+                placeholder="Enter Customs Office Name"
+                maxlength="52"
+                formControlName="customs_office_name"
+              />
+              <mat-error
+                *ngIf="
+                  !contactSubmit ||
+                  (!detailsForm.controls.customs_office_name.pristine &&
+                    detailsForm.controls.customs_office_name.hasError(
+                      'required'
+                    ))
+                "
+                >{{ language.validations.customs_office_name }}</mat-error
+              >
+            </mat-form-field>
+
+            <mat-form-field
+              fxFlex="50"
+              class="custom-input grid-six"
+              floatLabel="never"
+            >
+              <label class="custom-label">{{
+                language.defaults.address1
+              }}</label>
+              <input
+                matInput
+                #myInput
+                placeholder="Enter Address 1"
+                maxlength="52"
+                formControlName="address1"
+              />
+              <mat-error
+                *ngIf="
+                  !contactSubmit ||
+                  (!detailsForm.controls.address1.pristine &&
+                    detailsForm.controls.address1.hasError('required'))
+                "
+                >{{ language.validations.address1 }}</mat-error
+              >
+            </mat-form-field>
+            <mat-form-field
+              fxFlex="50"
+              class="custom-input grid-six"
+              floatLabel="never"
+            >
+              <label class="custom-label">{{
+                language.defaults.address2
+              }}</label>
+              <input
+                matInput
+                placeholder="Enter Address 2"
+                formControlName="address2"
+                maxlength="52"
+                id="address2"
+              />
+              <mat-error
+                *ngIf="
+                  !contactSubmit ||
+                  (!detailsForm.controls.address2.pristine &&
+                    detailsForm.controls.address2.hasError('required'))
+                "
+                >{{ language.validations.address2 }}</mat-error
+              >
+            </mat-form-field>
+            <mat-form-field
+              fxFlex="50"
+              class="custom-input grid-six"
+              floatLabel="never"
+            >
+              <label class="custom-label">{{
+                language.defaults.postalCode
+              }}</label>
+              <input
+                matInput
+                maxlength="12"
+                placeholder="Enter Postal Code"
+                formControlName="postal_code"
+                id="postal_code"
+              />
+              <mat-error
+                *ngIf="
+                  !contactSubmit ||
+                  (!detailsForm.controls.postal_code.pristine &&
+                    detailsForm.controls.postal_code.hasError('required'))
+                "
+                >{{ language.validations.postalCode }}</mat-error
+              >
+            </mat-form-field>
+            <mat-form-field
+              fxFlex="50"
+              class="custom-input grid-six"
+              floatLabel="never"
+            >
+              <label class="custom-label">{{ language.defaults.city }}</label>
+              <input
+                matInput
+                maxlength="25"
+                placeholder="Enter City"
+                formControlName="city"
+                id="city"
+              />
+              <mat-error
+                *ngIf="
+                  !contactSubmit ||
+                  (!detailsForm.controls.city.pristine &&
+                    detailsForm.controls.city.hasError('required'))
+                "
+                >{{ language.validations.city }}</mat-error
+              >
+            </mat-form-field>
+            <mat-form-field
+              fxFlex="50"
+              class="custom-input grid-six"
+              floatLabel="never"
+              *ngIf="globalData"
+            >
+              <label class="custom-label">{{
+                language.defaults.selectCountry
+              }}</label>
+              <mat-select
+                placeholder="{{ language.defaults.selectCountry }}"
+                (selectionChange)="onCountryChange($event)"
+                formControlName="country_id"
+                id="country_id"
+              >
+                <mat-option
+                  *ngFor="let country of globalData.countries"
+                  [value]="country.id"
+                  >{{ country.name }}</mat-option
+                >
+              </mat-select>
+              <mat-error
+                *ngIf="
+                  !contactSubmit ||
+                  (!detailsForm.controls.country_id.pristine &&
+                    detailsForm.controls.country_id.hasError('required'))
+                "
+                >Please Select Country</mat-error
+              >
+            </mat-form-field>
+            <mat-form-field
+              fxFlex="50"
+              class="custom-input grid-six"
+              floatLabel="never"
+            >
+              <label class="custom-label">{{
+                language.defaults.selectState
+              }}</label>
+              <mat-select
+                placeholder="Select state"
+                (change)="onStateChange($event)"
+                formControlName="state_province_id"
+                id="state_province_id"
+              >
+                <mat-option *ngFor="let state of states" [value]="state.id">{{
+                  state.name
+                }}</mat-option>
+              </mat-select>
+              <mat-error
+                *ngIf="
+                  !contactSubmit ||
+                  (!detailsForm.controls.state_province_id.pristine &&
+                    detailsForm.controls.state_province_id.hasError('required'))
+                "
+                >Please Select State</mat-error
+              >
+            </mat-form-field>
+            <mat-form-field
+              fxFlex="50"
+              class="custom-input grid-six"
+              floatLabel="never"
+            >
+              <label class="custom-label">Email Address</label>
+              <input
+                matInput
+                placeholder="Enter Email Address"
+                formControlName="email"
+                id="email"
+              />
+              <mat-error
+                *ngIf="
+                  (!detailsForm.controls.email.pristine &&
+                    detailsForm.controls.email.hasError('required')) ||
+                  detailsForm.controls.email.hasError('pattern')
+                "
+                >Please Enter valid E-Mail Id</mat-error
+              >
+            </mat-form-field>
+            <mat-form-field
+              fxFlex="50"
+              class="custom-input grid-six"
+              floatLabel="never"
+            >
+              <label class="custom-label">Customs Office Code</label>
+              <input
+                matInput
+                placeholder="Enter Customs Office Code"
+                formControlName="customs_office_code"
+                id="customs_office_code"
+              />
+            </mat-form-field>
+            <mat-form-field
+              fxFlex="50"
+              class="custom-input grid-six"
+              floatLabel="never"
+            >
+              <label class="custom-label">Port of Entry</label>
+              <input
+                matInput
+                placeholder="Enter Port of Entry"
+                formControlName="port_entry"
+                id="port_entry"
+              />
+            </mat-form-field>
+            <mat-form-field
+              fxFlex="50"
+              class="custom-input grid-six"
+              floatLabel="never"
+            >
+              <label class="custom-label">Contact Person Name</label>
+              <input
+                matInput
+                placeholder="Enter Contact Person Name"
+                formControlName="contact_person_name"
+                id="contact_person_name"
+              />
+            </mat-form-field>
+            <mat-form-field
+              fxFlex="50"
+              class="custom-input grid-six"
+              floatLabel="never"
+            >
+              <label class="custom-label">Contact Person Phone Number</label>
+              <input
+                matInput
+                minlength="6"
+                placeholder="Enter Contact Person Phone Number"
+                formControlName="contact_person_phone"
+                id="phone"
+              />
+              <mat-error
+                *ngIf="
+                  !detailsForm.controls.contact_person_phone.hasError(
+                    'pattern'
+                  ) &&
+                  detailsForm.controls.contact_person_phone.hasError(
+                    'minlength'
+                  )
+                "
+                >Please Enter Minimum 6 Characters</mat-error
+              >
+            </mat-form-field>
+            <mat-form-field
+              fxFlex="50"
+              class="custom-input grid-six"
+              floatLabel="never"
+            >
+              <label class="custom-label">{{ language.defaults.status }}</label>
+              <mat-select
+                placeholder="Select Status"
+                formControlName="status"
+                (selectionChange)="onStatusChange($event)"
+              >
+                <mat-option
+                  [value]="stat.param"
+                  *ngFor="let stat of status"
+                  [innerHtml]="stat.value"
+                ></mat-option>
+              </mat-select>
+              <mat-error
+                *ngIf="
+                  !contactSubmit ||
+                  (!detailsForm.controls.status.pristine &&
+                    detailsForm.controls.status.hasError('required'))
+                "
+                >{{ language.validations.status }}</mat-error
+              >
+            </mat-form-field>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="document-footer"
+        fxLayout="row"
+        fxLayoutAlign="start center"
+        *ngIf="detailsForm.dirty"
+      >
+        <div class="min-container d-flex justify-content-end">
+          <button
+            type="button"
+            class="back-btn-ui"
+            (click)="cancel(detailsForm)"
+          >
+            {{ language.defaults.cancel }}
+          </button>
+          <button
+            type="submit"
+            mat-raised-button
+            [disabled]="detailsForm.invalid"
+          >
+            {{ addContacts }}
+          </button>
+        </div>
+      </div>
+    </form>
+    <div *ngIf="noContacts" class="no-results full">
+      <div class="empty-img-holder">
+        <img [src]="images.no_contacts" />
+      </div>
+      <p class="no-result-text">{{ language.defaults.noContactsFound }}</p>
+    </div>
+  </perfect-scrollbar>
+</div> -->
+<div class="center-section-scroll vh-100 d-flex body-white">
+  <!-- *ngIf="!noProducts" -->
+  <div class="page-header-ui">
+    <div class="flex-fixed-header page-title container-ui">
+      <!-- <h2
+      class="admin-heading"
+      *ngIf="selectedProducts"
+        title="{{
+          selectedProducts.name ? selectedProducts.name : 'Add Product'
+        }}"
+        [innerHtml]="
+          selectedProducts.name ? selectedProducts.name : 'Add Product'
+        "
+        
+      ></h2> -->
+      <!-- <div *ngIf="viewActivityLogIcon">
+        <button (click)="openActivityModal('add_products')" mat-icon-button class="action-orderbtn">
+          
+          <img [src]="images.activity_log_icon" title="User Activity Tracker" />
+        </button>
+      </div> -->
+    </div>
+  </div>
+  <perfect-scrollbar class="padding-16">
+    <div style="display: flex; gap: 10%">
+      <div class="min-container">
+        <!-- <mat-spinner class="medium-spinner" *ngIf="fetchingData"></mat-spinner> -->
+        <!-- *ngIf="!noProducts && !fetchingData" -->
+        <div class="box">
+          <app-form-builder
+            [module]="'customs_addresses'"
+            (trigger)="createForm($event)"
+          ></app-form-builder>
+          <!-- (trigger)="formEmitEvent($event)"
+            [Contacts]="contacts"
+            (emitUploadInfo)="emitUploadInfo($event)"
+            [undoOnCancel]="undoOnCancel" -->
+        </div>
+        <div class="footer" fxLayout="row" fxLayoutAlign="start center">
+          <!-- *ngIf="detailsForm?.dirty" -->
+          <div class="min-container d-flex justify-content-end">
+            <!--  (click)="cancel(detailsForm)" -->
+            <button type="button" class="back-btn-ui">
+              <!-- {{ language.defaults.cancel }} -->
+            </button>
+            <!-- [disabled]="detailsForm.invalid"
+             -->
+            <button
+              (click)="createCustomsAddress(detailsForm)"
+              type="submit"
+              mat-raised-button
+            >
+              <!-- {{ addProducts }} -->
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- *ngIf="noProducts" -->
+    <!-- <div  class="no-results full">
+      <div class="empty-img-holder">
+        <img [src]="images.no_products" />
+      </div>
+      <p class="no-result-text">
+        {{ language.defaults.noProductTypeFound }}
+      </p>
+    </div> -->
+    <!-- <div *ngIf="totalSpinner">
+      <mat-spinner class="medium-spinner"></mat-spinner>
+    </div>
+    <mat-spinner class="medium-spinner" *ngIf="conformsubmit"></mat-spinner> -->
+  </perfect-scrollbar>
+</div>

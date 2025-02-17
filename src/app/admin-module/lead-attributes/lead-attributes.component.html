@@ -1,4 +1,13 @@
 <div fxLayout="row">
-    <app-lead-atrbt-list  class="tabs-list" [update]="updatedRoleDetails" (trigger)="getSelectedRole($event)"></app-lead-atrbt-list>
-    <app-lead-atrbt-detail  class="inner-content" [roles]="selectedAttribute" style="width:100%;" (trigger)="updateDetails($event)"  ></app-lead-atrbt-detail>
-  </div>
+  <app-lead-atrbt-list
+    class="tabs-list"
+    [update]="updatedRoleDetails"
+    (trigger)="getSelectedRole($event)"
+  ></app-lead-atrbt-list>
+  <app-lead-atrbt-detail
+    class="inner-content"
+    [roles]="selectedAttribute"
+    style="width: 100%"
+    (trigger)="updateDetails($event)"
+  ></app-lead-atrbt-detail>
+</div>

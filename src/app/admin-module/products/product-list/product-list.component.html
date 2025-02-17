@@ -1,10 +1,18 @@
 <div class="center-section-scroll vh-100 d-flex media-list-data holy-grail body-white  ">
 	<div class="flex-fixed-header menu-title ">
 		<h2 style="font-weight: 400;">{{language.defaults.productType}} ({{totalCount}})</h2>
-		<span fxFlex></span>
-		<span class="add-link" (click)="getProduct()">
-			<mat-icon>add</mat-icon>Add
-		</span>
+		  <span class="add-link custom-tooltip import-img" (click)="getProduct()" 
+		  *ngIf="isAddPerm" 
+		  >
+			<img [src]='images.add'>
+			 <span class="tooltiptext">Add</span>
+		  </span>
+		  <span class="add-link custom-tooltip import-img" (click)="importProduct()" 
+		  *ngIf="isAddPerm" 
+		  >
+			<img [src]='images.import'>
+			  <span class="tooltiptext">Import</span>
+		   </span>
 	</div>
 
 	<div class="app-search-container search-small">
@@ -26,7 +34,7 @@
 			<mat-spinner class="medium-spinner" *ngIf="fetchingData"></mat-spinner>
 			<mat-list *ngIf="!fetchingData" class="media-list">
 				<mat-list-item @AdminListAnimate *ngFor="let list of productLIst" (click)="getProduct(list)"
-					[class.active]="list.id === selectedProduct.id">
+					[class.active]="list.id === selectedProduct.id" class="admin-internal-menu-list">
 					<div class="media d-flex align-items-center">
 						<div class="media-body ">
 							<h1 class="font-weight-bold d-block text-nowrap single" title="{{list.name}}"

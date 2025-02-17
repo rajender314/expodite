@@ -1,0 +1,458 @@
+<!-- <div class="sub-total-wrapper">
+    <div class="sub-total d-flex">
+      <p style="flex: 1">
+        Sub Total <span>( {{ selectedCurrency || order.currency }} )</span>
+      </p>
+      <p class="">{{ subTotal | number }}</p>
+    </div>
+    <form class="sub-total-freight" [formGroup]="subTotalForm">
+      <div class="order-discount d-flex">
+        <div class="discount-tag">
+          <p class="discount-label mt-10">Freight</p>
+          <mat-form-field
+            class="custom-input"
+            floatLabel="never"
+            style="margin-top: 4px"
+          >
+            <input
+              matInput
+              formControlName="freight"
+              type="number"
+              placeholder="0.00"
+              oninput="javascript:  if (!/^(-?\d+(\.\d{0,3})?)?$/.test(this.value)) this.value = this.value.slice(0, -1);"
+              min="0"
+              max="99999999"
+              step="0.01"
+              [readonly]="subTotal == 0"
+              [class.disableClass]="subTotal == 0"
+              [value]=""
+              (keyup)="enterFreight($event)"
+              (wheel)="onWheel($event)"
+              (keydown)="preventInputE($event)"
+            />
+            <mat-error
+              class="error-msg"
+              *ngIf="subTotalForm.controls.freight?.hasError('pattern')"
+              style="margin-top: 8px; font-size: 10px"
+            >
+              Please Enter Up To 7 Characters With 3 Decimals Max
+            </mat-error>
+          </mat-form-field>
+        </div>
+        <p class="mt-10">{{ freightamt | number }}</p>
+      </div>
+      <div class="order-discount d-flex">
+        <div class="discount-tag">
+          <p class="discount-label mt-10">Insurance</p>
+          <mat-form-field
+            class="custom-input"
+            floatLabel="never"
+            style="margin-top: 4px"
+          >
+            <input
+              matInput
+              formControlName="insurance"
+              type="number"
+              placeholder="0.00"
+              min="0"
+              maxlength="10"
+              [readonly]="subTotal == 0"
+              [class.disableClass]="subTotal == 0"
+              [value]=""
+              (keyup)="enterInsurance($event)"
+              (wheel)="onWheel($event)"
+              (keydown)="preventInputE($event)"
+              oninput="javascript:  if (!/^(\d+(\.\d{0,3})?)?$/.test(this.value)) this.value = this.value.slice(0, -1);"
+            />
+            <mat-error
+              class="error-msg"
+              *ngIf="subTotalForm.controls.insurance?.hasError('pattern')"
+              style="margin-top: 8px; font-size: 10px"
+            >
+              Please Enter Up To 7 Characters With 3 Decimals Max
+            </mat-error>
+          </mat-form-field>
+        </div>
+        <p class="mt-10">{{ insuranceValue | number }}</p>
+      </div>
+      <div class="order-discount precentage d-flex scroll-error">
+        <div class="discount-tag">
+          <p class="discount-label mt-10">Discount</p>
+          <mat-form-field
+            class="custom-input percentaged"
+            floatLabel="never"
+            style="padding-top: 0px"
+            style="margin-top: 4px"
+          >
+            <input
+              matInput
+              formControlName="discount"
+              type="number"
+              placeholder="0.00"
+              min="0"
+              max=""
+              step="0.01"
+              (keydown)="handleKeyDown($event)"
+              [readonly]="subTotal == 0"
+              [class.disableClass]="subTotal == 0"
+              [value]=""
+              (keyup)="enterDiscount($event)"
+              (wheel)="onWheel($event)"
+              (keydown)="preventInputE($event)"
+              oninput="javascript:  if (!/^(\d+(\.\d{0,3})?)?$/.test(this.value)) this.value = this.value.slice(0, -1);"
+            />
+            <mat-error
+              class="error-msg"
+              *ngIf="
+                !discountError &&
+                subTotalForm.controls.discount?.hasError('pattern')
+              "
+              style="margin-top: 8px; font-size: 10px"
+            >
+              Please Enter Up To 7 Characters With 3 Decimals Max
+            </mat-error>
+            <p *ngIf="discountError" class="error-discount">
+              Discount cannot exceed sub total
+            </p>
+          </mat-form-field>
+        </div>
+        <p class="mt-10">
+          <span style="font-size: 11px">(-)</span>
+          {{ discount | number }}
+        </p>
+      </div>
+    </form>
+    <div class="sub-total d-flex">
+      <p style="flex: 1">
+        Total <span>( {{ order.currency }} )</span>
+      </p>
+      <p class="">{{ total | number }}</p>
+    </div>
+  </div> -->
+<div class="sub-total-wrapper wid-50">
+  <div class="sub-total d-flex">
+    <p style="flex: 1" class="font-600">
+      Sub Total <span>({{ selectedCurrency.type }})</span>
+    </p>
+    <p class="font-600">
+      {{ currencyFormatter(subTotalSum, selectedCurrency.type) }}
+    </p>
+  </div>
+  <div [formGroup]="subTotalForm" class="sub-total-freight">
+    <div formArrayName="fieldList">
+      <div
+        *ngFor="let attribute of fieldList?.controls; let i = index"
+        [formGroupName]="i"
+        class="fields-list"
+      >
+        <div
+          *ngFor="let attribute of subTotalData; let j = index"
+          [ngSwitch]="subTotalData[j]?.slug"
+          [ngClass]="
+            subTotalData[j]?.slug === 'custom_component' ||
+            subTotalData[j]?.slug === 'paragraph_text' ||
+            subTotalData[j]?.slug === 'rich_text_editor' ||
+            subTotalData[j]?.slug === 'upload'
+              ? 'w-100 mb-8'
+              : 'w-100'
+          "
+          [ngStyle]="{
+            display: subTotalData[j].is_hide ? 'none' : 'block'
+          }"
+        >
+          <div class="form-elements">
+            <div class="stores-attr-data sub-total-fields-list">
+              <div *ngSwitchCase="'single_line_text'">
+                <div
+                  *ngIf="!subTotalData[j].is_hide"
+                  class="order-discount d-flex"
+                >
+                  <mat-form-field
+                    [ngClass]="
+                      !subTotalData[j].is_editable || disableEdit
+                        ? 'custom-input block-ele mandatory w-100 pointer-none'
+                        : 'custom-input block-ele mandatory w-100'
+                    "
+                    floatLabel="never"
+                  >
+                    <label
+                      class="custom-label font-600"
+                      [class.mandatory]="subTotalData[j]?.required"
+                      >{{ subTotalData[j]?.label_name }}</label
+                    >
+                    <input
+                      matInput
+                      placeholder="Enter {{ subTotalData[j]?.label_name }}"
+                      [errorStateMatcher]="matcher"
+                      [formControlName]="subTotalData[j]?.form_control_name"
+                      [readonly]="!subTotalData[j].is_editable || disableEdit"
+                      [type]="
+                        subTotalData[j].label_element_data_type === 'numeric'
+                          ? 'number'
+                          : 'text'
+                      "
+                      (keydown)="
+                        onKeyUpChange(
+                          $event,
+                          subTotalData[j]?.form_control_name,
+                          subTotalData[j]?.label_element_data_type
+                        )
+                      "
+                      (input)="
+                        onInputChange(
+                          $event,
+                          subTotalData[j]?.form_control_name
+                        )
+                      "
+                    />
+
+                    <mat-error
+                      *ngIf="
+                        submittedStoresAttributeForm &&
+                        (subTotalForm?.controls?.fieldList?.controls[
+                          i
+                        ].controls[subTotalData[j].form_control_name].hasError(
+                          'required'
+                        ) ||
+                          subTotalForm.controls.fieldList.controls[i].controls[
+                            subTotalData[j].form_control_name
+                          ].hasError('whitespace'))
+                      "
+                    >
+                      Please Enter
+                      <!-- <span class="capitalize"
+                        >{{ subTotalData[j].label_name }}
+                      </span> -->
+                      <span>{{ subTotalData[j].label_name }} </span>
+                    </mat-error>
+                    <mat-error
+                      *ngIf="
+                        submittedStoresAttributeForm &&
+                        (subTotalForm?.controls?.fieldList?.controls[
+                          i
+                        ]?.controls[subTotalData[j].form_control_name].hasError(
+                          'pattern'
+                        ) ||
+                          (subTotalForm?.controls?.fieldList?.controls[
+                            i
+                          ]?.controls[
+                            subTotalData[j].form_control_name
+                          ].hasError('pattern') &&
+                            subTotalForm?.controls?.fieldList?.controls[
+                              i
+                            ]?.controls[
+                              subTotalData[j].form_control_name
+                            ].hasError('maxlength'))) &&
+                        !subTotalForm?.controls?.fieldList?.controls[
+                          i
+                        ]?.controls[subTotalData[j].form_control_name].hasError(
+                          'minlength'
+                        )
+                      "
+                    >
+                      Please Enter
+                      <!-- <span class="capitalize"
+                        >valid {{ subTotalData[j].label_name }}
+                      </span> -->
+                      <span>valid {{ subTotalData[j].label_name }} </span>
+                    </mat-error>
+                    <mat-error
+                      *ngIf="
+                        submittedStoresAttributeForm &&
+                        subTotalForm.controls.fieldList.controls[i].controls[
+                          subTotalData[j].form_control_name
+                        ].hasError('minlength') &&
+                        !subTotalForm.controls.fieldList.controls[i].controls[
+                          subTotalData[j].form_control_name
+                        ].hasError('maxlength')
+                      "
+                    >
+                      Please Enter minimum of
+                      <span
+                        >{{
+                          subTotalForm.controls.fieldList.controls[i].controls[
+                            subTotalData[j].form_control_name
+                          ].getError("minlength").requiredLength
+                        }}
+                        characters
+                      </span>
+                    </mat-error>
+                    <mat-error
+                      *ngIf="
+                        submittedStoresAttributeForm &&
+                        !subTotalForm.controls.fieldList.controls[i].controls[
+                          subTotalData[j].form_control_name
+                        ].hasError('minlength') &&
+                        !subTotalForm.controls.fieldList.controls[i].controls[
+                          subTotalData[j].form_control_name
+                        ].hasError('pattern') &&
+                        subTotalForm.controls.fieldList.controls[i].controls[
+                          subTotalData[j].form_control_name
+                        ].hasError('maxlength')
+                      "
+                    >
+                      {{ subTotalData[j].label_name }} Cannot Exceed
+                      <span
+                        >{{
+                          subTotalForm.controls.fieldList.controls[i].controls[
+                            subTotalData[j].form_control_name
+                          ].getError("maxlength").requiredLength
+                        }}
+                        characters
+                      </span>
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+              </div>
+              <div *ngSwitchCase="'number'" class="order-discount d-flex">
+                <div class="order-discount d-flex">
+                  <div class="discount-tag">
+                    <p class="discount-label mt-10 font-600">
+                      {{ subTotalData[j].label_name }}
+                    </p>
+                    <mat-form-field
+                      class="custom-input block-ele mandatory w-100"
+                      floatLabel="never"
+                      [ngClass]="
+                        !subTotalData[j].is_editable || disableEdit
+                          ? 'custom-input block-ele mandatory w-100 pointer-none'
+                          : 'custom-input block-ele mandatory w-100'
+                      "
+                    >
+                      <!-- <label
+                  class="custom-label"
+                  [class.mandatory]="subTotalData[j]?.required"
+                  >{{ subTotalData[j].label_name }}</label
+                > -->
+                      <input
+                        matInput
+                        placeholder="Enter {{ subTotalData[j].label_name }}"
+                        [errorStateMatcher]="matcher"
+                        [formControlName]="subTotalData[j]?.form_control_name"
+                        [maxlength]="subTotalData[j].label_element_data_length"
+                        (keyup)="
+                          onKeyUpChange(
+                            $event,
+                            subTotalData[j]?.form_control_name,
+                            subTotalData[j]?.label_element_data_type
+                          )
+                        "
+                        (input)="
+                          onInput($event, subTotalData[j]?.form_control_name)
+                        "
+                        [readonly]="!subTotalSum || disableEdit"
+                      />
+
+                      <mat-error
+                        *ngIf="
+                          subTotalForm.controls.fieldList.controls[i].controls[
+                            subTotalData[j].form_control_name
+                          ].touched &&
+                          subTotalForm?.controls?.fieldList?.controls[
+                            i
+                          ]?.controls[
+                            subTotalData[j].form_control_name
+                          ].hasError('required')
+                        "
+                      >
+                        Please Enter
+                        <span>{{ subTotalData[j].label_name }}</span>
+                      </mat-error>
+                      <mat-error
+                        *ngIf="
+                          subTotalForm.controls.fieldList.controls[i].controls[
+                            subTotalData[j].form_control_name
+                          ].touched &&
+                          !subTotalForm?.controls?.fieldList?.controls[
+                            i
+                          ]?.controls[
+                            subTotalData[j].form_control_name
+                          ].hasError('required') &&
+                          subTotalForm?.controls?.fieldList?.controls[
+                            i
+                          ]?.controls[
+                            subTotalData[j].form_control_name
+                          ].hasError('pattern')
+                        "
+                      >
+                        Please Enter valid
+                        <span>{{ subTotalData[j].label_name }}</span>
+                      </mat-error>
+                      <mat-error
+                        *ngIf="
+                          subTotalForm.controls.fieldList.controls[i].controls[
+                            subTotalData[j].form_control_name
+                          ].touched &&
+                          !subTotalForm?.controls?.fieldList?.controls[
+                            i
+                          ]?.controls[
+                            subTotalData[j].form_control_name
+                          ].hasError('required') &&
+                          !subTotalForm?.controls?.fieldList?.controls[
+                            i
+                          ]?.controls[
+                            subTotalData[j].form_control_name
+                          ].hasError('pattern') &&
+                          subTotalForm?.controls?.fieldList?.controls[
+                            i
+                          ]?.controls[
+                            subTotalData[j].form_control_name
+                          ].hasError('max')
+                        "
+                      >
+                        <span
+                          >{{ subTotalData[j].label_name }} cannot be greater
+                          than
+                          {{
+                            subTotalForm?.controls?.fieldList?.controls[
+                              i
+                            ]?.controls[
+                              subTotalData[j].form_control_name
+                            ]?.getError("max").max
+                          }}</span
+                        >
+                      </mat-error>
+                      <mat-error
+                        *ngIf="
+                          subTotalForm.controls.fieldList.controls[i].controls[
+                            subTotalData[j].form_control_name
+                          ].touched &&
+                          !subTotalForm.controls.fieldList.controls[i].controls[
+                            subTotalData[j].form_control_name
+                          ].hasError('minlength') &&
+                          subTotalForm.controls.fieldList.controls[i].controls[
+                            subTotalData[j].form_control_name
+                          ].hasError('maxlength')
+                        "
+                      >
+                        {{ subTotalData[j].label_name }} Cannot Exceed
+                        <span
+                          >{{
+                            subTotalForm.controls.fieldList.controls[
+                              i
+                            ].controls[
+                              subTotalData[j].form_control_name
+                            ].getError("maxlength").requiredLength
+                          }}
+                          characters
+                        </span>
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="sub-total d-flex">
+    <p style="flex: 1" class="font-600">
+      Total <span>({{ selectedCurrency.type }})</span>
+    </p>
+    <p class="font-600">
+      {{ currencyFormatter(totalSum, selectedCurrency.type) }}
+    </p>
+  </div>
+</div>

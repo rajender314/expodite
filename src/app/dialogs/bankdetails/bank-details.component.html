@@ -1,0 +1,30 @@
+<mat-toolbar>
+  <h2 mat-dialog-title>
+    {{ data.prefill_id ? "Update Bank Details" : "Add Bank Details" }}
+  </h2>
+  <span fxFlex></span>
+</mat-toolbar>
+
+<mat-dialog-content>
+  <form>
+    <app-form-builder
+      [module]="data.form_module_name ? data.form_module_name : 'bank_details'"
+      (trigger)="generateDetailsForm($event)"
+      [Contacts]="data.prefill_id ? data.prefill_id : ''"
+    ></app-form-builder>
+  </form>
+</mat-dialog-content>
+<mat-spinner class="medium-spinner" *ngIf="showSpinner"></mat-spinner>
+<mat-dialog-actions>
+  <span fxFlex></span>
+  <button class="back-btn-ui" mat-dialog-close>
+    {{ language.defaults.cancel }}
+  </button>
+  <button
+    (click)="addBankform(detailsForm)"
+    [disabled]="disabledSave"
+    mat-raised-button
+  >
+    {{ data.prefill_id ? "Update" : "Add Bank Details" }}
+  </button>
+</mat-dialog-actions>

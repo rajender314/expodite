@@ -1,0 +1,107 @@
+<div class="center-section-scroll vh-100 d-flex body-white">
+  <div *ngIf="!noContacts" class="page-header-ui">
+    <div class="flex-fixed-header page-title container-ui">
+      <h2
+        class="admin-heading"
+        *ngIf="selectedContacts"
+        title="{{
+          selectedContacts?.name
+            ? selectedContacts.name
+            : selectedContacts?.percentage
+            ? selectedContacts.percentage
+            : selectedContacts?.customs_office_name
+            ? selectedContacts?.customs_office_name
+            : selectedContacts.address_1
+            ? selectedContacts.address_1
+            : 'Add ' + (namingConvention ? namingConvention : form_name)
+        }}"
+        [innerHtml]="
+          selectedContacts?.name
+            ? selectedContacts.name
+            : selectedContacts?.percentage
+            ? selectedContacts.percentage
+            : selectedContacts?.customs_office_name
+            ? selectedContacts?.customs_office_name
+            : selectedContacts.address_1
+            ? selectedContacts.address_1
+            : 'Add ' + (namingConvention ? namingConvention : form_name)
+        "
+      ></h2>
+      <div *ngIf="viewActivityLogIcon">
+        <button
+          (click)="openActivityModal(form_module_name)"
+          mat-icon-button
+          class="action-orderbtn"
+        >
+          <img [src]="images.activity_log_icon" title="User Activity Tracker" />
+        </button>
+      </div>
+    </div>
+  </div>
+  <perfect-scrollbar class="padding-16">
+    <div *ngIf="!noContacts" style="display: flex; gap: 10%; height: 100%">
+      <div class="min-container" style="height: 100%">
+        <!-- <mat-spinner class="medium-spinner" *ngIf="fetchingData"></mat-spinner> -->
+
+        <div
+          *ngIf="!noContacts && !fetchingData"
+          class="box"
+          style="height: calc(100% - 60px); overflow: auto"
+        >
+          <app-form-builder
+            [module]="form_module_name"
+            (trigger)="createForm($event)"
+            [undoOnCancel]="undoOnCancel"
+            [Contacts]="contacts"
+            (emitUploadInfo)="emitUploadInfo($event)"
+            [PermissionKey]="permissionKey"
+          ></app-form-builder>
+          <!-- (trigger)="formEmitEvent($event)"
+            (emitUploadInfo)="emitUploadInfo($event)"
+             -->
+        </div>
+        <div
+          *ngIf="detailsForm?.dirty && !fetchingData"
+          class="footer"
+          fxLayout="row"
+          fxLayoutAlign="start center"
+        >
+          <div class="min-container d-flex justify-content-end">
+            <button
+              (click)="cancel(detailsForm)"
+              type="button"
+              class="back-btn-ui"
+            >
+              {{ language.defaults.cancel }}
+            </button>
+
+            <button
+              (click)="createContactAddress(detailsForm)"
+              [disabled]="detailsForm.invalid || conformsubmit"
+              type="submit"
+              mat-raised-button
+            >
+              <!-- Add -->
+              {{ addContacts }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="noContacts" class="no-results full">
+      <div class="empty-img-holder">
+        <img [src]="noDataImage" />
+      </div>
+      <p class="no-result-text">
+        {{
+          "No " + (namingConvention ? namingConvention : form_name) + " Found"
+        }}
+      </p>
+    </div>
+    <!-- <div *ngIf="totalSpinner">
+      <mat-spinner class="medium-spinner"></mat-spinner>
+    </div> -->
+    <mat-spinner class="medium-spinner" *ngIf="conformsubmit"></mat-spinner>
+  </perfect-scrollbar>
+</div>

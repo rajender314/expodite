@@ -2,27 +2,27 @@
 	<div class="page-header-ui" *ngIf="!noUser">
 		<div class="flex-fixed-header page-title   ">
 			<span *ngIf="selectedUser" class="d-flex align-items-center">
-				<h2 style="font-weight: 400;" title="{{selectedUser.name? selectedUser.name : 'Add New User'}}">{{selectedUser.name? selectedUser.name : 'Add New User'}}</h2>&nbsp;&nbsp;
-				<span class="user-detail-email" title="{{selectedUser.email}}">{{selectedUser.email || ""}}</span>
+				<h2 class="admin-heading" title="{{selectedUser.name? selectedUser.name : 'Add New User'}}">{{selectedUser.name? selectedUser.name : 'Add New User'}}</h2>&nbsp;&nbsp;
+				<!-- <span class="user-detail-email" title="{{selectedUser.email}}">{{selectedUser.email || ""}}</span> -->
 			</span>
 			<span fxFlex></span>
-		<button mat-button color="warn" *ngIf="selectedUser?.email && selectedUser?.status" (click)="openDialog('reset')">{{language.defaults.resetPassword}}</button>
+		<button mat-button color="warn" *ngIf="selectedUser?.email && selectedUser?.status && isEditPerm" (click)="openDialog('reset')">{{language.defaults.resetPassword}}</button>
 		</div>
 
 	</div>
-	<perfect-scrollbar class="d-flex padding-16">
-		<div class="page-sub-heading" *ngIf="!noUser" style="margin-top: 16px;"><h3>{{language.defaults.userProfile}}</h3></div>
-		<div class="min-container">
+	<perfect-scrollbar class="d-flex perfect-scroll">
+		<!-- <div class="page-sub-heading" *ngIf="!noUser" ><h3>{{language.defaults.userProfile}}</h3></div> -->
+		<div class="min-container" style="height: 100%;">
 			<mat-spinner *ngIf="fetchingData" class="medium-spinner"></mat-spinner>
-			<div *ngIf="!noUser">
-				<form class="user-form" [formGroup]="userForm" (ngSubmit)="submitUser(userForm)">
-					<div class="details" [class.user-footer]="userForm.dirty" *ngIf="!fetchingData">
+			<div *ngIf="!noUser" style="height: 100%;">
+				<form class="user-form roles-form " [formGroup]="userForm" (ngSubmit)="submitUser(userForm)">
+					<div class="details" [class.user-footer]="userForm.dirty" *ngIf="!fetchingData" style="height: 100%;overflow: auto;">
 						<div fxLayout="column" >
 						
                             
-								<div class="user_data">
-									<div class="ex-row">
-										<div class="grid-nine">
+								<div class="user_data" style="overflow: auto;">
+									<div class="ex-row" style="padding: 0;">
+										<div class="grid-nine" style="padding: 0;">
 											<div class="ex-row">
 
 												<mat-form-field class="custom-input mandatory grid-six" floatLabel="never">
@@ -39,14 +39,14 @@
 												
 												<mat-form-field  class="custom-input mandatory grid-six" floatLabel="never">
 													<label class="custom-label mandatory">{{language.defaults.status}}</label>
-													<mat-select placeholder="Status" formControlName="status" [disabled]="disableSelect" [(ngModel)]="selectedtype">
+													<mat-select placeholder="Status" formControlName="status" [(ngModel)]="selectedtype">
 														<mat-option [value]="stat.param" *ngFor="let stat of status" [innerHtml]="stat.value"></mat-option>
 													</mat-select>
 													<mat-error *ngIf="userSubmit || !userForm.controls.status.pristine && userForm.controls.status.hasError('required')">{{language.validations.status}}</mat-error>
 												</mat-form-field>
 												<mat-form-field class="custom-input mandatory grid-six" floatLabel="never">
 													<label class="custom-label mandatory">{{language.defaults.selectRole}}</label>
-													<mat-select placeholder="User Role" formControlName="roles_id" [disabled]="disableSelect">
+													<mat-select placeholder="User Role" formControlName="roles_id">
 														<mat-option [value]="role.id" *ngFor="let role of rolesList" [innerHtml]="role.name"></mat-option>
 													</mat-select>
 												<mat-error *ngIf="userSubmit || !userForm.controls.roles_id.pristine && userForm.controls.roles_id.hasError('required')">Please Select User Role</mat-error>
@@ -63,11 +63,11 @@
 											</div>
 										</div>
 										<div class="grid-three" fxLayoutAlign="end  start " >
-											<div fxLayout="column" class="image-upload org-upload" [class.not-allowed]="pointerEvent">
+											<div fxLayout="column" class="image-upload org-upload" [class.not-allowed]="disableUpload">
 												<div ng2FileDrop [ngClass]="{'file-over': hasDropZoneOver}" (fileOver)="fileOverBase($event)" (onFileDrop)="fileDrop($event)"
 													[uploader]="uploader" class="file-drop-zone">
 														<input id="edit-org-logo" type="file" ng2FileSelect [uploader]="uploader" (change)="fileSelected($event)" [hidden]="true"
-															multiple/>
+														 [disabled]="disableUpload"	multiple/>
 														<label for="edit-org-logo" class="browse-file" *ngIf="!uploads.length">
 															<a>{{language.defaults.browseFile}}</a>
 														</label>
@@ -102,7 +102,7 @@
 					</div>
 					<div class="document-footer" fxLayout="row" fxLayoutAlign="start  center" *ngIf="userForm.dirty">
 							<div class="min-container d-flex justify-content-end  ">
-								<button type="button" mat-button (click)="cancel(userForm)">{{language.defaults.cancel}}</button>
+								<button type="button"  class="back-btn-ui" (click)="cancel(userForm)">{{language.defaults.cancel}}</button>
 								<button type="submit" mat-raised-button >{{saveUser}}</button>
 							</div>
 					

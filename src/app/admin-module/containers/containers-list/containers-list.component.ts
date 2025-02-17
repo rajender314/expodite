@@ -6,6 +6,7 @@ import * as _ from 'lodash';
 import { Param } from '../../../custom-format/param';
 import { AdminService } from '../../../services/admin.service';
 import { trigger, style, transition, animate, keyframes, query, stagger } from '@angular/animations';
+import { Images } from '../../../images/images.module';
 
 @Component({
   selector: 'app-containers-list',
@@ -22,7 +23,7 @@ import { trigger, style, transition, animate, keyframes, query, stagger } from '
   ]
 })
 export class ContainersListComponent implements OnInit {
-
+  public images = Images;
   public language = language;
   public open = false;
   totalCount: number = 0;

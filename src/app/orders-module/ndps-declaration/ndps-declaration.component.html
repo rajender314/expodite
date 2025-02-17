@@ -1,0 +1,116 @@
+<div
+  class="inner-container declaration-section"
+  [class.collapse]="!showNdpsDecl"
+>
+  <mat-toolbar class="package-toolbar">
+    <img class="shipping-image" [src]="images.pdf_download" />
+    <span>NDPS </span>
+    <span fxFlex></span>
+    <button (click)="onEdit()" mat-icon-button>
+      <mat-icon class="edit-icon" title="Edit" mat-icon-button
+        >mode_edit
+      </mat-icon>
+    </button>
+    <a
+      *ngIf="!clientPermission"
+      target="_blank"
+      href="generateNdpsDeclaration?id={{
+        orders.selectedOrder.id
+      }}&is_printable=1"
+    >
+      <button mat-icon-button>
+        <img [src]="images.printer_icon" title="Print" />
+      </button>
+    </a>
+    <a
+      href="generateNdpsDeclaration?id={{
+        orders.selectedOrder.id
+      }}&is_printable=0"
+    >
+      <button mat-icon-button>
+        <img [src]="images.download_arrow" title="Download" />
+      </button>
+    </a>
+    <button mat-icon-button (click)="toggleNDPSDecl()">
+      <img [src]="images.grey_arrow" mat-icon-button *ngIf="showNdpsDecl" />
+      <mat-icon class="toggle-arrow" *ngIf="!showNdpsDecl">
+        keyboard_arrow_down</mat-icon
+      >
+    </button>
+  </mat-toolbar>
+  <div class="non-scomet-decl" *ngIf="showNdpsDecl">
+    <p
+      style="font-size: 16px; font-weight: 700"
+      *ngFor="let invoice of orders.invoice"
+    >
+      Date: {{ invoice.Inovice.date_added }}
+    </p>
+
+    <p class="mt mb" *ngFor="let invoice of orders.invoice">
+      Reference: - Our Export Invoice No:
+      {{ invoice.Inovice.inv_nbr }} Dated:
+      {{ invoice.Inovice.date_added }}
+    </p>
+
+    <p>
+      We hereby declare that the export item
+      <!-- {{ productDetails }} -->
+      <span *ngIf="!isEditing" [innerHTML]="productDetails"></span>
+      <span>
+        <mat-form-field
+          *ngIf="isEditing"
+          class="custom-input block-ele grid-full"
+          floatLabel="never"
+          style="
+            margin-top: 0px;
+            position: relative;
+            left: -5px;
+            top: 7px;
+            max-width: 50%;
+          "
+        >
+          <textarea
+            [(ngModel)]="productDetails"
+            matInput
+            placeholder="Enter To Address"
+            autofocus="on"
+            style="
+              height: 126px;
+              line-height: 1.4;
+              padding: 4px 10px;
+              border-width: 2px;
+            "
+            rows="3"
+          >
+          </textarea>
+        </mat-form-field>
+      </span>
+      are not covered in list of Narcotics Items or any other restricted list of
+      Exports. We are exporting to
+      {{ orders.selectedOrder.client_name }},
+      {{ orders.shippingAddr.ship_countrty }}.
+    </p>
+    <div>
+      <p class="mb">Thanking You,</p>
+      <p class="mb">For {{ compnayDetails?.name }}</p>
+      <p class="">Authorized Signatory</p>
+    </div>
+    <div
+      *ngIf="isEditing"
+      class="footer-bottom fxflex"
+      style="padding: 14px; bottom: 0; right: 0"
+      fxLayout="row"
+      fxLayoutAlign="end center"
+    >
+      <span fxFlex></span>
+      <section class="section-right">
+        <button (click)="onEdit()" type="button" mat-button>Cancel</button>
+
+        <button (click)="onEdited()" type="submit" mat-raised-button>
+          Save
+        </button>
+      </section>
+      <div class="cb"></div>
+    </div>
+  </div>
+</div>

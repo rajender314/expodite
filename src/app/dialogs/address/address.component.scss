@@ -49,10 +49,16 @@
 //             }
 //          }
 //         &:hover {
-//             background-color:transparent; 
+//             background-color:transparent;
 //         }
 //     }
 // }
 // // .selection-address.mat-selection-list .mat-list-item .mat-list-item-content, .mat-selection-list .mat-list-option .mat-list-item-content {
 // //     padding: 0px !important;
 // // }
+.vendor-address {
+  font-weight: 400;
+  padding-bottom: 20px;
+  font-size: 16px;
+  padding-left: 8px;
+}

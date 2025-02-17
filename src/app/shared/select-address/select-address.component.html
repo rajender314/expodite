@@ -1,0 +1,107 @@
+<div
+  *ngFor="let attribute of addressList; let j = index"
+  [ngSwitch]="addressList[j]?.slug"
+>
+  <div *ngSwitchCase="'addresses_checkbox'" [ngClass]="'address-list-' + j">
+    <div *ngIf="!addressList[j].is_hide">
+      <div class="address-content">
+        <mat-toolbar class="mat-toolbar-strip" style="padding: 0">
+          <h3>{{ attribute.label_name }}</h3>
+          <span fxFlex></span>
+          <span
+            class="add-link"
+            (click)="goToCreateAddress(attribute.form_control_name, attribute)"
+            *ngIf="clientSelectedId"
+          >
+            <mat-icon class="mat-icon material-icons">add</mat-icon>Add New
+          </span>
+        </mat-toolbar>
+        <mat-selection-list class="address-selection">
+          <p class="address-error" *ngIf="attribute.validationError">
+            Please Select {{ attribute.label_name }}
+          </p>
+          <mat-list-option
+            [selected]="address.selected"
+            (click)="
+              selectAddress(
+                address,
+                attribute.options,
+                attribute.form_control_name
+              )
+            "
+            class="orders-list create-order"
+            *ngFor="let address of attribute.options"
+          >
+            <p>{{ address?.company_name }}</p>
+            <p>{{ address.address1 }}</p>
+            <p>{{ address.address2 }}</p>
+            <p>{{ address.address3 }}</p>
+            <p>{{ address.address4 }}</p>
+            <p>{{ address.city }}</p>
+            <p>{{ address.state_name }}</p>
+            <p>{{ address.country_name }}</p>
+            <p>{{ address.postal_code }}</p>
+          </mat-list-option>
+        </mat-selection-list>
+        <!-- <mat-toolbar class="mat-toolbar-strip">
+      <h3>Select Billing Address</h3>
+      <span fxFlex></span>
+      <span class="add-link" (click)="goToCreateAddress('company')">
+        <mat-icon class="mat-icon material-icons">add</mat-icon>Add New
+      </span>
+    </mat-toolbar>
+    <mat-selection-list class="address-selection">
+      <p class="address-error" *ngIf="order.selectedBillingError">
+        Please Select Billing Address
+      </p>
+      <mat-list-option
+        selected="{{ address.selected }}"
+        (click)="selectAddress(address, order.companyAddress, 2)"
+        class="orders-list create-order"
+        *ngFor="let address of order.companyAddress"
+      >
+        <p>{{ address?.company_name }}</p>
+        <p>{{ address.address1 }}</p>
+        <p>{{ address.address2 }}</p>
+        <p>{{ address.address3 }}</p>
+        <p>{{ address.address4 }}</p>
+        <p>{{ address.city }}</p>
+        <p>{{ address.state }}</p>
+        <p>{{ address.country_name }}</p>
+      </mat-list-option>
+    </mat-selection-list>
+
+    <div>
+      <mat-toolbar class="mat-toolbar-strip">
+        <h3>Select Notify Address</h3>
+        <span fxFlex></span>
+        <span class="add-link" (click)="goToCreateAddress('notify')">
+          <mat-icon class="mat-icon material-icons">add</mat-icon>Add
+          New
+        </span>
+      </mat-toolbar>
+      <mat-selection-list class="address-selection">
+        <p class="address-error" *ngIf="order.selectedNotifyError">
+          Please Select Notify Address
+        </p>
+        <mat-list-option
+          selected="{{ address.selected }}"
+          (click)="selectAddress(address, order.notifyAddress, 3)"
+          class="orders-list create-order"
+          *ngFor="let address of order.notifyAddress"
+        >
+          <p>{{ address?.company_name }}</p>
+          <p>{{ address.address1 }}</p>
+          <p>{{ address.address2 }}</p>
+          <p>{{ address.address3 }}</p>
+          <p>{{ address.address4 }}</p>
+          <p>{{ address.city }}</p>
+          <p>{{ address.state }}</p>
+          <p>{{ address.country_name }}</p>
+        </mat-list-option>
+      </mat-selection-list>
+    </div> -->
+      </div>
+    </div>
+  </div>
+</div>

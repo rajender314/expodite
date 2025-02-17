@@ -1,0 +1,475 @@
+<section class="hiden-stepper">
+  <mat-horizontal-stepper class="inv-stepper" #stepper>
+    <mat-step>
+      <div
+        class="center-section-scroll expansion-panel-ui vh-100 d-flex body-color"
+      >
+        <mat-toolbar class="page-header-ui">
+          <div
+            class="flex-fixed-header page-title min-container"
+            style="margin: 0 auto"
+          >
+            <div (click)="goBack()" class="detail-back-action">
+              <mat-icon
+                class="back-to-orders mat-icon material-icons"
+                role="img"
+                aria-hidden="true"
+                >arrow_back</mat-icon
+              >
+            </div>
+            <span
+              class="title"
+              title="{{ PolicyNumber }}"
+              [innerHtml]="PolicyNumber"
+            ></span>
+            <div
+              class="item-container status-cell status-tag-container"
+              style="padding-left: 10px"
+            >
+              <div
+                class="client-status"
+                title="{{ status }}"
+                [ngClass]="{
+                  partially_used: status == 'Partially Applied',
+                  order_confirmed: status == 'Recorded'
+                }"
+              >
+                {{ status }}
+              </div>
+            </div>
+            <span fxFlex></span>
+          </div>
+        </mat-toolbar>
+
+        <div
+          class="w-100 expansion-panel-scroll"
+          style="height: calc(100vh - 70px)"
+        >
+          <div
+            class="min-container body-white"
+            style="
+              margin: 0 auto;
+              margin-top: 16px;
+              border: 1px solid rgb(216, 218, 221);
+            "
+          >
+            <div
+              class="header-icon-container"
+              *ngIf="
+                !editable &&
+                currentTabIndex == 0 &&
+                !isLoading &&
+                status_slug != 'payments_applied' &&
+                adminService.rolePermissions.edit_payment == 1
+              "
+            >
+              <div class="edit_icon" title="Edit" (click)="editInventory()">
+                <img [src]="EditIcon" alt="edit" />
+              </div>
+            </div>
+            <mat-tab-group
+              #batchTabGroup
+              class="inv-detail"
+              (selectedIndexChange)="onTabChange($event)"
+            >
+              <mat-tab label="Payment Details">
+                <div
+                  class="min-container"
+                  id="custome-gaps"
+                  style="
+                    height: calc(100vh - 140px);
+                    overflow-y: auto;
+                    margin: 0 auto;
+                    padding: 16px;
+                    border-top: none;
+                  "
+                  *ngFor="let detail of selectedInsuranceList"
+                >
+                  <div class="ex-row" *ngIf="!editable">
+                    <div class="grid-six">
+                      <h3 class="inv-readonly fw-600">Payment ID</h3>
+                      <span class="inv-para">{{
+                        detail?.payment_id ? detail?.payment_id : "--"
+                      }}</span>
+                    </div>
+                    <div class="grid-six">
+                      <h3 class="inv-readonly fw-600">Client Name</h3>
+                      <span class="inv-para">{{
+                        detail?.client_id ? detail?.client_id : "--"
+                      }}</span>
+                    </div>
+
+                    <div class="grid-six">
+                      <h3 class="inv-readonly fw-600">Country</h3>
+                      <span class="inv-para">{{
+                        detail?.country_id ? detail?.country_id : "--"
+                      }}</span>
+                    </div>
+
+                    <div class="grid-six">
+                      <h3 class="inv-readonly fw-600">Currency</h3>
+                      <span class="inv-para">{{
+                        detail?.currency_id ? detail?.currency_id : "--"
+                      }}</span>
+                    </div>
+
+                    <div class="grid-six">
+                      <h3 class="inv-readonly fw-600">Remitter Name</h3>
+                      <span class="inv-para">{{
+                        detail?.remitter_name ? detail?.remitter_name : "--"
+                      }}</span>
+                    </div>
+
+                    <div class="grid-six">
+                      <h3 class="inv-readonly fw-600">Amount</h3>
+                      <span class="inv-para">{{
+                        detail?.amount ? detail?.amount : "--"
+                      }}</span>
+                    </div>
+
+                    <div class="grid-six">
+                      <h3 class="inv-readonly fw-600">
+                        Conversion Rate (applied)
+                      </h3>
+                      <span class="inv-para">{{
+                        detail?.conversion_rate_applied
+                          ? detail?.conversion_rate_applied
+                          : "--"
+                      }}</span>
+                    </div>
+
+                    <div class="grid-six">
+                      <h3 class="inv-readonly fw-600">
+                        Conversion Rate (icegate)
+                      </h3>
+                      <span class="inv-para">{{
+                        detail?.bank_name ? detail?.bank_name : "--"
+                      }}</span>
+                    </div>
+
+                    <div class="grid-six">
+                      <h3 class="inv-readonly fw-600">Payment Date</h3>
+                      <span class="inv-para">{{
+                        detail?.date_of_payment ? detail?.date_of_payment : "--"
+                      }}</span>
+                    </div>
+
+                    <div class="grid-six">
+                      <h3 class="inv-readonly fw-600">Bank Name</h3>
+                      <span class="inv-para">{{
+                        detail?.bank_name ? detail?.bank_name : "--"
+                      }}</span>
+                    </div>
+
+                    <div class="grid-six">
+                      <h3 class="inv-readonly fw-600">Bank Charges (USD)</h3>
+                      <span class="inv-para">{{
+                        detail?.bank_charges_usd
+                          ? detail?.bank_charges_usd
+                          : "--"
+                      }}</span>
+                    </div>
+
+                    <div class="grid-six">
+                      <h3 class="inv-readonly fw-600">Bank Charges (INR)</h3>
+                      <span class="inv-para">{{
+                        detail?.bank_charges_inr
+                          ? detail?.bank_charges_inr
+                          : "--"
+                      }}</span>
+                    </div>
+
+                    <div class="grid-six">
+                      <h3 class="inv-readonly fw-600">Bank Advise Notes</h3>
+                      <span class="inv-para">{{
+                        detail?.bank_advise_notes
+                          ? detail?.bank_advise_notes
+                          : "--"
+                      }}</span>
+                    </div>
+
+                    <div class="grid-six">
+                      <h3 class="inv-readonly fw-600">Payment Mode</h3>
+                      <span class="inv-para">{{
+                        detail?.payment_mode ? detail?.payment_mode : "--"
+                      }}</span>
+                    </div>
+
+                    <div class="grid-six">
+                      <h3 class="inv-readonly fw-600">Type of Payment</h3>
+                      <span class="inv-para">{{
+                        detail?.type_of_payment ? detail?.type_of_payment : "--"
+                      }}</span>
+                    </div>
+
+                    <div class="grid-six">
+                      <h3 class="inv-readonly fw-600">Purpose Code</h3>
+                      <span class="inv-para">{{
+                        detail?.purpose_code ? detail?.purpose_code : "--"
+                      }}</span>
+                    </div>
+                    <div class="grid-six">
+                      <h3 class="inv-readonly fw-600">FIRC Number</h3>
+                      <span class="inv-para">{{
+                        detail?.firc_no ? detail?.firc_no : "--"
+                      }}</span>
+                    </div>
+
+                    <div class="grid-six">
+                      <h3 class="inv-readonly fw-600">FIRC Date</h3>
+                      <span class="inv-para">{{
+                        detail?.firc_date ? detail?.firc_date : "--"
+                      }}</span>
+                    </div>
+                    <div class="grid-six">
+                      <h3 class="inv-readonly fw-600">BRC No</h3>
+                      <span class="inv-para">{{
+                        detail?.brc_no ? detail?.brc_no : "--"
+                      }}</span>
+                    </div>
+                    <div class="grid-six">
+                      <h3 class="inv-readonly fw-600">BRC Date</h3>
+                      <span class="inv-para">{{
+                        detail?.brc_date ? detail?.brc_date : "--"
+                      }}</span>
+                    </div>
+                  </div>
+                  <div *ngIf="!editable">
+                    <h3
+                      class="inv-readonly fw-600"
+                      style="padding-left: 14px; font-size: 20px"
+                    >
+                      Documents
+                    </h3>
+                    <div style="display: flex">
+                      <div
+                        class="docs_img_wrap"
+                        *ngFor="let file of detail.upload_docs; let i = index"
+                      >
+                        <div class="upload_post">
+                          <div class="upload_section">
+                            <a target="_blank" style="padding-bottom: 20px">
+                              <div class="delete-value">
+                                <button
+                                  mat-icon-button
+                                  class="dots"
+                                  [matMenuTriggerFor]="menu"
+                                  aria-label="Example icon-button with a menu"
+                                >
+                                  <mat-icon>more_vert</mat-icon>
+                                </button>
+                              </div>
+
+                              <img
+                                *ngIf="
+                                  file.filepath.lastIndexOf('.pdf') == -1 &&
+                                  file.filepath.lastIndexOf('.doc') == -1 &&
+                                  file.filepath.lastIndexOf('.doc') == -1 &&
+                                  file.filepath.lastIndexOf('.xlsx') == -1
+                                "
+                                class="list-upload-img"
+                                [src]="file.filepath"
+                              />
+                              <div
+                                *ngIf="file.filepath.lastIndexOf('.pdf') > -1"
+                              >
+                                <img
+                                  [src]="images.pdf_png"
+                                  style="
+                                    height: 100%;
+                                    width: 100%;
+                                    object-fit: contain;
+                                  "
+                                />
+                              </div>
+                              <div
+                                *ngIf="file.filepath.lastIndexOf('.xlsx') > -1"
+                              >
+                                <img
+                                  [src]="images.xlsx_png"
+                                  style="
+                                    height: 100%;
+                                    width: 100%;
+                                    object-fit: contain;
+                                  "
+                                />
+                              </div>
+                              <div
+                                *ngIf="
+                                  file.filepath.lastIndexOf('.doc') > -1 ||
+                                  file.filepath.lastIndexOf('.docx') > -1
+                                "
+                              >
+                                <img
+                                  [src]="images.docx_png"
+                                  style="
+                                    height: 100%;
+                                    width: 100%;
+                                    object-fit: contain;
+                                  "
+                                />
+                              </div>
+                              <p
+                                class="file-name truncate"
+                                title="{{ file.original_name }}"
+                              >
+                                {{ file.original_name }}
+                              </p>
+                            </a>
+                          </div>
+                          <mat-menu #menu="matMenu" class="custom-menu-list">
+                            <div class="upload-drop">
+                              <span class="img-icon">
+                                <a
+                                  class="click"
+                                  title="Download"
+                                  (click)="downloadFile(file, i, 'sales')"
+                                >
+                                  <span class="pointer"> Download </span>
+                                </a>
+                              </span>
+                              <!-- <span class="img-icon">
+                          <a
+                            class="click"
+                            title="notes"
+                            (click)="SaveDescription(file)"
+                          >
+                            <span class="pointer"> Notes </span>
+                          </a>
+                        </span> -->
+                            </div>
+                          </mat-menu>
+                          <div class="icon-sections">
+                            <div class="icon-content"></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="edit-tab" *ngIf="editable">
+                    <form class="ex-row form-ui">
+                      <app-form-builder
+                        [module]="'add_payments'"
+                        (trigger)="formEmitEvent($event)"
+                        (emitUploadInfo)="emitUploadInfo($event)"
+                        [batchId]="data.estimate_id"
+                      ></app-form-builder>
+                      <div style="clear: both"></div>
+                      <div
+                        fxLayout="row"
+                        class="w-100"
+                        style="padding: 0 16px"
+                        fxLayoutAlign="end center"
+                        *ngIf="showSavePanel"
+                      >
+                        <button
+                          class="back-btn-ui"
+                          (click)="resetInsurance(editForm)"
+                        >
+                          {{ language.defaults.cancel }}
+                        </button>
+                        <button
+                          mat-raised-button
+                          (click)="update()"
+                          [disabled]="editForm.invalid || disableBtn"
+                        >
+                          {{ language.defaults.save }}
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+
+                <div
+                  class="container-ui new-center-empty-ui"
+                  *ngIf="selectedInsuranceList.length == 0"
+                >
+                  <mat-card class="no-results">
+                    <div class="empty-img-holder">
+                      <img [src]="images.batchIcon_o" />
+                    </div>
+                    <p class="no-result-text">No Data Found</p>
+                  </mat-card>
+                </div>
+              </mat-tab>
+              <mat-tab label="Payment Used Details" class="client-orders">
+                <div class="client-reports inventory">
+                  <table class="client-detail-table">
+                    <thead>
+                      <tr>
+                        <th class="wid-10 align-center fw-600">Sl No</th>
+                        <th class="wid-25 align-center fw-600">Payment ID</th>
+                        <th class="wid-25 align-center fw-600">
+                          Invoice number
+                        </th>
+                        <th class="wid-25 align-right fw-600">
+                          Amount Applied
+                        </th>
+                        <th class="wid-25 align-right fw-600">
+                          <div>
+                            Balance Amount<mat-icon
+                              style="font-size: 13px; height: 0; width: 14px"
+                              title="This is the unallocated payment amount that can be applied to invoices."
+                              >info</mat-icon
+                            >
+                          </div>
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let detail of selectedClientDetail">
+                        <td class="align-center">{{ detail.sr_no }}</td>
+                        <td class="align-center border-right">
+                          {{ detail.payment_id ? detail.payment_id : "--" }}
+                        </td>
+                        <td class="align-center border-right">
+                          <!-- {{ detail.invoice_no ? detail.invoice_no : "--" }} -->
+                          <a
+                            style="
+                              color: #253957;
+                              text-decoration: underline;
+                              font-weight: 600;
+                              cursor: pointer;
+                            "
+                            mat-line
+                            class="mat-line"
+                            (click)="
+                              navigateToShipment(
+                                detail.order_id,
+                                detail.shipment_id
+                              )
+                            "
+                            [title]="detail.invoice_no"
+                          >
+                            {{ detail.invoice_no ? detail.invoice_no : "--" }}
+                          </a>
+                        </td>
+                        <td class="align-right border-right">
+                          {{ detail.amount_used }}
+                        </td>
+                        <td class="align-right">
+                          {{ detail.balance_amount }}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <p
+                    *ngIf="!selectedClientDetail.length"
+                    style="
+                      text-align: center;
+                      color: #737373;
+                      font-size: 18px;
+                      padding: 18px;
+                    "
+                  >
+                    No Data Found
+                  </p>
+                </div>
+              </mat-tab>
+            </mat-tab-group>
+          </div>
+        </div>
+      </div>
+    </mat-step>
+  </mat-horizontal-stepper>
+</section>

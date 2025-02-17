@@ -1,0 +1,69 @@
+<div class="center-section-scroll vh-100 d-flex body-white" fxFlex>
+  <div class=" " *ngIf="!noShipments">
+    <div class="flex-fixed-header menu-title">
+      <h2
+        class="admin-heading"
+        title="{{
+          selectedShipment.name ? selectedShipment.name : 'Add Inco Term'
+        }}"
+        *ngIf="selectedShipment"
+        [innerHtml]="
+          selectedShipment.name ? selectedShipment.name : 'Add Inco Term'
+        "
+      ></h2>
+      <div *ngIf="viewActivityLogIcon">
+        <button
+          mat-icon-button
+          class="action-orderbtn"
+          (click)="openActivityModal('add_incoterms')"
+        >
+          <img [src]="images.activity_log_icon" title="User Activity Tracker" />
+        </button>
+      </div>
+    </div>
+  </div>
+  <perfect-scrollbar class="perfect-scroll">
+    <div class="min-container" style="height: calc(100% - 60px);position: relative;">
+      <mat-spinner class="medium-spinner" *ngIf="isUpdating"></mat-spinner>
+      <div
+        class="box"
+        *ngIf="!noShipments && !fetchingData"
+        [class.user-footer]="detailsForm?.dirty"
+        style="height: 100%;padding: 0 10px;overflow: auto;"
+      >
+        <div class="form-fields">
+          <app-form-builder
+            [module]="'add_incoterms'"
+            (trigger)="formEmitEvent($event)"
+            [Contacts]="shipments"
+            [undoOnCancel]="undoOnCancel"
+          ></app-form-builder>
+        </div>
+      </div>
+
+      <div
+        class="footer"
+        fxLayout="row"
+        fxLayoutAlign="end center"
+        *ngIf="detailsForm?.dirty"
+      >
+        <button type="button"  class="back-btn-ui" (click)="cancel(detailsForm)">
+          {{ language.defaults.cancel }}
+        </button>
+        <button
+          type="submit"
+          mat-raised-button
+          [disabled]="detailsForm?.invalid || isUpdating"
+          (click)="createIncoterm(detailsForm)"
+        >
+          {{ newShipAdd }}
+        </button>
+      </div>
+    </div>
+
+    <div *ngIf="noShipments" class="no-records">
+      <img [src]="images.no_shipments" />
+      <p>No Incoterms Found</p>
+    </div>
+  </perfect-scrollbar>
+</div>

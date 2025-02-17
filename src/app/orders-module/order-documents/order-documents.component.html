@@ -1,0 +1,59 @@
+<mat-list class="shipment_section inv_hover" style="padding-top: 0">
+  <mat-expansion-panel class="shipment_panel">
+    <mat-expansion-panel-header
+      [collapsedHeight]="'40px'"
+      [expandedHeight]="'40px'"
+      *ngIf="orderDocMap.get(typeId)[0].is_display"
+    >
+      <mat-list-item class="inactive-tab shipping_item inv_hover">
+        <mat-icon mat-list-icon class="post_ship_icon icon-menu">
+          <img
+            [src]="images.Pre_Shipping_Generation_Icon"
+            style="position: relative; top: 1px"
+            title="Custom Documents"
+          />
+        </mat-icon>
+        <h4 mat-line class="shipment_title">
+          {{ orderDocMap.get(typeId)[0].document_type_name }}
+        </h4>
+      </mat-list-item>
+    </mat-expansion-panel-header>
+    <ng-container>
+      <mat-list-item
+        (click)="
+          moveSelectedDocument(list.id ? list.id : list.module, list.type)
+        "
+        class="inactive-tab"
+        title="{{ list.name }}"
+        *ngFor="let list of orderDocMap.get(typeId)"
+        [class.active]="list.id == docName"
+      >
+        <mat-icon
+          mat-list-icon
+          class="post_ship_icon icon-menu"
+          style="background-color: #f07e0a"
+        >
+          <img
+            [src]="images.orders_small"
+            style="position: relative; top: 1px"
+            title="Export Invoice"
+          />
+        </mat-icon>
+        <h4 mat-line>
+          {{ list.name }}
+        </h4>
+      </mat-list-item>
+    </ng-container>
+  </mat-expansion-panel>
+</mat-list>
+<!---pre shipping -->
+<!-- <app-pre-shipping-documents
+  [preShippingDocumentsList]="orderPreDocuments"
+  [orderId]="orderId"
+  (dataEvent)="receivedDocument($event)"
+>
+</app-pre-shipping-documents> -->
+<!--post shipping-->
+<!-- <app-post-shipping-documents
+  [postShippingDocuments]="orderPostDocuments"
+></app-post-shipping-documents> -->

@@ -1,0 +1,24 @@
+.button-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+}
+.button-container button {
+  flex: 1;
+}
+.page-inner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.cdk-overlay-container .mat-dialog-container .mat-toolbar {
+  justify-content: center;
+}
+
+.cdk-overlay-container .mat-dialog-content {
+  margin-left: 25px;
+}
+.info-icon {
+  margin-left: -10px;
+}

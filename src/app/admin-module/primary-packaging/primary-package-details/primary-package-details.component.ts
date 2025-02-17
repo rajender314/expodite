@@ -14,7 +14,7 @@ import * as _ from 'lodash';
   selector: 'app-primary-package-details',
   templateUrl: './primary-package-details.component.html',
   styleUrls: ['./primary-package-details.component.scss'],
-  providers: [AdminService, SnakbarService],
+  providers: [SnakbarService],
   animations: [
       trigger('AdminDetailsAnimate', [
           transition(':enter', [
@@ -28,6 +28,8 @@ export class PrimaryPackageDetailsComponent implements OnInit {
   @ViewChild("myInput", {static: false}) nameField: MatSelect;
   @Input() containers;
   @Output() trigger = new EventEmitter<object>();
+  @Input() isEditPermission = true;
+
   public images = Images;
   detailsForm: FormGroup;
   fetchingData: boolean;
@@ -111,10 +113,13 @@ private param = {
   }
 
   ngOnInit() {
-    // console.log(this.adminService)
     this.createForm();
     this.getContainers(this.param, 'pagination');
-
+    if(this.isEditPermission) {
+      this.detailsForm.enable();
+    } else if(!this.isEditPermission) {
+      this.detailsForm.disable();
+    }
   }
 
   getContainers(param: object, flag?: string, cb?): void {

@@ -1,0 +1,68 @@
+<div class="order-main-container">
+  <mat-toolbar>
+    <div class="create-order-title-wrapper">
+      <span class="img-icon">
+        <img [src]="createOrderIcon" alt="Icon" />
+      </span>
+      <h2 class="order-main-title">
+        {{ data.title ? data.title : "Create PO" }}
+      </h2>
+    </div>
+  </mat-toolbar>
+  <mat-dialog-content style="max-height: 70vh !important">
+    <div class="page-inner-container">
+      <form>
+        <app-form-builder
+          [module]="'add_po'"
+          (trigger)="formEmitEvent($event)"
+          (changeclietId)="changeclietId($event)"
+          [Contacts]="data.order_id ? data.order_id : ''"
+        ></app-form-builder>
+        <app-products-form
+          [module]="'add_products_in_po'"
+          [shipmetOrderProducts]="data.shipmetOrderProducts || ''"
+          (trigger)="emitNewProductsData($event)"
+          [Contacts]="data.order_id ? data.order_id : ''"
+          [clientSelectedId]="clientSelectedId"
+          [selectedRowsGrid]="data.rowIds"
+          [editPo]="data.isEditMode"
+        >
+        </app-products-form>
+        <div>
+          <app-sub-total-form
+            [module]="'po_subtotal_form'"
+            [subTotalSum]="subTotalVal"
+            [selectedCurrency]="selectedCurrency"
+            (trigger)="subTotalFormEvent($event)"
+            [Contacts]="data.order_id ? data.order_id : ''"
+          ></app-sub-total-form>
+        </div>
+      </form>
+      <mat-spinner
+        class="medium-spinner page-fixed"
+        *ngIf="fetchingData"
+      ></mat-spinner>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions>
+    <div class="cofirmOrderActionsBlock">
+      <button class="back-btn-ui" mat-dialog-close>Close</button>
+      <button
+        mat-raised-button
+        id="createorder"
+        color="primary"
+        (click)="createPoConfirm()"
+        [disabled]="
+        !poFormData?.valid ||
+          !SubTotalPayload?.valid ||
+          !productsFormData?.valid ||
+          disabledSave
+        "
+      >
+        <!-- getSelectedProdsLenght() == 0 || -->
+        {{ data.isEditMode ? "Update PO" : "Confirm PO" }}
+      </button>
+    </div>
+  </mat-dialog-actions>
+</div>

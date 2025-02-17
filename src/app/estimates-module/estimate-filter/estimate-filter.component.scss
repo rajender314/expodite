@@ -1,0 +1,11 @@
+.filter-field-container {
+    max-height: 88% !important;
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px 24px;
+    .fields {
+        display: flex;
+        flex-direction: column;
+        // gap: 10px;
+    }
+}

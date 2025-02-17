@@ -1,0 +1,22 @@
+<div fxLayout="row">
+  <app-view-list
+    [update]="updatedContactDetails"
+    (trigger)="getSelectedContactAddress($event)"
+    [form_module_name]="form_module_name"
+    (getFormName)="getFormName($event)"
+    [namingConvention]="namingConvention"
+    [isAddPerm]="getAddPermission()"
+    [isImportPerm]="getImportPermission()"
+  ></app-view-list>
+  <app-view-details
+    [contacts]="selectedContact"
+    style="width: 100%"
+    (trigger)="updateContactDetails($event)"
+    [form_module_name]="form_module_name"
+    [form_name]="form_name"
+    [noDataImage]="noDataImage"
+    [namingConvention]="namingConvention"
+    [isEditPerm]="getEditPermission()"
+    [isAddPerm]="getAddPermission()"
+  ></app-view-details>
+</div>

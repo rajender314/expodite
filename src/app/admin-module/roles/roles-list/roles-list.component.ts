@@ -6,6 +6,7 @@ import * as _ from 'lodash';
 import { Param } from '../../../custom-format/param';
 import { AdminService } from '../../../services/admin.service';
 import { trigger, style, transition, animate, keyframes, query, stagger } from '@angular/animations';
+import { Images } from '../../../images/images.module';
 
 @Component({
   selector: 'app-roles-list',
@@ -22,7 +23,7 @@ import { trigger, style, transition, animate, keyframes, query, stagger } from '
   ]
 })
 export class RolesListComponent implements OnInit, OnChanges {
-
+  public images = Images;
   fetchingData: boolean;
   searching: boolean;
   paginationScroll: boolean;
@@ -37,7 +38,7 @@ export class RolesListComponent implements OnInit, OnChanges {
   private listActive = true;
   @Input() update;
   @Output() trigger = new EventEmitter<object>();
-
+  @Input() isAddPerm = true;
   private param: Param = {
     page: 1,
     perPage: 12,

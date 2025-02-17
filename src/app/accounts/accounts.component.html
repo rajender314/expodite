@@ -1,0 +1,67 @@
+<!-- <mat-sidenav-container>
+    <mat-sidenav #sidenav  style="width:300px;">
+      <mat-toolbar color="primary">
+        <h2>Accounts</h2> 
+</mat-toolbar>
+      <mat-nav-list>
+        <a *ngFor="let list of sideList"  routerLinkActive="active"
+           mat-list-item  
+           [routerLink]="[list.route]"
+           (click)="sidenav.toggle()"> {{list.name}}</a>
+          
+
+
+      </mat-nav-list>
+    </mat-sidenav>
+    <mat-sidenav-content >
+      <div style="height: 100vh;">
+          <mat-toolbar color="primary">
+            <button  mat-icon-button 
+                     aria-label="Menu"
+                     (click)="sidenav.open()">
+            <mat-icon>menu</mat-icon>
+                     </button>  
+                     <h2>Accounts</h2> 
+    </mat-toolbar>
+      <router-outlet></router-outlet>
+      </div>
+    </mat-sidenav-content>
+  </mat-sidenav-container> -->
+  <div class="admin" fxLayout="row">
+  
+    <div class="center-section-scroll vh-100 d-flex secundory-menu " id="forResponsive">
+      <div class="flex-fixed-header menu-title">
+        <h1 >Accounts</h1>
+      </div>
+      <perfect-scrollbar class="flex-scroll-items p-l-8 p-r-8 ">
+        <!-- <mat-list class="media-list ">
+          <a *ngFor="let list of sideList"  routerLinkActive="active"
+           mat-list-item  
+           [routerLink]="[list.route]"
+          > {{list.name}}</a>
+          
+      </mat-list> -->
+      <mat-list class="media-list ">
+        <mat-list-item  *ngFor="let list of sideList" [routerLink]="[list.route]" routerLinkActive="active">
+          <div class="media d-flex align-items-center">
+            <div class="media-aside align-self-center" title="{{list.name}}">
+              <span class="b-avatar badge-light-primary  badge-light-info" style="border-radius: 0px;">
+                <span class="b-avatar-img img " style="border-radius: 0px;">
+                  <img class="admin-icons" [src]='list.icon'>
+                </span>
+              </span>
+            </div>
+            <div class="media-body">
+              <h1 style="padding-bottom: 0;" title="{{list.name}}">{{list.name}}</h1>
+            </div>
+          </div>
+           
+        </mat-list-item>
+    </mat-list>
+      </perfect-scrollbar>
+  
+    </div>
+    <div class="center-section-scroll vh-100 d-flex body-color ">
+      <router-outlet></router-outlet>
+    </div>
+  </div>

@@ -1,0 +1,122 @@
+<section
+  class="center-section-scroll vh-100 d-flex body-color"
+>
+  <div class="page-header-ui">
+    <div class="flex-fixed-header page-title">
+      <div class="d-flex">
+        <div class="inv-back" [routerLink]="['/reports']">
+          <mat-icon class="back-to-orders">arrow_back</mat-icon>
+        </div>
+        <h1>Duty Drawback</h1>
+      </div>
+      <div class="d-flex align-items-center">
+        <div
+          class="view-section"
+          *ngIf="permissionForView && viewsList.length && showSaveView"
+        >
+          <mat-form-field appearance="fill" class="custom-input custom-client">
+            <!-- <label class="font-600">Saved Views</label> -->
+            <mat-select
+              [(ngModel)]="savedViewValue"
+              placeholder="Saved Views"
+            >
+              <mat-option
+              (click)="getSelectedView(savedViewValue, view)"
+                *ngFor="let view of viewsList; let i = index"
+                [value]="view.view_id"
+                class="with-delete-icon"
+                >{{ view.view_name }}
+                <span
+                  class="delete-view"
+                  title="Delete View"
+                  *ngIf="view.view_id != 1 && view.is_delete_icon"
+                  (click)="deleteView(view.view_id, i)"
+                >
+                  <img [src]="deleteIcon" alt="delete icon" />
+                </span>
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <button
+          mat-raised-button
+          class="mat-button mat-primary-btn"
+          *ngIf="showSaveView && adminService.rolePermissions.save_report_views == 1"
+          (click)="saveView()"
+        >
+          Save View
+        </button>
+        <button
+          mat-raised-button
+          class="mat-button mat-primary-btn"
+          (click)="getOrdersExportReport()"
+          *ngIf="adminService.rolePermissions.export_report == 1"
+        >
+          Export
+        </button>
+        <button
+          mat-raised-button
+          class="mat-button mat-primary-btn filter-btn"
+          (click)="openFilters()"
+        >
+        <div>
+          <mat-icon [matBadge]="filterCount">filter_list</mat-icon>
+          <span>Filters</span>
+        </div>
+          <div (click)="clearFilters($event)" title="Clear Filters" *ngIf="filterCount" style="display: flex;">
+          <!-- <mat-icon class="close-icon">close</mat-icon> -->
+          <img [src]="images.removeIcon" alt="img" class="removeRedIcon">
+          </div>
+        </button>
+        <!-- <div class="clear-filter" (click)="clearFilters()" *ngIf="filterCount">
+          Clear
+        </div> -->
+        <!-- <button class="mat-primary" mat-button (click)="clearFilters()">
+          Clear
+        </button> -->
+      </div>
+    </div>
+  </div>
+
+
+
+    <div class="reports-grid" >
+      <ng-container *ngIf="showGrid">
+        <ag-grid-angular
+          class="ag-theme-alpine ag-theme-balham reports_grid"
+          [gridOptions]="ReportsService.gridOptions"
+          [sideBar]="sideBar"
+          [defaultColDef]="defaultColDef"
+          [columnDefs]="columnDefs"
+          [animateRows]="true"
+          rowHeight="40"
+          headerHeight="30"
+          [enableRangeSelection]="true"
+          [enableFilter]="true"
+          [enableSorting]="true"
+          [enableColResize]="true"
+          (gridReady)="onGridReady($event)"
+          [rowModelType]="rowModelType"
+          (sortChanged)="onSortChanged($event)"
+          (firstDataRendered)="ReportsService.onFirstDataRendered($event)"
+        >
+        
+        </ag-grid-angular>
+      </ng-container>
+    </div>
+    <div class="pagination-footer" >
+      <div class="container-ui d-flex space-between align-items-center" style="max-width: unset;padding: 0 20px;">
+        <div>
+          <p>Showing {{ listCount }} out of {{ totalCount }}</p>
+        </div>
+        <div>
+          <app-pagination
+          [pageLimit]="totalCount"
+          (pageloadMore)="loadMore($event)"
+          [pageNumber]="pageNumber"
+        >
+        </app-pagination>
+        </div>
+      </div>
+    </div>
+</section>

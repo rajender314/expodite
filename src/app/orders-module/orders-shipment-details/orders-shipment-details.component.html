@@ -1,0 +1,974 @@
+<div class="orders">
+  <div>
+    <mat-horizontal-stepper #stepper>
+      <mat-step-header></mat-step-header>
+
+      <mat-step>
+        <div *ngIf="!fetchingData">
+          <mat-toolbar class="inner-detail-toolbar" id="order-toolbar">
+            <div class="inv-back" (click)="backToOrders(stepper)">
+              <mat-icon class="back-to-orders">arrow_back</mat-icon>
+            </div>
+            <img [src]="images.small_icon" />
+            <span class="title" title="{{ orders.selectedOrder.order_no }}">{{
+              orders.selectedOrder.order_no
+            }}</span>
+            <span
+              class="title"
+              *ngIf="clientPermission"
+              title="{{ orders.selectedOrder.po_nbr }}"
+              >{{ orders.selectedOrder.po_nbr }}</span
+            >
+            <div
+              class="order-detail-status"
+              [ngStyle]="{ background: orders.selectedOrder.status_color_code }"
+            >
+              {{ selectedOrderStatus }}
+            </div>
+            <span fxFlex></span>
+
+            <span class="order-date"
+              >Client Name:
+              <b>{{ orders.selectedOrder.client_name }}</b>
+            </span>
+            <span class="vertical-divider"></span>
+            <span class="order-date"
+              >Order Date:
+              <b>{{ orders.selectedOrder.order_date }}</b>
+            </span>
+            <span class="vertical-divider"></span>
+
+            <!-- <button
+              mat-button
+              class="cancel-order-button"
+              [disableRipple]="true"
+              *ngIf="
+                disableCancel != undefined &&
+                !(orders.selectedOrder.status_slug == 'cancelled') &&
+                blockContent &&
+                !disableCancel &&
+                factoryPermission &&
+                !(orders.selectedOrder.status_slug == 'delivered')
+              "
+              (click)="cancelAllOrder()"
+            >
+              Cancel this Order
+            </button> -->
+            <!-- <button
+              mat-button
+              class="cancel-order-button"
+              [disableRipple]="true"
+              *ngIf="
+                disableCancel != undefined &&
+                disableCancel &&
+                blockContent &&
+                factoryPermission &&
+                !(orders.selectedOrder.status_slug == 'delivered')
+              "
+              (click)="deliverOrder()"
+            >
+              Mark as Delivered
+            </button> -->
+            <!-- <button
+              mat-button
+              class="cancel-order-button"
+              [disableRipple]="true"
+              *ngIf="
+                selectedOrderStatus == 'Delivered' ||
+                selectedOrderStatus == 'Mail Sent'
+              "
+              (click)="deliverOrder()"
+            >
+              Delivery Info
+            </button> -->
+            <!-- <button
+              mat-button
+              class="cancel-order-button"
+              *ngIf="factoryPermission && !clientPermission"
+              [disabled]="
+                sendDocumentMails == false || selectedOrderStatus == 'Cancelled'
+              "
+              [disableRipple]="true"
+              (click)="sendMails()"
+            >
+              Email Documents
+            </button> -->
+          </mat-toolbar>
+          <div
+            class="inner-detail-container"
+            id="innerDetailContent"
+            fxLayout="row"
+          >
+            <div class="side-nav">
+              <mat-list class="inner-detail-list">
+                <mat-list-item
+                  class="inactive-tab"
+                  title="Activity"
+                  [class.active]="activeTab == 'activity'"
+                >
+                  <mat-icon
+                    mat-list-icon
+                    class="icon-menu"
+                    style="background: #ef5350"
+                  >
+                    <img [src]="images.activity_small" title="Activity" />
+                  </mat-icon>
+                  <h4 mat-line>Activity</h4>
+                </mat-list-item>
+
+                <mat-list-item
+                  class="inactive-tab"
+                  title="Order Details"
+                  (click)="moveToDetails()"
+                  [class.active]="activeTab == 'details'"
+                >
+                  <mat-icon
+                    mat-list-icon
+                    class="icon-menu"
+                    style="background: #f07e0a"
+                  >
+                    <img
+                      [src]="images.orders_small"
+                      style="position: relative; top: 3px"
+                      title="Order Details"
+                    />
+                  </mat-icon>
+                  <h4 mat-line>Order Details</h4>
+                </mat-list-item>
+
+                <mat-list-item
+                  class="inactive-tab"
+                  title="Freight and Logistics for Customs Passing"
+                  *ngIf="factoryPermission"
+                  [ngClass]="{
+                    active: activeTab == 'freight',
+                    'no-details': !order_Permissions?.freight_and_logistic
+                  }"
+                >
+                  <mat-icon
+                    mat-list-icon
+                    class="icon-menu"
+                    style="background: #679136"
+                  >
+                    <img
+                      [src]="images.shippingDetails_small"
+                      title="Freight and Logistics for Customs Passing"
+                    />
+                  </mat-icon>
+                  <h4 mat-line>Freight and Logistics for Customs Passing</h4>
+                </mat-list-item>
+                <mat-list-item
+                  class="inactive-tab"
+                  title="Other Order Details"
+                  *ngIf="factoryPermission"
+                  [ngClass]="{
+                    active: activeTab == 'otherOrder',
+                    'no-details': !order_Permissions?.other_order_details
+                  }"
+                >
+                  <!-- 'no-details':
+                    this.orders.selectedOrder.status_slug < 12 &&
+                    this.orders.selectedOrder.status_slug != 'delivered' &&
+                    this.orders.selectedOrder.status_slug != 'processed' &&
+                    !saveFreight -->
+                  <mat-icon
+                    mat-list-icon
+                    class="icon-menu"
+                    style="background: #679136"
+                  >
+                    <img
+                      [src]="images.shippingDetails_small"
+                      title="Other Order Details"
+                    />
+                  </mat-icon>
+                  <h4 mat-line>Other Order Details</h4>
+                </mat-list-item>
+
+                <mat-list-item
+                  class="inactive-tab"
+                  title="Shipping Details"
+                  *ngIf="factoryPermission"
+                  [ngClass]="{
+                    active: activeTab == 'shipping',
+                    'no-details': !order_Permissions?.shipping_details
+                  }"
+                >
+                  <!-- 'no-details': !customDocs -->
+                  <mat-icon
+                    mat-list-icon
+                    class="icon-menu"
+                    style="background: #679136"
+                  >
+                    <img
+                      [src]="images.shippingDetails_small"
+                      title="Shipping Details"
+                    />
+                  </mat-icon>
+                  <h4 mat-line>Shipping Details</h4>
+                </mat-list-item>
+                <mat-list-item
+                  class="inactive-tab"
+                  title="OtherCost"
+                  *ngIf="factoryPermission"
+                  [ngClass]="{
+                    active: activeTab == 'othercosts',
+                    'no-details': !order_Permissions?.other_costs
+                  }"
+                >
+                  <!-- 'no-details':
+                    orders.selectedOrder.status_slug != 'docs_completed' &&
+                    orders.selectedOrder.status_slug != 'delivered' &&
+                    orders.selectedOrder.status_slug != 'processed' -->
+                  <mat-icon mat-list-icon class="icon-menu">
+                    <img [src]="images.other_cost_icon" title="OtherCost" />
+                  </mat-icon>
+                  <h4 mat-line>Other Costs</h4>
+                </mat-list-item>
+                <mat-list-item
+                  class="inactive-tab"
+                  title="OtherCost"
+                  *ngIf="factoryPermission"
+                  [ngClass]="{
+                    active: activeTab == 'exportregister',
+                    'no-details': !order_Permissions?.export_register
+                  }"
+                >
+                  <mat-icon mat-list-icon class="icon-menu">
+                    <img
+                      [src]="images.export_register"
+                      title="exportRegister"
+                    />
+                  </mat-icon>
+                  <h4 mat-line>Export Register</h4>
+                </mat-list-item>
+              </mat-list>
+
+              <mat-divider class="divider"></mat-divider>
+              <div *ngIf="dynamicDocLoader">
+                <app-order-documents
+                  [orderDocMap]="orderDocuments"
+                  (documentEventId)="handleDocumentEventId($event)"
+                  [typeId]="typeId"
+                  *ngFor="let typeId of orderDocumentsArr"
+                >
+                </app-order-documents>
+              </div>
+              <!-- _New Adc documents-->
+              <mat-list
+                class="shipment_section post_document_section"
+                style="padding-top: 0"
+              >
+                <mat-expansion-panel
+                  class="shipment_panel"
+                  *ngIf="
+                    factoryPermission && !clientPermission && !isSampleDocs
+                  "
+                >
+                  <mat-expansion-panel-header
+                    [collapsedHeight]="'40px'"
+                    [expandedHeight]="'40px'"
+                  >
+                    <mat-list-item
+                      class="inactive-tab shipping_item"
+                      [ngClass]="{ 'no-details-grp': !postShipDocs }"
+                    >
+                      <mat-icon
+                        mat-list-icon
+                        class="post_ship_icon icon-menu"
+                        style="background-color: #1f8080"
+                      >
+                        <img
+                          [src]="images.invoice_small"
+                          style="position: relative; top: -1px"
+                          title="Post-Shipping Documents"
+                        />
+                      </mat-icon>
+                      <h4 mat-line class="shipment_title">
+                        Post-Shipping Documents
+                      </h4>
+                    </mat-list-item>
+                  </mat-expansion-panel-header>
+
+                  <mat-list-item
+                    class="inactive-tab"
+                    title="Commercial Invoice"
+                    (click)="moveToPostCommercialInvoice()"
+                    *ngIf="factoryPermission && !clientPermission && is_aapl"
+                    [ngClass]="{
+                      active: activeTab == 'postCommercialInvoice',
+                      'no-details': !postShipDocs
+                    }"
+                  >
+                    <mat-icon
+                      mat-list-icon
+                      class="post_ship_icon icon-menu"
+                      style="background-color: #f07e0a"
+                      ><img
+                        [src]="images.orders_small"
+                        style="position: relative; top: 1px"
+                        title="Export Invoice"
+                      />
+                    </mat-icon>
+                    <h4 mat-line>
+                      Commercial Invoice
+                      <span *ngIf="originFileAttachments.length"
+                        >({{ originFileAttachments.length }})</span
+                      >
+                    </h4>
+                  </mat-list-item>
+
+                  <mat-list-item
+                    class="inactive-tab"
+                    title="Country of Origin"
+                    (click)="moveToOrigin()"
+                    *ngIf="factoryPermission && !clientPermission"
+                    [ngClass]="{
+                      active: activeTab == 'origin',
+                      'no-details': true
+                    }"
+                  >
+                    <!-- 'no-details': !postShipDocs -->
+                    <mat-icon mat-list-icon>
+                      <img
+                        [src]="images.pdf_download"
+                        title="Country of Origin"
+                      />
+                    </mat-icon>
+                    <h4 mat-line>
+                      Country of Origin
+                      <span *ngIf="originFileAttachments.length"
+                        >({{ originFileAttachments.length }})</span
+                      >
+                    </h4>
+                  </mat-list-item>
+                  <mat-list-item
+                    class="inactive-tab"
+                    title="Insurance"
+                    (click)="moveToInsurance()"
+                    *ngIf="factoryPermission && !clientPermission"
+                    [ngClass]="{
+                      active: activeTab == 'insurance',
+                      'no-details': true
+                    }"
+                  >
+                    <!-- 'no-details': !postShipDocs -->
+                    <mat-icon mat-list-icon>
+                      <img [src]="images.pdf_download" title="Insurance" />
+                    </mat-icon>
+                    <h4 mat-line>
+                      Insurance
+                      <span *ngIf="insuranceAttachments.length"
+                        >({{ insuranceAttachments.length }})</span
+                      >
+                    </h4>
+                  </mat-list-item>
+
+                  <mat-list-item
+                    class="inactive-tab"
+                    title="Shipping Bill"
+                    (click)="moveToAirway()"
+                    *ngIf="factoryPermission && !clientPermission"
+                    [ngClass]="{
+                      active: activeTab == 'airway',
+                      'no-details': true
+                    }"
+                  >
+                    <!-- 'no-details': !postShipDocs -->
+                    <mat-icon mat-list-icon>
+                      <img [src]="images.pdf_download" title="Shipping Bill" />
+                    </mat-icon>
+                    <h4 mat-line>
+                      Shipping Bill
+                      <span *ngIf="airwayAttachments.length"
+                        >({{ airwayAttachments.length }})</span
+                      >
+                    </h4>
+                  </mat-list-item>
+                </mat-expansion-panel>
+              </mat-list>
+
+              <mat-divider class="divider"></mat-divider>
+
+              <!-- <div
+                fxLayout="column"
+                class="image-upload uploader-ui-section"
+                *ngIf="factoryPermission"
+                [class.not-allowed]="pointerEvent"
+              >
+                <p class="label-title">
+                  Other Documents
+                  <span
+                    class="upload-inform"
+                    *ngIf="
+                      !(orders.selectedOrder.status_slug == 'cancelled') &&
+                      blockContent
+                    "
+                  >
+                    <mat-icon
+                      class="mat-icon material-icons"
+                      role="img"
+                      aria-hidden="true"
+                      title="Valid File Types: jpg, jpeg, pdf, png, doc, docx. File Size: Upto 5MB"
+                      >info</mat-icon
+                    >
+                  </span>
+                </p>
+                <div
+                  *ngIf="!clientPermission"
+                  ng2FileDrop
+                  [ngClass]="{ 'file-over': hasDropZoneOver }"
+                  (fileOver)="fileOverBase($event)"
+                  (onFileDrop)="fileDrop($event)"
+                  [uploader]="uploader"
+                  class="file-zone"
+                  [ngClass]="{
+                    disableClass: selectedOrderStatus == 'Delivered',
+                    'events-none': selectedOrderStatus == 'Delivered'
+                  }"
+                >
+                  <input
+                    id="upload-attachments"
+                    type="file"
+                    ng2FileSelect
+                    [uploader]="uploader"
+                    [ngClass]="{
+                      disableClass: selectedOrderStatus == 'Delivered',
+                      'events-none': selectedOrderStatus == 'Delivered'
+                    }"
+                    (change)="fileSelected($event)"
+                    [hidden]="true"
+                    multiple
+                  />
+                  <div class="pdf-upload layout-column">
+                    <div class="upload-block"></div>
+                    <label
+                      for="upload-attachments"
+                      *ngIf="
+                        !(orders.selectedOrder.status_slug == 'cancelled') &&
+                        blockContent
+                      "
+                    >
+                      <span
+                        class="upload-btn"
+                        [ngClass]="{
+                          disableClass: selectedOrderStatus == 'Delivered',
+                          'events-none': selectedOrderStatus == 'Delivered'
+                        }"
+                        (click)="setImageUrl($event)"
+                      >
+                        <mat-icon
+                          class="mat-icon material-icons"
+                          role="img"
+                          aria-hidden="true"
+                        >
+                          add</mat-icon
+                        >
+                        <span>Upload</span>
+                      </span>
+                    </label>
+                  </div>
+                  <p class="no-docs" *ngIf="!attachments.length">
+                    No Documents Uploaded
+                  </p>
+                </div>
+                <div class="images">
+                  <mat-list
+                    class="other-docs-images"
+                    *ngIf="attachments.length"
+                  >
+                    <mat-list-item
+                      class="images-list"
+                      *ngFor="let file of attachments; let i = index"
+                      (click)="moveToOtherdocs(file)"
+                    >
+                      <span class="upload-image">
+                        <img
+                          class="list-upload"
+                          [src]="images.fileupload_pdf"
+                        />
+                      </span>
+                      <span
+                        class="upload-name"
+                        title="{{ file.original_name }}"
+                      >
+                        <a [href]="file.link_url" target="_blank">{{
+                          file.original_name
+                        }}</a>
+                      </span>
+                      <span fxFlex></span>
+                      <mat-icon
+                        class="delete-upload"
+                        *ngIf="blockContent"
+                        [class.disableClass]="
+                          selectedOrderStatus == 'Delivered' ||
+                          selectedOrderStatus == 'Cancelled'
+                        "
+                        [class.events-none]="
+                          selectedOrderStatus == 'Delivered' ||
+                          selectedOrderStatus == 'Cancelled'
+                        "
+                        (click)="deleteAttachment(i, file)"
+                        title="Delete"
+                        >delete</mat-icon
+                      >
+                    </mat-list-item>
+                  </mat-list>
+                </div>
+              </div> -->
+            </div>
+            <div
+              fxFlex
+              class="inner-detail-content order-detail-content"
+              id="printAll"
+              #scrollContainer
+              (scroll)="scrollOrdersContainer($event)"
+            >
+              <div class="app-container order-form-view">
+                <!-- New Activity Log -->
+                <div class="activity-container" #activity>
+                  <div>
+                    <mat-toolbar class="package-toolbar">
+                      <img
+                        class="logo-img"
+                        [src]="images.activity_small"
+                        title="Activity"
+                      />
+                      <span>Activity Log</span>
+                      <span fxFlex></span>
+                    </mat-toolbar>
+                    <div class="address-container activity-status">
+                      <mat-list *ngFor="let activity of orders.activityDetails">
+                        <mat-list-item class="activity-list">
+                          <div class="activity-progress today-activity"></div>
+                          <div class="activity-details">
+                            <span class="activity-name">
+                              {{ activity.name }}
+                            </span>
+                            <span>{{ activity.date_added }}</span>
+                          </div>
+                        </mat-list-item>
+                      </mat-list>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- .Order Details -->
+                <div
+                  *ngIf="order_Permissions?.order_details"
+                  [class]="details.print ? 'print' : 'no-print'"
+                >
+                  <div
+                    class="order-inner-container"
+                    #details
+                    [class.collapse]="!displayTabs.order_details"
+                  >
+                    <mat-toolbar class="package-toolbar">
+                      <img class="logo-img" [src]="images.ordersIcon_o" />
+                      <span>Order Details</span>
+                      <span fxFlex></span>
+                      <div *ngIf="viewActivityLogIcon">
+                        <button
+                          mat-icon-button
+                          class="action-orderbtn"
+                          (click)="openActivityModal('order_details')"
+                        >
+                          <img
+                            [src]="images.activity_log_icon"
+                            title="Activity Log"
+                          />
+                        </button>
+                      </div>
+                      <a
+                        *ngIf="
+                          !clientPermission &&
+                          orders.selectedOrder.status != 'Cancelled'
+                        "
+                        target="_blank"
+                        [ngClass]="{
+                          'events-none':
+                            orders.selectedOrder.status == 'Cancelled'
+                        }"
+                        href="generate_pdf?id={{
+                          orders.selectedOrder.id
+                        }}&is_printable=1"
+                      >
+                        <button mat-icon-button class="action-orderbtn">
+                          <img [src]="images.printer_icon" title="Print" />
+                        </button>
+                      </a>
+                      <a
+                        *ngIf="orders.selectedOrder.status != 'Cancelled'"
+                        href="generate_pdf?id={{
+                          orders.selectedOrder.id
+                        }}&is_printable=0"
+                        [ngClass]="{
+                          'events-none':
+                            orders.selectedOrder.status == 'Cancelled'
+                        }"
+                      >
+                        <button mat-icon-button class="action-orderbtn">
+                          <img [src]="images.download_arrow" title="Download" />
+                        </button>
+                      </a>
+                      <button
+                        mat-icon-button
+                        (click)="hideTabs('order_details')"
+                      >
+                        <img
+                          [src]="images.grey_arrow"
+                          mat-icon-button
+                          *ngIf="displayTabs.order_details"
+                        />
+                        <mat-icon
+                          class="toggle-arrow"
+                          *ngIf="!displayTabs.order_details"
+                          >keyboard_arrow_down
+                        </mat-icon>
+                      </button>
+                    </mat-toolbar>
+                    <div *ngIf="displayTabs.order_details">
+                      <div
+                        class="address-container"
+                        fxLayout="row"
+                        style="min-height: 400px"
+                      >
+                        <div class="shipper-secction" fxFlex="33">
+                          <h4 class="gray-title">SHIPPER</h4>
+                          <div
+                            class="address-inner-content"
+                            *ngIf="orders.selectedOrder.status == 'Placed'"
+                          >
+                            The shipper address will be updated once the order
+                            is accepted.
+                          </div>
+                          <div
+                            class="address-inner-content text-capitalized"
+                            *ngIf="
+                              orders.selectedOrder.status != 'Placed' &&
+                              orders.companyShpAddrDt
+                            "
+                          >
+                            <b>{{ orders.companyShpAddrDt.address1 }}</b>
+                            <p style="margin: 0px">
+                              {{ orders.companyShpAddrDt.address2 }}
+                            </p>
+                            <p style="margin: 0px">
+                              {{ orders.companyShpAddrDt?.address3 }}
+                            </p>
+                            <p style="margin: 0px">
+                              {{ orders.companyShpAddrDt?.address4 }}
+                            </p>
+                            <p style="margin: 0px">
+                              {{ orders.companyShpAddrDt.city }} -
+                              {{ orders.companyShpAddrDt.postal_code }}
+                            </p>
+                            <p style="margin: 0px">
+                              {{ orders.companyShpAddrDt.state }}
+                            </p>
+                            <p style="margin: 0px">
+                              {{ orders.companyShpAddrDt.country }}
+                            </p>
+                          </div>
+
+                          <button
+                            mat-button
+                            class="cancel-order-button change-shipper"
+                            [disabled]="
+                              orders.selectedOrder.status_slug != 'received' &&
+                              orders.selectedOrder.status_slug !=
+                                'order_ready' &&
+                              orders.selectedOrder.status_slug !=
+                                'confirmation_pending,'
+                            "
+                            [class.disableClass]="
+                              orders.selectedOrder.status_slug != 'received' &&
+                              orders.selectedOrder.status_slug !=
+                                'order_ready' &&
+                              orders.selectedOrder.status_slug !=
+                                'confirmation_pending,'
+                            "
+                            [class.events-none]="
+                              orders.selectedOrder.status_slug != 'received' &&
+                              orders.selectedOrder.status_slug !=
+                                'order_ready' &&
+                              orders.selectedOrder.status_slug !=
+                                'confirmation_pending,'
+                            "
+                            *ngIf="blockContent && factoryPermission"
+                            (click)="changeAddress()"
+                          >
+                            <mat-icon>mode_edit</mat-icon>Change Shipper Address
+                          </button>
+                          <div class="instructions">
+                            <span
+                              title="{{
+                                orders.selectedOrder.special_instructions
+                              }}"
+                              *ngIf="
+                                orders.selectedOrder.special_instructions &&
+                                factoryPermission &&
+                                !clientPermission
+                              "
+                              >Special Instructions:
+                              <b>{{
+                                orders.selectedOrder.special_instructions
+                              }}</b>
+                            </span>
+                          </div>
+                          <div class="instructions">
+                            <span
+                              title="{{
+                                orders.selectedOrder.special_instructions
+                              }}"
+                              *ngIf="
+                                orders.selectedOrder.dispatch_date &&
+                                factoryPermission &&
+                                !clientPermission
+                              "
+                            >
+                              Dispatch Date:
+                              <b>{{
+                                orders.selectedOrder.dispatch_date
+                                  | date : "MMM dd, yyyy"
+                              }}</b>
+                            </span>
+                          </div>
+                          <div class="instructions">
+                            <span
+                              title="{{
+                                orders.selectedOrder.special_instructions
+                              }}"
+                              *ngIf="factoryPermission && !clientPermission"
+                              >Expected Delivery Date:
+                              <b>{{
+                                orders.selectedOrder.delivery_date
+                                  | date : "MMM dd, yyyy"
+                              }}</b>
+                            </span>
+                          </div>
+                        </div>
+                        <div class="vertical-divider"></div>
+                        <div fxFlex="33" class="order-billing">
+                          <div class="shipper-secction">
+                            <h4 class="gray-title">BILL TO PARTY</h4>
+                            <p class="shippers-text shipper-hdng">
+                              {{ orders.billingAddr.billing_company }}
+                            </p>
+                            <div class="address-inner-content">
+                              <b class="bill-address">{{
+                                orders.billingAddr.billing_address1
+                              }}</b>
+                              <p class="bill-address text-capitalized">
+                                {{ orders.billingAddr.billing_address2 }}
+                              </p>
+                              <p class="bill-address text-capitalized">
+                                {{ orders.billingAddr?.billing_address3 }}
+                              </p>
+                              <p class="bill-address text-capitalized">
+                                {{ orders.billingAddr?.billing_address4 }}
+                              </p>
+                              <p
+                                class="bill-address text-capitalized"
+                                *ngIf="
+                                  orders.billingAddr.billing_city ||
+                                  orders.billingAddr.billing_postal_code
+                                "
+                              >
+                                {{ orders.billingAddr.billing_city }} -
+                                {{ orders.billingAddr.billing_postal_code }}
+                              </p>
+                              <p class="bill-address text-capitalized">
+                                {{ orders.billingAddr.billing_state }}
+                              </p>
+                              <p class="bill-address text-capitalized">
+                                {{ orders.billingAddr.billing_country }}
+                              </p>
+                            </div>
+                          </div>
+                          <div class="shipper-secction mt_30">
+                            <h4 class="gray-title">SHIP TO PARTY</h4>
+                            <p class="shippers-text shipper-hdng">
+                              {{ orders.shippingAddr.shipping_company }}
+                            </p>
+                            <div class="address-inner-content">
+                              <b class="bill-address">{{
+                                orders.shippingAddr.shipping_address1
+                              }}</b>
+                              <p class="bill-address text-capitalized">
+                                {{ orders.shippingAddr.shipping_address2 }}
+                              </p>
+                              <p class="bill-address">
+                                {{ orders.shippingAddr?.shipping_address3 }}
+                              </p>
+                              <p class="bill-address">
+                                {{ orders.shippingAddr?.shipping_address4 }}
+                              </p>
+                              <p
+                                class="bill-address text-capitalized"
+                                *ngIf="
+                                  orders.shippingAddr.shipping_city ||
+                                  orders.shippingAddr.shipping_postal_code
+                                "
+                              >
+                                {{ orders.shippingAddr.shipping_city }} -
+                                {{ orders.shippingAddr.shipping_postal_code }}
+                              </p>
+                              <p class="bill-address text-capitalized">
+                                {{ orders.shippingAddr.shipping_state }}
+                              </p>
+                              <p class="bill-address">
+                                {{ orders.shippingAddr.shipping_country }}
+                              </p>
+                            </div>
+                          </div>
+                          <div
+                            class="shipper-secction mt_30"
+                            *ngIf="showNotifyAddress"
+                          >
+                            <h4 class="gray-title">NOTIFY TO PARTY</h4>
+                            <p class="shippers-text shipper-hdng">
+                              {{ orders.notifyAddr.notify_company }}
+                            </p>
+                            <div class="address-inner-content">
+                              <b class="bill-address">{{
+                                orders.notifyAddr.notify_address1
+                              }}</b>
+                              <p class="bill-address text-capitalized">
+                                {{ orders.notifyAddr.notify_address2 }}
+                              </p>
+                              <p class="bill-address">
+                                {{ orders.notifyAddr?.notify_address4 }}
+                              </p>
+                              <p class="bill-address">
+                                {{ orders.notifyAddr?.notify_address3 }}
+                              </p>
+
+                              <p
+                                class="bill-address text-capitalized"
+                                *ngIf="
+                                  orders.notifyAddr.notify_city ||
+                                  orders.notifyAddr.notify_postal_code
+                                "
+                              >
+                                {{ orders.notifyAddr.notify_city }} -
+                                {{ orders.notifyAddr.notify_postal_code }}
+                              </p>
+                              <p class="bill-address text-capitalized">
+                                {{ orders.notifyAddr.notify_state }}
+                              </p>
+                              <p class="bill-address text-capitalized">
+                                {{ orders.notifyAddr.notify_country }}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                        <div
+                          fxFlex
+                          class="order-po-container"
+                          *ngIf="!is_automech"
+                        >
+                          <div class="order-po">
+                            <a class="no-img">
+                              <img class="logo-img" [src]="images.file_pdf" />
+                            </a>
+                            <div class="po-numbheader">
+                              <p
+                                (keydown)="
+                                  editInLineitems(
+                                    $event.target.innerText,
+                                    'po_nbr',
+                                    orderId
+                                  )
+                                "
+                              >
+                                <span>PO No - </span>
+
+                                <span
+                                  class="editable-cell"
+                                  contenteditable="true"
+                                  *ngIf="
+                                    orders.selectedOrder.status !=
+                                      'In-transit' &&
+                                    orders.selectedOrder.status !=
+                                      'Cancelled' &&
+                                    orders.selectedOrder.status !=
+                                      'Delivered' &&
+                                    factoryPermission &&
+                                    adminUser
+                                  "
+                                >
+                                  {{ orders.selectedOrder.po_nbr }}</span
+                                >
+                                <span>{{ errormes }}</span>
+                                <span
+                                  contenteditable="false"
+                                  *ngIf="
+                                    orders.selectedOrder.status ==
+                                      'In-transit' ||
+                                    orders.selectedOrder.status ==
+                                      'Cancelled' ||
+                                    orders.selectedOrder.status ==
+                                      'Delivered' ||
+                                    !factoryPermission ||
+                                    !adminUser
+                                  "
+                                  >{{ orders.selectedOrder.po_nbr }}</span
+                                >
+                              </p>
+                            </div>
+                          </div>
+                          <div class="po-date">
+                            <mat-form-field
+                              class="custom-deliveryDate custom-deliveryDatePo"
+                              floatLabel="never"
+                              style="position: relative; bottom: 21px"
+                            >
+                              <label class="custom-labeldate po-date"
+                                >PO Date</label
+                              >
+                              <input
+                                matInput
+                                class="datepicker"
+                                (focus)="openCalendar(picker2)"
+                                (click)="openCalendar(picker2)"
+                                [disabled]="
+                                  orders.selectedOrder.status == 'In-transit' ||
+                                  orders.selectedOrder.status == 'Cancelled' ||
+                                  orders.selectedOrder.status == 'Delivered' ||
+                                  !factoryPermission ||
+                                  !adminUser
+                                "
+                                [(ngModel)]="po_date2"
+                                [matDatepicker]="picker2"
+                                placeholder="PO Date"
+                                readonly
+                                (dateChange)="
+                                  editInLineitems(po_date2, 'po_date', orderId)
+                                "
+                              />
+                              <mat-datepicker-toggle
+                                class="mat-picker"
+                                matSuffix
+                                [for]="picker2"
+                              >
+                              </mat-datepicker-toggle>
+                              <mat-datepicker
+                                #picker2
+                                startView="year"
+                              ></mat-datepicker>
+                            </mat-form-field>
+                          </div>
+                        </div>
+                      </div>
+                      <div fxLayout="row"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-step>
+    </mat-horizontal-stepper>
+  </div>
+</div>

@@ -1,0 +1,111 @@
+.numaricEdit {
+  border: none;
+  background-color: transparent;
+  outline: none;
+
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  letter-spacing: 0;
+  font-size: 14px;
+
+  text-align: center;
+  color: #323232;
+
+  &.charges {
+    font-weight: 400;
+    text-align: right;
+    padding-right: 5px;
+    color: #565656;
+    padding: 5px;
+    width: 90px;
+  }
+}
+.mat-icon.poQty {
+  cursor: pointer;
+  visibility: hidden;
+  font-size: 14px;
+  color: #747474;
+  // padding-top: 6px;
+}
+
+.invoice-edit:hover .mat-icon.poQty {
+  visibility: visible;
+}
+.edit-hover-po {
+  background: #ffffff;
+  border: 1px solid;
+  border-color: #dfe3e9;
+  text-align: right;
+  border-radius: 3px;
+  padding: 5px 12px;
+  transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+  -webkit-transition: background-color 0.2s ease-in-out,
+    border-color 0.2s ease-in-out;
+}
+.edit-qty-po {
+  border: 1px solid #075da8;
+}
+.close-circle-icons-po {
+  font-size: 18px;
+}
+.edit-po-description {
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  font-size: 14px;
+  // color: #565656;
+  letter-spacing: -0.18px;
+  line-height: 25px;
+  text-align: left;
+  height: 120px;
+  width: 140px;
+  padding: 2px;
+}
+.po-descr {
+  font-size: 14px;
+  color: #323232;
+  font-weight: 400;
+  text-align: left;
+  line-height: 21px;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+.descountEdit:hover .mat-icon {
+  display: inline-block;
+  // opacity: 1;
+  cursor: pointer;
+}
+.mat-icon.descountEdit {
+  cursor: pointer;
+  display: none;
+  // opacity: 0;
+  font-size: 14px;
+  color: #747474;
+  padding-top: 6px;
+}
+.ellipse-po {
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.save-icons {
+  display: flex;
+  mat-icon {
+    font-size: 24px;
+  }
+}
+.edit-new-style {
+  padding: 0 !important;
+  width: 0 !important;
+  border-top: 1px solid #dfdfdf;
+
+  &.table-style {
+    border: 1px solid #dfdfdf;
+    border-right: 0;
+  }
+  mat-icon {
+    display: flex !important;
+    justify-content: center;
+    align-items: center;
+    width: 20px !important;
+  }
+}

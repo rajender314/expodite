@@ -61,6 +61,7 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
   imports: [
   
     InvoiceRoutingModule,
+    CommonModule,
     SharedModule,
     
     

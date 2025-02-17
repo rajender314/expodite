@@ -1,0 +1,62 @@
+<div
+  class="shipping-container"
+  [class.collapse]="!showexportRegister"
+  *ngIf="order_Permissions.export_register"
+>
+  <!-- order.orders_types_id == '14' ||
+  order.orders_types_id == '4' ||
+  order.orders_types_id == '6' -->
+  <mat-toolbar class="package-toolbar">
+    <img class="othercost-image" [src]="images.export_register" />
+    <span>Export Register</span>
+    <span fxFlex></span>
+    <div *ngIf="viewActivityLogIcon">
+      <button
+        mat-icon-button
+        class="action-orderbtn"
+        (click)="openActivityModal('other_order_details')"
+      >
+        <img [src]="images.activity_log_icon" title="Activity Log" />
+      </button>
+    </div>
+    <button mat-icon-button (click)="toggleExportRegister()">
+      <img
+        [src]="images.grey_arrow"
+        mat-icon-button
+        *ngIf="showexportRegister"
+      />
+      <mat-icon class="toggle-arrow" *ngIf="!showexportRegister"
+        >keyboard_arrow_down
+      </mat-icon>
+    </button>
+  </mat-toolbar>
+  <div class="shipping-sec" style="padding: 16px" *ngIf="showexportRegister">
+    <app-form-builder
+      [related_to_id]="order.id"
+      module="export_register"
+      (trigger)="formEmitEvent($event)"
+      [undoOnCancel]="undoOnCancel"
+    ></app-form-builder>
+    <mat-list
+      class="footer-bottom fxflex"
+      *ngIf="exportRegisterForm?.dirty"
+      fxLayout="row"
+      fxLayoutAlign="end center"
+    >
+      <span fxFlex></span>
+      <section class="section-right">
+        <button type="button" mat-button (click)="cancelExportRegister()">
+          Cancel
+        </button>
+        <button
+          type="submit"
+          mat-raised-button
+          (click)="submmitExportRegister(exportRegisterForm)"
+        >
+          Save
+        </button>
+      </section>
+      <div class="cb"></div>
+    </mat-list>
+  </div>
+</div>

@@ -1,0 +1,258 @@
+<div class="center-section-scroll vh-100 d-flex body-white">
+  <div class="page-header-ui" *ngIf="!noDataFound">
+    <div class="flex-fixed-header page-title container-ui">
+      <h2
+        class="admin-heading"
+        *ngIf="selectedDocument"
+        [innerHtml]="
+          selectedDocument.name ? selectedDocument.name : 'Add Document'
+        "
+      >
+        Document Templates
+      </h2>
+    </div>
+  </div>
+  <perfect-scrollbar class="padding-16">
+    <div class="max-container">
+      <form
+        [formGroup]="documentTemplate"
+        (ngSubmit)="createDocument(documentTemplate)"
+      >
+        <mat-spinner *ngIf="fetchingData" class="medium-spinner"></mat-spinner>
+        <div
+          [class.user-footer]="documentTemplate.dirty"
+          *ngIf="!noDataFound && !fetchingData"
+        >
+          <div>
+            <mat-form-field
+              class="custom-input mandatory"
+              floatLabel="never"
+              style="width: 50%"
+            >
+              <label class="custom-label mandatory">Document Name</label>
+              <input
+                matInput
+                #myInput
+                placeholder="Document Name"
+                formControlName="name"
+              />
+              <mat-error
+                *ngIf="
+                  submmitDcoumentcontent ||
+                  (!documentTemplate.controls.name.pristine &&
+                    documentTemplate.controls.name.hasError('required'))
+                "
+                >Please Enter Document Name</mat-error
+              >
+            </mat-form-field>
+            <div>
+              <mat-form-field
+                class="custom-input mandatory compny-sub-flx"
+                floatLabel="never"
+                style="width: 50%"
+              >
+                <label class="custom-label mandatory">Type of Document</label>
+                <mat-select
+                  placeholder="Type of Document"
+                  formControlName="document_template_types_id"
+                >
+                  <mat-option
+                    *ngFor="let type of typeOfDocument"
+                    [value]="type.id"
+                    >{{ type.name }}</mat-option
+                  >
+                </mat-select>
+                <mat-error
+                  *ngIf="
+                    submmitDcoumentcontent ||
+                    (!documentTemplate.controls.document_template_types_id
+                      .pristine &&
+                      documentTemplate.controls.document_template_types_id.hasError(
+                        'required'
+                      ))
+                  "
+                  >Please Select Type of Document</mat-error
+                >
+              </mat-form-field>
+            </div>
+            <div>
+              <mat-form-field
+                class="custom-input mandatory"
+                floatLabel="never"
+                style="width: 50%"
+              >
+                <label class="custom-label mandatory">Display Order</label>
+                <input
+                  matInput
+                  #myInput
+                  placeholder="Display Order"
+                  formControlName="display_order"
+                />
+                <mat-error
+                  *ngIf="
+                    submmitDcoumentcontent ||
+                    (!documentTemplate.controls.name.pristine &&
+                      documentTemplate.controls.name.hasError('required'))
+                  "
+                  >Please Enter Document Name</mat-error
+                >
+              </mat-form-field>
+            </div>
+
+            <div>
+              <mat-form-field
+                class="custom-input compny-sub-flx"
+                floatLabel="never"
+                style="width: 50%"
+              >
+                <label class="custom-label">Status</label>
+                <mat-select placeholder="Status" formControlName="status">
+                  <mat-option
+                    *ngFor="let status of statuses"
+                    [value]="status.code"
+                    [innerHtml]="status.name"
+                    >{{ status.name }}</mat-option
+                  >
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div *ngIf="addDocument">
+              <mat-checkbox
+                color="primary"
+                [disabled]="disableCheck"
+                formControlName="is_editable"
+                [(ngModel)]="isModuleSelectEnabled"
+                (change)="onCheckboxChange($event)"
+              >
+                Is Editable
+              </mat-checkbox>
+            </div>
+            <div>
+              <mat-form-field
+                class="custom-input mandatory"
+                floatLabel="never"
+                style="width: 50%"
+                *ngIf="isModuleSelectEnabled"
+              >
+                <label class="custom-label mandatory">Select Form</label>
+                <mat-select
+                  placeholder="Select Form"
+                  [(ngModel)]="selectedModule"
+                  formControlName="form_id"
+                  (selectionChange)="changeModule($event.value)"
+                >
+                  <mat-option
+                    *ngFor="let module of modulesList"
+                    [value]="module.id"
+                  >
+                    {{ module.name }}
+                  </mat-option>
+                </mat-select>
+                <mat-error
+                  *ngIf="
+                    submmitDcoumentcontent ||
+                    (!documentTemplate.controls.form_id.pristine &&
+                      documentTemplate.controls.form_id.hasError('required'))
+                  "
+                  >Please Select Form</mat-error
+                >
+              </mat-form-field>
+            </div>
+            <div *ngIf="addDocument">
+              <mat-form-field
+                class="custom-input compny-sub-flx"
+                floatLabel="never"
+                style="width: 50%"
+              >
+                <label class="custom-label"
+                  >Copy From (Default Templates)</label
+                >
+                <mat-select
+                  placeholder="Copy From"
+                  formControlName="default_template_id"
+                  (selectionChange)="selectTemplate($event.value)"
+                >
+                  <!-- (click)="selectTemplate(template)" -->
+                  <mat-option
+                    *ngFor="let template of copyFormArray"
+                    [value]="template.id"
+                    >{{ template.name }}</mat-option
+                  >
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div style="padding: 10px 0px">
+              <mat-checkbox
+                color="primary"
+                [disabled]="disableCheck"
+                formControlName="document_header"
+              >
+                Document Header
+              </mat-checkbox>
+              <mat-checkbox
+                style="padding-left: 18px"
+                color="primary"
+                [disabled]="disableCheck"
+                formControlName="document_footer"
+              >
+                Document Footer
+              </mat-checkbox>
+            </div>
+          </div>
+
+          <div class="page-sub-heading" style="color: #565656">
+            <h3 style="font-weight: 600">Applies For</h3>
+          </div>
+
+          <div>
+            <editor
+              formControlName="document_body"
+              apiKey="m6pytxyrr1skt334tr62hs26erp55qjgr1zhvwp8k2lt9hik"
+              id=""
+              [init]="{
+                height: 500,
+                plugins:
+                  'advlist autolink link image lists charmap print preview hr anchor pagebreak spellchecker searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime media nonbreaking save table directionality template paste',
+                toolbar:
+                  'insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | l      ink image | print preview media fullpage | forecolor backcolor ',
+                fontsize_formats:
+                  '5pt 6pt 7pt 8pt 9pt 10pt 11pt 12pt 14pt 18pt 24pt 30pt 36pt 48pt 60pt 72pt 96pt'
+              }"
+            ></editor>
+          </div>
+        </div>
+
+        <div
+          *ngIf="documentTemplate.dirty && documentTemplate.enabled"
+          class="document-footer document-container"
+          fxLayout="row"
+          fxLayoutAlign="start end"
+        >
+          <div class="min-container d-flex justify-content-end">
+            <button
+              type="button"
+              class="back-btn-ui"
+              (click)="cancel(documentTemplate)"
+            >
+              <!-- {{ language.defaults.cancel }} -->
+              Cancel
+            </button>
+            <button
+              type="submit"
+              mat-raised-button
+              [disabled]="documentTemplate.invalid"
+            >
+              {{ addTemplate }}
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="no-results full" *ngIf="noDataFound">
+      <div class="empty-img-holder">
+        <img [src]="images.no_category" />
+      </div>
+      <p class="no-result-text">No Templates Found</p>
+    </div>
+  </perfect-scrollbar>
+</div>

@@ -1,0 +1,668 @@
+<div>
+  <div class="inner-container" [class.collapse]="!showPackage">
+    <mat-toolbar class="package-toolbar">
+      <img class="shipping-image" [src]="images.pdf_download" />
+      <span> Packing List</span>
+      <span fxFlex></span>
+      <div *ngIf="viewActivityLogIcon">
+        <button
+          mat-icon-button
+          class="action-orderbtn"
+          (click)="openActivityModal('package_list')"
+        >
+          <img [src]="images.activity_log_icon" title="Activity Log" />
+        </button>
+      </div>
+      <a
+        href="generatePackingList?orders_id={{order_id}}&is_printable=1"
+        target="_blank"
+      >
+        <button mat-icon-button>
+          <img [src]="images.printer_icon" title="Print" />
+        </button>
+      </a>
+      <a href="generatePackingList?orders_id={{ order_id }}&is_printable=0">
+        <button mat-icon-button>
+          <img [src]="images.download_arrow" title="Download" />
+        </button>
+      </a>
+
+      <a
+        *ngIf="viewExcelIcon"
+        href="generatePackingList?orders_id={{ order_id }}&is_excel=1&is_printable=0"
+      >
+        <button mat-icon-button>
+          <img [src]="images.excel_icon" title="Download Excel" />
+        </button>
+      </a>
+
+      <button mat-icon-button (click)="togglePackage()">
+        <img [src]="images.grey_arrow" mat-icon-button *ngIf="showPackage" />
+        <mat-icon mat-icon-button class="toggle-arrow" *ngIf="!showPackage">
+          keyboard_arrow_down</mat-icon
+        >
+      </button>
+    </mat-toolbar>
+    <div class="Fema-declration table-container" *ngIf="showPackage">
+      <div class="fema-container">
+        <div class="VGM-table">
+          <div class="address-container" fxLayout="row">
+            <div class="shipper-secction" fxFlex="30">
+              <div style="display: flex; gap: 4px">
+                <h4 class="gray-title">CONSIGNEE</h4>
+                <div style="display: flex; cursor: pointer">
+                  <span (click)="consigneEdit()">
+                    <mat-icon class="mat-icon-notify1" mat-icon-button
+                      >edit</mat-icon
+                    >
+                  </span>
+                </div>
+              </div>
+
+              <mat-form-field
+                class="custom-input block-ele grid-full"
+                floatLabel="never"
+                *ngIf="editConsigne"
+                style="
+                  margin-top: 0px;
+                  position: relative;
+                  left: -20px;
+                  top: -8px;
+                "
+              >
+                <textarea
+                  (focus)="captureInitialValue($event, '')"
+                  #consigneeTextarea1
+                  matInput
+                  placeholder="Enter Consignee"
+                  autofocus="on"
+                  style="
+                    height: 90px;
+                    line-height: 1.4;
+                    padding: 4px 10px;
+                    border-width: 2px;
+                  "
+                  rows="3"
+                  (focusout)="SaveAddress('consigne',$event)"
+                  [(ngModel)]="consignee"
+                >
+                </textarea>
+              </mat-form-field>
+              <div class="shipper-secction" *ngIf="showConsigne">
+                <div class="address-inner-content">
+                  <p class="invoice-contact" [innerHTML]="consignee"></p>
+                </div>
+              </div>
+            </div>
+
+            <div class="vertical-divider"></div>
+            <div class="shipper-secction" fxFlex="30">
+              <div style="display: flex; gap: 4px">
+                <h4 class="gray-title">BUYER</h4>
+                <div style="display: flex; cursor: pointer">
+                  <span (click)="customBillParty()">
+                    <mat-icon class="mat-icon-notify1" mat-icon-button
+                      >edit</mat-icon
+                    >
+                  </span>
+                </div>
+              </div>
+
+              <mat-form-field
+                class="custom-input block-ele grid-full"
+                floatLabel="never"
+                *ngIf="editBillPackage"
+                style="
+                  margin-top: 0px;
+                  position: relative;
+                  left: -20px;
+                  top: -8px;
+                "
+              >
+                <textarea
+                  (focus)="captureInitialValue($event, '')"
+                  #buyerTextarea1
+                  matInput
+                  placeholder="Enter Buyer"
+                  autofocus="on"
+                  style="
+                    height: 90px;
+                    line-height: 1.4;
+                    padding: 4px 10px;
+                    border-width: 2px;
+                  "
+                  rows="3"
+                  (focusout)="SaveAddress('buyer',$event)"
+                  [(ngModel)]="buyer"
+                >
+                </textarea>
+              </mat-form-field>
+              <div class="shipper-secction" *ngIf=" showBill">
+                <div class="address-inner-content">
+                  <p class="invoice-contact" [innerHTML]="buyer"></p>
+                </div>
+              </div>
+            </div>
+
+            <div class="vertical-divider"></div>
+            <div class="shipper-secction" fxFlex="30">
+              <div style="display: flex; gap: 4px">
+                <h4 class="gray-title">NOTIFY TO PARTY</h4>
+                <div style="display: flex; cursor: pointer">
+                  <span (click)="EditNotifyParty()">
+                    <mat-icon class="mat-icon-notify1" mat-icon-button
+                      >edit</mat-icon
+                    >
+                  </span>
+                </div>
+              </div>
+
+              <mat-form-field
+                class="custom-input block-ele grid-full"
+                floatLabel="never"
+                *ngIf="editNotify"
+                style="
+                  margin-top: 0px;
+                  position: relative;
+                  left: -20px;
+                  top: -8px;
+                "
+              >
+                <textarea
+                  (focus)="captureInitialValue($event, '')"
+                  #notifyTextarea1
+                  matInput
+                  placeholder="Enter Notify To Party"
+                  autofocus="on"
+                  style="
+                    height: 90px;
+                    line-height: 1.4;
+                    padding: 4px 10px;
+                    border-width: 2px;
+                  "
+                  rows="3"
+                  (focusout)="SaveAddress('notify',$event)"
+                  [(ngModel)]="notify"
+                >
+                </textarea>
+              </mat-form-field>
+              <div class="shipper-secction" *ngIf=" showNotify">
+                <div class="address-inner-content">
+                  <p class="invoice-contact" [innerHTML]="notify"></p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- <table
+              style="
+                border-collapse: collapse;
+                border: 1px solid #565656;
+                width: 100%;
+                padding-top: 60px;
+              "
+            >
+              <tbody>
+                <tr>
+                  <td
+                    colspan="4"
+                    style="
+                      text-align: center;
+                      border-right: 1px solid #565656;
+                      padding-left: 10px;
+                      border-top: 1px solid #565656;
+                      font-weight: bold;
+                    "
+                  >
+                    COMMERCIAL INVOICE
+                  </td>
+                </tr>
+                <tr>
+                  <td
+                    colspan="2"
+                    rowspan="5"
+                    style="
+                      border-right: 1px solid #565656;
+                      padding-left: 10px;
+                      border-top: 1px solid #565656;
+                    "
+                  >
+                    Exporter
+                    <p style="margin: 0; margin-bottom: 8px">AAPL SOLUTIONS</p>
+                  </td>
+                  <td
+                    colspan="1"
+                    rowspan="1"
+                    style="
+                      border-right: 1px solid #565656;
+                      padding-left: 10px;
+                      border-top: 1px solid #565656;
+                      height: 50px;
+                    "
+                  >
+                    Invoice No. & Date
+                  </td>
+                  <td
+                    colspan="1"
+                    rowspan="1"
+                    style="
+                      border-right: 1px solid #565656;
+                      padding-left: 10px;
+                      border-top: 1px solid #565656;
+                    "
+                  >
+                    Exporter's Ref
+                  </td>
+                </tr>
+                <tr>
+                  <td
+                    colspan="1"
+                    rowspan="1"
+                    style="
+                      border-left: 1px solid #565656;
+                      border-right: 1px solid #565656;
+                      padding-left: 10px;
+                      border-top: 1px solid #565656;
+                      height: 10px;
+                    "
+                  ></td>
+                  <td
+                    colspan="1"
+                    rowspan="1"
+                    style="
+                      border-bottom: 1px solid #565656;
+                      border-left: 1px solid #565656;
+                      padding-left: 10px;
+                      border-top: 1px solid #565656;
+                    "
+                  ></td>
+                </tr>
+                <tr>
+                  <td
+                    style="
+                      border-left: 1px solid #565656;
+                      padding-left: 10px;
+                      border-top: 1px solid #565656;
+                      height: 50px;
+                    "
+                  >
+                    Buyer Order No. & Date
+                  </td>
+                </tr>
+                <tr>
+                  <td
+                    colspan="1"
+                    style="
+                      border-left: 1px solid #565656;
+                      padding-left: 10px;
+                      border-top: 1px solid #565656;
+                    "
+                  >
+                    <p style="margin: 0; margin-bottom: 8px"></p>
+                  </td>
+                  <td
+                    colspan="1"
+                    style="
+                      border-left: 1px solid #565656;
+                      padding-left: 10px;
+                      border-top: 1px solid #565656;
+                    "
+                  >
+                    <p style="margin: 0; margin-bottom: 8px"></p>
+                  </td>
+                </tr>
+                <tr>
+                  <td
+                    colspan="1"
+                    style="
+                      border-left: 1px solid #565656;
+                      padding-left: 10px;
+                      border-top: 1px solid #565656;
+                    "
+                  >
+                    <p style="margin: 0; margin-bottom: 8px">
+                      Other Reference (s)
+                    </p>
+                  </td>
+                  <td
+                    colspan="1"
+                    style="
+                      border-left: 1px solid #565656;
+                      padding-left: 10px;
+                      border-top: 1px solid #565656;
+                    "
+                  >
+                    <p style="margin: 0; margin-bottom: 8px"></p>
+                  </td>
+                </tr>
+                <tr>
+                  <td
+                    colspan="2"
+                    rowspan="3"
+                    style="
+                      border-right: 1px solid #565656;
+                      padding-left: 10px;
+                      border-top: 1px solid #565656;
+                    "
+                  >
+                    Consignee
+                  </td>
+                  <td
+                    colspan="2"
+                    style="
+                      border-right: 1px solid #565656;
+                      padding-left: 10px;
+                      border-top: 1px solid #565656;
+                      height: 150px;
+                    "
+                  >
+                    Buyer (if other than Consignee)
+                  </td>
+                </tr>
+                <tr>
+                  <td
+                    colspan="1"
+                    style="
+                      border-left: 1px solid #565656;
+                      padding-left: 10px;
+                      border-top: 1px solid #565656;
+                    "
+                  >
+                    Country of Origin of Goods INDIA
+                  </td>
+                  <td
+                    colspan="1"
+                    style="
+                      border-left: 1px solid #565656;
+                      padding-left: 10px;
+                      border-top: 1px solid #565656;
+                    "
+                  >
+                    Counrty of Final Destination USA
+                  </td>
+                </tr>
+                <tr>
+                    <td
+                      colspan="1"
+                      style="
+                        border-left: 1px solid #565656;
+                        padding-left: 10px;
+                        border-top: 1px solid #565656;
+                      "
+                    >
+                      -
+                    </td>
+                    <td
+                      colspan="1"
+                      style="
+                        border-left: 1px solid #565656;
+                        padding-left: 10px;
+                        border-top: 1px solid #565656;
+                      "
+                    >
+                      -
+                    </td>
+                  </tr>
+              </tbody>
+            </table> -->
+          <style>
+            .packaging-table {
+              width: 100%;
+              border-collapse: collapse;
+              /* table-layout: fixed; */
+            }
+
+            .packaging-table tr td {
+              padding: 4px;
+            }
+
+            .packaging-table tr td.p-0 {
+              padding: 0;
+            }
+          </style>
+          <table class="packaging-table" cellspacing="0" cellpadding="0">
+            <tr style="text-align: left">
+              <td colspan="2">Pre Carriage by</td>
+              <td colspan="2">Place of Receipent by pr-carrier</td>
+              <td colspan="1">Vessel/Flight No.</td>
+              <td colspan="2">Port of Loading :</td>
+            </tr>
+            <tr style="text-align: left">
+              <td colspan="2">{{freightData?.precarriage_by }}</td>
+              <td colspan="2">{{freightData?.place_of_reciept_pre_carrier}}</td>
+              <td colspan="1" style="word-break: break-all">
+                {{shippingData?.vessel_no}}
+              </td>
+              <td colspan="2">{{freightData?.port_of_loading}}</td>
+            </tr>
+            <tr style="text-align: left">
+              <td colspan="3">Marks & Nos .</td>
+              <!-- <td colspan="2"> No. & Kind of Packages</td> -->
+              <td colspan="2">Port of Discharge</td>
+              <td colspan="2">Final Destination</td>
+            </tr>
+            <tr style="text-align: left">
+              <td
+                style="padding: 28px"
+                colspan="3"
+                [innerHTML]="PackageData?.description"
+              ></td>
+              <!-- <td colspan="2">{{ PackageData?.container_string }}</td> -->
+              <td colspan="2">{{freightData?.port_of_discharge}}</td>
+              <td colspan="2">{{freightData?.final_destination}}</td>
+            </tr>
+            <tr>
+              <td style="width: 5%; text-align: left">S.No.</td>
+              <td style="text-align: left">Packing</td>
+              <td style="text-align: left">Description of Goods</td>
+              <td style="text-align: left">Hs Code</td>
+              <td style="text-align: right">Quantity</td>
+              <td style="text-align: right">Rate</td>
+              <td style="text-align: right">Amount</td>
+            </tr>
+
+            <ng-container
+              *ngFor="let product of PackageData?.packing;index as productIndex"
+            >
+              <tr
+                *ngFor="let batch of product?.batchesData[0]?.contains; index as batchIndex;"
+              >
+                <td style="text-align: left">{{batch?.serial_no}}</td>
+                <td style="text-align: left">{{ batch.container_name }}</td>
+                <td style="text-align: left">
+                  {{ product?.productPackage.product_name }}
+                </td>
+                <td style="text-align: left">
+                  {{ product?.productPackage.hs_code }}
+                </td>
+                <td style="text-align: right">
+                  {{ (batch?.palletType ? batch?.primary_quantity *
+                  batch?.container_quantity * batch?.quantity_type :
+                  batch?.container_quantity * batch?.quantity_type) | number}}
+                </td>
+                <td style="text-align: right">{{ batch?.price }}</td>
+                <td style="text-align: right">{{ batch?.prod_total_price }}</td>
+              </tr>
+            </ng-container>
+            <tr>
+              <td colspan="7" align="center">Packaging Details</td>
+            </tr>
+            <tr>
+              <td style="text-align: left; width: 5%">S.No.</td>
+              <td style="text-align: left; width: 15%">Total Ctns / Pallets</td>
+              <td style="text-align: left; width: 20%">Items</td>
+              <td style="text-align: left; width: 15%">Dimensions (cm)</td>
+              <!-- <td style="width: 15%;">EACH CARTON</td> -->
+              <td class="p-0">
+                <table width="100%" style="border: 0px">
+                  <tr>
+                    <td colspan="2" align="center" style="border: 0px">
+                      Each Carton
+                    </td>
+                  </tr>
+                  <tr>
+                    <td
+                      style="width: 50%; border-bottom: 0px; border-left: 0px"
+                      align="right"
+                    >
+                      Net Wt
+                    </td>
+                    <td
+                      style="width: 50%; border-bottom: 0px; border-right: 0px"
+                      align="right"
+                    >
+                      Gross Wt
+                    </td>
+                  </tr>
+                </table>
+              </td>
+              <td class="p-0">
+                <table width="100%" style="border: 0px">
+                  <tr>
+                    <td colspan="2" align="center" style="border: 0px">
+                      Total Weight
+                    </td>
+                  </tr>
+                  <tr>
+                    <td
+                      style="width: 50%; border-bottom: 0px; border-left: 0px"
+                      align="right"
+                    >
+                      Net Wt
+                    </td>
+                    <td
+                      style="width: 50%; border-bottom: 0px; border-right: 0px"
+                      align="right"
+                    >
+                      Gross Wt
+                    </td>
+                  </tr>
+                </table>
+              </td>
+              <td style="width: 10%; text-align: right">
+                {{PackageData?.cal_label}}
+              </td>
+            </tr>
+            <ng-container
+              *ngFor="let product of PackageData?.packing;index as productIndex"
+            >
+              <tr
+                *ngFor="let batch of product.batchesData[0].contains; index as batchIndex;"
+              >
+                <td style="text-align: left; width: 5%">
+                  {{batch?.serial_no}}
+                </td>
+                <td style="text-align: left; width: 15%">
+                  {{ batch.container_quantity }}
+                </td>
+                <td style="text-align: left; width: 20%">
+                  {{ product?.productPackage.product_name }}
+                </td>
+                <td style="text-align: left; width: 15%">
+                  {{ batch.height_in_cm }} X {{ batch.weight_in_cm }} X {{
+                  batch.dimensions_in_cm }}
+                </td>
+                <td class="p-0">
+                  <table width="100%" style="border: 0px">
+                    <tr>
+                      <td
+                        style="
+                          width: 50%;
+                          border-top: 0px;
+                          border-bottom: 0px;
+                          border-left: 0px;
+                        "
+                        align="right"
+                      >
+                        {{ (!batch.palletType ? batch.net_weight : '' )|
+                        number:'1.2-2'}}
+                      </td>
+                      <td
+                        style="
+                          width: 50%;
+                          border-top: 0px;
+                          border-bottom: 0px;
+                          border-right: 0px;
+                        "
+                        align="right"
+                      >
+                        {{ (!batch.palletType ? +batch.net_weight +
+                        +batch.tar_weight : '') | number:'1.2-2' }}
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+                <td class="p-0">
+                  <table width="100%" style="border: 0px">
+                    <tr>
+                      <td
+                        style="
+                          width: 50%;
+                          border-top: 0px;
+                          border-bottom: 0px;
+                          border-left: 0px;
+                        "
+                        align="right"
+                      >
+                        {{ batch.net_wgt_total }}
+                      </td>
+                      <td
+                        style="
+                          width: 50%;
+                          border-top: 0px;
+                          border-bottom: 0px;
+                          border-right: 0px;
+                        "
+                        align="right"
+                      >
+                        {{ batch.gross_weight_total }}
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+                <td style="width: 10%; text-align: right">
+                  {{batch?.cal_val}}
+                </td>
+              </tr>
+            </ng-container>
+          </table>
+          <div class="adc-enclosure shipper_address package-list">
+            <p class="shipper-head-address">
+              BL NO. : {{shippingData?.bol_id}}
+            </p>
+            <p class="shipper-head-address">
+              S/B NO : {{shippingData?.bill_no}}
+            </p>
+            <p class="shipper-head-address">
+              CONTAINER NO. : {{container_nbr}}
+            </p>
+            <p class="shipper-head-address">A. SEAL NO. :{{custom_seal_nbr}}</p>
+            <p class="shipper-head-address">
+              C. SEAL NO. : {{carrier_seal_nbr}}
+            </p>
+            <p class="shipper-head-address">
+              GSTIN NO. : {{companyDetails?.gstin_no}}
+            </p>
+            <p class="shipper-head-address">
+              I.E. CODE NO. : {{companyDetails?.ie_code}}
+            </p>
+            <p class="shipper-head-address">Declaration :</p>
+            <p class="shipper-head-address">
+              We declare that this Invoice shows the actual price of the goods
+            </p>
+            <p class="shipper-head-address">
+              described and that all particulars are true and correct
+            </p>
+          </div>
+          <div
+            class="adc-signature authorized-signature"
+            style="text-align: right"
+          >
+            <p class="authorized-head">{{companyDetails?.name}}</p>
+            <p class="authorized-head">Authorised Signatory</p>
+          </div>
+        </div>
+        <!-- </div> -->
+      </div>
+    </div>
+  </div>
+</div>

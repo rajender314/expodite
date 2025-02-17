@@ -23,7 +23,7 @@
 		</mat-card>
 	</div>
 	<div class="footer-bottom products-footer fxflex animated slideInUp" *ngIf="activeState"  fxLayout="row" fxLayoutAlign="end center">
-		<button type="button" mat-button (click)="cancelDocumentTypes()">{{language.defaults.cancel}}</button>
+		<button type="button"  class="back-btn-ui" (click)="cancelDocumentTypes()">{{language.defaults.cancel}}</button>
 		<button type="submit" mat-raised-button (click)="saveDocumentTypes()">{{language.defaults.save}}</button>
 	</div>
 </div>

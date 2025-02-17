@@ -1,0 +1,31 @@
+<mat-toolbar>
+  <h2 mat-dialog-title>Add Vendor</h2>
+</mat-toolbar>
+<mat-dialog-content>
+  <form [formGroup]="detailsForm" class="multy-forms">
+    <!-- [class.not-allowed]="pointerEvent" -->
+
+    <div fxLayout="row" style="padding-top: 0">
+      <app-form-builder
+      [module]="'add_vendors'"
+      (trigger)="formEmitEvent($event)"
+      (emitUploadInfo)="emitUploadInfo($event)"
+      [editUpload]="false"
+      [PermissionKey]="'add_vendor'"
+    ></app-form-builder>
+    </div>
+  </form>
+</mat-dialog-content>
+<mat-spinner class="medium-spinner" *ngIf="showSpinner"></mat-spinner>
+<mat-dialog-actions>
+  <span fxFlex></span>
+  <button class="back-btn-ui" mat-dialog-close (click)="cancelOrg()">Cancel</button>
+  <button
+    mat-raised-button
+    (click)="addOrg(detailsForm)"
+    [disabled]="disabledSave || !detailsForm || detailsForm?.invalid"
+
+  >
+    Add Vendor
+  </button>
+</mat-dialog-actions>

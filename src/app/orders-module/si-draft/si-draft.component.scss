@@ -1,0 +1,27 @@
+.disable {
+  border: none;
+  margin: 0;
+  background-color: transparent;
+}
+
+.layout {
+  max-height: 100%;
+  overflow: visible;
+  transition: all 0.3s ease;
+
+  &.minimize-div {
+    padding: 0;
+    max-height: 0vh;
+    overflow: hidden;
+  }
+}
+
+.expand-icon {
+  transition: all 0.5s ease;
+  &.close {
+    transform: rotate(-180deg);
+  }
+}
+.word-break {
+  word-break: break-all;
+}

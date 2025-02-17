@@ -128,7 +128,10 @@ export class EmailDocumentsComponent implements OnInit {
     }else{
       this.showAttachmentsError = false;
     }
-    const params = { orders_id: this.data.order_id, invoice_id: this.data.invoice_id, to: this.emailDocuments.value.toUser, cc: this.emailDocuments.value.ccUser, subject: this.emailDocuments.value.emailSubject, message: this.emailDocuments.value.emailBody, documentArr: selectedIds }
+    const params = { orders_id: this.data.order_id, 
+      invoice_id: this.data.invoice_id, to: this.emailDocuments.value.toUser,
+       cc: this.emailDocuments.value.ccUser, subject: this.emailDocuments.value.emailSubject,
+        message: this.emailDocuments.value.emailBody, documentArr: selectedIds, uom_id: this.data.uom_id }
     if (this.emailDocuments.valid && selectedIds.length){
       this.dialogRef.close();
       let toast: object;

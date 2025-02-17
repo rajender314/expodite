@@ -1,0 +1,32 @@
+.add-package-button {
+  display: flex;
+  padding: 15px;
+  gap: 8px;
+  background: #e4e5e9;
+  cursor: pointer;
+  align-items: center;
+  border-radius: 5px;
+  font-size: 15px;
+  color: #ff5722;
+  border: 0;
+}
+.package-container {
+  padding: 16px;
+}
+.add-import {
+  display: flex;
+  gap: 10px;
+}
+.import-items {
+  background: transparent;
+  border: 0px;
+  cursor: pointer;
+  font-size: 15px;
+  display: flex;
+  color: #323232;
+  align-items: center;
+  gap: 4px;
+  &:hover {
+    text-decoration: underline;
+  }
+}

@@ -12,3 +12,18 @@
 //         }
 //     }
 // }
+
+perfect-scrollbar {
+    .ps-content {
+        height: 100% !important;
+        .roles-form {
+            height: calc(100% - 68px) !important;
+            .min-container  {
+                height: 100% !important;
+            .form-fields {
+                overflow: auto !important;
+            }
+            }
+        }
+    }
+}

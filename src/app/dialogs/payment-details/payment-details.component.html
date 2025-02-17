@@ -1,0 +1,246 @@
+<mat-toolbar color="primary" style="height: 54px">
+  <h2 mat-dialog-title>Payment Details</h2>
+  <span fxFlex></span>
+</mat-toolbar>
+<mat-dialog-content style="padding: 0px">
+  <div
+    class="min-container"
+    id="custome-gaps"
+    style="
+      height: calc(100vh - 140px);
+      margin: 0 auto;
+      padding: 0px;
+      border-top: none;
+    "
+    *ngFor="let detail of selectedInsuranceList"
+  >
+    <!-- *ngIf="!editable" -->
+    <div class="ex-row">
+      <div class="grid-six">
+        <h3 class="inv-readonly fw-600">Payment ID</h3>
+        <span class="inv-para">{{
+          detail?.payment_id ? detail?.payment_id : "--"
+        }}</span>
+      </div>
+      <div class="grid-six">
+        <h3 class="inv-readonly fw-600">Client Name</h3>
+        <span class="inv-para">{{
+          detail?.client_id ? detail?.client_id : "--"
+        }}</span>
+      </div>
+
+      <div class="grid-six">
+        <h3 class="inv-readonly fw-600">Country</h3>
+        <span class="inv-para">{{
+          detail?.country_id ? detail?.country_id : "--"
+        }}</span>
+      </div>
+
+      <div class="grid-six">
+        <h3 class="inv-readonly fw-600">Currency</h3>
+        <span class="inv-para">{{
+          detail?.currency_id ? detail?.currency_id : "--"
+        }}</span>
+      </div>
+
+      <div class="grid-six">
+        <h3 class="inv-readonly fw-600">Remitter Name</h3>
+        <span class="inv-para">{{
+          detail?.remitter_name ? detail?.remitter_name : "--"
+        }}</span>
+      </div>
+
+      <div class="grid-six">
+        <h3 class="inv-readonly fw-600">Amount</h3>
+        <span class="inv-para">{{
+          detail?.amount ? detail?.amount : "--"
+        }}</span>
+      </div>
+
+      <div class="grid-six">
+        <h3 class="inv-readonly fw-600">Conversion Rate (applied)</h3>
+        <span class="inv-para">{{
+          detail?.conversion_rate_applied
+            ? detail?.conversion_rate_applied
+            : "--"
+        }}</span>
+      </div>
+
+      <div class="grid-six">
+        <h3 class="inv-readonly fw-600">Conversion Rate (icegate)</h3>
+        <span class="inv-para">{{
+          detail?.bank_name ? detail?.bank_name : "--"
+        }}</span>
+      </div>
+
+      <div class="grid-six">
+        <h3 class="inv-readonly fw-600">Payment Date</h3>
+        <span class="inv-para">{{
+          detail?.date_of_payment ? detail?.date_of_payment : "--"
+        }}</span>
+      </div>
+
+      <div class="grid-six">
+        <h3 class="inv-readonly fw-600">Bank Name</h3>
+        <span class="inv-para">{{
+          detail?.bank_name ? detail?.bank_name : "--"
+        }}</span>
+      </div>
+
+      <div class="grid-six">
+        <h3 class="inv-readonly fw-600">Bank Charges (USD)</h3>
+        <span class="inv-para">{{
+          detail?.bank_charges_usd ? detail?.bank_charges_usd : "--"
+        }}</span>
+      </div>
+
+      <div class="grid-six">
+        <h3 class="inv-readonly fw-600">Bank Charges (INR)</h3>
+        <span class="inv-para">{{
+          detail?.bank_charges_inr ? detail?.bank_charges_inr : "--"
+        }}</span>
+      </div>
+
+      <div class="grid-six">
+        <h3 class="inv-readonly fw-600">Bank Advise Notes</h3>
+        <span class="inv-para">{{
+          detail?.bank_advise_notes ? detail?.bank_advise_notes : "--"
+        }}</span>
+      </div>
+
+      <div class="grid-six">
+        <h3 class="inv-readonly fw-600">Payment Mode</h3>
+        <span class="inv-para">{{
+          detail?.payment_mode ? detail?.payment_mode : "--"
+        }}</span>
+      </div>
+
+      <div class="grid-six">
+        <h3 class="inv-readonly fw-600">Type of Payment</h3>
+        <span class="inv-para">{{
+          detail?.type_of_payment ? detail?.type_of_payment : "--"
+        }}</span>
+      </div>
+
+      <div class="grid-six">
+        <h3 class="inv-readonly fw-600">Purpose Code</h3>
+        <span class="inv-para">{{
+          detail?.purpose_code ? detail?.purpose_code : "--"
+        }}</span>
+      </div>
+      <div class="grid-six">
+        <h3 class="inv-readonly fw-600">FIRC Number</h3>
+        <span class="inv-para">{{
+          detail?.firc_no ? detail?.firc_no : "--"
+        }}</span>
+      </div>
+
+      <div class="grid-six">
+        <h3 class="inv-readonly fw-600">FIRC Date</h3>
+        <span class="inv-para">{{
+          detail?.firc_date ? detail?.firc_date : "--"
+        }}</span>
+      </div>
+      <div class="grid-six">
+        <h3 class="inv-readonly fw-600">BRC No</h3>
+        <span class="inv-para">{{
+          detail?.brc_no ? detail?.brc_no : "--"
+        }}</span>
+      </div>
+      <div class="grid-six">
+        <h3 class="inv-readonly fw-600">BRC Date</h3>
+        <span class="inv-para">{{
+          detail?.brc_date ? detail?.brc_date : "--"
+        }}</span>
+      </div>
+    </div>
+    <!-- <div>
+      <h3
+        class="inv-readonly fw-600"
+        style="padding-left: 14px; font-size: 20px"
+      >
+        Documents
+      </h3>
+      <div style="display: flex">
+        <div
+          class="docs_img_wrap"
+          *ngFor="let file of detail.upload_docs; let i = index"
+        >
+          <div class="upload_post">
+            <div class="upload_section">
+              <a target="_blank" style="padding-bottom: 20px">
+                <div class="delete-value">
+                  <button
+                    mat-icon-button
+                    class="dots"
+                    [matMenuTriggerFor]="menu"
+                    aria-label="Example icon-button with a menu"
+                  >
+                    <mat-icon>more_vert</mat-icon>
+                  </button>
+                </div>
+
+                <img
+                  *ngIf="
+                    file.filepath.lastIndexOf('.pdf') == -1 &&
+                    file.filepath.lastIndexOf('.doc') == -1 &&
+                    file.filepath.lastIndexOf('.doc') == -1 &&
+                    file.filepath.lastIndexOf('.xlsx') == -1
+                  "
+                  class="list-upload-img"
+                  [src]="file.filepath"
+                />
+                <div *ngIf="file.filepath.lastIndexOf('.pdf') > -1">
+                  <img
+                    [src]="images.pdf_png"
+                    style="height: 100%; width: 100%; object-fit: contain"
+                  />
+                </div>
+                <div *ngIf="file.filepath.lastIndexOf('.xlsx') > -1">
+                  <img
+                    [src]="images.xlsx_png"
+                    style="height: 100%; width: 100%; object-fit: contain"
+                  />
+                </div>
+                <div
+                  *ngIf="
+                    file.filepath.lastIndexOf('.doc') > -1 ||
+                    file.filepath.lastIndexOf('.docx') > -1
+                  "
+                >
+                  <img
+                    [src]="images.docx_png"
+                    style="height: 100%; width: 100%; object-fit: contain"
+                  />
+                </div>
+                <p class="file-name truncate" title="{{ file.original_name }}">
+                  {{ file.original_name }}
+                </p>
+              </a>
+            </div>
+            <mat-menu #menu="matMenu" class="custom-menu-list">
+              <div class="upload-drop">
+                <span class="img-icon">
+                  <a
+                    class="click"
+                    title="Download"
+                    (click)="downloadFile(file, i, 'sales')"
+                  >
+                    <span class="pointer"> Download </span>
+                  </a>
+                </span>
+              </div>
+            </mat-menu>
+            <div class="icon-sections">
+              <div class="icon-content"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div> -->
+  </div>
+</mat-dialog-content>
+<mat-dialog-actions style="height: 54px">
+  <span fxFlex></span>
+  <button class="back-btn-ui" mat-dialog-close>Cancel</button>
+</mat-dialog-actions>

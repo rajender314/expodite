@@ -1,0 +1,322 @@
+<div class="inner-container" style="min-height: unset !important">
+  <!-- [class.collapse]="!showChaLetter" -->
+  <mat-toolbar class="package-toolbar">
+    <img class="shipping-image" [src]="images.pdf_download" />
+    <span>CHA Letter</span>
+    <span fxFlex></span>
+    <div *ngIf="viewActivityLogIcon">
+      <button
+        mat-icon-button
+        class="action-orderbtn"
+        (click)="openActivityModal('cha_letter')"
+      >
+        <img [src]="images.activity_log_icon" title="Activity Log" />
+      </button>
+    </div>
+
+    <button (click)="onEdit()" mat-icon-button>
+      <mat-icon class="edit-icon" title="Edit" mat-icon-button
+        >mode_edit
+      </mat-icon>
+    </button>
+    <a
+      *ngIf="!clientPermission"
+      target="_blank"
+      href="generatecha1Pdf?orders_id={{
+        orders.selectedOrder.id
+      }}&is_printable=1"
+    >
+      <button mat-icon-button>
+        <img [src]="images.printer_icon" title="Print" />
+      </button>
+    </a>
+    <a
+      href="generatecha1Pdf?orders_id={{
+        orders.selectedOrder.id
+      }}&is_printable=0"
+    >
+      <button mat-icon-button>
+        <img [src]="images.download_arrow" title="Download" />
+      </button>
+    </a>
+    <!-- (click)="toggleChaLetter()" -->
+    <!-- *ngIf="showChaLetter" -->
+    <!-- *ngIf="!showChaLetter" -->
+
+    <button (click)="toggleDiv()" mat-icon-button>
+      <img
+        class="expand-icon"
+        [class.close]="!showDiv"
+        [src]="images.grey_arrow"
+        mat-icon-button
+      />
+    </button>
+  </mat-toolbar>
+  <!-- *ngIf="showChaLetter" -->
+  <div class="table-container layout" [class.minimize-div]="!showDiv">
+    <div class="sealed-container" style="font-size: 14px; color: #565656">
+      <table style="width: 100%">
+        <tr>
+          <td valign="top">
+            <p style="margin: 0; margin-bottom: 4px">To,</p>
+            <p
+              *ngIf="!isEditing"
+              style="padding-top: 20px; margin: 0"
+              [innerHTML]="data?.toAddress"
+            ></p>
+            <mat-form-field
+              *ngIf="isEditing"
+              class="custom-input block-ele grid-full"
+              floatLabel="never"
+              style="
+                margin-top: 0px;
+                position: relative;
+                left: -5px;
+                top: 7px;
+                max-width: 50%;
+              "
+            >
+              <textarea
+                [(ngModel)]="toAddress"
+                matInput
+                placeholder="Enter To Address"
+                autofocus="on"
+                style="
+                  height: 126px;
+                  line-height: 1.4;
+                  padding: 4px 10px;
+                  border-width: 2px;
+                "
+                rows="3"
+              >
+              </textarea>
+            </mat-form-field>
+          </td>
+          <td valign="top" style="text-align: right; margin-right: 30px">
+            <b>{{ currentDate }}</b>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2">
+            <!-- <p
+              style="margin: 6px 0px 12px"
+              *ngFor="let invoice of orders.invoice"
+            >
+              Kind Attention: {{ invoice.Inovice?.kindName }}
+            </p> -->
+            <p style="margin: 16px 0px">
+              Sub:
+              <span style="text-decoration: underline"
+                >Export Document
+                <span *ngFor="let invoice of orders.invoice">{{
+                  invoice.Inovice.inv_nbr
+                }}</span
+                >– By
+                <span> {{ freightData.shipment_name }}</span>
+              </span>
+            </p>
+            <p style="margin-bottom: 4px">Dear Sir,</p>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2" *ngFor="let invoice of orders.invoice">
+            <p style="padding: 6px 0px">
+              We are sending herewith below exports documents for custom
+              clearing purpose:
+            </p>
+            <div style="padding-left: 24px">
+              <p style="padding: 6px 0px">
+                <span style="padding-right: 10px">1.</span>Invoice No.
+                {{ invoice.Inovice.inv_nbr }} dtd.
+                {{ invoice.Inovice.date_added }} (5 Original)
+              </p>
+              <p style="padding: 6px 0px">
+                <span style="padding-right: 10px">2.</span>Packing List No.
+                {{ invoice.Inovice.inv_nbr }} dtd.
+                {{ invoice.Inovice.date_added }} (5 Original)
+              </p>
+              <p style="padding: 6px 0px">
+                <span style="padding-right: 10px">3.</span>Tax Invoice No.
+                {{ invoice.Inovice.inv_nbr }} dtd.
+                {{ invoice.Inovice.date_added }}
+              </p>
+              <p style="padding: 6px 0px">
+                <span style="padding-right: 10px">4.</span>
+                Documents are under Duty Drawback scheme.
+              </p>
+              <p
+                *ngIf="!isEditing"
+                style="padding: 6px 0px; padding-left: 36px; font-weight: bold"
+                [innerHTML]="products"
+              ></p>
+              <mat-form-field
+                *ngIf="isEditing"
+                class="custom-input block-ele grid-full"
+                floatLabel="never"
+                style="
+                  margin-top: 0px;
+                  position: relative;
+                  left: -5px;
+                  top: 7px;
+                  max-width: 50%;
+                "
+              >
+                <textarea
+                  [(ngModel)]="data.product"
+                  matInput
+                  placeholder="Enter To Address"
+                  autofocus="on"
+                  style="
+                    height: 126px;
+                    line-height: 1.4;
+                    padding: 4px 10px;
+                    border-width: 2px;
+                  "
+                  rows="3"
+                >
+                </textarea>
+              </mat-form-field>
+              <!-- <p
+                style="padding: 6px 0px; padding-left: 36px; font-weight: bold"
+                *ngFor="
+                  let product of orders.productsData.data;
+                  index as productIndex
+                "
+              >
+                {{ product?.product_name }} - HS CODE-
+                {{ product?.hs_code }}
+              </p> -->
+
+              <p style="padding: 6px 0px">
+                <span style="padding-right: 10px">5.</span>
+                Collect original transport documents from truck driver and
+                courier to us.
+              </p>
+              <p style="padding: 6px 0px">
+                <span style="padding-right: 10px">6.</span>
+                Kindly Pick up Empty Container for
+                <b>
+                  <span *ngIf="freightData?.mode_of_shipment == '2'">
+                    {{ freightData?.number_of_containers }} X
+                  </span>
+                  <span>{{ typeOfContainersString() }}</span>
+                  <!-- <span
+                    *ngFor="let item of freightData.containers; let i = index"
+                  >
+                    <span
+                      *ngIf="
+                        i &&
+                        freightData.containers[i - 1].type_of_container &&
+                        item.type_of_container
+                      "
+                      >,</span
+                    >
+                    {{ item.type_of_container }}
+                  </span> -->
+
+                  // (
+
+                  <span>{{ freightData?.location_stuffing }}</span
+                  >)</b
+                >
+              </p>
+              <p style="padding: 6px 0px">
+                <span style="padding-right: 10px">7.</span>
+                CFS Invoice should be in our name.
+              </p>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding-left: 24px">
+            <p style="padding: 6px 0px">
+              <span style="padding-right: 10px">8.</span>
+              Please mention Bank Name AD Code :
+            </p>
+            <table style="width: 100%; padding-left: 32px">
+              <tr>
+                <td>
+                  <p style="padding-top: 6px">BANK NAME</p>
+                  <p style="height: 40px; padding-top: 6px; font-weight: bold">
+                    FEDERAL BANK
+                  </p>
+                </td>
+                <td>
+                  <p style="padding-top: 6px">A.D. CODE</p>
+                  <p style="height: 40px; padding-top: 6px; font-weight: bold">
+                    6210550
+                  </p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2">
+            <p style="padding: 6px 0px 12px" *ngIf="!isEditing">
+              <b *ngIf="!!!data?.cha_declaration">
+                Please declare commission 12.50% in shipping bill payable to
+                agent in foreign country.
+              </b>
+            </p>
+            <div
+              style="padding: 6px 0px 12px"
+              *ngIf="!isEditing"
+              class="invoice-contact ql-snow ql-editor"
+              [innerHTML]="data?.cha_declaration"
+            ></div>
+            <div *ngIf="isEditing" style="width: 48%">
+              <quill-editor
+                style="min-height: 110px"
+                [(ngModel)]="cha_declaration"
+                class="invoice-contact ql-snow ql-editor"
+                placeholder="Enter Cha Declaration "
+              ></quill-editor>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2">
+            <p style="line-height: 22px">
+              Please declare
+              <b>
+                “We intend to claim rewards under Remission of Duties and Taxes
+                on Exported Products Scheme (RoDTEP)”
+              </b>
+              in shipping Bill.
+            </p>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2">
+            <p style="margin-bottom: 16px">Kindly confirm receipt.</p>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2">
+            <p style="margin: 4px 0px">Thanks & Regards</p>
+            <p>For AAPL Solutions Pvt. Ltd.</p>
+            <p style="padding-top: 40px">Authorised Signatory</p>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div
+      *ngIf="isEditing"
+      class="footer-bottom fxflex"
+      style="padding: 14px; position: absolute; bottom: 0; right: 0"
+      fxLayout="row"
+      fxLayoutAlign="end center"
+    >
+      <span fxFlex></span>
+      <section class="section-right">
+        <button (click)="onEdit()" type="button" mat-button>Cancel</button>
+
+        <button (click)="onEdited()" type="submit" mat-raised-button>
+          Save
+        </button>
+      </section>
+      <div class="cb"></div>
+    </div>
+  </div>
+</div>

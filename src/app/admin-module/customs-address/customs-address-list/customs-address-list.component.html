@@ -1,0 +1,45 @@
+
+
+<div class="center-section-scroll vh-100 d-flex media-list-data holy-grail body-white ">
+	<div class="flex-fixed-header menu-title">
+
+		<h2 style="font-weight: 400;" (click)="backToList()">{{language.defaults.customsAddress}} ({{totalCount}})</h2>
+		<!-- <span class="add-link" (click)="getContact()">
+			<mat-icon>add</mat-icon>Add
+		</span> -->
+		<span class="add-link custom-tooltip import-img" (click)="getContact()" >
+			<img [src]='images.add'>
+			 <span class="tooltiptext">Add</span>
+		  </span>
+	</div>
+	<div class="app-search-container search-small  ">
+		<mat-form-field class="search" floatLabel="never">
+			<input matInput placeholder={{language.defaults.search}} #search (keyup)="searchContacts(search.value, $event)" (blur)="!search.value.length ? open = false : open = true">
+			<mat-icon matPrefix class="org-search">search</mat-icon>
+			<mat-icon matSuffix *ngIf="searching" class="spinner">
+				<mat-spinner class="small-spinner"></mat-spinner>
+			</mat-icon>
+			<mat-icon matSuffix *ngIf="!searching && search.value.length" (click)="search.value = '';searchContacts(search.value)">close</mat-icon>
+		</mat-form-field>
+	</div>
+	<perfect-scrollbar class="flex-scroll-items p-l-8 p-r-8">
+
+		<div class="list-items" infiniteScroll [infiniteScrollDistance]="1" [infiniteScrollThrottle]="50" (scrolled)="onScroll()"
+		[scrollWindow]="false">
+		<mat-spinner class="medium-spinner" *ngIf="fetchingData"></mat-spinner>
+		<mat-list *ngIf="!fetchingData" class="media-list">
+			<mat-list-item @AdminListAnimate *ngFor="let list of contactAddressList" (click)="getContact(list)" [class.active]="list.id === selectedContact.id" class="menu-main-list">
+
+				<div class="media d-flex align-items-center">
+					<div class="media-body " style="padding-left: 2px"><h1 class="font-weight-bold d-block text-nowrap single " title="{{list.customs_office_name}}" >{{list.customs_office_name}}</h1></div></div>
+
+				<!-- <h4 mat-line title="{{list.address1}}" [innerHtml]="list.address1"></h4> -->
+			</mat-list-item>
+			<mat-list-item *ngIf="paginationScroll">{{language.defaults.loading}}</mat-list-item>
+		</mat-list>
+		<div class="search-empty admin-search" *ngIf="noContacts && !fetchingData">{{language.defaults.noContactsFound}}</div>
+	  </div>
+	</perfect-scrollbar>
+	<app-pagination *ngIf="totalCount!=0" [pageLimit]="totalCount" (pageloadMore)="loadMore($event)"></app-pagination>
+
+</div>

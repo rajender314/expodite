@@ -19,7 +19,6 @@ import { trigger, style, transition, animate, keyframes, query, stagger } from '
   selector: 'app-roles-details',
   templateUrl: './roles-details.component.html',
   styleUrls: ['./roles-details.component.scss'],
-  providers: [AdminService, SnakbarService, PermissionsService],
   animations: [
     trigger('AdminDetailsAnimate', [
       transition(':enter', [
@@ -33,6 +32,8 @@ export class RolesDetailsComponent implements OnInit, OnChanges {
   @ViewChild('myInput') inputEl: ElementRef;
   @Input() roles;
   @Output() trigger = new EventEmitter<object>();
+  @Input() isEditPerm = true;
+  @Input() isAddPerm;
   status: Array<object> = [
     { id: 1, value: 'Active', param: true },
     { id: 0, value: 'Inactive', param: false }
@@ -67,12 +68,26 @@ export class RolesDetailsComponent implements OnInit, OnChanges {
   ngOnChanges(changes: { [propKey: string]: SimpleChange }) {
     this.noRoles = false;
     this.fetchingData = true;
+    if(this.roles?.id) {
+      if(this.isEditPerm) {
+        this.detailsForm.enable();
+      } else if(!this.isEditPerm) {
+        this.detailsForm.disable();
+      }
+    } else { 
+      if(this.isAddPerm && this.detailsForm) {
+        this.detailsForm.enable();
+      } else if(!this.isAddPerm && this.detailsForm) {
+        this.detailsForm.disable();
+      }
+    }
+  
     setTimeout(() => {
       this.fetchingData = false;
     }, 300);
     // console.log(this.roles)
     if (this.roles !== undefined) {
-      if (!_.isEmpty(this.roles) && this.roles.id != undefined) {
+      if (!_.isEmpty(this.roles) ) {
         // console.log(this.roles)
 
         this.newRoleAdd = "Update Role"
@@ -94,7 +109,8 @@ export class RolesDetailsComponent implements OnInit, OnChanges {
 
               // console.log(this.adminService.isRoleEditable)
               this.rolePermissions = response.result.data.role_details.roles_permissions;
-              this.setForm(this.selectedRoles);
+
+                         this.setForm(this.selectedRoles);
               this.loadInitials(this.globalPermissions);
             }
           })
@@ -112,11 +128,15 @@ export class RolesDetailsComponent implements OnInit, OnChanges {
     // this.getRoles();
     this.createForm();
     this.getGlobalPermissions();
+    this.adminService.getGlobalPerm().subscribe(res => {
+      this.globalPermissions = res;
+    });
+
+   
   }
   
 
   newRole(flag: boolean): void {
-    console.log("role")
     this.newRoleAdd = "Add Role"
     if (flag) { setTimeout(() => { this.loadInitials(this.globalPermissions); }, 100); }
     this.selectedRoles = {};
@@ -182,6 +202,7 @@ export class RolesDetailsComponent implements OnInit, OnChanges {
   }
 
   createRole(form: any): void {
+    this.adminService.setBlue(true);
     this.detailsSubmit = true;
     let toast: object;
     if (!form.valid)  {return; }
@@ -203,7 +224,9 @@ export class RolesDetailsComponent implements OnInit, OnChanges {
           this.selectedRoles = response.result.data;
           this.trigger.emit({ flag: param.id, data: this.selectedRoles });
           form.markAsPristine();
-          
+          this.adminService.getUserPermissionsApi();
+          this.adminService.getSecondLevelMenus();
+
         }else {
           toast = { msg: response.result.message, status: 'error' };
         }
@@ -233,17 +256,24 @@ export class RolesDetailsComponent implements OnInit, OnChanges {
       status: data.status,
     });
   }
-
   getGlobalPermissions() {
     this.adminService
       .getGlobalPermissions()
       .then(response => {
         if (response.result.success) {
           this.globalPermissions = response.result.data.global_system_permissions;
+          this.adminService.setGlobalPerm(this.globalPermissions);
           // console.log(response)
         }
       })
       .catch(error => console.log(error));
   }
 
+  getUpdatedEvent(ev) {
+    console.log(ev);
+  }
+  public totalChecked = false;
+  check(ev) {
+    this.totalChecked = ev.checked;
+  }
 }

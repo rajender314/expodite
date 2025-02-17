@@ -1,0 +1,99 @@
+<mat-toolbar color="primary">
+  <h2 mat-dialog-title>Upload Files</h2>
+  <span fxFlex></span>
+</mat-toolbar>
+<mat-dialog-content class="import document-upload" style="padding-top: 0;">
+  <form>
+    <div class="image-uploade" [class.not-allowed]="pointerEvent">
+      <div
+        ng2FileDrop
+        [ngClass]="{ 'file-over': hasDropZoneOver }"
+        [uploader]="uploader"
+        (fileOver)="fileOverBase($event)"
+        class="file-drop-zone"
+        (onFileDrop)="fileDrop($event)"
+      >
+        <input
+          type="file"
+          id="import-category"
+          value="description"
+          [uploader]="uploader"
+          ng2FileSelect
+          (change)="fileSelected($event.target.files)"
+          [hidden]="true"
+        />
+        <label for="import-category">
+          <!-- <span class="material-icons" >
+          photo_library 
+          </span> -->
+          <!-- <img [src]='images.dialogs.upload_icon' title="upload"> -->
+          <img src="signatures/assets/images/uploadicon.svg" title="upload" />
+          <p class="drag-drop">
+            Drag & drop files
+            <span style="text-transform: lowercase"
+              >{{ language.defaults.or }}
+            </span>
+            <span
+              class="primary-text-link"
+              style="
+                font-weight: normal;
+                padding: 0;
+                text-decoration: underline;
+              "
+            >
+              {{ language.defaults.browse }}</span
+            >
+          </p>
+          <div *ngIf="selectedFile">
+            <p class="file-name">{{ selectedFile.name }}</p>
+            <p *ngIf="uploadFilestatus && !uploadError" class="upload-success">
+              File Uploaded
+            </p>
+          </div>
+
+          <small class="support-format">(Maximum file size is {{data.formObject.max_file_size}} MB )</small>
+        </label>
+      </div>
+
+      <p *ngIf="uploadError" class="error-msg m_3">{{ uploadErroMsg }}</p>
+      <div *ngIf="isSample">
+        <a href="sampleDownload?type={{ type }}" download class="sample-file">
+          Sample File
+          <span>
+            <img
+              class="sample-img"
+              src="signatures/assets/images/sampleupload.svg"
+              title="sample"
+            />
+          </span>
+        </a>
+      </div>
+      <!-- <a [href]="getFileUrl()" download>Download File</a> -->
+    </div>
+    <!-- <div class="customer_notes">
+      <mat-form-field
+        class="custom-input compny-sub-flx grid-full"
+        floatLabel="never"
+      >
+        <textarea
+          maxlength="250"
+          matInput
+          style="height: 100px"
+          (change)="descriptionvalue($event)"
+          class="customer-notes_text-area"
+          placeholder="Add Description"
+        ></textarea>
+      </mat-form-field>
+    </div> -->
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <span fxFlex></span>
+  <button mat-dialog-close class="back-btn-ui">Cancel</button>
+  <!-- <button
+    mat-raised-button
+    (click)="importFile()"
+  >
+    Save
+  </button> -->
+</mat-dialog-actions>
